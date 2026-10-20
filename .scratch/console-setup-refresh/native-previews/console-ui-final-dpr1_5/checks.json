@@ -1,0 +1,965 @@
+{
+    "allPassed": true,
+    "boundedFocusControls": 30,
+    "captures": [
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 44,
+                "name": "manualAddress",
+                "width": 457,
+                "x": 48,
+                "y": 247
+            },
+            "height": 600,
+            "image": "900x600-manual-form.png",
+            "name": "900x600-manual-form",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "manualAdd",
+                "width": 171,
+                "x": 335,
+                "y": 529
+            },
+            "height": 600,
+            "image": "900x600-manual-form-actions.png",
+            "name": "900x600-manual-form-actions",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "manualBackToConsoles",
+                "width": 197,
+                "x": 308,
+                "y": 394
+            },
+            "height": 600,
+            "image": "900x600-manual-saved-existing.png",
+            "name": "900x600-manual-saved-existing",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "manualBackToConsoles",
+                "width": 197,
+                "x": 308,
+                "y": 375
+            },
+            "height": 600,
+            "image": "900x600-manual-saved-deferred.png",
+            "name": "900x600-manual-saved-deferred",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "manualBackToDetails",
+                "width": 183,
+                "x": 322,
+                "y": 305
+            },
+            "height": 600,
+            "image": "900x600-manual-failure.png",
+            "name": "900x600-manual-failure",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 44,
+                "name": "registrationConsole",
+                "width": 464,
+                "x": 48,
+                "y": 244
+            },
+            "height": 600,
+            "image": "900x600-registration-form.png",
+            "name": "900x600-registration-form",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationSubmit",
+                "width": 195,
+                "x": 317,
+                "y": 522
+            },
+            "height": 600,
+            "image": "900x600-registration-form-actions.png",
+            "name": "900x600-registration-form-actions",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationCloseProgress",
+                "width": 184.640625,
+                "x": 48,
+                "y": 475
+            },
+            "height": 600,
+            "image": "900x600-registration-progress.png",
+            "name": "900x600-registration-progress",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 180,
+                "name": "registrationLogText",
+                "width": 464,
+                "x": 48,
+                "y": 384
+            },
+            "height": 600,
+            "image": "900x600-registration-progress-log.png",
+            "name": "900x600-registration-progress-log",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationDetails",
+                "width": 182.984375,
+                "x": 48,
+                "y": 510
+            },
+            "height": 600,
+            "image": "900x600-registration-failure.png",
+            "name": "900x600-registration-failure",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationDone",
+                "width": 196.234375,
+                "x": 48,
+                "y": 351
+            },
+            "height": 600,
+            "image": "900x600-registration-success.png",
+            "name": "900x600-registration-success",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 44,
+                "name": "manualRegistration",
+                "width": 457,
+                "x": 48,
+                "y": 384
+            },
+            "height": 600,
+            "image": "900x600-private-manual-form.png",
+            "name": "900x600-private-manual-form",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "manualBackToConsoles",
+                "width": 197,
+                "x": 308,
+                "y": 394
+            },
+            "height": 600,
+            "image": "900x600-private-manual-saved.png",
+            "name": "900x600-private-manual-saved",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 44,
+                "name": "registrationAccountId",
+                "width": 464,
+                "x": 48,
+                "y": 289
+            },
+            "height": 600,
+            "image": "900x600-private-registration-form.png",
+            "name": "900x600-private-registration-form",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationCloseProgress",
+                "width": 184.640625,
+                "x": 48,
+                "y": 449
+            },
+            "height": 600,
+            "image": "900x600-private-registration-progress.png",
+            "name": "900x600-private-registration-progress",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationDetails",
+                "width": 182.984375,
+                "x": 48,
+                "y": 344
+            },
+            "height": 600,
+            "image": "900x600-private-registration-failure.png",
+            "name": "900x600-private-registration-failure",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationDone",
+                "width": 196.234375,
+                "x": 48,
+                "y": 325
+            },
+            "height": 600,
+            "image": "900x600-private-registration-success.png",
+            "name": "900x600-private-registration-success",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "addConsoleButton",
+                "width": 133,
+                "x": 745,
+                "y": 39
+            },
+            "height": 600,
+            "image": "900x600-library-return.png",
+            "name": "900x600-library-return",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 900
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 44,
+                "name": "manualAddress",
+                "width": 800,
+                "x": 48,
+                "y": 247
+            },
+            "height": 720,
+            "image": "1280x720-manual-form.png",
+            "name": "1280x720-manual-form",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "manualAdd",
+                "width": 171,
+                "x": 678,
+                "y": 497
+            },
+            "height": 720,
+            "image": "1280x720-manual-form-actions.png",
+            "name": "1280x720-manual-form-actions",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "manualBackToConsoles",
+                "width": 197,
+                "x": 651,
+                "y": 356
+            },
+            "height": 720,
+            "image": "1280x720-manual-saved-existing.png",
+            "name": "1280x720-manual-saved-existing",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "manualBackToConsoles",
+                "width": 197,
+                "x": 651,
+                "y": 356
+            },
+            "height": 720,
+            "image": "1280x720-manual-saved-deferred.png",
+            "name": "1280x720-manual-saved-deferred",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "manualBackToDetails",
+                "width": 183,
+                "x": 665,
+                "y": 286
+            },
+            "height": 720,
+            "image": "1280x720-manual-failure.png",
+            "name": "1280x720-manual-failure",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 44,
+                "name": "registrationConsole",
+                "width": 703,
+                "x": 48,
+                "y": 244
+            },
+            "height": 720,
+            "image": "1280x720-registration-form.png",
+            "name": "1280x720-registration-form",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationSubmit",
+                "width": 195,
+                "x": 556,
+                "y": 642
+            },
+            "height": 720,
+            "image": "1280x720-registration-form-actions.png",
+            "name": "1280x720-registration-form-actions",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationCloseProgress",
+                "width": 184.640625,
+                "x": 48,
+                "y": 460
+            },
+            "height": 720,
+            "image": "1280x720-registration-progress.png",
+            "name": "1280x720-registration-progress",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 180,
+                "name": "registrationLogText",
+                "width": 703,
+                "x": 48,
+                "y": 460
+            },
+            "height": 720,
+            "image": "1280x720-registration-progress-log.png",
+            "name": "1280x720-registration-progress-log",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationDetails",
+                "width": 182.984375,
+                "x": 48,
+                "y": 551
+            },
+            "height": 720,
+            "image": "1280x720-registration-failure.png",
+            "name": "1280x720-registration-failure",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationDone",
+                "width": 196.234375,
+                "x": 48,
+                "y": 336
+            },
+            "height": 720,
+            "image": "1280x720-registration-success.png",
+            "name": "1280x720-registration-success",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 44,
+                "name": "manualRegistration",
+                "width": 800,
+                "x": 48,
+                "y": 368
+            },
+            "height": 720,
+            "image": "1280x720-private-manual-form.png",
+            "name": "1280x720-private-manual-form",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "manualBackToConsoles",
+                "width": 197,
+                "x": 651,
+                "y": 356
+            },
+            "height": 720,
+            "image": "1280x720-private-manual-saved.png",
+            "name": "1280x720-private-manual-saved",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 44,
+                "name": "registrationAccountId",
+                "width": 703,
+                "x": 48,
+                "y": 425
+            },
+            "height": 720,
+            "image": "1280x720-private-registration-form.png",
+            "name": "1280x720-private-registration-form",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationCloseProgress",
+                "width": 184.640625,
+                "x": 48,
+                "y": 434
+            },
+            "height": 720,
+            "image": "1280x720-private-registration-progress.png",
+            "name": "1280x720-private-registration-progress",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationDetails",
+                "width": 182.984375,
+                "x": 48,
+                "y": 329
+            },
+            "height": 720,
+            "image": "1280x720-private-registration-failure.png",
+            "name": "1280x720-private-registration-failure",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationDone",
+                "width": 196.234375,
+                "x": 48,
+                "y": 310
+            },
+            "height": 720,
+            "image": "1280x720-private-registration-success.png",
+            "name": "1280x720-private-registration-success",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "addConsoleButton",
+                "width": 133,
+                "x": 1109,
+                "y": 39
+            },
+            "height": 720,
+            "image": "1280x720-library-return.png",
+            "name": "1280x720-library-return",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        },
+        {
+            "captureMethod": "Production OpenGL QQuickRenderControl framebuffer",
+            "devicePixelRatio": 1.5,
+            "discoveryEnabled": false,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "registrationCloseResult",
+                "width": 61.5,
+                "x": 48,
+                "y": 390
+            },
+            "height": 720,
+            "image": "lifecycle-profile-invalid.png",
+            "name": "lifecycle-profile-invalid",
+            "physicalHeight": 1080,
+            "physicalWidth": 1920,
+            "screenDevicePixelRatio": 1.5,
+            "sessionCreated": false,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+            "truncatedLabels": [
+            ],
+            "visible": true,
+            "width": 1280
+        }
+    ],
+    "controlledAccountSuccessAndCancellationBothRoutes": true,
+    "dismissalOverlapCapturedTargetProfileChangeAndOpenerFocus": true,
+    "emptyListAndManualProfileInvalidation": true,
+    "expectedPhase": "failure",
+    "lastFocus": {
+        "height": 42,
+        "name": "manualBackToDetails",
+        "width": 183,
+        "x": 665,
+        "y": 286
+    },
+    "lastNativeError": "Registration in progress: Wait for the current registration to finish before starting another request.",
+    "limits": [
+        "Controlled transport and account returns; no real pairing or authentication",
+        "Keyboard mappings do not prove physical controller input",
+        "Native registered-host map cannot contain ambiguous duplicate MACs; complete-screen tests cover ambiguity and reorder",
+        "QSettings has no durable disk-write result",
+        "Qt WebEngineQuick unavailable"
+    ],
+    "manualExistingDeferredRemovalRecoveryAndCancel": true,
+    "mouseTabShiftTabDirectionalActivationPopupEscapeAndInputEditing": true,
+    "nativeProgressFailureRetryLateCallbackAndSuccess": true,
+    "observedPhase": "failure",
+    "phase": "1280x720",
+    "recordsAtExit": {
+        "manual": [
+        ],
+        "registered": [
+        ]
+    },
+    "requestedControl": "manualBackToDetails",
+    "revision": "c2e2acef integrated production screens",
+    "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-ui-final-dpr1_5",
+    "streamerFormsSelectorsProgressFailureSuccessAndLogs": true
+}

@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Users/david/.codex/worktrees/console-setup-acceptance/chiaki-ng-ui/build/gui-screen
+Test project C:/Users/david/.codex/worktrees/console-setup-acceptance/chiaki-ng-ui/build/gui-screen
+    Start 1: chiaki-console-screen
+1/1 Test #1: chiaki-console-screen ............   Passed  422.50 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) = 422.51 sec
