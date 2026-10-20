@@ -15,6 +15,7 @@ public slots:
 #ifdef Q_OS_WIN
         QGuiApplication::setFont(QFont("Segoe UI"));
 #endif
+        engine->addImportPath(QStringLiteral(QUICK_TEST_SOURCE_DIR "/../imports"));
         engine->addImageProvider("svg", new QmlSvgProvider());
     }
 };

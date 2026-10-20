@@ -1,0 +1,3 @@
+module org.streetpea.chiaking
+singleton Chiaki 1.0 Chiaki.qml
+ChiakiWindow 1.0 ChiakiWindow.qml

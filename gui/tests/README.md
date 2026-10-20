@@ -142,3 +142,20 @@ PSN authentication, wake, streaming, or physical controller input. Those checks
 need the full application and the relevant hardware or account. Native display
 scaling also needs a separate full-application check. A passing build alone
 does not verify any of these behaviors.
+
+## Settings screen tests
+
+`SettingsHarness.qml` loads the production Settings screen with synthetic
+settings and action handlers. The application uses the native defaults for
+`backend`, `navigation`, and `openExternal`. The test import path and fake
+Chiaki module are available only in the screen-test executable.
+
+Use the harness `settings.changeCount` to observe changed values and
+`settings.actions` or `actions` to inspect dispatched commands. Create a
+harness with `screenActive: false`, set the fixture values, reset the counters,
+and then activate the screen to check construction. Fixture defaults are
+synthetic test inputs, not a copy of the native defaults specification.
+
+`SettingsGeneral` checks category selection, General setting writes, all four
+shortcut choices, device conditions, privacy, log access, popup Escape handling,
+and focus visibility at 1280, 800, and 390 pixels wide.
