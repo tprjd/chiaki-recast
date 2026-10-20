@@ -78,14 +78,27 @@ Rectangle {
             objectName: "consoleName"
             Layout.fillWidth: true
             text: card.consoleName
+            textFormat: Text.PlainText
             font.pixelSize: 20
             font.bold: true
             wrapMode: Text.Wrap
             maximumLineCount: 2
             elide: Text.ElideRight
             Accessible.name: card.consoleName
-            ToolTip.visible: nameHover.hovered
-            ToolTip.text: card.consoleName
+            ToolTip {
+                id: nameToolTip
+                objectName: "consoleNameToolTip"
+                visible: nameHover.hovered
+                text: card.consoleName
+                contentItem: Text {
+                    text: nameToolTip.text
+                    textFormat: Text.PlainText
+                    font: nameToolTip.font
+                    wrapMode: Text.Wrap
+                    color: nameToolTip.Material.foreground
+                    Accessible.name: text
+                }
+            }
             HoverHandler { id: nameHover }
         }
         Label {
@@ -158,7 +171,21 @@ Rectangle {
                 flat: true
                 text: "\u2026"
                 font.pixelSize: 20
-                Accessible.name: qsTr("Actions for %1").arg(card.consoleName)
+                Accessible.name: qsTr("Details for %1").arg(card.consoleName)
+                ToolTip {
+                    id: detailsToolTip
+                    objectName: "consoleDetailsToolTip"
+                    visible: actionsButton.hovered
+                    text: actionsButton.Accessible.name
+                    contentItem: Text {
+                        text: detailsToolTip.text
+                        textFormat: Text.PlainText
+                        font: detailsToolTip.font
+                        wrapMode: Text.Wrap
+                        color: detailsToolTip.Material.foreground
+                        Accessible.name: text
+                    }
+                }
                 firstInFocusChain: true
                 lastInFocusChain: true
                 sendOutput: true

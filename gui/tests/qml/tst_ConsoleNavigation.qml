@@ -169,6 +169,8 @@ TestCase {
         commandSpy.target = screen;
         connectSpy.target = screen;
         mouseClick(findChild(screen, "consoleActionsButton"));
+        tryCompare(findChild(screen, "consoleDetails"), "opened", true);
+        mouseClick(findChild(screen, "consoleManageButton"));
         const menu = findChild(screen, "consoleActionsMenu");
         tryCompare(menu, "opened", true);
         const action = findChild(screen, data.item);
@@ -191,10 +193,18 @@ TestCase {
         commandSpy.target = screen;
         const opener = findChild(screen, "consoleActionsButton");
         mouseClick(opener);
+        const details = findChild(screen, "consoleDetails");
+        tryCompare(details, "opened", true);
+        const manage = findChild(screen, "consoleManageButton");
+        mouseClick(manage);
         const menu = findChild(screen, "consoleActionsMenu");
         tryCompare(menu, "opened", true);
         keyClick(Qt.Key_Escape);
         tryCompare(menu, "opened", false);
+        tryCompare(manage, "activeFocus", true);
+        verify(details.opened);
+        keyClick(Qt.Key_Escape);
+        tryCompare(details, "opened", false);
         tryCompare(opener, "activeFocus", true);
         compare(commandSpy.count, 0);
     }
