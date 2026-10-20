@@ -22,20 +22,6 @@ FocusScope {
     property string profileKey: backend.settings.currentProfile
     readonly property bool privateMode: backend.settings.streamerMode
     readonly property var registeredHosts: backend.settings.registeredHosts
-    component SetupButton: ConsoleButton {
-        id: actionButton
-        topPadding: 10
-        bottomPadding: 10
-        implicitHeight: Math.max(42, contentItem.implicitHeight + topPadding + bottomPadding)
-        contentItem: Text {
-            text: actionButton.text
-            font: actionButton.font
-            color: actionButton.Material.foreground
-            wrapMode: Text.Wrap
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
-    }
     onRegisteredHostsChanged: {
         if (phase !== "saved" && selectionKind === "registered" && registrationIndex() < 0)
             invalidateSelection();
