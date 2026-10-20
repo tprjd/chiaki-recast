@@ -362,8 +362,10 @@ TestCase {
     function test_allControllerPrimaryAndAlternateRoutes() {
         const h = createTemporaryObject(linkedHarnessComponent, testCase, {width: 900, height: 600});
         const mapping = [];
-        for (let i = 0; i < 23; ++i)
-            mapping.push({buttonValue: Math.pow(2, i < 18 ? i : i + 8), buttonName: "Target " + i, physicalButton: ["PRIVATE_PHYSICAL", "PRIVATE_ALTERNATE"]});
+        const nativeIds = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072,
+            67108864, 134217728, 268435456, 536870912, 1073741824];
+        for (let i = 0; i < nativeIds.length; ++i)
+            mapping.push({buttonValue: nativeIds[i], buttonName: "Target " + i, physicalButton: ["PRIVATE_PHYSICAL", "PRIVATE_ALTERNATE"]});
         h.backend.currentControllerMapping = mapping;
         h.settings.changeCount = 0;
         for (const row of mapping) for (let slot = 0; slot < 2; ++slot) {
@@ -556,6 +558,37 @@ TestCase {
         tryCompare(h.pages, "depth", 2);
         tryCompare(findChild(h.pages.currentItem, "placeboColorAdjustmentBrightness"), "activeFocus", true);
         compare(search.text, "");
+    }
+    function test_escapeDuringKeyCaptureOpeningKeepsSettings() {
+        const h = createTemporaryObject(harnessComponent, testCase);
+        h.settings.controllerMapping = [{buttonValue: 1, buttonName: "Cross", keyName: "Existing"}];
+        searchFor(h, "Keyboard key for Cross");
+        mouseClick(findChild(h, "keyMapping1"));
+        const capture = findChild(h, "keyCaptureDialog");
+        verify(capture.visible);
+        verify(!capture.opened, "Escape is sent during the native popup opening transition");
+        keyClick(Qt.Key_Escape);
+        tryCompare(capture, "visible", false);
+        compare(h.actions.filter(action => action.name === "close").length, 0);
+        compare(h.settings.controllerMapping[0].keyName, "Existing");
+        compare(h.settings.actions.filter(action => action.name === "changeControllerKey").length, 0);
+        tryCompare(findChild(h, "keyMapping1"), "activeFocus", true);
+    }
+    function test_keyboardResultsScrollFullyIntoView() {
+        const h = createTemporaryObject(harnessComponent, testCase, {width: 900, height: 600});
+        const search = findChild(h, "settingsSearch");
+        search.text = "Brightness";
+        const results = findChild(h, "settingsSearchResults");
+        verify(results.count > 3);
+        search.forceActiveFocus(Qt.TabFocusReason);
+        for (let index = 0; index < results.count; ++index) keyClick(Qt.Key_Down);
+        compare(results.currentIndex, results.count - 1);
+        tryVerify(function() {
+            const row = results.currentItem;
+            if (!row || !row.activeFocus) return false;
+            const point = row.mapToItem(results, 0, 0);
+            return point.y >= -1 && point.y + row.height <= results.height + 1;
+        }, 5000, "The entire focused result becomes visible after the native list movement settles");
     }
     function test_everyCategoryAndStreamRoute() {
         const h = createTemporaryObject(harnessComponent, testCase);

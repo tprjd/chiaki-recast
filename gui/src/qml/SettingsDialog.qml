@@ -146,7 +146,8 @@ FocusScope {
     }
     function close() { navigation.closeDialog(); }
     Keys.onEscapePressed: {
-        if (searchField.text.length) { searchField.clear(); searchField.forceActiveFocus(); }
+        if (keyDialog.visible) keyDialog.close();
+        else if (searchField.text.length) { searchField.clear(); searchField.forceActiveFocus(); }
         else close();
     }
     StackView.onDeactivating: restoreFocusItem = Window.window.activeFocusItem
