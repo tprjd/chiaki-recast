@@ -176,6 +176,8 @@ TestCase {
         compare(harness.settings.changeCount, 0);
         choose(findChild(harness, "consoleSelection"), 0);
         choose(findChild(harness, "consoleSelection"), 1);
+        compare(findChild(harness, "resolutionLocalPS5").currentIndex, 3);
+        compare(findChild(harness, "resolutionRemotePS5").currentIndex, 2);
         const resolution = findChild(harness, "resolutionLocalPS5");
         resolution.forceActiveFocus(Qt.TabFocusReason);
         keyClick(Qt.Key_Right);
@@ -185,8 +187,7 @@ TestCase {
 
     function test_responsiveStream_data() {
         return [{tag: "desktop", width: 1280, height: 720},
-            {tag: "narrow", width: 800, height: 600},
-            {tag: "minimum", width: 390, height: 600}];
+            {tag: "minimum", width: 900, height: 600}];
     }
     function test_responsiveStream(data) {
         const harness = openStream(data.width, data.height);

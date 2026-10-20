@@ -803,11 +803,7 @@ FocusScope {
                                         Layout.fillWidth: true
                                         Layout.minimumWidth: 0
                                         font.pixelSize: 14
-                                        model: route.ps5
-                                            ? (route.index === 0
-                                                ? [qsTr("360p"), qsTr("540p"), qsTr("720p"), qsTr("1080p (Default)")]
-                                                : [qsTr("360p"), qsTr("540p"), qsTr("720p (Default)"), qsTr("1080p")])
-                                            : [qsTr("360p"), qsTr("540p"), qsTr("720p (Default)"), qsTr("1080p (PS5 and PS4 Pro)")]
+                                        model: [qsTr("360p"), qsTr("540p"), qsTr("720p"), qsTr("1080p")]
                                         currentIndex: dialog.backend.settings["resolution" + route.suffix] - 1
                                         onActivated: index => {
                                             dialog.backend.settings["resolution" + route.suffix] = index + 1;
@@ -818,6 +814,14 @@ FocusScope {
                                         KeyNavigation.down: fps
                                         KeyNavigation.left: route.index === 1 && route.peer ? route.peer.resolutionControl : null
                                         KeyNavigation.right: route.index === 0 && route.peer ? route.peer.resolutionControl : null
+                                    }
+                                    Label {
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        opacity: 0.65
+                                        text: !route.ps5 ? qsTr("Default: 720p. 1080p requires PS4 Pro.")
+                                            : route.index === 0 ? qsTr("Default: 1080p") : qsTr("Default: 720p")
                                     }
                                     Label { text: qsTr("Frame rate"); font.pixelSize: 14 }
                                     C.ComboBox {
