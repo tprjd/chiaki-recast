@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import org.streetpea.chiaking
 import "controls" as C
+import "SettingsSearch.js" as Search
 
 DialogView {
     enum GamutMappingFunction {
@@ -36,6 +37,14 @@ DialogView {
     objectName: "placeboColorMappingDialog"
     property var backend: Chiaki
     property var navigation: root
+    property var searchRoute: null
+    function revealSetting(route) { Search.reveal(dialog, route, "color", "placeboGamutMappingFunction"); }
+    StackView.onActivated: Qt.callLater(function() {
+        if (!searchRoute) return;
+        const route = searchRoute;
+        searchRoute = null;
+        revealSetting(route);
+    })
     property int currentSection: 0
     title: qsTr("Color Mapping settings")
     header: ""
