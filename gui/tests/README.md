@@ -169,8 +169,9 @@ and requires the delayed identity check in ticket 06.
 
 `selectedIdentity` is the selected console. `selectedTarget` resolves its
 current host, source index, and nickname. `moveSelection(offset)` moves through
-visible cards and terminates with an empty list. `restoreCardFocus(identity)`
-focuses that console's primary action, a remaining card, or Add console.
+visible, resolvable cards and terminates with an empty list.
+`restoreCardFocus(identity)` focuses that console's primary action, a remaining
+resolvable card, or Add console.
 
 `ConsoleCard.qml` owns only the card appearance and its focusable controls.
 It accepts `host`, `streamerMode`, `selected`, and `targetEnabled`.
@@ -182,6 +183,7 @@ The card's ellipsis opens `ConsoleDetails.qml` without a connection request.
 The popup shows available address, ID, registration, route, app, and title ID
 fields. ID uses the MAC when available and otherwise the PSN DUID. Missing
 fields have no row. Long details scroll while Close remains visible.
+Host names, details fields, and card tooltips use plain text.
 
 Details resolve their saved identity against the current full host list.
 Rename and reorder update the popup. Removal, hidden entries, duplicate
@@ -193,7 +195,7 @@ the menu first and returns focus to Manage. A management action closes both
 popups before its command runs. Ticket 06 replaces this temporary management
 route and completes delayed PIN target checks.
 
-Search and counts belong in `ConsoleLibrary.qml`, including `libraryToolbar`
+Search and counts are in `ConsoleLibrary.qml`, including `libraryToolbar`
 and the footer after the card grid. Details use
 `ConsoleCard.actionsRequested(opener)`. Both features resolve identities
 against the full `hosts` list.
@@ -236,3 +238,51 @@ The screen test observes commands without a network session. Full-application
 verification, console hardware, PSN accounts, physical controllers, and
 Windows display scaling remain outside this ticket's checks. The existing
 management menu remains available through Manage until ticket 06 replaces it.
+
+After the search integration, all 106 screen checks and CTest passed. The added
+plain-text regression first detected a rendered hyperlink in a console name.
+It now checks literal names, app text, and tooltips through their rendered
+link behavior and accessible text.
+
+## Search and live selection API
+
+`searchText` is the search field's text. `visibleHosts` excludes records with
+`display: false`. `displayedHosts` applies search to that visible list without
+changing backend order or source indices.
+
+Search matches every space-separated word against the displayed name and the
+known console type. It ignores case and extra spaces. Known types include
+PS4, PS5, PlayStation 4, and PlayStation 5. A missing type has no type keyword.
+Streamer mode searches the masked name when an address is the name.
+
+The footer shows the visible total and the filtered count during search.
+The empty screen offers Add console, Enable discovery, or Clear search for
+its current state. Clear search also returns focus to the search field.
+
+Selection retains its identity after reorder or rename when the console still
+matches. A removed, filtered, or ambiguous target selects the first remaining
+resolvable card, or clears selection. Profile changes invalidate old identities.
+Normal text editing stays active during host updates, with the same cursor
+position and focus. Enter does not connect a console from search. Escape clears
+nonempty search first, then uses the existing Quit request for empty search.
+Tab and Shift+Tab use normal focus navigation.
+
+The grid derives card width from the viewport column count. One or two results
+keep their normal card width, left alignment, and 18-pixel gap.
+
+## Search results, 2026-10-20
+
+The MSVC 19.44 and Qt 6.9.3 screen target built successfully. CTest passed.
+The complete suite reported 89 passed checks with no failures or skipped checks.
+The new search checks use `qml/tst_ConsoleSearch.qml` and the production screen.
+
+The name and type filters, counts, empty-state actions, selection after filter,
+editing keys, Escape, Tab navigation, and partial-row geometry failed before
+their corresponding changes. Checks also cover live reorder and removal,
+profile changes, all-hidden lists, missing or ambiguous identities, streamer
+mode, empty navigation, and narrow empty-state bounds.
+
+Offscreen renders at 1280 by 720 and 800 by 600 confirmed the filtered card
+width, search field, count labels, and no-match action. Full application launch,
+hardware connections, physical controllers, and Windows display scaling remain
+for integration verification.
