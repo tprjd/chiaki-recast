@@ -99,16 +99,14 @@ TestCase {
         compare(request.pin, "00123456");
         compare(request.consolePin, "0042");
         compare(request.broadcast, true);
-        const log = findChild(harness, "registrationLog");
-        tryCompare(log, "visible", true);
-        tryVerify(() => findChild(harness, "registrationLogText").activeFocus);
+        tryCompare(field(harness, "Progress"), "visible", true);
+        tryVerify(() => field(harness, "CloseProgress").activeFocus);
         harness.backend.callback("controlled diagnostic", true, false);
         compare(findChild(harness, "registrationLogText").text, "controlled diagnostic\n");
         harness.backend.callback("", true, true);
-        compare(log.standardButtons, Dialog.Close);
-        keyClick(Qt.Key_Return);
-        tryCompare(log, "visible", false);
-        compare(harness.actions[0].name, "close");
+        tryCompare(field(harness, "Success"), "visible", true);
+        activate(field(harness, "Done"));
+        compare(harness.actions[0].name, "consoles");
         compare(harness.backend.requests.length, 1);
     }
     function test_hostnameAndOptionalPin() {
@@ -119,7 +117,7 @@ TestCase {
         compare(harness.backend.requests[0].host, "games.example");
         compare(harness.backend.requests[0].broadcast, false);
         compare(harness.backend.requests[0].consolePin, "");
-        tryVerify(() => findChild(harness, "registrationLogText").activeFocus);
+        tryVerify(() => field(harness, "CloseProgress").activeFocus);
         keyClick(Qt.Key_Escape);
         tryVerify(() => harness.actions.length > 0);
         compare(harness.actions[0].name, "close");
@@ -151,6 +149,8 @@ TestCase {
         verify(!findChild(harness, "registrationLog").visible);
         verify(field(harness, "Submit").enabled);
         verify(field(harness, "Error").text.indexOf("eight bytes encoded as Base64") >= 0);
+        harness.backend.callback("late rejected request", true, true);
+        verify(field(harness, "Submit").visible);
         enter(field(harness, "AccountId"), "fixed account");
         compare(field(harness, "AccountId").text, "fixed account");
     }

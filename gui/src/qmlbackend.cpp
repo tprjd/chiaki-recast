@@ -31,6 +31,7 @@
 #include <QProcessEnvironment>
 #include <QDesktopServices>
 #include <QtConcurrent>
+#include <memory>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -102,11 +103,15 @@ static void msg_handler(QtMsgType type, const QMessageLogContext &context, const
     chiaki_log(chiaki_log_ctx, chiaki_level, "%s", qPrintable(msg));
 }
 
-QmlRegist::QmlRegist(const ChiakiRegistInfo &regist_info, uint32_t log_mask, QObject *parent)
+QmlRegist::QmlRegist(uint32_t log_mask, QObject *parent)
     : QObject(parent)
 {
     chiaki_log_init(&chiaki_log, log_mask, &QmlRegist::log_cb, this);
-    chiaki_regist_start(&chiaki_regist, &chiaki_log, &regist_info, &QmlRegist::regist_cb, this);
+}
+
+ChiakiErrorCode QmlRegist::start(const ChiakiRegistInfo &regist_info)
+{
+    return chiaki_regist_start(&chiaki_regist, &chiaki_log, &regist_info, &QmlRegist::regist_cb, this);
 }
 
 void QmlRegist::log_cb(ChiakiLogLevel level, const char *msg, void *user)
@@ -426,6 +431,7 @@ QList<QmlController*> QmlBackend::qmlControllers() const
 
 void QmlBackend::profileChanged()
 {
+    ++profile_generation;
     QString profile = settings->GetCurrentProfile();
     Settings *settings_copy = new Settings(profile);
     if(settings_allocd)
@@ -1195,8 +1201,24 @@ QVariantList QmlBackend::hiddenHosts() const
 }
 
 
-bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QJSValue &callback)
+QVariantMap QmlBackend::createRegistrationContext() const
 {
+    return {{"profileGeneration", QVariant::fromValue(profile_generation)},
+        {"discovered", false}, {"manualId", -1}, {"manualAddress", QString()}};
+}
+
+bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QJSValue &callback, const QVariantMap &context)
+{
+    if(!context.contains("profileGeneration") || context.value("profileGeneration").toULongLong() != profile_generation)
+    {
+        emit error(tr("Profile changed"), tr("Close this screen and open registration again for the current profile."));
+        return false;
+    }
+    if(registration_active)
+    {
+        emit error(tr("Registration in progress"), tr("Wait for the current registration to finish before starting another request."));
+        return false;
+    }
     ChiakiRegistInfo info = {};
     QByteArray hostb = host.toUtf8();
     info.host = hostb.constData();
@@ -1219,34 +1241,72 @@ bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const 
         info.psn_online_id = nullptr;
         memcpy(info.psn_account_id, account_id.constData(), CHIAKI_PSN_ACCOUNT_ID_SIZE);
     }
-    auto regist = new QmlRegist(info, settings->GetLogLevelMask(), this);
-    connect(regist, &QmlRegist::log, this, [callback](ChiakiLogLevel level, QString msg) {
+    auto regist = new QmlRegist(settings->GetLogLevelMask(), this);
+    auto completed = std::make_shared<bool>(false);
+    const auto generation = profile_generation;
+    registration_active = true;
+    connect(regist, &QmlRegist::log, this, [callback, completed](ChiakiLogLevel level, QString msg) {
+        if(*completed)
+            return;
         QJSValue cb = callback;
         if (cb.isCallable())
             cb.call({QString("[%1] %2").arg(chiaki_log_level_char(level)).arg(msg), true, false});
     });
-    connect(regist, &QmlRegist::failed, this, [this, callback]() {
+    connect(regist, &QmlRegist::failed, this, [this, callback, completed, generation]() {
+        if(*completed)
+            return;
+        *completed = true;
+        registration_active = false;
         QJSValue cb = callback;
         if (cb.isCallable())
-            cb.call({QString(), false, true});
-
-        regist_dialog_server = {};
+            cb.call({generation == profile_generation ? QString() : tr("The profile changed. The registration was not saved."), false, true});
     });
-    connect(regist, &QmlRegist::success, this, [this, host, callback](const RegisteredHost &rhost) {
-        QJSValue cb = callback;
-        if (cb.isCallable())
-            cb.call({QString(), true, true});
-
-        settings->AddRegisteredHost(rhost);
-        if(regist_dialog_server.discovered == false)
+    connect(regist, &QmlRegist::success, this, [this, host, callback, context, generation, completed](const RegisteredHost &rhost) {
+        if(*completed)
+            return;
+        *completed = true;
+        QString completion_error;
+        if(generation != profile_generation)
+            completion_error = tr("The profile changed. The registration was not saved.");
+        const int manual_id = context.value("manualId").toInt();
+        const QString address = context.value("manualAddress").toString();
+        const auto manual_target_valid = [this, manual_id, address] {
+            return manual_id < 0 || (settings->GetManualHostExists(manual_id)
+                && settings->GetManualHost(manual_id).GetHost() == address);
+        };
+        if(completion_error.isEmpty() && !context.value("discovered").toBool() && !manual_target_valid())
+            completion_error = tr("The original console address changed or was removed. Open registration again.");
+        if(completion_error.isEmpty())
         {
-            ManualHost manual_host = regist_dialog_server.manual_host;
-            if(manual_host.GetHost().isEmpty())
-                manual_host.SetHost(host);
-            manual_host.Register(rhost);
-            settings->SetManualHost(manual_host);
+            settings->AddRegisteredHost(rhost);
+            if(generation != profile_generation)
+                completion_error = tr("The profile changed during the update. Check the original profile before trying again.");
+            else if(!context.value("discovered").toBool())
+            {
+                if(!manual_target_valid())
+                    completion_error = tr("The console address changed during the update. Check registration before trying again.");
+                else
+                {
+                    ManualHost manual_host(manual_id, address.isEmpty() ? host : address, false, {});
+                    manual_host.Register(rhost);
+                    settings->SetManualHost(manual_host);
+                }
+            }
         }
+        registration_active = false;
+        QJSValue cb = callback;
+        if(cb.isCallable())
+            cb.call({completion_error, completion_error.isEmpty(), true});
     });
+    const auto err = regist->start(info);
+    if(err != CHIAKI_ERR_SUCCESS)
+    {
+        *completed = true;
+        registration_active = false;
+        regist->deleteLater();
+        emit error(tr("Registration did not start"), QString::fromUtf8(chiaki_error_string(err)));
+        return false;
+    }
     return true;
 }
 
@@ -1359,7 +1419,14 @@ void QmlBackend::connectToHost(int index, QString nickname)
 
     if (!server.registered) {
         regist_dialog_server = server;
-        emit registDialogRequested(server.GetHostAddr(), server.IsPS5(), server.duid);
+        auto context = createRegistrationContext();
+        context["discovered"] = server.discovered;
+        if(!server.discovered)
+        {
+            context["manualId"] = server.manual_host.GetID();
+            context["manualAddress"] = server.manual_host.GetHost();
+        }
+        emit registDialogRequested(server.GetHostAddr(), server.IsPS5(), server.duid, context);
         return;
     }
 
