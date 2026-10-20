@@ -1,0 +1,667 @@
+{
+  "productionRevision": "a19f26f1b24844cbc2b050957e9b511b66a3093a",
+  "allStagedGuiFilesMatch": true,
+  "qaHooksRemoved": true,
+  "files": [
+    {
+      "file": "gui/CMakeLists.txt",
+      "sha256": "0b06606424de29c1166518a4aecfd5c232292370c186497e0562797b77d00c2e"
+    },
+    {
+      "file": "gui/MacOSXBundleInfo.plist.in",
+      "sha256": "ffbad8a2e4c7dd6c26968110b040d9327cea01313b615d6e21cb63b9244e03d1"
+    },
+    {
+      "file": "gui/chiaki.icns",
+      "sha256": "a8c383c1e5395ea5bf1dff37743090e85c72640ff1eb6e95849778b429a65ca8"
+    },
+    {
+      "file": "gui/chiaki.png",
+      "sha256": "fe637b3062727a51cf232840234163508b69711233226873c6814f4c12fa08fe"
+    },
+    {
+      "file": "gui/chiaki4deck.icns",
+      "sha256": "b42cbfd72c5620225f03c65ff19fb16f3190f2fca55ac8aed5b7fcb70e19c2f3"
+    },
+    {
+      "file": "gui/chiaki4deck.ico",
+      "sha256": "b7cb04ae544bf280b6586b7de0c5f729ac87c0c6d26bd7a0ecb74f5d681039bb"
+    },
+    {
+      "file": "gui/chiaki4deck.png",
+      "sha256": "850e8c682527168b4a701b644bcf1c1ae59f6a35dc70feeae0e456e4fcd672bb"
+    },
+    {
+      "file": "gui/chiaki4deck.rc",
+      "sha256": "0de01cb64de1501f7c7cd10f7c2e218b376b1482e2d8fddd5fd3d578a1565675"
+    },
+    {
+      "file": "gui/chiaking.desktop",
+      "sha256": "6c7e4198aefa1a053d5504cdb7b4bdae13f15ea973d23a7ebae8408e700297c5"
+    },
+    {
+      "file": "gui/chiaking.icns",
+      "sha256": "3f41a135d48f081d0e60d99c8d48541820faa79b074560bffa1bbc8b85a612ff"
+    },
+    {
+      "file": "gui/chiaking.ico",
+      "sha256": "3732a99d16189776ac43f8277cdfb473bf6fc851320b83126400e7cc42e7c62b"
+    },
+    {
+      "file": "gui/chiaking.png",
+      "sha256": "d85b742963d4c093e6b935a7cedaba0e7caa9531e3c351be59132e6e36cb37c2"
+    },
+    {
+      "file": "gui/chiaking.rc.in",
+      "sha256": "0bdfa660697d3d6e560993a440797739f5d15e86688b896d9aac1f15cddcad72"
+    },
+    {
+      "file": "gui/entitlements.xml",
+      "sha256": "bdd39ce0ce34669e92e8789fb96eb5bd559d828af8f0e5a014d291a76c82cc85"
+    },
+    {
+      "file": "gui/include/avwidget.h",
+      "sha256": "28ba6d5c649f6575e1f7b84ed7c0a9930a0ee3db8aafc673f2769f278a1c0461"
+    },
+    {
+      "file": "gui/include/controllermanager.h",
+      "sha256": "2292586038db5b6e8486c4a4e8cb15d437b13ac98a03074e68dc63a29d35464c"
+    },
+    {
+      "file": "gui/include/discoverymanager.h",
+      "sha256": "5bb693b868dffbac6b576feb6ec09048aa5591b4ef565f3bc23abdbeb37fbf29"
+    },
+    {
+      "file": "gui/include/exception.h",
+      "sha256": "547f237e75a3922c781df89e5d32636f974c0a2481f88dc62024ec5f85fbd8f7"
+    },
+    {
+      "file": "gui/include/host.h",
+      "sha256": "117f428836b2c9a969697be020fe395feb5ef1223308dc58200e5fea5fb79c05"
+    },
+    {
+      "file": "gui/include/jsonrequester.h",
+      "sha256": "35ea1e3a1c3c44ab614399a8749ab19a31ebd05df3554fc25e017d6d387312c8"
+    },
+    {
+      "file": "gui/include/logsniffer.h",
+      "sha256": "37cfe22aa60152de8a1a573bd12490035646b2e4c5069c30e3733d3eb74d8642"
+    },
+    {
+      "file": "gui/include/macMicPermission.h",
+      "sha256": "04778d987e41d3f59ac8a3d5a1750cc47ea9012a99039c95dce910e545ae8b2b"
+    },
+    {
+      "file": "gui/include/macWakeSleep.h",
+      "sha256": "41d693ee0d943aca4f46b7d1f702a4043d03f592b28f7c7160c855bf9cf0fb46"
+    },
+    {
+      "file": "gui/include/psnaccountid.h",
+      "sha256": "11540820f12bea0d17e191d1ab2eed5b1d8c2d9f2e27a91812137d598ec8d9ae"
+    },
+    {
+      "file": "gui/include/psntoken.h",
+      "sha256": "be4904cdc87330293fc05582c8f06ef754bac4d026d528a37d8165f2968e683d"
+    },
+    {
+      "file": "gui/include/qmlbackend.h",
+      "sha256": "ba9dad2286f55e4bba07315f7bb69da66b7372cfdda4d0e3880473d06636816b"
+    },
+    {
+      "file": "gui/include/qmlcontroller.h",
+      "sha256": "959a2b1ba48df93036d24fba81857e867e0edcf922a01a3ff18117aebcf70357"
+    },
+    {
+      "file": "gui/include/qmlmainwindow.h",
+      "sha256": "ba7f6ed066ebab97504e3de9cce9aa1dcaea42e038abf07a84ad91c875ba9dd8"
+    },
+    {
+      "file": "gui/include/qmlsettings.h",
+      "sha256": "df54fee131345f1c4a2166df14f31383aae63758d4cda07d0237709627c37d85"
+    },
+    {
+      "file": "gui/include/qmlsvgprovider.h",
+      "sha256": "90aa7aac7f135dc677632db0d3ea4497ba5575fc4a971d55496ab8b9ff5c63fc"
+    },
+    {
+      "file": "gui/include/sdinput.json",
+      "sha256": "1967679bdc0f0c3379a88cdfa5b6e408ae3757505c691ced7cd05b66baa10569"
+    },
+    {
+      "file": "gui/include/sdinputcontext.h",
+      "sha256": "ddb1f3ce27f47bd0d78524e495d8db76f9b169cb94e3f020a8c0694d733b140e"
+    },
+    {
+      "file": "gui/include/sessionlog.h",
+      "sha256": "22def72173a6340b98e23ac9bf42844cff88802be5034bea3255fcaf8aea15ee"
+    },
+    {
+      "file": "gui/include/settings.h",
+      "sha256": "d4a8358b65bd678fb2e7cb9e9d6971c3e6d3520c3fb12ac0f66406988578f38c"
+    },
+    {
+      "file": "gui/include/streamsession.h",
+      "sha256": "81160710eab43709dd3c4f76608f76f48e40eed98f8514d0e2f920927b79e5f8"
+    },
+    {
+      "file": "gui/include/systemdinhibit.h",
+      "sha256": "754323b67b1e1701b5400dc66bd7a09fc3700037bac3bb0f20f254afce6107be"
+    },
+    {
+      "file": "gui/include/windowsWakeSleep.h",
+      "sha256": "5a03b232facb4bb4029a97588423bcb772502ab1553d7e0185f0e95639c7ec15"
+    },
+    {
+      "file": "gui/io.github.streetpea.Chiaki4deck.appdata.xml",
+      "sha256": "9d9fdde29d10d1642116c2fa300ac3cd0b2f469b1c42a0e45bc1bcd289e8ba71"
+    },
+    {
+      "file": "gui/prototype/console-setup/index.html",
+      "sha256": "20071a6a43745b413c00d142312e267475342cab432fd9af128ba19c519a1f2f"
+    },
+    {
+      "file": "gui/prototype/console-setup/setup.css",
+      "sha256": "808897fbf109c2c2a4351f0d64338836e6bf069dcc4ae8fa13c007ae655913c2"
+    },
+    {
+      "file": "gui/prototype/console-setup/setup.js",
+      "sha256": "d773a318848c761435ad3a5a128df92fd48fc447e0ea3eba4b9b66d0a6a3addb"
+    },
+    {
+      "file": "gui/res/add-24px.svg",
+      "sha256": "0f9c3aeb08f6c1b737a0c5d71f99807f2b8c27bf938ff9801095403db0b6a3fb"
+    },
+    {
+      "file": "gui/res/arrow-right-24px.svg",
+      "sha256": "3bb0bf02eb87eb8f376ac97252bc5f1c7caaac85bcf1d61c226efd2ade53d3cd"
+    },
+    {
+      "file": "gui/res/buttons-deck.svg",
+      "sha256": "2cdc160b29f273aa31f6db636ccefc05f17606a10f4ea952be903d9172369e73"
+    },
+    {
+      "file": "gui/res/buttons-ps.svg",
+      "sha256": "e86dc3433d7cc3dde6561be8ac0fe46d2d5a3be46f129b3c36d02b1d8d5d1bf7"
+    },
+    {
+      "file": "gui/res/chiaki.svg",
+      "sha256": "287894f55429f6ff4f1e7a9a82097ca679826ffc20ea6d65b1784c0389665499"
+    },
+    {
+      "file": "gui/res/chiaki4deck.svg",
+      "sha256": "0b13245833c4007735db7f10c452e8d48d73326cd928b0aed1a9f61ea86f05d2"
+    },
+    {
+      "file": "gui/res/chiaki_macos.svg",
+      "sha256": "84c83a6c9aa457cf7b7d89baeee508bfae11cf9adf840edc5cc76f1b157feb9b"
+    },
+    {
+      "file": "gui/res/chiaking-logo-white.svg",
+      "sha256": "e5a088049809db3e61624ca3eefd94a8d1df81c619708aed0559a26f99370d59"
+    },
+    {
+      "file": "gui/res/chiaking-logo.svg",
+      "sha256": "b8c4d80a2012086655365f5c7ba3e1f3c85a29a5072d52f9232efc43dd7aeaf2"
+    },
+    {
+      "file": "gui/res/chiaking.svg",
+      "sha256": "48229ecdfedc671eca564ee4aadbabb8eaf3d3a875842f654f12a822f895248c"
+    },
+    {
+      "file": "gui/res/chiaking_macos.svg",
+      "sha256": "e4e5e8a3fa381b0741f381204b4ff5cc9ea39c33cc614def3c5078cf1b515cbe"
+    },
+    {
+      "file": "gui/res/close-24px.svg",
+      "sha256": "f09698af06ea9142bbc384b3ffacee473e303ea6f79a9af763fc8ddde9938704"
+    },
+    {
+      "file": "gui/res/console-ps4.svg",
+      "sha256": "1208212ec98eee24166d40d71766177b83c09d02ea540de1578e99fa59455a47"
+    },
+    {
+      "file": "gui/res/console-ps5.svg",
+      "sha256": "db28857dcc12053736e86254db0e24a5f3485b1ddd02141b891dc42595a04dfb"
+    },
+    {
+      "file": "gui/res/discover-24px.svg",
+      "sha256": "2805513c42bf707a95af7d034eb865efb3aeff5463175ef02dacfa3a5339389a"
+    },
+    {
+      "file": "gui/res/discover-off-24px.svg",
+      "sha256": "730912ad27e9b0b203ce1726b2f762a436dc88fb9de4cd56b56d3e7b2d837dee"
+    },
+    {
+      "file": "gui/res/l1.svg",
+      "sha256": "f3ef83cd44533b4247da74d7b061e9acab7ddf5e17aa935f0ccb8e91d69eab3c"
+    },
+    {
+      "file": "gui/res/l3.svg",
+      "sha256": "fc44c4a1d65f26f1025a4b2ec5c9a77cfe9d104e45c658c9f8c6bbd9642a892f"
+    },
+    {
+      "file": "gui/res/more-24px.svg",
+      "sha256": "d527aba75260ddf83a7fd4476136b9af22594309e9c71e5cecf710216c2fc442"
+    },
+    {
+      "file": "gui/res/options.svg",
+      "sha256": "1ad50297b208378b8ecc59b0b09162a34f72b8e47c4b28b6c734fed1c8797b4b"
+    },
+    {
+      "file": "gui/res/r1.svg",
+      "sha256": "e1a19749652a403aa6538a2f2a7812631c384e9ead07c986ec56898a45909318"
+    },
+    {
+      "file": "gui/res/r3.svg",
+      "sha256": "081090428a8263bbf3259bae9bb8722e6f2a1e8bfe6b30f3759ad3686b141e86"
+    },
+    {
+      "file": "gui/res/resources.qrc",
+      "sha256": "3a8ea2c34b570850a6f73fac1cb4fb69806ef192dbedabb44773da8830c45c61"
+    },
+    {
+      "file": "gui/res/search-24px.svg",
+      "sha256": "f7fdca9fdd93c0624dcfa6e2f64b2a5c7b78f1d60145a165d2b9781f09788490"
+    },
+    {
+      "file": "gui/res/settings-20px.svg",
+      "sha256": "9612037446e0413c2cd043a0d4bb633d973d75941378cf809275e5cddad83d79"
+    },
+    {
+      "file": "gui/res/shaders/FSR.glsl",
+      "sha256": "da0ef900341515d35993d90f5f5f01e3df45f9148615e725a783488198ede675"
+    },
+    {
+      "file": "gui/res/shaders/FSRCNNX_x2_16-0-4-1.glsl",
+      "sha256": "3fad74dff41e7600f5e447e434dbc72f860677e5d4654d4e029129fd5ea834eb"
+    },
+    {
+      "file": "gui/res/shaders/FSRCNNX_x2_8-0-4-1.glsl",
+      "sha256": "05990107059591be7c9e52c868055e47aec4a67650ac0c0eef4abf6248b70dd8"
+    },
+    {
+      "file": "gui/res/steam_hero.png",
+      "sha256": "b7633e7d9013114004361a92186b0abebe94fc8fbed52493b5e9dc73183522ee"
+    },
+    {
+      "file": "gui/res/steam_icon.png",
+      "sha256": "c5f5f0b1d670ea60f8b86a2e8ad1371527c4571d22b2a8fff1fee2b145f1329d"
+    },
+    {
+      "file": "gui/res/steam_landscape.png",
+      "sha256": "4966ffe6fc8117ba66f9a2d7952c424f2152f67c366f0072560821e6a3629e18"
+    },
+    {
+      "file": "gui/res/steam_logo.png",
+      "sha256": "5b63c1f40f31dc09dc06eb2ecf4025fbee5bc059f443670fa711364a96ad6070"
+    },
+    {
+      "file": "gui/res/steam_portrait.png",
+      "sha256": "1512335f8119708dc3c8ea8fc622fc89c6e0c2fbf1150519f172fa4c0b0b5da2"
+    },
+    {
+      "file": "gui/src/controllermanager.cpp",
+      "sha256": "93ee146c72bc402f7514e4f11fc44378f83646042f79d8d1aa126b4f072581a1"
+    },
+    {
+      "file": "gui/src/discoverymanager.cpp",
+      "sha256": "20b65fec2eeba920fcc727d0b0dbbb8b388455c93cbd6bb920f09c025a543baa"
+    },
+    {
+      "file": "gui/src/host.cpp",
+      "sha256": "9fb40d3ee6070a5fdac92523bc1a22adb634509cb9ebb6b52cfadf35b2aee205"
+    },
+    {
+      "file": "gui/src/jsonrequester.cpp",
+      "sha256": "6358f6688da6521075c7efdc8f8f266ec13da7ee9ae466c202c44f24fb69e4f1"
+    },
+    {
+      "file": "gui/src/libav_impl.c",
+      "sha256": "8941ea35857c2e0c332db220066411f7cbd3fe948483a8b0670d5e0087b53599"
+    },
+    {
+      "file": "gui/src/macMicPermission.m",
+      "sha256": "ac0cb4eaf4ec8373fb16f549a71394d423541bd7329a50945bd1acc6d3499a91"
+    },
+    {
+      "file": "gui/src/macWakeSleep.cpp",
+      "sha256": "19ce0dcd54367cee22c0ca05fbd35d94ea54f2af7f197a577390a948a1ee32c4"
+    },
+    {
+      "file": "gui/src/main.cpp",
+      "sha256": "8ab73edc06b58f874e63b0c9957777f6549c2893f60be1c7927f8b13129b9a4f"
+    },
+    {
+      "file": "gui/src/psnaccountid.cpp",
+      "sha256": "19a78ead7143a4f6bc450ac590956e36d87e307be33ec70932affe5c31beed53"
+    },
+    {
+      "file": "gui/src/psntoken.cpp",
+      "sha256": "8c338e51d42fcc8b5f275e4a7798528287ae8b3bc4e2725a9215cae6d95c6636"
+    },
+    {
+      "file": "gui/src/qml/AutoConnectView.qml",
+      "sha256": "0de0ff5b8dca74a728b4c941bf3ed23837a406211ada449e8130f721a6dfff27"
+    },
+    {
+      "file": "gui/src/qml/ConfirmDialog.qml",
+      "sha256": "87a65a9065176fb86b55ef42eda157f9e7dee8addb282297a4b3a1429b33220c"
+    },
+    {
+      "file": "gui/src/qml/ConsoleButton.qml",
+      "sha256": "7bf8a1aae6800125669ff11a06167efc1dcb9b5e7a02e508e18db087909d5f68"
+    },
+    {
+      "file": "gui/src/qml/ConsoleCard.qml",
+      "sha256": "1f9dbfd2eba81743d68c3f85e9e03f9f0fb8cded7c0a583a6102e1ab52a86a20"
+    },
+    {
+      "file": "gui/src/qml/ConsoleDetails.qml",
+      "sha256": "6efdf3dcc14969d1684c92e52c61ecc630178056dac0c0e2b85a6881de3a2952"
+    },
+    {
+      "file": "gui/src/qml/ConsoleLibrary.qml",
+      "sha256": "9ca085946ba5b021add8a7916e025358612501399088c1d127572500446aee39"
+    },
+    {
+      "file": "gui/src/qml/ConsolePinDialog.qml",
+      "sha256": "848bc9516256f3839df6bdbb040743b3db49ea8a38941c4443c3cd652b798232"
+    },
+    {
+      "file": "gui/src/qml/ControllerMappingDialog.qml",
+      "sha256": "d57d208e17367a5a824b48edddd10c1fc512e717d589527b47f7382219a74b5a"
+    },
+    {
+      "file": "gui/src/qml/DialogView.qml",
+      "sha256": "7d5606deeda1cf6fffaefccf7ace856aefb2e9c6a20b2a84c18537a67b20dbcf"
+    },
+    {
+      "file": "gui/src/qml/DisplaySettingsDialog.qml",
+      "sha256": "75864fde807ffaa89f93cdd824d412a0bd53a175444251cb84005cc001e36612"
+    },
+    {
+      "file": "gui/src/qml/Main.qml",
+      "sha256": "48e8d1d05d04845c559c2a18b7df6b5b298048609a5d76ba1419652ce32e49b4"
+    },
+    {
+      "file": "gui/src/qml/MainView.qml",
+      "sha256": "6408eb6a16101cd3ee940b229c6cc7683f88bc4947f5fba1d334172e181e3228"
+    },
+    {
+      "file": "gui/src/qml/ManualHostDialog.qml",
+      "sha256": "71a1ea753a53282466a19ced8a2952d70d7dcb9f6dec306dd217810069687ada"
+    },
+    {
+      "file": "gui/src/qml/PSNLoginDialog.qml",
+      "sha256": "48f9d38ae0b8aeb520b3c2a6a9c2b19814c6fd9906476d065ce643c19468845a"
+    },
+    {
+      "file": "gui/src/qml/PSNTokenDialog.qml",
+      "sha256": "c10d56e28c45307f1b6528f7b1d77e79c68feef77561589c6e97d4cdb494d088"
+    },
+    {
+      "file": "gui/src/qml/PlaceboColorMappingDialog.qml",
+      "sha256": "4d54a0f7503fd1d94b405a68781b8d88d8efb08f61386cd9881145066159721d"
+    },
+    {
+      "file": "gui/src/qml/PlaceboSettingsDialog.qml",
+      "sha256": "a7001f4f0f90689efa49f2f7c44c744ee2046b0100051061bf4b5bfe512c6cd1"
+    },
+    {
+      "file": "gui/src/qml/ProfileDialog.qml",
+      "sha256": "3491f66f2266f672530762597f3184eb63d12d4891a7b998310972df8ffc4cfd"
+    },
+    {
+      "file": "gui/src/qml/PsnView.qml",
+      "sha256": "f8877525944ab31766855bc466ff7b2f245c4c82926bb1793a670ff764b83c2a"
+    },
+    {
+      "file": "gui/src/qml/RegistDialog.qml",
+      "sha256": "28bd38c0f7cc94a72eb9e75c05063d1cc1d5f6f6278174210978d72bf12597da"
+    },
+    {
+      "file": "gui/src/qml/RemindDialog.qml",
+      "sha256": "2a90129a75076e2ce6ab70bdc49a814d1aa5721ec555d240185fb2963b726bc5"
+    },
+    {
+      "file": "gui/src/qml/SettingsDialog.qml",
+      "sha256": "608a3131613f65e13d64fe123f9d90829ef9701d505063b9146b4163f8c5a437"
+    },
+    {
+      "file": "gui/src/qml/SettingsSearch.js",
+      "sha256": "1136270efe6595e4cca9368887a4873d6fcf9866547c53953653a4446b439122"
+    },
+    {
+      "file": "gui/src/qml/SteamShortcutDialog.qml",
+      "sha256": "8265b87d154321a880ff962c255034d19aca2a0b9f3938d4e998a4f56375cc59"
+    },
+    {
+      "file": "gui/src/qml/StreamMenuWindow.qml",
+      "sha256": "158add3ef7c03c94b58b77632793d75cad1b262b67141b8d761d2db8ba3c6227"
+    },
+    {
+      "file": "gui/src/qml/StreamView.qml",
+      "sha256": "74c0756965f11a290ba5d6df7e09c85afcc04758c32c72345758bfadf622ab99"
+    },
+    {
+      "file": "gui/src/qml/controls/Button.qml",
+      "sha256": "476a452c1f931a3f186aca7856a3d6745ae5ddd254edd905bf55b2550654298e"
+    },
+    {
+      "file": "gui/src/qml/controls/CheckBox.qml",
+      "sha256": "a9fc7133672cfb7080f427839f4642e80e345ea7925cf0d49ffbbb02a1dc0918"
+    },
+    {
+      "file": "gui/src/qml/controls/ComboBox.qml",
+      "sha256": "084a8a66182eb2610f6eaeed6a3d00f5238260be687d070b2fd2a373cd6612bf"
+    },
+    {
+      "file": "gui/src/qml/controls/RadioButton.qml",
+      "sha256": "fecea7609115d8711e4736519c09c871f7667757dd43990d15a859dc64fd87e5"
+    },
+    {
+      "file": "gui/src/qml/controls/Slider.qml",
+      "sha256": "caa6f05204e75a0d068eb15d7ce71b3d0c669ac9c77ec245795db5a80873361d"
+    },
+    {
+      "file": "gui/src/qml/controls/TextField.qml",
+      "sha256": "b9e361b6d19ba8632ece7a93bc72e70876a682db73b859beb83495bcd3451938"
+    },
+    {
+      "file": "gui/src/qml/qml.qrc",
+      "sha256": "1b6a5c288624c57c225ec894423f7128884f912d8b8d180770078ebc6cf9a46f"
+    },
+    {
+      "file": "gui/src/qml/qtquickcontrols2.conf",
+      "sha256": "afd2259524236eb8b339a63e0db0f93a548d9a44a151d62e9b08935a34f12f06"
+    },
+    {
+      "file": "gui/src/qmlbackend.cpp",
+      "sha256": "336ae2c9f8b6b7f1e44169537cc843912b8f8a70a38d1c9f8946e1c3ff27f7ce"
+    },
+    {
+      "file": "gui/src/qmlcontroller.cpp",
+      "sha256": "558de0f8f4af6ec966cd22f9f02e5d8e82a21dda5980dc0d5c2a23181f00b911"
+    },
+    {
+      "file": "gui/src/qmlmainwindow.cpp",
+      "sha256": "00ce94b436b17783b89e610106176f079150367f50f02e27273b79d55bbcdce2"
+    },
+    {
+      "file": "gui/src/qmlsettings.cpp",
+      "sha256": "3e39deb8f10fc9ec1b6bdc29d282f5e2d186d851c7ecf0c47942199fa86c8e6b"
+    },
+    {
+      "file": "gui/src/qmlsvgprovider.cpp",
+      "sha256": "2fe55af267570a641c07b025cc3636e64ecb78ba235245214dc86219bbac4d38"
+    },
+    {
+      "file": "gui/src/sdinputcontext.cpp",
+      "sha256": "008b4b462ffc8ff11a28f58dfe04a2a4e02f97315487579338060e5c8450d78a"
+    },
+    {
+      "file": "gui/src/sessionlog.cpp",
+      "sha256": "769ede5141e3445eec4e63133ef942a1afc0737e3f8b9dcfdd2b23ef6c5a1381"
+    },
+    {
+      "file": "gui/src/settings.cpp",
+      "sha256": "24e564d18c299c0369a48e53a637d456d52aa561558f11ca20351264d4439adc"
+    },
+    {
+      "file": "gui/src/streamsession.cpp",
+      "sha256": "8c22be85717595182b02ea7dcd2c66d65579624483416857ab53e7f63171f3a2"
+    },
+    {
+      "file": "gui/src/systemdinhibit.cpp",
+      "sha256": "cf900a8641ac8d6418d437b8275574bc87392cbec0b35eb9e1163b5a26e6fb80"
+    },
+    {
+      "file": "gui/src/windowsWakeSleep.cpp",
+      "sha256": "513ccbb1d501e3e4fefe5f25c2e2bde22cd5eec5d73aba41114f27c599f1c29f"
+    },
+    {
+      "file": "gui/tests/CMakeLists.txt",
+      "sha256": "15ae7c8cc0ae6f90fc9bfadf1ecf93211ed9ef5c7dfb0e0e00e2178f1397e423"
+    },
+    {
+      "file": "gui/tests/README.md",
+      "sha256": "52fb50077e2dcb2dad12b6cd77916aee06553247296d2a01ab991c26baccb368"
+    },
+    {
+      "file": "gui/tests/imports/org/streetpea/chiaking/Chiaki.qml",
+      "sha256": "13180574c12a5330dcc3edfde4f2d4abef4c66d357cfee1baeb3b25f786189e0"
+    },
+    {
+      "file": "gui/tests/imports/org/streetpea/chiaking/ChiakiWindow.qml",
+      "sha256": "878d5c02fd44c85120b53c717eaaee96a33a7b2e8df07898ccc196134b169bda"
+    },
+    {
+      "file": "gui/tests/imports/org/streetpea/chiaking/qmldir",
+      "sha256": "cd379984041d388d2b62ad85142d53b5875b71612958144b19c49da0c886ca88"
+    },
+    {
+      "file": "gui/tests/main.cpp",
+      "sha256": "92d603a5f249b81dba26ae14df3026667ec6a1d19deca13cb82cde7c6e0e15a6"
+    },
+    {
+      "file": "gui/tests/qml/fixtures/FakeSettings.qml",
+      "sha256": "3afb6991688941f84ea426b1d3ec5995bf6fcb25958e5fb2f1bcd500809d06e8"
+    },
+    {
+      "file": "gui/tests/qml/fixtures/ManualHostHarness.qml",
+      "sha256": "d7740d85c7c3ba3e751448ee3005dedc2f5f5ef13e6b675e21aca50d243ec1fc"
+    },
+    {
+      "file": "gui/tests/qml/fixtures/RegistrationHarness.qml",
+      "sha256": "75a2ab8d144352b92cc970f2272f0f4bf34ec6d07fa647bfc69ad24805960018"
+    },
+    {
+      "file": "gui/tests/qml/fixtures/SettingsHarness.qml",
+      "sha256": "a628b34e53e6340248658f0d4d7149a9b64228ad5ab577a236d11a3e239399b7"
+    },
+    {
+      "file": "gui/tests/qml/fixtures/SettingsSearchHarness.qml",
+      "sha256": "005db040143a29585bc9ebff9f00c205812dc292f3713bde5fa4d53d20208059"
+    },
+    {
+      "file": "gui/tests/qml/tst_ConsoleAppearance.qml",
+      "sha256": "46c4061a2e09a048f503ad6b46a86e4be5de36f8770627dc87b911019bc8eff7"
+    },
+    {
+      "file": "gui/tests/qml/tst_ConsoleDetails.qml",
+      "sha256": "2913ee85b78a5c11fbc9dd2ab5361b673da8c6634e19a414e69bb8d75fa17da0"
+    },
+    {
+      "file": "gui/tests/qml/tst_ConsoleLibrary.qml",
+      "sha256": "b5b7ac89932fa1874e6b936e0ff20e384cb97a01adc3994d854bdab7cb6e2316"
+    },
+    {
+      "file": "gui/tests/qml/tst_ConsoleManagement.qml",
+      "sha256": "732e7b1f7c5257b280bf599278d48de698385daa62b7eb014878214afbc0d25f"
+    },
+    {
+      "file": "gui/tests/qml/tst_ConsoleNavigation.qml",
+      "sha256": "46d2fe0cdb26d7fccb216c6f2b4162acd3210003a82eeee5580d1d83c65f5c87"
+    },
+    {
+      "file": "gui/tests/qml/tst_ConsoleSearch.qml",
+      "sha256": "b8b1c314621c948f03782e86880cefd6b693e847f745f934f579a2b3f2aeedb8"
+    },
+    {
+      "file": "gui/tests/qml/tst_ManualHost.qml",
+      "sha256": "56bb870806cb27e7d8ae39e67a2fd94e5531be2a724b643c8bdf255a16b315b0"
+    },
+    {
+      "file": "gui/tests/qml/tst_RegistrationForm.qml",
+      "sha256": "8bfd018518181a029406e4ddea856ce803dbbd135dd5e2f8eeb7a61f77a4f960"
+    },
+    {
+      "file": "gui/tests/qml/tst_RegistrationResults.qml",
+      "sha256": "d2b08880f04f0d121e04d1da555a9302e07dca4623c94ee862176d7ec567d237"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsAudio.qml",
+      "sha256": "00d07a21b4c88675b62886011ec12a071af07743d8fb088e6c3bf4fa3ca9fd93"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsColorMapping.qml",
+      "sha256": "95fb327e5752a3e3fc13546b9996fe6fb2f8f6668700675e7493602cf29b0bad"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsConfig.qml",
+      "sha256": "5e1441083ea483754f82b4bf4b40d3f17f248fe4ca44c7f3cf62a1bc2c2d4315"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsConsoles.qml",
+      "sha256": "1023f7b3151fbcca70baf517467b9c806fab7b242a4bffe5f63d7a9a3def3925"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsControllerMapping.qml",
+      "sha256": "8971e210db7c56acaf76649cc65f2c8fd5b4247cc0dd9ad6eed1823a051d1791"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsControllers.qml",
+      "sha256": "0427e2e2effc47ed59a80b2eaf1dae0b126230ff0da7f85cca2190520d7c724c"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsDisplay.qml",
+      "sha256": "23468a0785fcdf716f05c37d1a3025e44a649616a3f7fc5f1f15ebad6aad9eaf"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsGeneral.qml",
+      "sha256": "2967cce6d920db18636439fb6e556d84a6893cf09c5dee88d4221fe9e384db5f"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsKeys.qml",
+      "sha256": "87199eb05a884349270bed019c82e73a975de9faa73b04bcefe489830b387e6a"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsProfiles.qml",
+      "sha256": "cde69eb5f77df2d9028c11f5df2ae811e350cb5f5417ec33c1c00b679e10c980"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsRemote.qml",
+      "sha256": "2fa351c05b085b18fb23b9cfd94b2808d6c4a3adf746c8cf64a2923059958220"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsRenderer.qml",
+      "sha256": "0f5a97a1d143c730a0dcc7204bd0fb1c2d528bfc82c9645e16f0446cf0f4ddaa"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsSearch.qml",
+      "sha256": "1f47ea0970d3890dbafe5e3b25d5ad50e67d43c0235d0260679b072828757088"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsSidebar.qml",
+      "sha256": "873f9f89561169f2ad92c38d4853a755aff6263e02f1157bc9b01becc8edf214"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsStream.qml",
+      "sha256": "37f1cd643a6ffe9fd92111f2c1ca024a19ab9e02adaaf1707848ad454eaab77f"
+    },
+    {
+      "file": "gui/tests/qml/tst_SettingsVideo.qml",
+      "sha256": "25aa2c9f58b4f57e9f8448bdea70da7b92475b0d1f77f30c10552e137ec61204"
+    }
+  ]
+}

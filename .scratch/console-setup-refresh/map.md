@@ -11,7 +11,7 @@ The original checkout and index remain unchanged.
 | [01: Manual host entry](issues/01-manual-host-entry.md) | None | `codex/console-setup-manual` |
 | [02: Registration form](issues/02-registration-form.md) | None | `codex/console-setup-form` |
 | [03: Progress and results](issues/03-registration-progress-results.md) | 02 | `codex/console-setup-results` |
-| [04: Native acceptance](issues/04-integrated-native-acceptance.md) | 01, 03 | Assigned after 01 and 03 merge |
+| [04: Native acceptance](issues/04-integrated-native-acceptance.md) | 01, 03 | `codex/console-setup-acceptance` |
 
 Each ticket records its status and evidence. Completion requires the integrated
 screen tests, native contract checks, native UI checks, and final code review.
@@ -49,3 +49,12 @@ form suite passed 22 checks, and the result suite passed 19 checks. Controlled
 native contracts and post-exit INI checks passed. QA hooks were removed, and the
 normal application build passed. Ticket 04 can use the external native helper
 and patch recorded in ticket 03 for integrated acceptance.
+
+[04: Native acceptance](issues/04-integrated-native-acceptance.md) is resolved.
+Both native screens retain layout A. The registration header now matches manual
+entry. The final integrated suite passed 627 checks. Native contracts, post-exit
+INI checks, and 111 framebuffer captures passed at both sizes and measured DPR
+1, 1.5, and 2, including expanded text, privacy, focus, routes, and results.
+QA hooks were removed. The normal build passed, and independent Computer Use
+confirmed the visible application and manual-entry route. The
+[acceptance record](native-acceptance.md) separates each check and its limits.

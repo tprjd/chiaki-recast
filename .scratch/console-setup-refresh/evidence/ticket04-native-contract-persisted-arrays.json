@@ -1,0 +1,58 @@
+{
+  "allPassed": true,
+  "source": "INI files read after the native process exited",
+  "profiles": {
+    "manual": {
+      "registrations": 1,
+      "manualHosts": 2
+    },
+    "settings": {
+      "registrations": 1,
+      "manualHosts": 2
+    },
+    "discovered": {
+      "registrations": 1,
+      "manualHosts": 0
+    },
+    "profile-a": {
+      "registrations": 0,
+      "manualHosts": 0
+    },
+    "profile-b": {
+      "registrations": 0,
+      "manualHosts": 0
+    },
+    "epoch-a": {
+      "registrations": 0,
+      "manualHosts": 0
+    },
+    "epoch-b": {
+      "registrations": 0,
+      "manualHosts": 0
+    },
+    "reject": {
+      "registrations": 0,
+      "manualHosts": 0
+    },
+    "removed": {
+      "registrations": 0,
+      "manualHosts": 1
+    },
+    "reentrant-target": {
+      "registrations": 1,
+      "manualHosts": 1
+    },
+    "reentrant-a": {
+      "registrations": 1,
+      "manualHosts": 0
+    },
+    "reentrant-b": {
+      "registrations": 0,
+      "manualHosts": 0
+    },
+    "callback-followup": {
+      "registrations": 1,
+      "manualHosts": 1
+    }
+  }
+}
