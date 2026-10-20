@@ -963,322 +963,359 @@ FocusScope {
                 // Audio and Wifi
                 Flickable {
                     id: audiowifiFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "audiowifiFlick"
+                    anchors.fill: parent
                     clip: true
-                    contentWidth: Math.max(width, audiowifigrid.width)
-                    contentHeight: audiowifigrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        id: audiowifiScrollbar
-                        policy: ScrollBar.AlwaysOn
-                        visible: audiowifiFlick.contentHeight > audiowifiFlick.height
-                    }
-                    GridLayout {
-                        id: audiowifigrid
-                        columns: 3
-                        rowSpacing: 10
-                        columnSpacing: 20
+                    contentWidth: width
+                    contentHeight: audiowifiLayout.height
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
+                        id: audiowifiLayout
+                        width: Math.max(0, audiowifiFlick.width - 14)
+                        spacing: 16
                         onVisibleChanged: if (visible) dialog.backend.settings.refreshAudioDevices()
+                        Label { text: qsTr("Audio/Wifi"); font.pixelSize: 24; font.bold: true }
 
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Output Device:")
-                        }
-
-                        C.ComboBox {
-                            id: audioOutDevice
-                            Layout.preferredWidth: 400
-                            popup.x: (width - popup.width) / 2
-                            popup.width: 700
-                            popup.font.pixelSize: 16
-                            firstInFocusChain: true
-                            model: [qsTr("Auto")].concat(dialog.backend.settings.availableAudioOutDevices)
-                            currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.audioOutDevice))
-                            onActivated: (index) => dialog.backend.settings.audioOutDevice = index ? model[index] : ""
-                            KeyNavigation.down: audioInDevice
-                            KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Auto)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Input Device:")
-                        }
-
-                        C.ComboBox {
-                            id: audioInDevice
-                            Layout.preferredWidth: 400
-                            popup.x: (width - popup.width) / 2
-                            popup.width: 700
-                            popup.font.pixelSize: 16
-                            model: [qsTr("Auto")].concat(dialog.backend.settings.availableAudioInDevices)
-                            currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.audioInDevice))
-                            onActivated: (index) => dialog.backend.settings.audioInDevice = index ? model[index] : ""
-                            KeyNavigation.up: audioOutDevice
-                            KeyNavigation.down: audioBufferSizeSlider
-                            KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Auto)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Audio Buffer Size:")
-                        }
-
-                        C.Slider {
-                            id: audioBufferSizeSlider
-                            Layout.preferredWidth: 250
-                            from: 1
-                            to: 10
-                            stepSize: 1
-                            value: dialog.backend.settings.audioBufferSize / 1920 ? (dialog.backend.settings.audioBufferSize / 1920) : 5
-                            onMoved: dialog.backend.settings.audioBufferSize = value * 1920;
-                            KeyNavigation.up: audioInDevice
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                        Label { font.pixelSize: 14; text: qsTr("Audio"); font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Output device\nDefault: Auto")
                                 }
-                                text: {
-                                    (parent.value * 10).toFixed(0) + qsTr(" ms")
+                                C.ComboBox {
+                                    id: audioOutDevice
+                                    objectName: "audioOutDevice"
+                                    Accessible.name: qsTr("Output device")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    Layout.preferredWidth: 300
+                                    popup.x: (width - popup.width) / 2
+                                    popup.width: Math.min(700, dialog.width - 24)
+                                    popup.font.pixelSize: 14
+                                    firstInFocusChain: true
+                                    model: [qsTr("Auto")].concat(dialog.backend.settings.availableAudioOutDevices)
+                                    currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.audioOutDevice))
+                                    onModelChanged: if (popup.visible) popup.close()
+                                    onActivated: index => {
+                                        if (index >= 0 && index < model.length)
+                                            dialog.backend.settings.audioOutDevice = index ? model[index] : "";
+                                    }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Input device\nDefault: Auto")
+                                }
+                                C.ComboBox {
+                                    id: audioInDevice
+                                    objectName: "audioInDevice"
+                                    Accessible.name: qsTr("Input device")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    Layout.preferredWidth: 300
+                                    popup.x: (width - popup.width) / 2
+                                    popup.width: Math.min(700, dialog.width - 24)
+                                    popup.font.pixelSize: 14
+                                    firstInFocusChain: false
+                                    model: [qsTr("Auto")].concat(dialog.backend.settings.availableAudioInDevices)
+                                    currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.audioInDevice))
+                                    onModelChanged: if (popup.visible) popup.close()
+                                    onActivated: index => {
+                                        if (index >= 0 && index < model.length)
+                                            dialog.backend.settings.audioInDevice = index ? model[index] : "";
+                                    }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Audio buffer size\nDefault: 50 ms")
+                                }
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    C.Slider {
+                                        id: audioBufferSizeSlider
+                                        objectName: "audioBufferSize"
+                                        Accessible.name: qsTr("Audio buffer size")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 1
+                                        to: 10
+                                        stepSize: 1
+                                        value: dialog.backend.settings.audioBufferSize / 1920 || 5
+                                        onMoved: dialog.backend.settings.audioBufferSize = value * 1920
+                                    }
+                                    Label {
+                                        objectName: "audioBufferSizeValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr("%1 ms").arg((audioBufferSizeSlider.value * 10).toFixed(0))
+                                    }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Audio volume\nDefault: 100%")
+                                }
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    C.Slider {
+                                        id: audioVolumeSlider
+                                        objectName: "audioVolume"
+                                        Accessible.name: qsTr("Audio volume")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 0
+                                        to: 128
+                                        stepSize: 1
+                                        value: dialog.backend.settings.audioVolume
+                                        onMoved: dialog.backend.settings.audioVolume = value
+                                    }
+                                    Label {
+                                        objectName: "audioVolumeValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr("%1% volume").arg((audioVolumeSlider.value / 128 * 100).toFixed(0))
+                                    }
                                 }
                             }
                         }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(50 ms)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Audio Volume:")
-                        }
-
-                        C.Slider {
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 128
-                            stepSize: 1
-                            value: dialog.backend.settings.audioVolume
-                            onMoved: dialog.backend.settings.audioVolume = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                        Label { font.pixelSize: 14; text: qsTr("Microphone"); font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Start mic unmuted\nDefault: Unchecked")
                                 }
-                                text: {
-                                    ((parent.value / 128.0) * 100).toFixed(0) + qsTr("% volume")
+                                C.CheckBox {
+                                    objectName: "startMicUnmuted"
+                                    Accessible.name: qsTr("Start mic unmuted")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    text: qsTr("Start mic unmuted")
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.startMicUnmuted
+                                    onToggled: dialog.backend.settings.startMicUnmuted = checked
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Speech processing\nDefault: Unchecked")
+                                    visible: typeof dialog.backend.settings.speechProcessing !== "undefined"
+                                }
+                                C.CheckBox {
+                                    objectName: "speechProcessing"
+                                    Accessible.name: qsTr("Speech processing")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    text: qsTr("Noise suppression + echo cancellation")
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.speechProcessing || false
+                                    onToggled: dialog.backend.settings.speechProcessing = checked
+                                    visible: typeof dialog.backend.settings.speechProcessing !== "undefined"
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Noise to suppress\nDefault: 6 dB")
+                                    visible: dialog.backend.settings.speechProcessing || false
+                                }
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    visible: dialog.backend.settings.speechProcessing || false
+                                    C.Slider {
+                                        id: noiseSuppressLevelSlider
+                                        objectName: "noiseSuppressLevel"
+                                        Accessible.name: qsTr("Noise to suppress")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 0
+                                        to: 60
+                                        stepSize: 1
+                                        value: typeof dialog.backend.settings.noiseSuppressLevel !== "undefined" ? dialog.backend.settings.noiseSuppressLevel : 6
+                                        onMoved: dialog.backend.settings.noiseSuppressLevel = value
+                                    }
+                                    Label {
+                                        objectName: "noiseSuppressLevelValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr("%1 dB").arg(noiseSuppressLevelSlider.value)
+                                    }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Echo to suppress\nDefault: 30 dB")
+                                    visible: dialog.backend.settings.speechProcessing || false
+                                }
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    visible: dialog.backend.settings.speechProcessing || false
+                                    C.Slider {
+                                        id: echoSuppressLevelSlider
+                                        objectName: "echoSuppressLevel"
+                                        Accessible.name: qsTr("Echo to suppress")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 0
+                                        to: 60
+                                        stepSize: 1
+                                        value: typeof dialog.backend.settings.echoSuppressLevel !== "undefined" ? dialog.backend.settings.echoSuppressLevel : 30
+                                        onMoved: dialog.backend.settings.echoSuppressLevel = value
+                                    }
+                                    Label {
+                                        objectName: "echoSuppressLevelValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr("%1 dB").arg(echoSuppressLevelSlider.value)
+                                    }
                                 }
                             }
                         }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(100%)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Start Mic Unmuted:")
-                        }
-
-                        C.CheckBox {
-                            checked: dialog.backend.settings.startMicUnmuted
-                            onToggled: dialog.backend.settings.startMicUnmuted = checked
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Unchecked)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Speech Processing:")
-                            visible: typeof dialog.backend.settings.speechProcessing !== "undefined"
-                        }
-
-                        C.CheckBox {
-                            text: qsTr("Noise suppression + echo cancellation")
-                            checked: dialog.backend.settings.speechProcessing
-                            onToggled: dialog.backend.settings.speechProcessing = !dialog.backend.settings.speechProcessing
-                            visible: typeof dialog.backend.settings.speechProcessing !== "undefined"
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Unchecked)")
-                            visible: typeof dialog.backend.settings.speechProcessing !== "undefined"
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Noise To Suppress:")
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                        }
-
-                        C.Slider {
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 60
-                            stepSize: 1
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                            value: dialog.backend.settings.noiseSuppressLevel
-                            onMoved: dialog.backend.settings.noiseSuppressLevel = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                        Label { font.pixelSize: 14; text: qsTr("Connection feedback"); font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Weak Wifi notification\nDefault: 3%")
                                 }
-                                text: qsTr("%1 dB").arg(parent.value)
-                            }
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(6 dB)")
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Echo To Suppress:")
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                        }
-
-                        C.Slider {
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 60
-                            stepSize: 1
-                            value: dialog.backend.settings.echoSuppressLevel
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                            onMoved: dialog.backend.settings.echoSuppressLevel = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    C.Slider {
+                                        id: wifiDroppedNotifSlider
+                                        objectName: "wifiDroppedNotif"
+                                        Accessible.name: qsTr("Weak Wifi notification")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 0
+                                        to: 100
+                                        stepSize: 1
+                                        value: dialog.backend.settings.wifiDroppedNotif
+                                        onMoved: dialog.backend.settings.wifiDroppedNotif = value
+                                    }
+                                    Label {
+                                        objectName: "wifiDroppedNotifValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr(">= %1% dropped packets").arg(wifiDroppedNotifSlider.value)
+                                    }
                                 }
-                                text: qsTr("%1 dB").arg(parent.value)
-                            }
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(30 dB)")
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Weak Wifi Notification:")
-                        }
-
-                        C.Slider {
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 100
-                            stepSize: 1
-                            value: dialog.backend.settings.wifiDroppedNotif
-                            onMoved: dialog.backend.settings.wifiDroppedNotif = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Packet loss reported max\nDefault: 5%")
                                 }
-                                text: qsTr(">= %1% dropped packets").arg(parent.value)
-                            }
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(3%)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Packet Loss Reported Max:")
-                        }
-
-                        C.Slider {
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 100
-                            stepSize: 1
-                            value: dialog.backend.settings.packetLossReportedMax
-                            onMoved: dialog.backend.settings.packetLossReportedMax = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    C.Slider {
+                                        id: packetLossReportedMaxSlider
+                                        objectName: "packetLossReportedMax"
+                                        Accessible.name: qsTr("Packet loss reported max")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 0
+                                        to: 100
+                                        stepSize: 1
+                                        value: dialog.backend.settings.packetLossReportedMax
+                                        onMoved: dialog.backend.settings.packetLossReportedMax = value
+                                    }
+                                    Label {
+                                        objectName: "packetLossReportedMaxValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr("%1% packet loss").arg(packetLossReportedMaxSlider.value)
+                                    }
                                 }
-                                text: qsTr("%1% packet loss").arg(parent.value)
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Request IDR frame on FEC failure\nDefault: Unchecked")
+                                }
+                                C.CheckBox {
+                                    objectName: "iDROnFECFailureEnabled"
+                                    Accessible.name: qsTr("Request IDR frame on FEC failure")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    text: qsTr("Request IDR frame on FEC failure")
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.iDROnFECFailureEnabled
+                                    onToggled: dialog.backend.settings.iDROnFECFailureEnabled = checked
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Show stream stats during gameplay\nDefault: Unchecked")
+                                }
+                                C.CheckBox {
+                                    objectName: "showStreamStats"
+                                    Accessible.name: qsTr("Show stream stats during gameplay")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    text: qsTr("Show stream stats during gameplay")
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.showStreamStats
+                                    onToggled: dialog.backend.settings.showStreamStats = checked
+                                    lastInFocusChain: true
+                                }
                             }
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(5%)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Request IDR Frame on FEC Failure")
-                        }
-
-                        C.CheckBox {
-                            checked: dialog.backend.settings.iDROnFECFailureEnabled
-                            onToggled: dialog.backend.settings.iDROnFECFailureEnabled = !dialog.backend.settings.iDROnFECFailureEnabled
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Unchecked)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Show Stream Stats During Gameplay")
-                        }
-
-                        C.CheckBox {
-                            lastInFocusChain: true
-                            checked: dialog.backend.settings.showStreamStats
-                            onToggled: dialog.backend.settings.showStreamStats = !dialog.backend.settings.showStreamStats
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Unchecked)")
                         }
                     }
                 }
@@ -1425,340 +1462,97 @@ FocusScope {
 
             Item {
                 // Keys
-                id: controllerMapping
                 Flickable {
                     id: keysFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "keysFlick"
+                    anchors.fill: parent
                     clip: true
-                    contentWidth: Math.max(width, keysGrid.width)
-                    contentHeight: keysGrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    function ensureItemVisible(item) {
-                        if (!item)
-                            return;
-                        const top = item.mapToItem(keysGrid, 0, 0).y;
-                        const bottom = top + item.height;
-                        if (top < contentY)
-                            contentY = top;
-                        else if (bottom > contentY + height)
-                            contentY = bottom - height;
-                    }
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: keysFlick.contentHeight > keysFlick.height
-                    }
-                    GridLayout {
-                        id: keysGrid
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        columns: 3
-                        rowSpacing: 3
-                        columnSpacing: 10
-
-                        Button {
-                            id: resetAllKeys
-                            text: "Reset All Keys"
-                            Layout.alignment: Qt.AlignRight
-                            property bool firstInFocusChain: true
-                            property bool lastInFocusChain: false
-                            onClicked: dialog.backend.settings.clearKeyMapping()
-                            Material.roundedScale: Material.SmallScale
-                            Material.background: visualFocus ? Material.accent : undefined
-                            onActiveFocusChanged: if (activeFocus) keysFlick.ensureItemVisible(this)
-
-                            Component.onDestruction: {
-                                if (visualFocus) {
-                                    let item = nextItemInFocusChain();
-                                    if (item)
-                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                }
-                            }
-                            Keys.onPressed: (event) => {
-                                switch (event.key) {
-                                case Qt.Key_Down:
-                                    if (!lastInFocusChain) {
-                                        let item = nextItemInFocusChain();
-                                        if (item) {
-                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                            keysFlick.ensureItemVisible(item);
-                                        }
-                                        for(var i = 0; i < 3; i++)
-                                        {
-                                            let item2 = item.nextItemInFocusChain();
-                                            if (item)
-                                            {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                                item = item2;
-                                            }
-                                        }
-                                        event.accepted = true;
-                                    }
-                                    break;
-                                case Qt.Key_Right:
-                                    if (!lastInFocusChain) {
-                                        let item = nextItemInFocusChain();
-                                        if (item) {
-                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                            keysFlick.ensureItemVisible(item);
-                                        }
-                                        event.accepted = true;
-                                    }
-                                    break;
-                                case Qt.Key_Return:
-                                    if (visualFocus) {
-                                        clicked();
-                                    }
-                                    event.accepted = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        CheckBox {
-                            text: qsTr("Keyboard as controller")
-                            checked: {
-                                dialog.backend.settings.keyboardEnabled
-                            }
-                            onToggled: dialog.backend.settings.keyboardEnabled = checked
-                            Layout.alignment: Qt.AlignRight
-                            property bool firstInFocusChain: false
-                            property bool lastInFocusChain: false
-                            Material.roundedScale: Material.SmallScale
-                            Material.background: visualFocus ? Material.accent : undefined
-                            onActiveFocusChanged: if (activeFocus) keysFlick.ensureItemVisible(this)
-
-                            Component.onDestruction: {
-                                if (visualFocus) {
-                                    let item = nextItemInFocusChain();
-                                    if (item)
-                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                }
-                            }
-                            Keys.onPressed: (event) => {
-                                switch (event.key) {
-                                    case Qt.Key_Left:
-                                        if (!firstInFocusChain) {
-                                            let item = nextItemInFocusChain(false);
-                                            if (item) {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                            }
-                                            event.accepted = true;
-                                        }
-                                        break;
-                                    case Qt.Key_Right:
-                                        if  (!lastInFocusChain) {
-                                            let item = nextItemInFocusChain();
-                                            if (item) {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                            }
-                                            event.accepted = true;
-                                        }
-                                        break;
-                                    case Qt.Key_Down:
-                                        if (!lastInFocusChain) {
-                                            let item = nextItemInFocusChain();
-                                            if (item) {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                            }
-                                            for(var i = 0; i < 3; i++)
-                                            {
-                                                let item2 = item.nextItemInFocusChain();
-                                                if (item)
-                                                {
-                                                    item.forceActiveFocus(Qt.TabFocusReason);
-                                                    keysFlick.ensureItemVisible(item);
-                                                    item = item2;
-                                                }
-                                            }
-                                            event.accepted = true;
-                                        }
-                                        break;
-                                    case Qt.Key_Return:
-                                        if (visualFocus) {
-                                            toggle();
-                                            toggled();
-                                        }
-                                        event.accepted = true;
-                                        break;
-                                }
-                            }
-                        }
-                        CheckBox {
-                            text: qsTr("Enable Mouse Touchpad")
-                            checked: {
-                                dialog.backend.settings.mouseTouchEnabled
-                            }
-                            onToggled: dialog.backend.settings.mouseTouchEnabled = checked
-                            Layout.alignment: Qt.AlignRight
-                            property bool firstInFocusChain: false
-                            property bool lastInFocusChain: false
-                            Material.roundedScale: Material.SmallScale
-                            Material.background: visualFocus ? Material.accent : undefined
-                            onActiveFocusChanged: if (activeFocus) keysFlick.ensureItemVisible(this)
-
-                            Component.onDestruction: {
-                                if (visualFocus) {
-                                    let item = nextItemInFocusChain();
-                                    if (item)
-                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                }
-                            }
-                            Keys.onPressed: (event) => {
-                                switch (event.key) {
-                                    case Qt.Key_Left:
-                                        if (!firstInFocusChain) {
-                                            let item = nextItemInFocusChain(false);
-                                            if (item) {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                            }
-                                            event.accepted = true;
-                                        }
-                                        break;
-                                    case Qt.Key_Down:
-                                        if (!lastInFocusChain) {
-                                            let item = nextItemInFocusChain();
-                                            if (item) {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                            }
-                                            for(var i = 0; i < 3; i++)
-                                            {
-                                                let item2 = item.nextItemInFocusChain();
-                                                if (item)
-                                                {
-                                                    item.forceActiveFocus(Qt.TabFocusReason);
-                                                    keysFlick.ensureItemVisible(item);
-                                                    item = item2;
-                                                }
-                                            }
-                                            event.accepted = true;
-                                        }
-                                        break;
-                                    case Qt.Key_Return:
-                                        if (visualFocus) {
-                                            toggle();
-                                            toggled();
-                                        }
-                                        event.accepted = true;
-                                        break;
-                                }
-                            }
-                        }
-                        Repeater {
-                            id: chiakiKeys
-                            model: dialog.backend.settings.controllerMapping
-
+                    contentWidth: width
+                    contentHeight: keysLayout.height
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
+                        id: keysLayout
+                        width: Math.max(0, keysFlick.width - 14)
+                        spacing: 16
+                        Label { text: qsTr("Keys"); font.pixelSize: 24; font.bold: true }
+                        Label { text: qsTr("Keyboard and mouse"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
                             RowLayout {
-                                spacing: 20
-
-                                Label {
-                                    Layout.preferredWidth: 200
-                                    horizontalAlignment: Text.AlignRight
-                                    text: modelData.buttonName
+                                anchors.fill: parent
+                                C.CheckBox {
+                                    objectName: "keyboardEnabled"
+                                    text: qsTr("Keyboard as controller")
+                                    Accessible.name: text
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.keyboardEnabled
+                                    onToggled: dialog.backend.settings.keyboardEnabled = checked
                                 }
-
-                                Button {
-                                    property bool firstInFocusChain: false
-                                    property bool lastInFocusChain: index == (chiakiKeys.count - 1)
-                                    Layout.preferredWidth: 170
-                                    Layout.preferredHeight: 52
-                                    text: modelData.keyName
-                                    Material.roundedScale: Material.SmallScale
-                                    Material.background: visualFocus ? Material.accent : undefined
-                                    onActiveFocusChanged: if (activeFocus) keysFlick.ensureItemVisible(this)
-                                    Component.onDestruction: {
-                                        if (visualFocus) {
-                                            let item = nextItemInFocusChain();
-                                            if (item)
-                                                item.forceActiveFocus(Qt.TabFocusReason);
+                                C.CheckBox {
+                                    objectName: "mouseTouchEnabled"
+                                    text: qsTr("Enable Mouse Touchpad")
+                                    Accessible.name: text
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.mouseTouchEnabled
+                                    onToggled: dialog.backend.settings.mouseTouchEnabled = checked
+                                }
+                            }
+                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Label { text: qsTr("Key assignments"); font.pixelSize: 14; font.bold: true; Layout.fillWidth: true }
+                            C.Button {
+                                font.pixelSize: 14
+                                id: resetAllKeys
+                                objectName: "resetAllKeys"
+                                text: qsTr("Reset All Keys")
+                                Accessible.name: text
+                                onClicked: dialog.backend.settings.clearKeyMapping()
+                            }
+                        }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: keysFlick.width >= 900 ? 3 : 2
+                                columnSpacing: 20
+                                rowSpacing: 6
+                                Repeater {
+                                    id: chiakiKeys
+                                    model: dialog.backend.settings.controllerMapping
+                                    RowLayout {
+                                        required property var modelData
+                                        Layout.fillWidth: true
+                                        spacing: 12
+                                        Label {
+                                            font.pixelSize: 14
+                                            Layout.minimumWidth: 0
+                                            Layout.fillWidth: true
+                                            Layout.preferredWidth: 120
+                                            text: modelData.buttonName
+                                            textFormat: Text.PlainText
+                                            wrapMode: Text.Wrap
                                         }
-                                    }
-                                    onClicked: {
-                                        keyDialog.show({
-                                            value: modelData.buttonValue,
-                                            mappingIndex: index,
-                                            callback: (name) => text = name,
-                                        });
-                                    }
-                                    Keys.onPressed: (event) => {
-                                        switch (event.key) {
-                                            case Qt.Key_Left:
-                                                if (!firstInFocusChain && ((index % 3) != 0)) {
-                                                    let item = nextItemInFocusChain(false);
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        keysFlick.ensureItemVisible(item);
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Right:
-                                                if  (!lastInFocusChain && (index % 3) != 2) {
-                                                    let item = nextItemInFocusChain();
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        keysFlick.ensureItemVisible(item);
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Up:
-                                                if (!firstInFocusChain)
-                                                {
-                                                    let item = nextItemInFocusChain(false);
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        keysFlick.ensureItemVisible(item);
-                                                    }
-                                                    for(var i = 0; i < 3; i++)
-                                                    {
-                                                        let item2 = item.nextItemInFocusChain(false);
-                                                        if (item)
-                                                        {
-                                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                                            keysFlick.ensureItemVisible(item);
-                                                            item = item2;
-                                                        }
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Down:
-                                                if (!lastInFocusChain && index < (chiakiKeys.count - 3)) {
-                                                    let item = nextItemInFocusChain();
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        keysFlick.ensureItemVisible(item);
-                                                    }
-                                                    for(var i = 0; i < 3; i++)
-                                                    {
-                                                        let item2 = item.nextItemInFocusChain();
-                                                        if (item)
-                                                        {
-                                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                                            keysFlick.ensureItemVisible(item);
-                                                            item = item2;
-                                                        }
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Return:
-                                                if (visualFocus) {
-                                                    clicked();
-                                                }
-                                                break;
+                                        C.Button {
+                                            font.pixelSize: 14
+                                            objectName: "keyMapping" + modelData.buttonValue
+                                            property string capturedKeyName: ""
+                                            Layout.preferredWidth: 120
+                                            Layout.minimumWidth: 0
+                                            text: capturedKeyName || modelData.keyName
+                                            Accessible.name: qsTr("Key for %1").arg(modelData.buttonName)
+                                            onClicked: keyDialog.show({
+                                                value: modelData.buttonValue,
+                                                opener: this,
+                                                callback: name => capturedKeyName = name
+                                            })
                                         }
                                     }
                                 }
@@ -2240,45 +2034,67 @@ FocusScope {
 
         Dialog {
             id: keyDialog
+            objectName: "keyCaptureDialog"
             focus: false
             property int buttonValue
             property var buttonCallback
-            property var keysIndex
+            property Item returnFocusItem
+            property bool captureActive: false
+            property int pressedKey: -1
             parent: Overlay.overlay
-            x: Math.round((dialog.navigation.width - width) / 2)
-            y: Math.round((dialog.navigation.height - height) / 2)
+            x: Math.round((dialog.width - width) / 2)
+            y: Math.round((dialog.height - height) / 2)
             title: qsTr("Key Capture")
             modal: true
             standardButtons: Dialog.Close
             closePolicy: Popup.CloseOnPressOutside
             onOpened: keyLabel.forceActiveFocus(Qt.TabFocusReason)
+            onAboutToHide: captureActive = false
             onClosed: {
-                let item = chiakiKeys.itemAt(keysIndex)
-                if(item)
-                {
-                    let item2 = item.children[1];
-                    if(item2)
-                        item2.forceActiveFocus(Qt.TabFocusReason);
-                }
                 keyLabel.focus = false;
                 focus = false;
+                Qt.callLater(() => {
+                    const item = returnFocusItem && returnFocusItem.visible && returnFocusItem.enabled
+                        ? returnFocusItem : resetAllKeys;
+                    if (item) item.forceActiveFocus(Qt.TabFocusReason);
+                });
             }
             Material.roundedScale: Material.MediumScale
 
             function show(opts) {
                 buttonValue = opts.value;
                 buttonCallback = opts.callback;
-                keysIndex = opts.mappingIndex;
+                returnFocusItem = opts.opener;
+                pressedKey = -1;
+                captureActive = true;
                 open();
             }
 
+            Connections {
+                target: dialog.backend.settings
+                function onCurrentProfileChanged() { keyDialog.close(); }
+                function onControllerMappingChanged() { keyDialog.close(); }
+            }
             Label {
                 id: keyLabel
+                objectName: "keyCapturePrompt"
                 focus: true
-                text: qsTr("Press any key to configure button or click close")
+                text: qsTr("Press a key to assign it. Press Escape or Close to cancel.")
+                Accessible.name: text
+                Keys.onPressed: (event) => {
+                    event.accepted = true;
+                    if (keyDialog.captureActive && !event.isAutoRepeat)
+                        keyDialog.pressedKey = event.key;
+                }
                 Keys.onReleased: (event) => {
-                    var name = dialog.backend.settings.changeControllerKey(keyDialog.buttonValue, event.key);
-                    keyDialog.buttonCallback(name);
+                    event.accepted = true;
+                    if (!keyDialog.captureActive || event.isAutoRepeat || keyDialog.pressedKey !== event.key)
+                        return;
+                    keyDialog.pressedKey = -1;
+                    if (event.key !== Qt.Key_Escape) {
+                        const name = dialog.backend.settings.changeControllerKey(keyDialog.buttonValue, event.key);
+                        keyDialog.buttonCallback(name);
+                    }
                     keyDialog.close();
                 }
             }
