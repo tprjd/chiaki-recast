@@ -1243,322 +1243,359 @@ FocusScope {
                 // Audio and Wifi
                 Flickable {
                     id: audiowifiFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "audiowifiFlick"
+                    anchors.fill: parent
                     clip: true
-                    contentWidth: Math.max(width, audiowifigrid.width)
-                    contentHeight: audiowifigrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        id: audiowifiScrollbar
-                        policy: ScrollBar.AlwaysOn
-                        visible: audiowifiFlick.contentHeight > audiowifiFlick.height
-                    }
-                    GridLayout {
-                        id: audiowifigrid
-                        columns: 3
-                        rowSpacing: 10
-                        columnSpacing: 20
+                    contentWidth: width
+                    contentHeight: audiowifiLayout.height
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
+                        id: audiowifiLayout
+                        width: Math.max(0, audiowifiFlick.width - 14)
+                        spacing: 16
                         onVisibleChanged: if (visible) dialog.backend.settings.refreshAudioDevices()
+                        Label { text: qsTr("Audio/Wifi"); font.pixelSize: 24; font.bold: true }
 
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Output Device:")
-                        }
-
-                        C.ComboBox {
-                            id: audioOutDevice
-                            Layout.preferredWidth: 400
-                            popup.x: (width - popup.width) / 2
-                            popup.width: 700
-                            popup.font.pixelSize: 16
-                            firstInFocusChain: true
-                            model: [qsTr("Auto")].concat(dialog.backend.settings.availableAudioOutDevices)
-                            currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.audioOutDevice))
-                            onActivated: (index) => dialog.backend.settings.audioOutDevice = index ? model[index] : ""
-                            KeyNavigation.down: audioInDevice
-                            KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Auto)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Input Device:")
-                        }
-
-                        C.ComboBox {
-                            id: audioInDevice
-                            Layout.preferredWidth: 400
-                            popup.x: (width - popup.width) / 2
-                            popup.width: 700
-                            popup.font.pixelSize: 16
-                            model: [qsTr("Auto")].concat(dialog.backend.settings.availableAudioInDevices)
-                            currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.audioInDevice))
-                            onActivated: (index) => dialog.backend.settings.audioInDevice = index ? model[index] : ""
-                            KeyNavigation.up: audioOutDevice
-                            KeyNavigation.down: audioBufferSizeSlider
-                            KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Auto)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Audio Buffer Size:")
-                        }
-
-                        C.Slider {
-                            id: audioBufferSizeSlider
-                            Layout.preferredWidth: 250
-                            from: 1
-                            to: 10
-                            stepSize: 1
-                            value: dialog.backend.settings.audioBufferSize / 1920 ? (dialog.backend.settings.audioBufferSize / 1920) : 5
-                            onMoved: dialog.backend.settings.audioBufferSize = value * 1920;
-                            KeyNavigation.up: audioInDevice
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                        Label { font.pixelSize: 14; text: qsTr("Audio"); font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: audiowifiFlick.width < 650 ? 1 : 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Output device\nDefault: Auto")
                                 }
-                                text: {
-                                    (parent.value * 10).toFixed(0) + qsTr(" ms")
+                                C.ComboBox {
+                                    id: audioOutDevice
+                                    objectName: "audioOutDevice"
+                                    Accessible.name: qsTr("Output device")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    Layout.preferredWidth: 300
+                                    popup.x: (width - popup.width) / 2
+                                    popup.width: Math.min(700, dialog.width - 24)
+                                    popup.font.pixelSize: 14
+                                    firstInFocusChain: true
+                                    model: [qsTr("Auto")].concat(dialog.backend.settings.availableAudioOutDevices)
+                                    currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.audioOutDevice))
+                                    onModelChanged: if (popup.visible) popup.close()
+                                    onActivated: index => {
+                                        if (index >= 0 && index < model.length)
+                                            dialog.backend.settings.audioOutDevice = index ? model[index] : "";
+                                    }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Input device\nDefault: Auto")
+                                }
+                                C.ComboBox {
+                                    id: audioInDevice
+                                    objectName: "audioInDevice"
+                                    Accessible.name: qsTr("Input device")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    Layout.preferredWidth: 300
+                                    popup.x: (width - popup.width) / 2
+                                    popup.width: Math.min(700, dialog.width - 24)
+                                    popup.font.pixelSize: 14
+                                    firstInFocusChain: false
+                                    model: [qsTr("Auto")].concat(dialog.backend.settings.availableAudioInDevices)
+                                    currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.audioInDevice))
+                                    onModelChanged: if (popup.visible) popup.close()
+                                    onActivated: index => {
+                                        if (index >= 0 && index < model.length)
+                                            dialog.backend.settings.audioInDevice = index ? model[index] : "";
+                                    }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Audio buffer size\nDefault: 50 ms")
+                                }
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    C.Slider {
+                                        id: audioBufferSizeSlider
+                                        objectName: "audioBufferSize"
+                                        Accessible.name: qsTr("Audio buffer size")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 1
+                                        to: 10
+                                        stepSize: 1
+                                        value: dialog.backend.settings.audioBufferSize / 1920 || 5
+                                        onMoved: dialog.backend.settings.audioBufferSize = value * 1920
+                                    }
+                                    Label {
+                                        objectName: "audioBufferSizeValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr("%1 ms").arg((audioBufferSizeSlider.value * 10).toFixed(0))
+                                    }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Audio volume\nDefault: 100%")
+                                }
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    C.Slider {
+                                        id: audioVolumeSlider
+                                        objectName: "audioVolume"
+                                        Accessible.name: qsTr("Audio volume")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 0
+                                        to: 128
+                                        stepSize: 1
+                                        value: dialog.backend.settings.audioVolume
+                                        onMoved: dialog.backend.settings.audioVolume = value
+                                    }
+                                    Label {
+                                        objectName: "audioVolumeValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr("%1% volume").arg((audioVolumeSlider.value / 128 * 100).toFixed(0))
+                                    }
                                 }
                             }
                         }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(50 ms)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Audio Volume:")
-                        }
-
-                        C.Slider {
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 128
-                            stepSize: 1
-                            value: dialog.backend.settings.audioVolume
-                            onMoved: dialog.backend.settings.audioVolume = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                        Label { font.pixelSize: 14; text: qsTr("Microphone"); font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: audiowifiFlick.width < 650 ? 1 : 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Start mic unmuted\nDefault: Unchecked")
                                 }
-                                text: {
-                                    ((parent.value / 128.0) * 100).toFixed(0) + qsTr("% volume")
+                                C.CheckBox {
+                                    objectName: "startMicUnmuted"
+                                    Accessible.name: qsTr("Start mic unmuted")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    text: qsTr("Start mic unmuted")
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.startMicUnmuted
+                                    onToggled: dialog.backend.settings.startMicUnmuted = checked
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Speech processing\nDefault: Unchecked")
+                                    visible: typeof dialog.backend.settings.speechProcessing !== "undefined"
+                                }
+                                C.CheckBox {
+                                    objectName: "speechProcessing"
+                                    Accessible.name: qsTr("Speech processing")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    text: qsTr("Noise suppression + echo cancellation")
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.speechProcessing || false
+                                    onToggled: dialog.backend.settings.speechProcessing = checked
+                                    visible: typeof dialog.backend.settings.speechProcessing !== "undefined"
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Noise to suppress\nDefault: 6 dB")
+                                    visible: dialog.backend.settings.speechProcessing || false
+                                }
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    visible: dialog.backend.settings.speechProcessing || false
+                                    C.Slider {
+                                        id: noiseSuppressLevelSlider
+                                        objectName: "noiseSuppressLevel"
+                                        Accessible.name: qsTr("Noise to suppress")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 0
+                                        to: 60
+                                        stepSize: 1
+                                        value: typeof dialog.backend.settings.noiseSuppressLevel !== "undefined" ? dialog.backend.settings.noiseSuppressLevel : 6
+                                        onMoved: dialog.backend.settings.noiseSuppressLevel = value
+                                    }
+                                    Label {
+                                        objectName: "noiseSuppressLevelValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr("%1 dB").arg(noiseSuppressLevelSlider.value)
+                                    }
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Echo to suppress\nDefault: 30 dB")
+                                    visible: dialog.backend.settings.speechProcessing || false
+                                }
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    visible: dialog.backend.settings.speechProcessing || false
+                                    C.Slider {
+                                        id: echoSuppressLevelSlider
+                                        objectName: "echoSuppressLevel"
+                                        Accessible.name: qsTr("Echo to suppress")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 0
+                                        to: 60
+                                        stepSize: 1
+                                        value: typeof dialog.backend.settings.echoSuppressLevel !== "undefined" ? dialog.backend.settings.echoSuppressLevel : 30
+                                        onMoved: dialog.backend.settings.echoSuppressLevel = value
+                                    }
+                                    Label {
+                                        objectName: "echoSuppressLevelValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr("%1 dB").arg(echoSuppressLevelSlider.value)
+                                    }
                                 }
                             }
                         }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(100%)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Start Mic Unmuted:")
-                        }
-
-                        C.CheckBox {
-                            checked: dialog.backend.settings.startMicUnmuted
-                            onToggled: dialog.backend.settings.startMicUnmuted = checked
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Unchecked)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Speech Processing:")
-                            visible: typeof dialog.backend.settings.speechProcessing !== "undefined"
-                        }
-
-                        C.CheckBox {
-                            text: qsTr("Noise suppression + echo cancellation")
-                            checked: dialog.backend.settings.speechProcessing
-                            onToggled: dialog.backend.settings.speechProcessing = !dialog.backend.settings.speechProcessing
-                            visible: typeof dialog.backend.settings.speechProcessing !== "undefined"
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Unchecked)")
-                            visible: typeof dialog.backend.settings.speechProcessing !== "undefined"
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Noise To Suppress:")
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                        }
-
-                        C.Slider {
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 60
-                            stepSize: 1
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                            value: dialog.backend.settings.noiseSuppressLevel
-                            onMoved: dialog.backend.settings.noiseSuppressLevel = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                        Label { font.pixelSize: 14; text: qsTr("Connection feedback"); font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: audiowifiFlick.width < 650 ? 1 : 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Weak Wifi notification\nDefault: 3%")
                                 }
-                                text: qsTr("%1 dB").arg(parent.value)
-                            }
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(6 dB)")
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Echo To Suppress:")
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                        }
-
-                        C.Slider {
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 60
-                            stepSize: 1
-                            value: dialog.backend.settings.echoSuppressLevel
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                            onMoved: dialog.backend.settings.echoSuppressLevel = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    C.Slider {
+                                        id: wifiDroppedNotifSlider
+                                        objectName: "wifiDroppedNotif"
+                                        Accessible.name: qsTr("Weak Wifi notification")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 0
+                                        to: 100
+                                        stepSize: 1
+                                        value: dialog.backend.settings.wifiDroppedNotif
+                                        onMoved: dialog.backend.settings.wifiDroppedNotif = value
+                                    }
+                                    Label {
+                                        objectName: "wifiDroppedNotifValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr(">= %1% dropped packets").arg(wifiDroppedNotifSlider.value)
+                                    }
                                 }
-                                text: qsTr("%1 dB").arg(parent.value)
-                            }
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(30 dB)")
-                            visible: if (typeof dialog.backend.settings.speechProcessing !== "undefined") {dialog.backend.settings.speechProcessing} else {false}
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Weak Wifi Notification:")
-                        }
-
-                        C.Slider {
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 100
-                            stepSize: 1
-                            value: dialog.backend.settings.wifiDroppedNotif
-                            onMoved: dialog.backend.settings.wifiDroppedNotif = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Packet loss reported max\nDefault: 5%")
                                 }
-                                text: qsTr(">= %1% dropped packets").arg(parent.value)
-                            }
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(3%)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Packet Loss Reported Max:")
-                        }
-
-                        C.Slider {
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 100
-                            stepSize: 1
-                            value: dialog.backend.settings.packetLossReportedMax
-                            onMoved: dialog.backend.settings.packetLossReportedMax = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    C.Slider {
+                                        id: packetLossReportedMaxSlider
+                                        objectName: "packetLossReportedMax"
+                                        Accessible.name: qsTr("Packet loss reported max")
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        Layout.preferredWidth: 300
+                                        from: 0
+                                        to: 100
+                                        stepSize: 1
+                                        value: dialog.backend.settings.packetLossReportedMax
+                                        onMoved: dialog.backend.settings.packetLossReportedMax = value
+                                    }
+                                    Label {
+                                        objectName: "packetLossReportedMaxValue"
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: qsTr("%1% packet loss").arg(packetLossReportedMaxSlider.value)
+                                    }
                                 }
-                                text: qsTr("%1% packet loss").arg(parent.value)
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Request IDR frame on FEC failure\nDefault: Unchecked")
+                                }
+                                C.CheckBox {
+                                    objectName: "iDROnFECFailureEnabled"
+                                    Accessible.name: qsTr("Request IDR frame on FEC failure")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    text: qsTr("Request IDR frame on FEC failure")
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.iDROnFECFailureEnabled
+                                    onToggled: dialog.backend.settings.iDROnFECFailureEnabled = checked
+                                }
+                                Label {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                    wrapMode: Text.Wrap
+                                    text: qsTr("Show stream stats during gameplay\nDefault: Unchecked")
+                                }
+                                C.CheckBox {
+                                    objectName: "showStreamStats"
+                                    Accessible.name: qsTr("Show stream stats during gameplay")
+                                    font.pixelSize: 14
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    text: qsTr("Show stream stats during gameplay")
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.showStreamStats
+                                    onToggled: dialog.backend.settings.showStreamStats = checked
+                                    lastInFocusChain: true
+                                }
                             }
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(5%)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Request IDR Frame on FEC Failure")
-                        }
-
-                        C.CheckBox {
-                            checked: dialog.backend.settings.iDROnFECFailureEnabled
-                            onToggled: dialog.backend.settings.iDROnFECFailureEnabled = !dialog.backend.settings.iDROnFECFailureEnabled
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Unchecked)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Show Stream Stats During Gameplay")
-                        }
-
-                        C.CheckBox {
-                            lastInFocusChain: true
-                            checked: dialog.backend.settings.showStreamStats
-                            onToggled: dialog.backend.settings.showStreamStats = !dialog.backend.settings.showStreamStats
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Unchecked)")
                         }
                     }
                 }
