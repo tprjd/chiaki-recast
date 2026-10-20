@@ -1,0 +1,31 @@
+{
+    "directQuickWindowWheelContentY": 72,
+    "failedCheck": "Native window did not forward mouse-wheel scrolling to the library",
+    "footerFocusReachable-1280x720": true,
+    "measuredDpr": 1,
+    "nativeMouseWheelContentY": 0,
+    "nativeMouseWheelScrolls": false,
+    "pid": 50200,
+    "psnMapping": {
+        "invalidIndicesRejected": true,
+        "mainPs4Suppressed": true,
+        "networkUsed": false,
+        "passed": true,
+        "resolved": [
+            {
+                "listedDuid": "qa-2",
+                "resolvedDuid": "qa-2",
+                "sourceIndex": 12
+            },
+            {
+                "listedDuid": "qa-3",
+                "resolvedDuid": "qa-3",
+                "sourceIndex": 13
+            }
+        ],
+        "sleepingNicknameSuppressed": true,
+        "visiblePsnCount": 2
+    },
+    "qtScaleFactor": "0.8",
+    "qtScreenScaleFactors": "1"
+}

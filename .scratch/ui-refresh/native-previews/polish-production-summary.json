@@ -1,0 +1,14 @@
+{
+  "executable": "C:\\Users\\david\\.cache\\chiaki-ui-native\\polish-bin\\chiaki.exe",
+  "sha256": "3FE342EAC125B1699485E5C82501347D08964EDFE881F4B33414E08B8260C567",
+  "pid": 46004,
+  "mainWindowHandle": 38275514,
+  "running": true,
+  "sourceMatchesWorkspace": true,
+  "qaHelperExcluded": true,
+  "qt": "6.11.2",
+  "screenChecksPassed": 206,
+  "ctestTargetsPassed": 2,
+  "nativeReplay125": "polish-native-final125c-checks.json",
+  "nativeReplay200": "polish-native-final200-checks.json"
+}

@@ -1,0 +1,40 @@
+{
+    "colorMappingBrowsingHasNoWrites": true,
+    "colorMappingCompletedGroups": [
+        "color-section0-1280x720",
+        "color-section1-1280x720",
+        "color-section2-1280x720",
+        "color-section3-1280x720",
+        "color-section4-1280x720",
+        "color-section0-900x600",
+        "color-section1-900x600",
+        "color-section2-900x600",
+        "color-section3-900x600",
+        "color-section4-900x600"
+    ],
+    "colorMappingConditions": [
+        "Perceptual",
+        "Soft Clip",
+        "Relative",
+        "Spline",
+        "Bt2390",
+        "Reinhard",
+        "Mobius",
+        "Linear"
+    ],
+    "colorMappingNumericPersistence": true,
+    "colorMappingReturnFocus": true,
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "passed": true,
+    "pid": 11548,
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/11-color-mapping-dpr1",
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

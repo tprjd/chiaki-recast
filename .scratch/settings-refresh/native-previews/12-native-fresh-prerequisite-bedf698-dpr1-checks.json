@@ -1,0 +1,34 @@
+{
+    "browsingHasNoWrites": true,
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "expectedSearchTarget": "videoPreset",
+    "freshCategoryRendererPrerequisiteBounds": true,
+    "measuredFramebufferDimensions": true,
+    "passed": true,
+    "pid": 46856,
+    "resultBeforeCapture": {
+        "activeFocus": true,
+        "focusReason": 7,
+        "visualFocus": false
+    },
+    "resultBeforeReturn": {
+        "activeFocus": true,
+        "currentIndex": 3,
+        "focusReason": 7,
+        "name": "settingsSearchResult3",
+        "visualFocus": false
+    },
+    "searchQuery": "Brightness",
+    "searchResultTarget": "placeboColorAdjustmentBrightness",
+    "sessionCreated": false,
+    "settingsDialogFocusChecks": 6,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/12-native-fresh-prerequisite-bedf698-dpr1",
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

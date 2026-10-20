@@ -1,0 +1,42 @@
+{
+    "detailsBottomMargin-390x600": 0,
+    "detailsContentHeight-390x600": 410,
+    "detailsFlickClass-390x600": "QQuickFlickable",
+    "detailsOriginY-390x600": 0,
+    "detailsRouteBottom-390x600": 378,
+    "detailsScrollBottom-390x600": 355,
+    "detailsScrollY-390x600": 72,
+    "detailsViewportHeight-390x600": 315,
+    "detailsWheelSceneX-390x600": 195,
+    "detailsWheelSceneY-390x600": 197.5,
+    "detailsWheelScrollSceneTop-390x600": 40,
+    "detailsWheelScrollWidth-390x600": 310,
+    "failedCheck": "Details route was not reachable after scrolling",
+    "footerFocusReachable-390x600": true,
+    "keyboardLastCardReachable-390x600": true,
+    "measuredDpr": 1,
+    "pid": 40032,
+    "psnMapping": {
+        "invalidIndicesRejected": true,
+        "mainPs4Suppressed": true,
+        "networkUsed": false,
+        "passed": true,
+        "resolved": [
+            {
+                "listedDuid": "qa-2",
+                "resolvedDuid": "qa-2",
+                "sourceIndex": 12
+            },
+            {
+                "listedDuid": "qa-3",
+                "resolvedDuid": "qa-3",
+                "sourceIndex": 13
+            }
+        ],
+        "sleepingNicknameSuppressed": true,
+        "visiblePsnCount": 2
+    },
+    "qtScaleFactor": "0.8",
+    "qtScreenScaleFactors": "1",
+    "tabEntersGrid-390x600": true
+}

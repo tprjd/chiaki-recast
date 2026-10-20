@@ -1,0 +1,18 @@
+{
+    "aboutReturnFocus": true,
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "nativeImportExportCancellation": true,
+    "passed": true,
+    "pid": 48880,
+    "profileCreateSwitchPersistenceAndCancel": true,
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/09-profile-actions-final-dpr1",
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

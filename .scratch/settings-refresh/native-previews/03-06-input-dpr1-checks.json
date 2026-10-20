@@ -1,0 +1,32 @@
+{
+    "categoryNavigationHasNoWrites": true,
+    "completedCategoryCaptures": [
+        "general-1280x720",
+        "video-1280x720",
+        "stream-1280x720",
+        "audio-wifi-1280x720",
+        "consoles-1280x720",
+        "keys-1280x720",
+        "general-900x600",
+        "video-900x600",
+        "stream-900x600",
+        "audio-wifi-900x600",
+        "consoles-900x600",
+        "keys-900x600"
+    ],
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "displayRoute": true,
+    "passed": true,
+    "pid": 52432,
+    "profileRoute": false,
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/03-06-input-dpr1",
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

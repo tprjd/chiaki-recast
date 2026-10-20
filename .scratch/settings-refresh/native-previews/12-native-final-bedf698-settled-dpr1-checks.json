@@ -1,0 +1,34 @@
+{
+    "expectedSearchTarget": "videoPreset",
+    "failedCheck": "Search did not focus its native target after navigation settled",
+    "focusAtUiFailure": [
+        {
+            "name": "videoPreset",
+            "text": "",
+            "type": "ComboBox_QMLTYPE_77",
+            "visible": true
+        }
+    ],
+    "immediatePopupBeforeEscape": {
+        "found": true,
+        "opened": false,
+        "visible": true
+    },
+    "measuredFramebufferDimensions": true,
+    "pid": 5672,
+    "resultBeforeCapture": {
+        "activeFocus": true,
+        "focusReason": 7,
+        "visualFocus": false
+    },
+    "resultBeforeReturn": {
+        "activeFocus": true,
+        "currentIndex": 3,
+        "focusReason": 7,
+        "name": "settingsSearchResult3",
+        "visualFocus": false
+    },
+    "searchQuery": "Brightness",
+    "searchResultTarget": "placeboColorAdjustmentBrightness",
+    "settingsDialogFocusChecks": 14
+}

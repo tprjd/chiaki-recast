@@ -1,0 +1,33 @@
+{
+    "displaySettingsDialogFocusChecks": 2,
+    "expectedSearchTarget": "keyMapping1",
+    "failedCheck": "Search did not focus its native target after navigation settled",
+    "focusAtUiFailure": [
+        {
+            "name": "settingsButton",
+            "text": "Settings",
+            "type": "ConsoleButton_QMLTYPE_144",
+            "visible": true
+        }
+    ],
+    "measuredFramebufferDimensions": true,
+    "pid": 40772,
+    "placeboColorMappingDialogFocusChecks": 1,
+    "placeboSettingsDialogFocusChecks": 2,
+    "resultBeforeCapture": {
+        "activeFocus": true,
+        "focusReason": 1,
+        "visualFocus": true
+    },
+    "resultBeforeReturn": {
+        "activeFocus": true,
+        "currentIndex": 0,
+        "focusReason": 1,
+        "name": "settingsSearchResult0",
+        "visualFocus": true
+    },
+    "searchPhase": "keyboard-capture-cancel",
+    "searchQuery": "Keyboard key for Cross",
+    "searchResultTarget": "keyMapping1",
+    "settingsDialogFocusChecks": 22
+}

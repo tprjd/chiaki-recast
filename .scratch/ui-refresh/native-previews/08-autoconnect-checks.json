@@ -1,0 +1,11 @@
+{
+    "autoconnectStartupGateAndCancel": true,
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "fixtureCleanup": true,
+    "mode": "autoconnect",
+    "passed": true,
+    "pid": 16604,
+    "scalingMethod": "Process-local QT_SCREEN_SCALE_FACTORS=1 and QT_SCALE_FACTOR compensation for measured native1.25 baseline; Windows desktop settings unchanged",
+    "sessionCreated": false
+}

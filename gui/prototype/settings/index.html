@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- PROTOTYPE ONLY: Selected sidebar layout. Full Settings inventory, with sample values. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>chiaki-ng · Settings prototype</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="settings.css">
+  <script src="settings-data.js" defer></script>
+  <script src="advanced-data.js" defer></script>
+  <script src="settings.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#content">Skip to settings</a>
+  <div class="shell">
+    <aside class="app-rail">
+      <a class="brand" href="../?variant=B" aria-label="chiaki-ng console library"><span class="brand-mark">χ</span><span>chiaki<span class="accent">-ng</span></span></a>
+      <nav aria-label="Application">
+        <a href="../?variant=B" aria-label="Consoles"><span aria-hidden="true">▦</span><span>Consoles</span></a>
+        <a class="active" href="./" aria-current="page" aria-label="Settings"><span aria-hidden="true">⚙</span><span>Settings</span></a>
+      </nav>
+      <span class="rail-foot">chiaki-ng</span>
+    </aside>
+    <main>
+      <header class="page-head"><div><div class="breadcrumb">chiaki-ng / Settings</div><h1>Settings</h1></div><div class="profile"><span class="avatar">D</span><div><small>Current profile</small><strong>Default</strong></div></div></header>
+      <div class="tools"><label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="Find a setting…" aria-label="Find a setting"></label><span class="tools-note">Defaults shown below controls · Device lists use samples</span></div>
+      <div id="layout"></div>
+    </main>
+  </div>
+  <aside class="lab" aria-label="Prototype controls">
+    <div class="lab-top"><span class="lab-label">A · SIDEBAR</span><span>Sample values · Nothing is saved</span><button id="reset">Reset demo</button></div>
+    <div id="layout-note">All conditional settings are shown for review.</div>
+  </aside>
+  <dialog aria-labelledby="dialog-title"><form method="dialog"><h2 id="dialog-title"></h2><p id="dialog-message"></p><button class="button">Close</button></form></dialog>
+  <div id="notice" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{
+    "browsingHasNoWrites": true,
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "expectedSearchTarget": "keyMapping1",
+    "finalSearchPresentationViewports": [
+        "1280x720",
+        "900x600"
+    ],
+    "immediateEscapeAttemptsPerViewport": 3,
+    "immediateKeyPopupEscapePreservesSettingsAndOpener": true,
+    "immediatePopupBeforeEscape": {
+        "found": true,
+        "opened": false,
+        "visible": true
+    },
+    "measuredFramebufferDimensions": true,
+    "passed": true,
+    "pid": 35480,
+    "qaOnlyLongLabelTranslation": false,
+    "resultBeforeCapture": {
+        "activeFocus": true,
+        "focusReason": 7,
+        "visualFocus": false
+    },
+    "resultBeforeReturn": {
+        "activeFocus": true,
+        "currentIndex": 3,
+        "focusReason": 7,
+        "name": "settingsSearchResult3",
+        "visualFocus": false
+    },
+    "searchQuery": "Keyboard key for Cross",
+    "searchResultTarget": "keyMapping1",
+    "sessionCreated": false,
+    "settingsDialogFocusChecks": 24,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/13-final-lifecycle-e0e33b8-dpr1",
+    "styledResultKeyboardVisibility": true,
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

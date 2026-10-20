@@ -1,0 +1,26 @@
+{
+    "expectedSearchTarget": "keyMapping1",
+    "failedCheck": "Immediate Escape left the key popup open",
+    "immediatePopupBeforeEscape": {
+        "found": true,
+        "opened": false,
+        "visible": true
+    },
+    "measuredFramebufferDimensions": true,
+    "pid": 9844,
+    "resultBeforeCapture": {
+        "activeFocus": true,
+        "focusReason": 7,
+        "visualFocus": false
+    },
+    "resultBeforeReturn": {
+        "activeFocus": true,
+        "currentIndex": 3,
+        "focusReason": 7,
+        "name": "settingsSearchResult3",
+        "visualFocus": false
+    },
+    "searchQuery": "Keyboard key for Cross",
+    "searchResultTarget": "keyMapping1",
+    "settingsDialogFocusChecks": 6
+}

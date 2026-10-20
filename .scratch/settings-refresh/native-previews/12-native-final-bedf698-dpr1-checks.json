@@ -1,0 +1,21 @@
+{
+    "expectedSearchTarget": "keyMapping1",
+    "failedCheck": "Immediate Escape precondition: Key Capture is not visible",
+    "measuredFramebufferDimensions": true,
+    "pid": 51980,
+    "resultBeforeCapture": {
+        "activeFocus": true,
+        "focusReason": 7,
+        "visualFocus": false
+    },
+    "resultBeforeReturn": {
+        "activeFocus": true,
+        "currentIndex": 3,
+        "focusReason": 7,
+        "name": "settingsSearchResult3",
+        "visualFocus": false
+    },
+    "searchQuery": "Keyboard key for Cross",
+    "searchResultTarget": "keyMapping1",
+    "settingsDialogFocusChecks": 5
+}

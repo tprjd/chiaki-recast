@@ -1,0 +1,30 @@
+{
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "displayNumericModesValuesPersistence": true,
+    "passed": true,
+    "pid": 28596,
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/settings-values-fixed-dpr1",
+    "settingsValueBrowsingHasNoWrites": true,
+    "settingsValueCategories": [
+        "video-values-1280x720",
+        "stream-values-1280x720",
+        "audio-values-1280x720",
+        "controllers-values-1280x720",
+        "remote-values-1280x720",
+        "video-values-900x600",
+        "stream-values-900x600",
+        "audio-values-900x600",
+        "controllers-values-900x600",
+        "remote-values-900x600"
+    ],
+    "speechProcessingAvailable": true,
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

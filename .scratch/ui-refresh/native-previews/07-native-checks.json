@@ -1,0 +1,20 @@
+{
+    "deleteIntendedHost": true,
+    "discoveryEnabled": false,
+    "fixtureAddresses": "RFC 5737 documentation range only",
+    "fixtureCleanup": true,
+    "passed": true,
+    "peerPinUnchanged": "2222",
+    "pid": 50016,
+    "pinBackUnchanged": true,
+    "pinEscapeUnchanged": true,
+    "pinStoredAfterSet": "0042",
+    "pinSubmitFocus": true,
+    "remainingChecksPassed": true,
+    "repeatedDeleteEscapeAndFocus": true,
+    "repeatedDeleteNoAndFocus": true,
+    "sessionCreated": false,
+    "settingsFile": "C:/Users/david/.cache/chiaki-ui-native/qa-settings/Chiaki/Chiaki.ini",
+    "staleDeleteDoesNotDeleteReusedIndex": true,
+    "threeDigitsDisabled": true
+}

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Prototype self-check</title>
+<style>
+  body { font: 14px/1.6 system-ui; background: #101217; color: #eee; padding: 24px; }
+  iframe { border: 1px solid #485060; display: block; margin-top: 24px; }
+  pre { white-space: pre-wrap; }
+</style>
+<h1>Prototype self-check</h1>
+<p>Run through the local HTTP server. Checks use an isolated preview and change only sample data.</p>
+<pre id="results" role="status">Running…</pre>
+<iframe id="preview" title="Test preview" width="1280" height="800" src="index.html?variant=A"></iframe>
+<script>
+const frame = document.querySelector("#preview");
+const results = document.querySelector("#results");
+const checks = [];
+function check(condition, message) {
+  if (!condition) throw new Error(message);
+  checks.push(`PASS ${message}`);
+}
+frame.addEventListener("load", async () => {
+  try {
+    const win = frame.contentWindow;
+    const doc = frame.contentDocument;
+    const find = selector => doc.querySelector(selector);
+    const click = selector => {
+      const element = find(selector);
+      if (!element) throw new Error(`Missing control: ${selector}`);
+      element.focus();
+      element.click();
+    };
+    const settled = () => new Promise(resolve => win.requestAnimationFrame(() => win.requestAnimationFrame(resolve)));
+    const scenario = value => {
+      find("#scenario").value = value;
+      find("#scenario").dispatchEvent(new win.Event("change", { bubbles: true }));
+    };
+    for (const width of [1280, 800, 390]) {
+      frame.width = width;
+      for (const variant of ["A", "B", "C"]) {
+        click(`[data-variant="${variant}"]`);
+        for (const value of ["everyday", "empty", "registration", "long"]) {
+          scenario(value);
+          await settled();
+          check(doc.documentElement.scrollWidth <= win.innerWidth, `${variant}, ${value}, ${width}px: no horizontal overflow`);
+          check(find("#main") && find("#design-description").textContent.length > 0, `${variant}, ${value}, ${width}px: screen and comparison controls rendered`);
+        }
+      }
+    }
+    frame.width = 1280;
+    scenario("everyday");
+    click('[data-variant="A"]');
+    click('[data-action="previous"]');
+    check(new URL(win.location.href).searchParams.get("variant") === "C", "Previous wraps A to C and updates the URL");
+    click('[data-action="next"]');
+    check(new URL(win.location.href).searchParams.get("variant") === "A", "Next wraps C to A");
+    click('[data-action="wake"][data-id="bedroom"]');
+    check(find('[data-action="connect"][data-id="bedroom"]'), "Wake-up makes Connect available");
+    click('[data-variant="B"]');
+    check(find('[data-action="connect"][data-id="bedroom"]'), "Sample state survives a design change");
+    click('[data-action="connect"][data-id="bedroom"]');
+    check(find("#dialog").open && find("#dialog").textContent.includes("No connection is made"), "Connect opens an explicit simulation");
+    click('[data-action="close"]');
+    await settled();
+    check(doc.activeElement.dataset.action === "connect", "Closing a dialog restores keyboard focus");
+    const search = find("#search");
+    search.value = "bed";
+    search.dispatchEvent(new win.Event("input", { bubbles: true }));
+    check(doc.querySelectorAll(".console-card").length === 1, "Search filters the visible consoles");
+    find("#search").dispatchEvent(new win.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    check(new URL(win.location.href).searchParams.get("variant") === "B", "Arrow keys in a field do not change designs");
+    scenario("empty");
+    click('[data-action="add"]');
+    const add = find("#add-form");
+    add.elements.name.value = '<img src=x onerror="alert(1)"> & Office';
+    add.elements.address.value = "192.168.1.123";
+    add.requestSubmit();
+    check(!find(".card-body img") && find(".console-name").textContent.startsWith("<img"), "User-entered names render as text, not HTML");
+    click('[data-action="register"]');
+    find("#register-form").elements.code.value = "12345678";
+    find("#register-form").requestSubmit();
+    check(find('[data-action="connect"]'), "Registration makes Connect available");
+    click('[data-action="details"]');
+    click('[data-action="remove"]');
+    click('[data-action="close"]');
+    check(doc.querySelectorAll(".console-card").length === 1, "Cancel removal preserves the console");
+    click('[data-action="details"]');
+    click('[data-action="remove"]');
+    click('[data-action="confirm-remove"]');
+    check(find(".empty"), "Confirmed removal returns to the empty state");
+    scenario("everyday");
+    click('[data-variant="C"]');
+    click('[data-action="select"][data-id="studio"]');
+    check(find(".focus-title h1").textContent === "Studio" && find(".focus-action button").disabled, "Focus view selects an offline console without enabling Connect");
+    click('[data-action="discovery"]');
+    check(find('[data-action="discovery"]').getAttribute("aria-pressed") === "false", "Discovery toggle exposes its state");
+    scenario("everyday");
+    click('[data-variant="A"]');
+    results.textContent = `${checks.length} checks passed.\n\n${checks.join("\n")}`;
+  } catch (error) {
+    results.textContent = `${checks.join("\n")}\n\nFAIL ${error.message}`;
+    console.error(error);
+  }
+}, { once: true });
+</script>
+</html>

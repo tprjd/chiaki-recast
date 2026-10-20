@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Settings prototype check</title>
+<style>
+body { margin:20px; background:#101217; color:#f2f4f8; font:14px/1.5 system-ui }
+iframe { display:block; border:1px solid #40516b; height:720px; margin-top:20px; background:#101217 }
+</style>
+<h1>Settings prototype check</h1>
+<p id="result" role="status">Running…</p>
+<iframe title="Settings test viewport"></iframe>
+<script>
+// Small browser self-check for the disposable layout study.
+const frame = document.querySelector("iframe");
+const result = document.querySelector("#result");
+let checks = 0;
+function assert(condition, message) { if (!condition) throw Error(message); checks++; }
+async function load(width, variant) {
+  frame.style.width = width + "px";
+  await new Promise(resolve => { frame.onload = resolve; frame.src = `./?variant=${variant}`; });
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  return frame.contentDocument;
+}
+(async () => {
+  for (const width of [1280, 800, 390]) {
+      const doc = await load(width, "A");
+      const win = frame.contentWindow;
+      const checkPage = async (name) => {
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        assert(doc.documentElement.scrollWidth <= width, `${name}/${width}: page overflow`);
+        const ids = [...doc.querySelectorAll("[id]")].map(e=>e.id);
+        assert(ids.length === new Set(ids).size, name + ": unique control IDs");
+        assert([...doc.querySelectorAll("input[type=number]")].every(e=>e.validity.valid), name + ": valid numeric defaults");
+        assert([...doc.querySelectorAll("select")].every(e=>e.selectedIndex>=0), name + ": selected choices");
+        assert([...doc.querySelectorAll("#content .control")].every(e=>e.getBoundingClientRect().right <= width), name + ": controls fit");
+      };
+      assert(doc.querySelectorAll("[data-category]").length === 9, "Nine categories");
+      const toggle = doc.querySelector('[data-key="General/Privacy and logs/Streamer mode"]');
+      toggle.click();
+      for (const name of ["Video","Audio/Wifi","Consoles","Keys","Controllers","Remote","Config","General"]) {
+        doc.querySelector(`[data-category="${name}"]`).click();
+        await checkPage(name);
+      }
+      assert(doc.querySelector('[data-key="General/Privacy and logs/Streamer mode"]').checked, "Values survive category changes");
+      assert(doc.querySelectorAll("[data-part]").length === 4, "Four shortcut choices");
+      doc.querySelector('[data-category="Stream"]').click();
+      assert(doc.querySelectorAll(".stream-grid .section").length === 2, "Local and Remote visible");
+      const bitrate = doc.querySelector('[data-key="Stream/PS5/Local/Bitrate"]');
+      bitrate.value = "25";
+      bitrate.dispatchEvent(new win.Event("change", {bubbles:true}));
+      await checkPage("PS5 stream");
+      doc.querySelector('[data-console="PS4"]').click();
+      assert(doc.querySelectorAll('[data-key$="/Codec"]').length === 0, "PS4 hides PS5 codec choices");
+      await checkPage("PS4 stream");
+      doc.querySelector('[data-console="PS5"]').click();
+      assert(doc.querySelector('[data-key="Stream/PS5/Local/Bitrate"]').value === "25", "PS5 values retained");
+      doc.querySelector('[data-category="Video"]').click();
+      doc.querySelector('[data-page="Display"]').click();
+      assert(doc.querySelectorAll(".row").length===6,"Six display controls");
+      await checkPage("Display");
+      doc.querySelector("[data-back]").click();
+      doc.querySelector('[data-page="Renderer"]').click();
+      assert(doc.querySelectorAll(".row").length===39,"39 renderer controls");
+      await checkPage("Renderer");
+      doc.querySelector('[data-page="Color mapping"]').click();
+      assert(doc.querySelectorAll(".row").length===28,"28 color mapping controls");
+      await checkPage("Color mapping");
+      doc.querySelector("[data-back]").click();
+      assert(doc.querySelector("h2").textContent==="Renderer","Color mapping returns to Renderer");
+      doc.querySelector('[data-category="Controllers"]').click();
+      doc.querySelector('[data-page="Controller mapping"]').click();
+      assert(doc.querySelectorAll("[data-part]").length===46,"23 controller mappings with two inputs each");
+      await checkPage("Controller mapping");
+      doc.querySelector('[data-category="Config"]').click();
+      doc.querySelector('[data-page="Profiles"]').click();
+      await checkPage("Profiles");
+      const search = doc.querySelector("#search");
+      search.value = "mapping";
+      search.dispatchEvent(new win.Event("input", {bubbles:true}));
+      assert(doc.querySelector("#content").textContent.includes("Gamut Mapping Function"), "Search includes advanced settings");
+      await checkPage("Search");
+      search.value = "no-such-setting-xyz";
+      search.dispatchEvent(new win.Event("input", {bubbles:true}));
+      assert(!!doc.querySelector(".empty"), "Empty search");
+      doc.querySelector("#reset").click();
+      assert(search.value === "", "Reset clears search");
+      doc.querySelector('[data-category="Stream"]').click();
+      assert(doc.querySelector('[data-key="Stream/PS5/Local/Bitrate"]').value === "15", "Reset restores samples");
+      doc.querySelector('[data-category="Consoles"]').click();
+      const auto = doc.querySelectorAll("[data-auto]");
+      auto[0].click(); auto[1].click();
+      assert(!auto[0].checked && auto[1].checked,"Only one auto-connect console");
+      doc.querySelector('[data-category="Keys"]').click();
+      assert(doc.querySelectorAll('input[type=text]').length===26,"All 26 key mappings");
+      doc.querySelector('[data-category="Remote"]').click();
+      doc.querySelector('[data-demo="Login to PSN"]').click();
+      assert(doc.querySelector("dialog").open, "Separate flow explanation opens");
+      doc.querySelector("dialog button").click();
+      assert(!doc.querySelector("dialog").open, "Dialog closes");
+  }
+  await load(390, "A");
+  result.textContent = `PASS: ${checks} checks. All categories and linked settings pages at 1280, 800 and 390 pixels. Narrow preview below.`;
+})().catch(error => { result.textContent = "FAIL: " + error.message; });
+</script>
+</html>

@@ -1,0 +1,51 @@
+{
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "displaySettingsDialogFocusChecks": 4,
+    "expectedSearchTarget": "exportSettings",
+    "measuredFramebufferDimensions": true,
+    "nativeSearchCompletedViewports": [
+        "1280x720",
+        "900x600"
+    ],
+    "nativeTypedKeyboardResultActivation": true,
+    "passed": true,
+    "physicalControllerCount": 0,
+    "pid": 42876,
+    "placeboColorMappingDialogFocusChecks": 2,
+    "placeboSettingsDialogFocusChecks": 4,
+    "profileDialogFocusChecks": 8,
+    "resultBeforeCapture": {
+        "activeFocus": true,
+        "focusReason": 1,
+        "visualFocus": true
+    },
+    "resultBeforeReturn": {
+        "activeFocus": true,
+        "currentIndex": 0,
+        "focusReason": 1,
+        "name": "settingsSearchResult0",
+        "visualFocus": true
+    },
+    "searchBrowsingHasNoWrites": true,
+    "searchConfigFocusAndNativeFileCancellation": true,
+    "searchDisplayRendererPrerequisitesAndTargets": true,
+    "searchMappingNormalSelectionCancelOnly": true,
+    "searchNestedColorAndOpenerReturn": true,
+    "searchNoMatchClearEscapeAndCategoryClear": true,
+    "searchPhase": "keyboard-capture-cancel",
+    "searchPrivacyExcludesStoredNamesValuesAndAssignedInputs": true,
+    "searchQuery": "Export settings",
+    "searchRepeatedProfilesNoActions": true,
+    "searchResultTarget": "exportSettings",
+    "sessionCreated": false,
+    "settingsDialogFocusChecks": 82,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/12-native-search-65f2dd1-reveal-dpr1",
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

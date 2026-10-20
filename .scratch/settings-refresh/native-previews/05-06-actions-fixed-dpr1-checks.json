@@ -1,0 +1,17 @@
+{
+    "consoleActionsAndPersistence": true,
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "keyCaptureCancelAssignPersistReset": true,
+    "passed": true,
+    "pid": 38764,
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/05-06-actions-fixed-dpr1",
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

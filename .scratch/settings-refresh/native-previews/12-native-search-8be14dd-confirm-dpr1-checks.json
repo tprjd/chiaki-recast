@@ -1,0 +1,13 @@
+{
+    "displaySettingsDialogFocusChecks": 1,
+    "expectedSearchTarget": "displaySettings",
+    "failedCheck": "Result activation did not clear the query",
+    "measuredFramebufferDimensions": true,
+    "pid": 54692,
+    "queryAfterReturn": "Brightness",
+    "resultIndexAfterReturn": 3,
+    "resultStillHasFocusAfterReturn": true,
+    "searchQuery": "Brightness",
+    "searchResultTarget": "placeboColorAdjustmentBrightness",
+    "settingsDialogFocusChecks": 10
+}

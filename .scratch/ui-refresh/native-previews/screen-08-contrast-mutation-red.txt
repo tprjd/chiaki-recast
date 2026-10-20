@@ -1,0 +1,12 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::ConsoleNavigation::initTestCase()
+FAIL!  : console_screen::ConsoleNavigation::test_consoleBodyIsReadableOnDarkCard(ps4) 'The console body contrasts with the dark artwork panel' returned FALSE. ()
+C:\Users\david\.codex\worktrees\ui-refresh-08\chiaki-ng-ui\gui\tests\qml\tst_ConsoleNavigation.qml(447) : failure location
+FAIL!  : console_screen::ConsoleNavigation::test_consoleBodyIsReadableOnDarkCard(ps5) 'The console body contrasts with the dark artwork panel' returned FALSE. ()
+C:\Users\david\.codex\worktrees\ui-refresh-08\chiaki-ng-ui\gui\tests\qml\tst_ConsoleNavigation.qml(447) : failure location
+FAIL!  : console_screen::ConsoleNavigation::test_primaryActionHasVisibleBackground() 'Connect has a visible blue background with the supported software renderer' returned FALSE. ()
+C:\Users\david\.codex\worktrees\ui-refresh-08\chiaki-ng-ui\gui\tests\qml\tst_ConsoleNavigation.qml(423) : failure location
+PASS   : console_screen::ConsoleNavigation::cleanupTestCase()
+Totals: 2 passed, 3 failed, 0 skipped, 0 blacklisted, 102ms
+********* Finished testing of console_screen *********

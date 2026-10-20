@@ -1,0 +1,21 @@
+{
+    "deleteIntendedHost": true,
+    "discoveryEnabled": false,
+    "fixtureAddresses": "RFC 5737 documentation range only",
+    "fixtureCleanup": true,
+    "knownFailure": "06 Delete Escape opened Quit; retained in 06-native-delete-escape-failure.json. This run used No to continue remaining checks.",
+    "passed": false,
+    "peerPinUnchanged": "2222",
+    "pid": 51772,
+    "pinBackUnchanged": true,
+    "pinEscapeUnchanged": true,
+    "pinStoredAfterSet": "0042",
+    "pinSubmitFocus": true,
+    "remainingChecksPassed": true,
+    "repeatedDeleteEscapeAndFocus": false,
+    "repeatedDeleteNoAndFocus": true,
+    "sessionCreated": false,
+    "settingsFile": "C:/Users/david/.cache/chiaki-ui-native/qa-settings/Chiaki/Chiaki.ini",
+    "staleDeleteDoesNotDeleteReusedIndex": true,
+    "threeDigitsDisabled": true
+}

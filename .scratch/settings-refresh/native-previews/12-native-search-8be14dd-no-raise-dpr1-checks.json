@@ -1,0 +1,25 @@
+{
+    "displaySettingsDialogFocusChecks": 1,
+    "expectedSearchTarget": "displaySettings",
+    "failedCheck": "Result activation did not clear the query",
+    "measuredFramebufferDimensions": true,
+    "pid": 38072,
+    "queryAfterReturn": "Brightness",
+    "resultBeforeCapture": {
+        "activeFocus": true,
+        "focusReason": 7,
+        "visualFocus": false
+    },
+    "resultBeforeReturn": {
+        "activeFocus": true,
+        "currentIndex": 3,
+        "focusReason": 7,
+        "name": "settingsSearchResult3",
+        "visualFocus": false
+    },
+    "resultIndexAfterReturn": 3,
+    "resultStillHasFocusAfterReturn": true,
+    "searchQuery": "Brightness",
+    "searchResultTarget": "placeboColorAdjustmentBrightness",
+    "settingsDialogFocusChecks": 10
+}

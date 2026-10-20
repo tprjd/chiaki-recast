@@ -1,0 +1,9 @@
+{
+    "debandAfter": "yes",
+    "debandBefore": "yes",
+    "debandEnabledAfter": true,
+    "failedCheck": "Disabling debanding failed or changed inverse tone mapping",
+    "inverseToneMappingAfter": "no",
+    "inverseToneMappingBefore": "yes",
+    "pid": 38524
+}

@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "nativeSettingWrites": {
+    "SettingsDialog.qml": 70,
+    "DisplaySettingsDialog.qml": 4,
+    "PlaceboSettingsDialog.qml": 34,
+    "PlaceboColorMappingDialog.qml": 28
+  },
+  "keyboardMappings": 26,
+  "prototypeRows": 199,
+  "advancedControls": 73,
+  "excluded": "Permanently hidden documentation URL field; native operating-system pickers and login/registration flows are entry points."
+}

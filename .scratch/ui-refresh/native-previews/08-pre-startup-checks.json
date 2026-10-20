@@ -1,0 +1,11 @@
+{
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "fixtureCleanup": true,
+    "mode": "startup-reminders",
+    "passed": true,
+    "pid": 47544,
+    "scalingMethod": "Process-local QT_SCREEN_SCALE_FACTORS=1 and QT_SCALE_FACTOR compensation for measured native1.25 baseline; Windows desktop settings unchanged",
+    "sessionCreated": false,
+    "startupReminderOrderAndChoices": true
+}

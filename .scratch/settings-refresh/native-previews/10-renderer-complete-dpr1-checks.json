@@ -1,0 +1,35 @@
+{
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "passed": true,
+    "pid": 39268,
+    "rendererBrowsingHasNoWrites": true,
+    "rendererColorMappingReturnFocus": true,
+    "rendererCompletedGroups": [
+        "renderer-section0-1280x720",
+        "renderer-section1-1280x720",
+        "renderer-section2-1280x720",
+        "renderer-section3-1280x720",
+        "renderer-section4-1280x720",
+        "renderer-section5-1280x720",
+        "renderer-section6-1280x720",
+        "renderer-section0-900x600",
+        "renderer-section1-900x600",
+        "renderer-section2-900x600",
+        "renderer-section3-900x600",
+        "renderer-section4-900x600",
+        "renderer-section5-900x600",
+        "renderer-section6-900x600"
+    ],
+    "rendererFileCancellation": true,
+    "rendererPresetAndNumericPersistence": true,
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/10-renderer-complete-dpr1",
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

@@ -1,0 +1,1 @@
+PASS: 297 checks. All categories and linked settings pages at 1280, 800 and 390 pixels. Narrow preview below.

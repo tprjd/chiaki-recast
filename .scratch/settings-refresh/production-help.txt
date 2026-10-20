@@ -1,0 +1,32 @@
+Usage: C:\Users\david\.cache\chiaki-ui-native\settings-bin\chiaki.exe [options] command nickname host
+
+Options:
+  -?, -h, --help             Displays help on commandline options.
+  --help-all                 Displays help, including generic Qt options.
+  --profile <profile>
+  --exit-app-on-stream-exit  Exit the GUI application when the stream session
+                             ends.
+  --registkey <registkey>
+  --morning <morning>
+  --fullscreen               Start window in fullscreen mode [maintains aspect
+                             ratio, adds black bars to fill unsused parts of
+                             screen if applicable] (only for use with stream
+                             command).
+  --dualsense                Enable DualSense haptics and adaptive triggers
+                             (PS5 and DualSense connected via USB only).
+  --zoom                     Start window in fullscreen zoomed in to fit screen
+                             [maintains aspect ratio, cutting off edges of image
+                             to fill screen] (only for use with stream command)
+  --stretch                  Start window in fullscreen stretched to fit screen
+                             [distorts aspect ratio to fill screen] (only for
+                             use with stream command).
+  --passcode <passcode>      Automatically send your PlayStation login passcode
+                             (only affects users with a login passcode set on
+                             their PlayStation console).
+
+Arguments:
+  command                    stream, list
+  nickname                   Needed for stream command to get credentials for
+                             connecting. Use 'list' to get the nickname.
+  host                       Address to connect to (when using the stream
+                             command).

@@ -1,0 +1,57 @@
+{
+    "detailsContentHeight-1280x720": 356,
+    "detailsContentHeight-390x600": 410,
+    "detailsContentHeight-800x600": 356,
+    "detailsFieldsReachableAndMasked-1280x720": true,
+    "detailsFieldsReachableAndMasked-800x600": true,
+    "detailsRouteBottom-1280x720": 435.5,
+    "detailsRouteBottom-390x600": 409,
+    "detailsRouteBottom-800x600": 354,
+    "detailsScrollBottom-1280x720": 435.5,
+    "detailsScrollBottom-390x600": 355,
+    "detailsScrollBottom-800x600": 355,
+    "detailsScrollY-1280x720": 0,
+    "detailsScrollY-390x600": 41,
+    "detailsScrollY-800x600": 42,
+    "detailsViewportHeight-1280x720": 356,
+    "detailsViewportHeight-390x600": 315,
+    "detailsViewportHeight-800x600": 315,
+    "failedCheck": "Details route was not reachable after scrolling",
+    "footerFocusReachable-1280x720": true,
+    "footerFocusReachable-390x600": true,
+    "footerFocusReachable-800x600": true,
+    "keyboardLastCardReachable-1280x720": true,
+    "keyboardLastCardReachable-390x600": true,
+    "keyboardLastCardReachable-800x600": true,
+    "measuredDpr": 1,
+    "nativeMouseWheelContentY": 72,
+    "nativeMouseWheelScrolls": true,
+    "pid": 28504,
+    "psnMapping": {
+        "invalidIndicesRejected": true,
+        "mainPs4Suppressed": true,
+        "networkUsed": false,
+        "passed": true,
+        "resolved": [
+            {
+                "listedDuid": "qa-2",
+                "resolvedDuid": "qa-2",
+                "sourceIndex": 12
+            },
+            {
+                "listedDuid": "qa-3",
+                "resolvedDuid": "qa-3",
+                "sourceIndex": 13
+            }
+        ],
+        "sleepingNicknameSuppressed": true,
+        "visiblePsnCount": 2
+    },
+    "qtScaleFactor": "0.8",
+    "qtScreenScaleFactors": "1",
+    "tabEntersGrid-1280x720": true,
+    "tabEntersGrid-390x600": true,
+    "tabEntersGrid-800x600": true,
+    "viewport-1280x720": true,
+    "viewport-800x600": true
+}

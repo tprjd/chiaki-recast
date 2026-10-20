@@ -1,0 +1,87 @@
+{
+  "integrationRevision": "e0e33b830d0f5f7f8eb5101657b16845e1f4d9ba",
+  "integrationTree": "813292d76dc7a7baf9213537e36d101aa3ee53e8",
+  "branch": "codex/settings-refresh-integration",
+  "executable": "C:\\Users\\david\\.cache\\chiaki-ui-native\\settings-bin\\chiaki.exe",
+  "executableSha256": "46cb6603ad172a3a8e3acdb9f151c542cf2362494614efbe27befa976e89d56d",
+  "launcher": "C:\\Users\\david\\.cache\\chiaki-ui-native\\settings-bin\\Launch-chiaki.cmd",
+  "productionSourceMatchesCheckout": true,
+  "productionSourceSha256": {
+    "gui/include/qmlmainwindow.h": "ba7f6ed066ebab97504e3de9cce9aa1dcaea42e038abf07a84ad91c875ba9dd8",
+    "gui/src/main.cpp": "8ab73edc06b58f874e63b0c9957777f6549c2893f60be1c7927f8b13129b9a4f",
+    "gui/src/qml/ControllerMappingDialog.qml": "d57d208e17367a5a824b48edddd10c1fc512e717d589527b47f7382219a74b5a",
+    "gui/src/qml/DisplaySettingsDialog.qml": "75864fde807ffaa89f93cdd824d412a0bd53a175444251cb84005cc001e36612",
+    "gui/src/qml/Main.qml": "02c529ff90a00e816c7d2dc4a35ca4b2039ec663ffaa764c1260aef19f839e4e",
+    "gui/src/qml/PlaceboColorMappingDialog.qml": "4d54a0f7503fd1d94b405a68781b8d88d8efb08f61386cd9881145066159721d",
+    "gui/src/qml/PlaceboSettingsDialog.qml": "a7001f4f0f90689efa49f2f7c44c744ee2046b0100051061bf4b5bfe512c6cd1",
+    "gui/src/qml/ProfileDialog.qml": "3491f66f2266f672530762597f3184eb63d12d4891a7b998310972df8ffc4cfd",
+    "gui/src/qml/SettingsDialog.qml": "608a3131613f65e13d64fe123f9d90829ef9701d505063b9146b4163f8c5a437",
+    "gui/src/qml/SettingsSearch.js": "1136270efe6595e4cca9368887a4873d6fcf9866547c53953653a4446b439122",
+    "gui/src/qml/qml.qrc": "5175c23da727e521d2c3d074a93de906afff18974fb4558250aa9bee54c44935",
+    "gui/src/qmlbackend.cpp": "455a1e262a5f63e7da88e6178ea067f84b54ae122040acab7ea37b94b6faedfd",
+    "gui/src/qmlmainwindow.cpp": "00ce94b436b17783b89e610106176f079150367f50f02e27273b79d55bbcdce2",
+    "gui/src/settings.cpp": "24e564d18c299c0369a48e53a637d456d52aa561558f11ca20351264d4439adc"
+  },
+  "originalConsoleFilesPreserved": [
+    {
+      "Path": "gui/res/resources.qrc",
+      "SHA256": "3A8EA2C34B570850A6F73FAC1CB4FB69806EF192DBEDABB44773DA8830C45C61"
+    },
+    {
+      "Path": "gui/src/qml/ConsoleCard.qml",
+      "SHA256": "1F9DBFD2EBA81743D68C3F85E9E03F9F0FB8CDED7C0A583A6102E1AB52A86A20"
+    },
+    {
+      "Path": "gui/src/qml/ConsoleDetails.qml",
+      "SHA256": "6EFDF3DCC14969D1684C92E52C61ECC630178056DAC0C0E2B85A6881DE3A2952"
+    },
+    {
+      "Path": "gui/src/qml/ConsoleLibrary.qml",
+      "SHA256": "9CA085946BA5B021ADD8A7916E025358612501399088C1D127572500446AEE39"
+    },
+    {
+      "Path": "gui/tests/qml/tst_ConsoleDetails.qml",
+      "SHA256": "2913EE85B78A5C11FBC9DD2AB5361B673DA8C6634E19A414E69BB8D75FA17DA0"
+    },
+    {
+      "Path": "gui/tests/qml/tst_ConsoleNavigation.qml",
+      "SHA256": "46D2FE0CDB26D7FCCB216C6F2B4162ACD3210003A82EEEE5580D1D83C65F5C87"
+    },
+    {
+      "Path": "gui/res/arrow-right-24px.svg",
+      "SHA256": "9922BED3B12425BF6B474BFCBF6227F49693A8713C16F670B5185A72D7618768"
+    },
+    {
+      "Path": "gui/res/close-24px.svg",
+      "SHA256": "524DF0747ABF1FD7DCB2759DD39D5B1B007EB6781A39DB6A4AC009B348D633CA"
+    },
+    {
+      "Path": "gui/res/more-24px.svg",
+      "SHA256": "6DACF4203CFE5B26D5A9D17B3C77537A6E01B6CF437D100E9BFA7666D3058222"
+    },
+    {
+      "Path": "gui/res/search-24px.svg",
+      "SHA256": "88D55C54EE46428BBCE986C29586F82564923872DD37EF451ADC4CC86E4E4C03"
+    },
+    {
+      "Path": "gui/src/qml/ConsoleButton.qml",
+      "SHA256": "79727D18B08553F3FE0BF32B1AF0EEC1B4E1C2ECA4E65DF50337494C651971EA"
+    },
+    {
+      "Path": "gui/tests/qml/tst_ConsoleAppearance.qml",
+      "SHA256": "4630AB66E720E310CA03F3F072490D2BE1E36AF38CCAF45ED801A2336138AC76"
+    }
+  ],
+  "composedResourcesRetained": true,
+  "qaInstrumentationRemoved": true,
+  "qaHelperAbsentFromBuildGraph": true,
+  "helpLaunchExitCode": 0,
+  "fullUiAcceptanceBinary": "settings-qa-bin/chiaki.exe with recorded isolated settings",
+  "buildLog": "production-build.txt",
+  "helpLog": "production-help.txt",
+  "limits": [
+    "Production full UI was not relaunched against user settings; isolated native UI acceptance is recorded separately.",
+    "Runtime uses the existing MSYS2 libraries through Launch-chiaki.cmd.",
+    "Physical controller input and live-stream entry points unavailable."
+  ]
+}

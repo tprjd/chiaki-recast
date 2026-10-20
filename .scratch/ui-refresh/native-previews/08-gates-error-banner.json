@@ -1,0 +1,17 @@
+{
+    "capturePath": "Production QQuickRenderControl OpenGL framebuffer",
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "exposed": true,
+    "height": 720,
+    "hostCount": 2,
+    "physicalHeight": 720,
+    "physicalWidth": 1280,
+    "pid": 50312,
+    "screenDevicePixelRatio": 1,
+    "screenshot": "C:/Users/david/Projects/chiaki-ng-ui/.scratch/ui-refresh/native-previews/08-gates-error-banner.png",
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-08/08-gates",
+    "visible": true,
+    "width": 1280
+}

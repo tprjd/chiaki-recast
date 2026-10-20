@@ -1,0 +1,21 @@
+{
+    "debandAfter": "no",
+    "debandBefore": "yes",
+    "debandDisablePreservesToneMapping": true,
+    "debandEnabledAfter": false,
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "inverseToneMappingAfter": "yes",
+    "inverseToneMappingBefore": "yes",
+    "passed": true,
+    "pid": 49904,
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/10-renderer-deband-fixed",
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

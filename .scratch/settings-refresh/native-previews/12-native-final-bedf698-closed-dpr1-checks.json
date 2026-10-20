@@ -1,0 +1,35 @@
+{
+    "clipAncestorHeight": 377,
+    "clipAncestorName": "videoFlick",
+    "clipAncestorType": "QQuickFlickable",
+    "clipAncestorWidth": 616,
+    "clipControlBottom": 49,
+    "clipControlRight": 588,
+    "clipControlX": 12,
+    "clipControlY": -7,
+    "clippedControl": "videoPreset",
+    "expectedSearchTarget": "videoPreset",
+    "failedCheck": "Focused settings control is clipped by its scroll viewport",
+    "immediatePopupBeforeEscape": {
+        "found": true,
+        "opened": false,
+        "visible": true
+    },
+    "measuredFramebufferDimensions": true,
+    "pid": 32980,
+    "resultBeforeCapture": {
+        "activeFocus": true,
+        "focusReason": 7,
+        "visualFocus": false
+    },
+    "resultBeforeReturn": {
+        "activeFocus": true,
+        "currentIndex": 3,
+        "focusReason": 7,
+        "name": "settingsSearchResult3",
+        "visualFocus": false
+    },
+    "searchQuery": "Brightness",
+    "searchResultTarget": "placeboColorAdjustmentBrightness",
+    "settingsDialogFocusChecks": 14
+}

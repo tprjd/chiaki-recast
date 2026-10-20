@@ -1,0 +1,12 @@
+{
+  "restoredFrom": "Actual JSON printed in exec chunk9751c6; original file was replaced by next replay",
+  "productionChangeRequired": false,
+  "measuredDpr": 1,
+  "failedCheck": "08 details did not open",
+  "tabEntersGrid-390x600": true,
+  "cause": "Cache helper reset contentY to zero, then clicked the clipped first-card opener without focus/reveal",
+  "pid": 30232,
+  "nativeMouseWheelContentY": 72,
+  "nativeMouseWheelScrolls": true,
+  "keyboardLastCardReachable-390x600": true
+}

@@ -1,0 +1,20 @@
+{
+  "remainingNativeDefect": "Intermittent900 lifecycle prerequisite top7px clip: two failures; clean and latest full lifecycle replay pass unchanged",
+  "sourceCommit": "bedf698451143a0d720cebfef28b8bfe762db585",
+  "helperSha256": "C79E3B7F72F3299A9DA9B1CC26F257FAC07513514579D098C0711F7593926C30",
+  "searchResourceAdded": true,
+  "productionQmlSha256": {
+    "PlaceboSettingsDialog.qml": "19A738E1718B90029AC6ADBE924258B5E0DB4ED47C26A852B81351A0A072515C",
+    "ControllerMappingDialog.qml": "D57D208E17367A5A824B48EDDDD10C1FC512E717D589527B47F7382219A74B5A",
+    "DisplaySettingsDialog.qml": "75864FDE807FFAA89F93CDD824D412A0BD53A175444251CB84005CC001E36612",
+    "SettingsSearch.js": "53CB888A0C929E0E4BF6631D438854C9F5C40B1081EF7AA003C943F6DB605EB5",
+    "Main.qml": "02C529FF90A00E816C7D2DC4A35CA4B2039EC663FFAA764C1260AEF19F839E4E",
+    "PlaceboColorMappingDialog.qml": "50F58B42C039006FFF847D687D221697C107D37C1B1B42E7BD5FC74EEDD5793A",
+    "ProfileDialog.qml": "3491F66F2266F672530762597F3184EB63D12D4891A7B998310972DF8FFC4CFD",
+    "SettingsDialog.qml": "EC5179FB5336D2F57B4514AC93AA188BDEFC8A3C53898B6F7E04030766F3B40B"
+  },
+  "executableSha256": "E67F01ED7B813774FA0A18FFAA7566A262BC057A6B2750A8C4BEE1DEAADB9B81",
+  "sourceLimits": "Cache retains original console-polish and explicit INI/discovery/accessor instrumentation",
+  "originalConsoleButtonResourcePreserved": true,
+  "fullIntegrationSourceIdentityVerified": false
+}

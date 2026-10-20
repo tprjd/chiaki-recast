@@ -1,0 +1,15 @@
+{
+  "sourceCommit": "846298e5cabda75fd49efb5a4064bdd0bf09779a",
+  "originalConsoleFiles": 12,
+  "originalConsoleResource": "ConsoleButton.qml",
+  "settingsSearchResource": "SettingsSearch.js",
+  "passed": 562,
+  "failed": 0,
+  "skipped": 0,
+  "qmlWarnings": 0,
+  "runtimeMilliseconds": 404210,
+  "sourceWorktree": "C:/Users/david/.codex/worktrees/settings-13-acceptance/chiaki-ng-ui",
+  "executable": "C:/Users/david/.cache/chiaki-settings-screen-final/chiaki-console-screen-tests.exe",
+  "finalCommit": "e0e33b830d0f5f7f8eb5101657b16845e1f4d9ba",
+  "finalDeltaChecks": "All six focused suites pass; see final-delta-checks and final-review.md"
+}

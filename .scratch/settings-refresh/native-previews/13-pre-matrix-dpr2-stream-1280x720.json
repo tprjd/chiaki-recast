@@ -1,0 +1,17 @@
+{
+    "capturePath": "Production QQuickRenderControl OpenGL framebuffer",
+    "devicePixelRatio": 2,
+    "discoveryEnabled": false,
+    "exposed": true,
+    "height": 720,
+    "hostCount": 0,
+    "physicalHeight": 1440,
+    "physicalWidth": 2560,
+    "pid": 11336,
+    "screenDevicePixelRatio": 2,
+    "screenshot": "C:/Users/david/Projects/chiaki-ng-ui/.scratch/settings-refresh/native-previews/13-pre-matrix-dpr2-stream-1280x720.png",
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/13-pre-matrix-dpr2",
+    "visible": true,
+    "width": 1280
+}

@@ -1,0 +1,14 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::SpecFocusedReorder::initTestCase()
+QDEBUG : console_screen::SpecFocusedReorder::test_focusedHostUpdate(first-reorder) qml: BEFORE first-reorder selected [0,"discovered","01"] expected [0,"discovered","01"] focus 
+PASS   : console_screen::SpecFocusedReorder::test_focusedHostUpdate(first-reorder)
+QDEBUG : console_screen::SpecFocusedReorder::test_focusedHostUpdate(second-reorder) qml: BEFORE second-reorder selected [0,"discovered","02"] expected [0,"discovered","02"] focus 
+PASS   : console_screen::SpecFocusedReorder::test_focusedHostUpdate(second-reorder)
+QDEBUG : console_screen::SpecFocusedReorder::test_focusedHostUpdate(first-unchanged-order) qml: BEFORE first-unchanged-order selected [0,"discovered","01"] expected [0,"discovered","01"] focus connectButton
+PASS   : console_screen::SpecFocusedReorder::test_focusedHostUpdate(first-unchanged-order)
+QDEBUG : console_screen::SpecFocusedReorder::test_focusedHostUpdate(second-unchanged-order) qml: BEFORE second-unchanged-order selected [0,"discovered","02"] expected [0,"discovered","02"] focus connectButton
+PASS   : console_screen::SpecFocusedReorder::test_focusedHostUpdate(second-unchanged-order)
+PASS   : console_screen::SpecFocusedReorder::cleanupTestCase()
+Totals: 6 passed, 0 failed, 0 skipped, 0 blacklisted, 334ms
+********* Finished testing of console_screen *********

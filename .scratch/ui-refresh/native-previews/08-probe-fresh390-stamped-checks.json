@@ -1,0 +1,53 @@
+{
+    "detailsBottomMargin-390x600": 0,
+    "detailsContentHeight-390x600": 410,
+    "detailsFieldsReachableAndMasked-390x600": true,
+    "detailsFlickClass-390x600": "QQuickFlickable",
+    "detailsOriginY-390x600": 0,
+    "detailsRouteBottom-390x600": 354,
+    "detailsScrollBottom-390x600": 355,
+    "detailsScrollY-390x600": 96,
+    "detailsViewportHeight-390x600": 315,
+    "detailsWheelDetents-390x600": 2,
+    "detailsWheelSceneX-390x600": 195,
+    "detailsWheelSceneY-390x600": 197.5,
+    "detailsWheelScrollSceneTop-390x600": 40,
+    "detailsWheelScrollWidth-390x600": 310,
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "fixtureCleanup": true,
+    "footerFocusReachable-390x600": true,
+    "keyboardLastCardReachable-390x600": true,
+    "longNamesManyHostsAbsentFields": true,
+    "measuredDpr": 1,
+    "mode": "matrix",
+    "optionalPsnRendering": "Availability override on real library only; no token or refresh dispatch",
+    "passed": true,
+    "pid": 43740,
+    "psnMapping": {
+        "invalidIndicesRejected": true,
+        "mainPs4Suppressed": true,
+        "networkUsed": false,
+        "passed": true,
+        "resolved": [
+            {
+                "listedDuid": "qa-2",
+                "resolvedDuid": "qa-2",
+                "sourceIndex": 12
+            },
+            {
+                "listedDuid": "qa-3",
+                "resolvedDuid": "qa-3",
+                "sourceIndex": 13
+            }
+        ],
+        "sleepingNicknameSuppressed": true,
+        "visiblePsnCount": 2
+    },
+    "qtScaleFactor": "0.8",
+    "qtScreenScaleFactors": "1",
+    "scalingMethod": "Process-local QT_SCREEN_SCALE_FACTORS=1 and QT_SCALE_FACTOR compensation for measured native1.25 baseline; Windows desktop settings unchanged",
+    "sessionCreated": false,
+    "tabEntersGrid-390x600": true,
+    "viewport-390x600": true
+}

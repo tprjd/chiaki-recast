@@ -1,0 +1,31 @@
+{
+    "clippedControl": "settingsSearchResult3",
+    "controlHeight": 134,
+    "controlWidth": 634,
+    "controlX": 228,
+    "controlY": 539,
+    "displaySettingsDialogFocusChecks": 3,
+    "expectedSearchTarget": "displaySettings",
+    "failedCheck": "Essential control is outside the logical viewport",
+    "measuredFramebufferDimensions": true,
+    "pid": 19720,
+    "placeboColorMappingDialogFocusChecks": 1,
+    "placeboSettingsDialogFocusChecks": 2,
+    "profileDialogFocusChecks": 4,
+    "resultBeforeCapture": {
+        "activeFocus": true,
+        "focusReason": 1,
+        "visualFocus": true
+    },
+    "resultBeforeReturn": {
+        "activeFocus": true,
+        "currentIndex": 0,
+        "focusReason": 1,
+        "name": "settingsSearchResult0",
+        "visualFocus": true
+    },
+    "searchPhase": "keyboard-capture-cancel",
+    "searchQuery": "Brightness",
+    "searchResultTarget": "placeboColorAdjustmentBrightness",
+    "settingsDialogFocusChecks": 50
+}

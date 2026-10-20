@@ -1,0 +1,131 @@
+{
+  "settingsQmlAndJsSha256": {
+    "PlaceboColorMappingDialog.qml": "4D54A0F7503FD1D94B405A68781B8D88D8EFB08F61386CD9881145066159721D",
+    "Main.qml": "02C529FF90A00E816C7D2DC4A35CA4B2039EC663FFAA764C1260AEF19F839E4E",
+    "ControllerMappingDialog.qml": "D57D208E17367A5A824B48EDDDD10C1FC512E717D589527B47F7382219A74B5A",
+    "ProfileDialog.qml": "3491F66F2266F672530762597F3184EB63D12D4891A7B998310972DF8FFC4CFD",
+    "SettingsSearch.js": "1136270EFE6595E4CCA9368887A4873D6FCF9866547C53953653A4446B439122",
+    "PlaceboSettingsDialog.qml": "A7001F4F0F90689EFA49F2F7C44C744EE2046B0100051061BF4B5BFE512C6CD1",
+    "SettingsDialog.qml": "608A3131613F65E13D64FE123F9D90829EF9701D505063B9146B4163F8C5A437",
+    "DisplaySettingsDialog.qml": "75864FDE807FFAA89F93CDD824D412A0BD53A175444251CB84005CC001E36612"
+  },
+  "buildLog": "C:/Users/david/.cache/chiaki-ui-native/build-settings-final-e0e33b8.log",
+  "pendingFinalRuns": [],
+  "executable": "C:/Users/david/.cache/chiaki-ui-native/settings-qa-bin/chiaki.exe",
+  "implementationRevision": "89699c4864bd658ba9f94fe1e1e35b658548f3cc",
+  "helper": "C:/Users/david/.cache/chiaki-ui-native/native-qa-settings.cpp",
+  "sourceLimits": "Documented original console overlay and cache-only INI/discovery/accessor/helper instrumentation remain. Not a clean production binary.",
+  "integrationRevision": "e0e33b830d0f5f7f8eb5101657b16845e1f4d9ba",
+  "capturePath": "Production QQuickRenderControl OpenGL framebuffer",
+  "helperSha256": "5F56ECCBA523B77B3C7A411C90873289BAC084DDDF6AED967C3B3866E6BE2873",
+  "composedResourceSha256": "5175C23DA727E521D2C3D074A93DE906AFFF18974FB4558250AA9BEE54C44935",
+  "identicalCommittedTree": "813292d76dc7a7baf9213537e36d101aa3ee53e8",
+  "preservedOverlaySha256": {
+    "gui/res/more-24px.svg": "6DACF4203CFE5B26D5A9D17B3C77537A6E01B6CF437D100E9BFA7666D3058222",
+    "gui/res/close-24px.svg": "524DF0747ABF1FD7DCB2759DD39D5B1B007EB6781A39DB6A4AC009B348D633CA",
+    "gui/src/qml/ConsoleButton.qml": "79727D18B08553F3FE0BF32B1AF0EEC1B4E1C2ECA4E65DF50337494C651971EA",
+    "gui/src/qml/ConsoleCard.qml": "1F9DBFD2EBA81743D68C3F85E9E03F9F0FB8CDED7C0A583A6102E1AB52A86A20",
+    "gui/src/qml/qml.qrc": "5175C23DA727E521D2C3D074A93DE906AFFF18974FB4558250AA9BEE54C44935",
+    "gui/res/arrow-right-24px.svg": "9922BED3B12425BF6B474BFCBF6227F49693A8713C16F670B5185A72D7618768",
+    "gui/tests/qml/tst_ConsoleNavigation.qml": "46D2FE0CDB26D7FCCB216C6F2B4162ACD3210003A82EEEE5580D1D83C65F5C87",
+    "gui/src/qml/ConsoleDetails.qml": "6EFDF3DCC14969D1684C92E52C61ECC630178056DAC0C0E2B85A6881DE3A2952",
+    "gui/res/search-24px.svg": "88D55C54EE46428BBCE986C29586F82564923872DD37EF451ADC4CC86E4E4C03",
+    "gui/src/qml/ConsoleLibrary.qml": "9CA085946BA5B021ADD8A7916E025358612501399088C1D127572500446AEE39",
+    "gui/tests/qml/tst_ConsoleDetails.qml": "2913EE85B78A5C11FBC9DD2AB5361B673DA8C6634E19A414E69BB8D75FA17DA0",
+    "gui/tests/qml/tst_ConsoleAppearance.qml": "4630AB66E720E310CA03F3F072490D2BE1E36AF38CCAF45ED801A2336138AC76",
+    "gui/res/resources.qrc": "3A8EA2C34B570850A6F73FAC1CB4FB69806EF192DBEDABB44773DA8830C45C61"
+  },
+  "executableSha256": "FE562342F3F4CE8B52EA4CB8BB9834CCE58F459334E73C6E663F5706F4A56A87",
+  "completedRuns": [
+    {
+      "run": "13-final-lifecycle-e0e33b8-dpr1",
+      "pid": 35480,
+      "devicePixelRatio": 1,
+      "actualPngAndStatePairs": 12,
+      "processExited": true,
+      "passed": true,
+      "result": "C:/Users/david/Projects/chiaki-ng-ui/.scratch/settings-refresh/native-previews/13-final-lifecycle-e0e33b8-dpr1-checks.json"
+    },
+    {
+      "run": "13-final-matrix-e0e33b8-dpr1",
+      "pid": 53796,
+      "devicePixelRatio": 1,
+      "actualPngAndStatePairs": 68,
+      "processExited": true,
+      "passed": true,
+      "result": "C:/Users/david/Projects/chiaki-ng-ui/.scratch/settings-refresh/native-previews/13-final-matrix-e0e33b8-dpr1-checks.json"
+    },
+    {
+      "run": "13-final-matrix-e0e33b8-dpr1_5",
+      "pid": 49604,
+      "devicePixelRatio": 1.5,
+      "actualPngAndStatePairs": 68,
+      "processExited": true,
+      "passed": true,
+      "result": "C:/Users/david/Projects/chiaki-ng-ui/.scratch/settings-refresh/native-previews/13-final-matrix-e0e33b8-dpr1_5-checks.json"
+    },
+    {
+      "run": "13-final-matrix-e0e33b8-dpr2",
+      "pid": 19896,
+      "devicePixelRatio": 2,
+      "actualPngAndStatePairs": 68,
+      "processExited": true,
+      "passed": true,
+      "result": "C:/Users/david/Projects/chiaki-ng-ui/.scratch/settings-refresh/native-previews/13-final-matrix-e0e33b8-dpr2-checks.json"
+    },
+    {
+      "run": "13-final-long-e0e33b8-dpr1",
+      "pid": 48648,
+      "devicePixelRatio": 1,
+      "actualPngAndStatePairs": 74,
+      "processExited": true,
+      "passed": true,
+      "result": "C:/Users/david/Projects/chiaki-ng-ui/.scratch/settings-refresh/native-previews/13-final-long-e0e33b8-dpr1-checks.json"
+    }
+  ],
+  "actualPngStatePairsVerified": 290.0,
+  "acceptanceComplete": true,
+  "allFinalQaProcessesExited": true,
+  "nativeLogChecks": [
+    {
+      "run": "13-final-lifecycle-e0e33b8-dpr1",
+      "stderr": "C:/Users/david/.cache/chiaki-ui-native/launch-13-final-lifecycle-e0e33b8-dpr1.stderr.log",
+      "existingMainShortcutMessages": 3,
+      "nativeOrQmlErrors": 0
+    },
+    {
+      "run": "13-final-matrix-e0e33b8-dpr1",
+      "stderr": "C:/Users/david/.cache/chiaki-ui-native/launch-13-final-matrix-e0e33b8-dpr1.stderr.log",
+      "existingMainShortcutMessages": 3,
+      "nativeOrQmlErrors": 0
+    },
+    {
+      "run": "13-final-matrix-e0e33b8-dpr1_5",
+      "stderr": "C:/Users/david/.cache/chiaki-ui-native/launch-13-final-matrix-e0e33b8-dpr1_5.stderr.log",
+      "existingMainShortcutMessages": 3,
+      "nativeOrQmlErrors": 0
+    },
+    {
+      "run": "13-final-matrix-e0e33b8-dpr2",
+      "stderr": "C:/Users/david/.cache/chiaki-ui-native/launch-13-final-matrix-e0e33b8-dpr2.stderr.log",
+      "existingMainShortcutMessages": 3,
+      "nativeOrQmlErrors": 0
+    },
+    {
+      "run": "13-final-long-e0e33b8-dpr1",
+      "stderr": "C:/Users/david/.cache/chiaki-ui-native/launch-13-final-long-e0e33b8-dpr1.stderr.log",
+      "existingMainShortcutMessages": 3,
+      "nativeOrQmlErrors": 0
+    }
+  ],
+  "remainingNativeDefects": [],
+  "representativeInspectedCaptures": [
+    "13-final-matrix-e0e33b8-dpr1-renderer4-900x600.png",
+    "13-final-matrix-e0e33b8-dpr1-config-900x600-focused-last.png",
+    "13-final-matrix-e0e33b8-dpr1_5-color1-900x600.png",
+    "13-final-matrix-e0e33b8-dpr2-video-900x600-focused-last.png",
+    "13-final-long-e0e33b8-dpr1-renderer4-900x600.png",
+    "13-final-long-e0e33b8-dpr1-color1-900x600.png",
+    "13-final-long-e0e33b8-dpr1-translated-search-result2-900x600.png"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+    "capturePath": "Production QQuickRenderControl OpenGL framebuffer",
+    "devicePixelRatio": 1.25,
+    "discoveryEnabled": false,
+    "exposed": true,
+    "height": 720,
+    "hostCount": 1,
+    "physicalHeight": 900,
+    "physicalWidth": 1600,
+    "pid": 47212,
+    "screenDevicePixelRatio": 1.25,
+    "screenshot": "C:/Users/david/Projects/chiaki-ng-ui/.scratch/ui-refresh/native-previews/polish-native-125-details-1280x720.png",
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-08/polish-native-125",
+    "visible": true,
+    "width": 1280
+}

@@ -1,0 +1,28 @@
+{
+    "categoryNavigationHasNoWrites": true,
+    "completedCategoryCaptures": [
+        "controllers-1280x720",
+        "remote-1280x720",
+        "config-1280x720",
+        "controllers-900x600",
+        "remote-900x600",
+        "config-900x600"
+    ],
+    "controllerSelectionCancel": true,
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "displayRoute": false,
+    "passed": true,
+    "physicalControllerCount": 0,
+    "pid": 47044,
+    "profileRoute": true,
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/07-09-management-dpr1",
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

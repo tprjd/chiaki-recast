@@ -1,0 +1,45 @@
+{
+    "failedCheck": "Expanded translated labels are truncated",
+    "measuredFramebufferDimensions": true,
+    "pid": 45428,
+    "placeboColorMappingDialogFocusChecks": 47,
+    "qaOnlyLongLabelTranslation": true,
+    "truncatedLongLabels": [
+        {
+            "capture": "color0-900x600",
+            "height": 19,
+            "text": "[QA] Gamut Mapping 1 extra",
+            "width": 132
+        },
+        {
+            "capture": "color0-900x600",
+            "height": 19,
+            "text": "[QA] Gamut Mapping 2 extra",
+            "width": 132
+        },
+        {
+            "capture": "color0-900x600",
+            "height": 19,
+            "text": "[QA] Tone-mapping 1 extra",
+            "width": 132
+        },
+        {
+            "capture": "color0-900x600",
+            "height": 19,
+            "text": "[QA] Tone-mapping 2 extra",
+            "width": 132
+        },
+        {
+            "capture": "color0-900x600",
+            "height": 19,
+            "text": "[QA] Tone-mapping 3 extra",
+            "width": 132
+        },
+        {
+            "capture": "color1-900x600",
+            "height": 19,
+            "text": "[QA] Enable Tricubic Interpolation for 3DLUTs extra extra extra",
+            "width": 380
+        }
+    ]
+}

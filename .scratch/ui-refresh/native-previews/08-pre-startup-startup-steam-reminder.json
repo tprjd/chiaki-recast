@@ -1,0 +1,17 @@
+{
+    "capturePath": "Production QQuickRenderControl OpenGL framebuffer",
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "exposed": true,
+    "height": 720,
+    "hostCount": 0,
+    "physicalHeight": 720,
+    "physicalWidth": 1280,
+    "pid": 47544,
+    "screenDevicePixelRatio": 1,
+    "screenshot": "C:/Users/david/Projects/chiaki-ng-ui/.scratch/ui-refresh/native-previews/08-pre-startup-startup-steam-reminder.png",
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-08/08-pre-startup",
+    "visible": true,
+    "width": 1280
+}

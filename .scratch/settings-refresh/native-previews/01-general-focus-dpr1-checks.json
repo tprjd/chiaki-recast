@@ -1,0 +1,22 @@
+{
+    "categoryNavigationHasNoWrites": true,
+    "completedCategoryCaptures": [
+        "general-1280x720",
+        "general-800x600",
+        "general-390x600"
+    ],
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "displayAndProfileRoutes": false,
+    "passed": true,
+    "pid": 55284,
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/01-general-focus-dpr1",
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

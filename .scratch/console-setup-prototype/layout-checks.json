@@ -1,0 +1,728 @@
+{
+  "checks": [
+    {
+      "variant": "A",
+      "screen": "register",
+      "state": "form",
+      "client": 888,
+      "fields": [
+        {
+          "id": "console",
+          "width": 371.3365478515625
+        },
+        {
+          "id": "address",
+          "width": 371.3365478515625
+        },
+        {
+          "id": "account",
+          "width": 371.3365478515625
+        },
+        {
+          "id": "pin",
+          "width": 371.3365478515625
+        },
+        {
+          "id": "consolePin",
+          "width": 371.3365478515625
+        }
+      ],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "scroll": 888,
+      "title": "Register console",
+      "width": 900
+    },
+    {
+      "variant": "A",
+      "screen": "register",
+      "state": "progress",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Registering console",
+      "scroll": 888,
+      "title": "Register console",
+      "width": 900
+    },
+    {
+      "variant": "A",
+      "screen": "register",
+      "state": "success",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Console registered",
+      "scroll": 888,
+      "title": "Register console",
+      "width": 900
+    },
+    {
+      "variant": "A",
+      "screen": "register",
+      "state": "failure",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Registration failed",
+      "scroll": 888,
+      "title": "Register console",
+      "width": 900
+    },
+    {
+      "variant": "A",
+      "screen": "manual",
+      "state": "form",
+      "client": 888,
+      "fields": [
+        {
+          "id": "address",
+          "width": 371.3365478515625
+        },
+        {
+          "id": "savedConsole",
+          "width": 371.3365478515625
+        }
+      ],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "scroll": 888,
+      "title": "Add manual console",
+      "width": 900
+    },
+    {
+      "variant": "A",
+      "screen": "manual",
+      "state": "success",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Manual console added",
+      "scroll": 888,
+      "title": "Add manual console",
+      "width": 900
+    },
+    {
+      "variant": "A",
+      "screen": "manual",
+      "state": "failure",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Console was not added",
+      "scroll": 888,
+      "title": "Add manual console",
+      "width": 900
+    },
+    {
+      "variant": "B",
+      "screen": "register",
+      "state": "form",
+      "client": 888,
+      "fields": [
+        {
+          "id": "console",
+          "width": 300.69232177734375
+        },
+        {
+          "id": "address",
+          "width": 300.69232177734375
+        },
+        {
+          "id": "account",
+          "width": 623.3846435546875
+        },
+        {
+          "id": "pin",
+          "width": 300.69232177734375
+        },
+        {
+          "id": "consolePin",
+          "width": 300.69232177734375
+        }
+      ],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "scroll": 888,
+      "title": "Consoles",
+      "width": 900
+    },
+    {
+      "variant": "B",
+      "screen": "register",
+      "state": "progress",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Registering console",
+      "scroll": 888,
+      "title": "Consoles",
+      "width": 900
+    },
+    {
+      "variant": "B",
+      "screen": "register",
+      "state": "success",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Console registered",
+      "scroll": 888,
+      "title": "Consoles",
+      "width": 900
+    },
+    {
+      "variant": "B",
+      "screen": "register",
+      "state": "failure",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Registration failed",
+      "scroll": 888,
+      "title": "Consoles",
+      "width": 900
+    },
+    {
+      "variant": "B",
+      "screen": "manual",
+      "state": "form",
+      "client": 888,
+      "fields": [
+        {
+          "id": "address",
+          "width": 300.69232177734375
+        },
+        {
+          "id": "savedConsole",
+          "width": 300.69232177734375
+        }
+      ],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "scroll": 888,
+      "title": "Consoles",
+      "width": 900
+    },
+    {
+      "variant": "B",
+      "screen": "manual",
+      "state": "success",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Manual console added",
+      "scroll": 888,
+      "title": "Consoles",
+      "width": 900
+    },
+    {
+      "variant": "B",
+      "screen": "manual",
+      "state": "failure",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Console was not added",
+      "scroll": 888,
+      "title": "Consoles",
+      "width": 900
+    },
+    {
+      "variant": "C",
+      "screen": "register",
+      "state": "form",
+      "client": 888,
+      "fields": [
+        {
+          "id": "console",
+          "width": 395.6153869628906
+        },
+        {
+          "id": "address",
+          "width": 395.6153869628906
+        },
+        {
+          "id": "account",
+          "width": 395.6153869628906
+        },
+        {
+          "id": "pin",
+          "width": 395.6153869628906
+        },
+        {
+          "id": "consolePin",
+          "width": 395.6153869628906
+        }
+      ],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "scroll": 888,
+      "title": "Register console",
+      "width": 900
+    },
+    {
+      "variant": "C",
+      "screen": "register",
+      "state": "progress",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Registering console",
+      "scroll": 888,
+      "title": "Register console",
+      "width": 900
+    },
+    {
+      "variant": "C",
+      "screen": "register",
+      "state": "success",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Console registered",
+      "scroll": 888,
+      "title": "Register console",
+      "width": 900
+    },
+    {
+      "variant": "C",
+      "screen": "register",
+      "state": "failure",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Registration failed",
+      "scroll": 888,
+      "title": "Register console",
+      "width": 900
+    },
+    {
+      "variant": "C",
+      "screen": "manual",
+      "state": "form",
+      "client": 888,
+      "fields": [
+        {
+          "id": "address",
+          "width": 395.6153869628906
+        },
+        {
+          "id": "savedConsole",
+          "width": 395.6153869628906
+        }
+      ],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "scroll": 888,
+      "title": "Add manual console",
+      "width": 900
+    },
+    {
+      "variant": "C",
+      "screen": "manual",
+      "state": "success",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Manual console added",
+      "scroll": 888,
+      "title": "Add manual console",
+      "width": 900
+    },
+    {
+      "variant": "C",
+      "screen": "manual",
+      "state": "failure",
+      "client": 888,
+      "fields": [],
+      "height": 600,
+      "labRight": 874.6154184341431,
+      "result": "Console was not added",
+      "scroll": 888,
+      "title": "Add manual console",
+      "width": 900
+    },
+    {
+      "variant": "A",
+      "screen": "register",
+      "state": "form",
+      "client": 1268,
+      "fields": [
+        {
+          "id": "console",
+          "width": 571.0288696289062
+        },
+        {
+          "id": "address",
+          "width": 571.0288696289062
+        },
+        {
+          "id": "account",
+          "width": 571.0288696289062
+        },
+        {
+          "id": "pin",
+          "width": 276.5096130371094
+        },
+        {
+          "id": "consolePin",
+          "width": 276.51922607421875
+        }
+      ],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "scroll": 1268,
+      "title": "Register console",
+      "width": 1280
+    },
+    {
+      "variant": "A",
+      "screen": "register",
+      "state": "progress",
+      "client": 1268,
+      "fields": [],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "result": "Registering console",
+      "scroll": 1268,
+      "title": "Register console",
+      "width": 1280
+    },
+    {
+      "variant": "A",
+      "screen": "register",
+      "state": "success",
+      "client": 1268,
+      "fields": [],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "result": "Console registered",
+      "scroll": 1268,
+      "title": "Register console",
+      "width": 1280
+    },
+    {
+      "variant": "A",
+      "screen": "register",
+      "state": "failure",
+      "client": 1268,
+      "fields": [],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "result": "Registration failed",
+      "scroll": 1268,
+      "title": "Register console",
+      "width": 1280
+    },
+    {
+      "variant": "A",
+      "screen": "manual",
+      "state": "form",
+      "client": 1268,
+      "fields": [
+        {
+          "id": "address",
+          "width": 571.0288696289062
+        },
+        {
+          "id": "savedConsole",
+          "width": 571.0288696289062
+        }
+      ],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "scroll": 1268,
+      "title": "Add manual console",
+      "width": 1280
+    },
+    {
+      "variant": "A",
+      "screen": "manual",
+      "state": "success",
+      "client": 1268,
+      "fields": [],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "result": "Manual console added",
+      "scroll": 1268,
+      "title": "Add manual console",
+      "width": 1280
+    },
+    {
+      "variant": "A",
+      "screen": "manual",
+      "state": "failure",
+      "client": 1268,
+      "fields": [],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "result": "Console was not added",
+      "scroll": 1268,
+      "title": "Add manual console",
+      "width": 1280
+    },
+    {
+      "variant": "B",
+      "screen": "register",
+      "state": "form",
+      "client": 1268,
+      "fields": [
+        {
+          "id": "console",
+          "width": 340.3846130371094
+        },
+        {
+          "id": "address",
+          "width": 340.3846130371094
+        },
+        {
+          "id": "account",
+          "width": 702.769287109375
+        },
+        {
+          "id": "pin",
+          "width": 340.3846130371094
+        },
+        {
+          "id": "consolePin",
+          "width": 340.3846130371094
+        }
+      ],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "scroll": 1268,
+      "title": "Consoles",
+      "width": 1280
+    },
+    {
+      "variant": "B",
+      "screen": "register",
+      "state": "progress",
+      "client": 1268,
+      "fields": [],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "result": "Registering console",
+      "scroll": 1268,
+      "title": "Consoles",
+      "width": 1280
+    },
+    {
+      "variant": "B",
+      "screen": "register",
+      "state": "success",
+      "client": 1280,
+      "fields": [],
+      "height": 720,
+      "labRight": 1075.0000762939453,
+      "result": "Console registered",
+      "scroll": 1280,
+      "title": "Consoles",
+      "width": 1280
+    },
+    {
+      "variant": "B",
+      "screen": "register",
+      "state": "failure",
+      "client": 1268,
+      "fields": [],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "result": "Registration failed",
+      "scroll": 1268,
+      "title": "Consoles",
+      "width": 1280
+    },
+    {
+      "variant": "B",
+      "screen": "manual",
+      "state": "form",
+      "client": 1280,
+      "fields": [
+        {
+          "id": "address",
+          "width": 340.3846130371094
+        },
+        {
+          "id": "savedConsole",
+          "width": 340.3846130371094
+        }
+      ],
+      "height": 720,
+      "labRight": 1075.0000762939453,
+      "scroll": 1280,
+      "title": "Consoles",
+      "width": 1280
+    },
+    {
+      "variant": "B",
+      "screen": "manual",
+      "state": "success",
+      "client": 1280,
+      "fields": [],
+      "height": 720,
+      "labRight": 1075.0000762939453,
+      "result": "Manual console added",
+      "scroll": 1280,
+      "title": "Consoles",
+      "width": 1280
+    },
+    {
+      "variant": "B",
+      "screen": "manual",
+      "state": "failure",
+      "client": 1268,
+      "fields": [],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "result": "Console was not added",
+      "scroll": 1268,
+      "title": "Consoles",
+      "width": 1280
+    },
+    {
+      "variant": "C",
+      "screen": "register",
+      "state": "form",
+      "client": 1268,
+      "fields": [
+        {
+          "id": "console",
+          "width": 509.923095703125
+        },
+        {
+          "id": "address",
+          "width": 509.923095703125
+        },
+        {
+          "id": "account",
+          "width": 509.923095703125
+        },
+        {
+          "id": "pin",
+          "width": 509.923095703125
+        },
+        {
+          "id": "consolePin",
+          "width": 509.923095703125
+        }
+      ],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "scroll": 1268,
+      "title": "Register console",
+      "width": 1280
+    },
+    {
+      "variant": "C",
+      "screen": "register",
+      "state": "progress",
+      "client": 1268,
+      "fields": [],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "result": "Registering console",
+      "scroll": 1268,
+      "title": "Register console",
+      "width": 1280
+    },
+    {
+      "variant": "C",
+      "screen": "register",
+      "state": "success",
+      "client": 1280,
+      "fields": [],
+      "height": 720,
+      "labRight": 1075.0000762939453,
+      "result": "Console registered",
+      "scroll": 1280,
+      "title": "Register console",
+      "width": 1280
+    },
+    {
+      "variant": "C",
+      "screen": "register",
+      "state": "failure",
+      "client": 1268,
+      "fields": [],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "result": "Registration failed",
+      "scroll": 1268,
+      "title": "Register console",
+      "width": 1280
+    },
+    {
+      "variant": "C",
+      "screen": "manual",
+      "state": "form",
+      "client": 1268,
+      "fields": [
+        {
+          "id": "address",
+          "width": 509.923095703125
+        },
+        {
+          "id": "savedConsole",
+          "width": 509.923095703125
+        }
+      ],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "scroll": 1268,
+      "title": "Add manual console",
+      "width": 1280
+    },
+    {
+      "variant": "C",
+      "screen": "manual",
+      "state": "success",
+      "client": 1280,
+      "fields": [],
+      "height": 720,
+      "labRight": 1075.0000762939453,
+      "result": "Manual console added",
+      "scroll": 1280,
+      "title": "Add manual console",
+      "width": 1280
+    },
+    {
+      "variant": "C",
+      "screen": "manual",
+      "state": "failure",
+      "client": 1268,
+      "fields": [],
+      "height": 720,
+      "labRight": 1069.1539154052734,
+      "result": "Console was not added",
+      "scroll": 1268,
+      "title": "Add manual console",
+      "width": 1280
+    }
+  ],
+  "interactions": [
+    "PIN validation and recovery",
+    "legacy PS4 Online ID",
+    "registration progress",
+    "failure log",
+    "retained form values",
+    "manual entry requires selection",
+    "deferred registration success"
+  ],
+  "consoleErrors": []
+}

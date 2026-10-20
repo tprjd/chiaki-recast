@@ -1,0 +1,17 @@
+{
+    "capturePath": "Production QQuickRenderControl OpenGL framebuffer",
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "exposed": true,
+    "height": 720,
+    "hostCount": 0,
+    "physicalHeight": 720,
+    "physicalWidth": 1280,
+    "pid": 42876,
+    "screenDevicePixelRatio": 1,
+    "screenshot": "C:/Users/david/Projects/chiaki-ng-ui/.scratch/settings-refresh/native-previews/12-native-search-65f2dd1-reveal-dpr1-search-renderer-1280x720-results.png",
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/12-native-search-65f2dd1-reveal-dpr1",
+    "visible": true,
+    "width": 1280
+}

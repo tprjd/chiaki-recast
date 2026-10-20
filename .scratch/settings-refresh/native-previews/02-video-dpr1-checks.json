@@ -1,0 +1,24 @@
+{
+    "categoryNavigationHasNoWrites": true,
+    "completedCategoryCaptures": [
+        "general-1280x720",
+        "video-1280x720",
+        "general-900x600",
+        "video-900x600"
+    ],
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "displayRoute": true,
+    "passed": true,
+    "pid": 42660,
+    "profileRoute": false,
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/02-video-dpr1",
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

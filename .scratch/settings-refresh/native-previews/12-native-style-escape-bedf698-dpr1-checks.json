@@ -1,0 +1,34 @@
+{
+    "browsingHasNoWrites": true,
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "expectedSearchTarget": "keyMapping1",
+    "finalSearchPresentationViewports": [
+        "1280x720",
+        "900x600"
+    ],
+    "immediateEscapeAttemptsPerViewport": 3,
+    "immediateKeyPopupEscapePreservesSettingsAndOpener": true,
+    "immediatePopupBeforeEscape": {
+        "found": true,
+        "opened": false,
+        "visible": true
+    },
+    "measuredFramebufferDimensions": true,
+    "passed": true,
+    "pid": 29796,
+    "qaOnlyLongLabelTranslation": false,
+    "searchQuery": "Keyboard key for Cross",
+    "searchResultTarget": "keyMapping1",
+    "sessionCreated": false,
+    "settingsDialogFocusChecks": 18,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/12-native-style-escape-bedf698-dpr1",
+    "styledResultKeyboardVisibility": true,
+    "untested": [
+        "Physical controller capture",
+        "Actual stream-time entry points",
+        "OS display scale changes",
+        "Real authentication",
+        "Registration acceptance"
+    ]
+}

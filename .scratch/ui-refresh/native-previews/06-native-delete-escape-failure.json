@@ -1,0 +1,17 @@
+{
+    "deleteIntendedHost": true,
+    "failedCheck": "Management did not return focus to the card primary action",
+    "fixtureAddresses": "RFC 5737 documentation range only",
+    "focusExpectedAddress": "192.0.2.27",
+    "focusFailureAncestry": "Button_QMLTYPE_54:consoleActionsButton/QQuickRowLayout:/QQuickColumnLayout:/ConsoleCard_QMLTYPE_126_QML_129:consoleCard/QQuickGridLayout_QML_127:/QQuickItem:/QQuickFlickable:libraryScroll/QQuickFocusScope:/QQuickColumnLayout:/ConsoleLibrary_QMLTYPE_114:/QQuickContentItem:MainView/MainView_QMLTYPE_113:/StackView_QMLTYPE_21:/Main_QMLTYPE_174:/QQuickRootItem:/",
+    "focusFailureClass": "Button_QMLTYPE_54",
+    "focusFailureObject": "consoleActionsButton",
+    "focusFailureText": "…",
+    "peerPinUnchanged": "2222",
+    "pid": 49992,
+    "pinBackUnchanged": true,
+    "pinEscapeUnchanged": true,
+    "pinStoredAfterSet": "0042",
+    "pinSubmitFocus": true,
+    "threeDigitsDisabled": true
+}

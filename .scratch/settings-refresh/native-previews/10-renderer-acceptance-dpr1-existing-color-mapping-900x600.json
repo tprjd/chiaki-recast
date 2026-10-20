@@ -1,0 +1,17 @@
+{
+    "capturePath": "Production QQuickRenderControl OpenGL framebuffer",
+    "devicePixelRatio": 1,
+    "discoveryEnabled": false,
+    "exposed": true,
+    "height": 600,
+    "hostCount": 0,
+    "physicalHeight": 600,
+    "physicalWidth": 900,
+    "pid": 37948,
+    "screenDevicePixelRatio": 1,
+    "screenshot": "C:/Users/david/Projects/chiaki-ng-ui/.scratch/settings-refresh/native-previews/10-renderer-acceptance-dpr1-existing-color-mapping-900x600.png",
+    "sessionCreated": false,
+    "settingsDirectory": "C:/Users/david/.cache/chiaki-ui-native/qa-settings-refresh/10-renderer-acceptance-dpr1",
+    "visible": true,
+    "width": 900
+}

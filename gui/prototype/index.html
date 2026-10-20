@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- PROTOTYPE: Three desktop console-screen designs, selected with ?variant=A, B, or C. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>chiaki-ng · Console design lab</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to consoles</a>
+  <div id="app"></div>
+  <aside class="design-lab" aria-label="Prototype controls">
+    <div class="lab-caption"><span class="lab-dot"></span> DESIGN LAB <span class="lab-divider">/</span> <span>Sample data</span></div>
+    <div class="lab-controls">
+      <button class="lab-arrow" data-action="previous" aria-label="Previous design">←</button>
+      <div class="variant-buttons" role="group" aria-label="Choose a design">
+        <button data-variant="A" aria-pressed="true">A <span>Console list</span></button>
+        <button data-variant="B" aria-pressed="false">B <span>Card library</span></button>
+        <button data-variant="C" aria-pressed="false">C <span>Focus view</span></button>
+      </div>
+      <button class="lab-arrow" data-action="next" aria-label="Next design">→</button>
+      <span class="lab-divider">|</span>
+      <label class="scenario-label" for="scenario">Scenario</label>
+      <select id="scenario">
+        <option value="everyday">Everyday</option>
+        <option value="empty">No consoles</option>
+        <option value="registration">Needs registration</option>
+        <option value="long">Long names</option>
+      </select>
+      <button class="lab-reset" data-action="reset" aria-label="Reset sample data">Reset</button>
+    </div>
+    <div class="lab-note"><span id="design-description"></span><span class="lab-key-hint">← → compare designs · Tab to navigate</span></div>
+  </aside>
+  <dialog id="dialog" aria-labelledby="dialog-title"></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

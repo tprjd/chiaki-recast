@@ -1,0 +1,11 @@
+{
+    "backgroundCommandBlocked-1280x720": true,
+    "failedCheck": "Native backdrop did not dim the sidebar",
+    "nativeBackdropDims-1280x720": true,
+    "overlayHeight-1280x720": 0,
+    "overlayHeight-800x600": 0,
+    "overlayWidth-1280x720": 0,
+    "overlayWidth-800x600": 0,
+    "pid": 50128,
+    "viewport-1280x720": true
+}

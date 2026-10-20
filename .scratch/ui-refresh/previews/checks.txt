@@ -1,0 +1,88 @@
+86 checks passed.
+
+PASS A, everyday, 1280px: no horizontal overflow
+PASS A, everyday, 1280px: screen and comparison controls rendered
+PASS A, empty, 1280px: no horizontal overflow
+PASS A, empty, 1280px: screen and comparison controls rendered
+PASS A, registration, 1280px: no horizontal overflow
+PASS A, registration, 1280px: screen and comparison controls rendered
+PASS A, long, 1280px: no horizontal overflow
+PASS A, long, 1280px: screen and comparison controls rendered
+PASS B, everyday, 1280px: no horizontal overflow
+PASS B, everyday, 1280px: screen and comparison controls rendered
+PASS B, empty, 1280px: no horizontal overflow
+PASS B, empty, 1280px: screen and comparison controls rendered
+PASS B, registration, 1280px: no horizontal overflow
+PASS B, registration, 1280px: screen and comparison controls rendered
+PASS B, long, 1280px: no horizontal overflow
+PASS B, long, 1280px: screen and comparison controls rendered
+PASS C, everyday, 1280px: no horizontal overflow
+PASS C, everyday, 1280px: screen and comparison controls rendered
+PASS C, empty, 1280px: no horizontal overflow
+PASS C, empty, 1280px: screen and comparison controls rendered
+PASS C, registration, 1280px: no horizontal overflow
+PASS C, registration, 1280px: screen and comparison controls rendered
+PASS C, long, 1280px: no horizontal overflow
+PASS C, long, 1280px: screen and comparison controls rendered
+PASS A, everyday, 800px: no horizontal overflow
+PASS A, everyday, 800px: screen and comparison controls rendered
+PASS A, empty, 800px: no horizontal overflow
+PASS A, empty, 800px: screen and comparison controls rendered
+PASS A, registration, 800px: no horizontal overflow
+PASS A, registration, 800px: screen and comparison controls rendered
+PASS A, long, 800px: no horizontal overflow
+PASS A, long, 800px: screen and comparison controls rendered
+PASS B, everyday, 800px: no horizontal overflow
+PASS B, everyday, 800px: screen and comparison controls rendered
+PASS B, empty, 800px: no horizontal overflow
+PASS B, empty, 800px: screen and comparison controls rendered
+PASS B, registration, 800px: no horizontal overflow
+PASS B, registration, 800px: screen and comparison controls rendered
+PASS B, long, 800px: no horizontal overflow
+PASS B, long, 800px: screen and comparison controls rendered
+PASS C, everyday, 800px: no horizontal overflow
+PASS C, everyday, 800px: screen and comparison controls rendered
+PASS C, empty, 800px: no horizontal overflow
+PASS C, empty, 800px: screen and comparison controls rendered
+PASS C, registration, 800px: no horizontal overflow
+PASS C, registration, 800px: screen and comparison controls rendered
+PASS C, long, 800px: no horizontal overflow
+PASS C, long, 800px: screen and comparison controls rendered
+PASS A, everyday, 390px: no horizontal overflow
+PASS A, everyday, 390px: screen and comparison controls rendered
+PASS A, empty, 390px: no horizontal overflow
+PASS A, empty, 390px: screen and comparison controls rendered
+PASS A, registration, 390px: no horizontal overflow
+PASS A, registration, 390px: screen and comparison controls rendered
+PASS A, long, 390px: no horizontal overflow
+PASS A, long, 390px: screen and comparison controls rendered
+PASS B, everyday, 390px: no horizontal overflow
+PASS B, everyday, 390px: screen and comparison controls rendered
+PASS B, empty, 390px: no horizontal overflow
+PASS B, empty, 390px: screen and comparison controls rendered
+PASS B, registration, 390px: no horizontal overflow
+PASS B, registration, 390px: screen and comparison controls rendered
+PASS B, long, 390px: no horizontal overflow
+PASS B, long, 390px: screen and comparison controls rendered
+PASS C, everyday, 390px: no horizontal overflow
+PASS C, everyday, 390px: screen and comparison controls rendered
+PASS C, empty, 390px: no horizontal overflow
+PASS C, empty, 390px: screen and comparison controls rendered
+PASS C, registration, 390px: no horizontal overflow
+PASS C, registration, 390px: screen and comparison controls rendered
+PASS C, long, 390px: no horizontal overflow
+PASS C, long, 390px: screen and comparison controls rendered
+PASS Previous wraps A to C and updates the URL
+PASS Next wraps C to A
+PASS Wake-up makes Connect available
+PASS Sample state survives a design change
+PASS Connect opens an explicit simulation
+PASS Closing a dialog restores keyboard focus
+PASS Search filters the visible consoles
+PASS Arrow keys in a field do not change designs
+PASS User-entered names render as text, not HTML
+PASS Registration makes Connect available
+PASS Cancel removal preserves the console
+PASS Confirmed removal returns to the empty state
+PASS Focus view selects an offline console without enabling Connect
+PASS Discovery toggle exposes its state

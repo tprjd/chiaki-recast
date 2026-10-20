@@ -1,0 +1,79 @@
+{
+  "DisplaySettingsDialog.qml": {
+    "sourceSha256": "75864fde807ffaa89f93cdd824d412a0bd53a175444251cb84005cc001e36612",
+    "checked": [
+      "Target Primaries",
+      "Target Transfer Characteristics",
+      "Target Peak",
+      "Target Peak Value",
+      "Target Contrast",
+      "Target Contrast Value"
+    ],
+    "issues": []
+  },
+  "PlaceboSettingsDialog.qml": {
+    "sourceSha256": "a7001f4f0f90689efa49f2f7c44c744ee2046b0100051061bf4b5bfe512c6cd1",
+    "checked": [
+      "Upscaler",
+      "Plane Upscaler",
+      "Downscaler",
+      "Plane Downscaler",
+      "Frame Mixer",
+      "Anti-ringing Strength",
+      "Deband Preset",
+      "Deband Iterations",
+      "Deband Threshold",
+      "Deband Radius",
+      "Deband Grain",
+      "Sigmoid Preset",
+      "Sigmoid Center",
+      "Sigmoid Slope",
+      "Color Adjustment Preset",
+      "Brightness",
+      "Contrast",
+      "Saturation",
+      "Hue",
+      "Gamma",
+      "Temperature",
+      "Peak Detection Preset",
+      "Peak Smoothing Period",
+      "Scene Threshold Low",
+      "Scene Threshold High",
+      "Peak Percentile",
+      "Black Cutoff",
+      "Color Mapping Preset"
+    ],
+    "issues": []
+  },
+  "PlaceboColorMappingDialog.qml": {
+    "sourceSha256": "4d54a0f7503fd1d94b405a68781b8d88d8efb08f61386cd9881145066159721d",
+    "checked": [
+      "Gamut Mapping Function",
+      "Perceptual Deadzone",
+      "Perceptual Strength",
+      "Colorimetric Gamma",
+      "Soft Clip Knee",
+      "Soft Clip Desaturation",
+      "LUT 3D Size I",
+      "LUT 3D Size C",
+      "LUT 3D Size h",
+      "Tone-mapping Function",
+      "Knee Adaptation",
+      "Knee Minimum",
+      "Knee Maximum",
+      "Knee Default",
+      "Knee Offset",
+      "Slope Tuning",
+      "Slope Offset",
+      "Spline Contrast",
+      "Reinhard Contrast",
+      "Linear Knee",
+      "Exposure",
+      "Tone-mapping Metadata",
+      "Tone LUT Size",
+      "Contrast Recovery",
+      "Contrast Smoothness"
+    ],
+    "issues": []
+  }
+}
