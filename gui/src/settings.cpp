@@ -1258,7 +1258,7 @@ void Settings::SetPlaceboDebandEnabled(bool enabled)
 	if(enabled)
 		placebo_settings.setValue("placebo_settings/deband", "yes");
 	else
-		placebo_settings.setValue("placebo_settings/inverse_tone_mapping", "no");
+		placebo_settings.setValue("placebo_settings/deband", "no");
 }
 
 static const QMap<PlaceboDebandPreset, QString> placebo_deband_preset_values = {
