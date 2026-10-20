@@ -44,8 +44,9 @@ Dialog {
     }
 
     function restoreFocus() {
-        if (restoreFocusItem)
+        if (restoreFocusItem && restoreFocusItem.visible && restoreFocusItem.enabled)
             restoreFocusItem.forceActiveFocus(Qt.TabFocusReason);
+        else root.restoreMainFocus();
         label.focus = false;
     }
 

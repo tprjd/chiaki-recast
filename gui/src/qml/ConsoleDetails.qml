@@ -46,6 +46,17 @@ Popup {
 
     contentItem: ColumnLayout {
         spacing: 16
+        Keys.onPressed: event => {
+            let action = "";
+            if (event.key === Qt.Key_PageUp) action = "pin";
+            else if (event.key === Qt.Key_Yes) action = "wake";
+            else if (event.key === Qt.Key_No)
+                action = details.availableActions.includes("delete") ? "delete" : "hide";
+            else if (event.key === Qt.Key_Escape) details.close();
+            if (!event.modifiers && details.availableActions.includes(action))
+                details.managementRequested(action);
+            event.accepted = true;
+        }
         ScrollView {
             objectName: "detailsScroll"
             Layout.fillWidth: true
@@ -88,6 +99,7 @@ Popup {
             Repeater {
                 model: details.availableActions
                 Controls.Button {
+                    id: managementButton
                     required property string modelData
                     objectName: modelData + "Action"
                     text: modelData === "pin" ? qsTr("Update Console Pin") : modelData === "wake" ? qsTr("Wake Up")
@@ -95,6 +107,12 @@ Popup {
                     icon.source: modelData === "pin" ? "qrc:/icons/l1.svg"
                         : "image://svg/button-" + (details.playStationController ? "ps" : "deck")
                           + (modelData === "wake" ? "#pyramid" : "#box")
+                    background: Rectangle {
+                        radius: 8
+                        color: managementButton.visualFocus ? "#1d354c" : "transparent"
+                        border.color: managementButton.visualFocus ? "#69b8ff" : "transparent"
+                        border.width: 2
+                    }
                     onClicked: details.managementRequested(modelData)
                 }
             }
@@ -106,6 +124,12 @@ Popup {
                 id: closeButton
                 objectName: "closeDetailsButton"
                 text: qsTr("Close")
+                background: Rectangle {
+                    radius: 8
+                    color: closeButton.visualFocus ? "#1d354c" : "transparent"
+                    border.color: closeButton.visualFocus ? "#69b8ff" : "transparent"
+                    border.width: 2
+                }
                 onClicked: details.close()
             }
         }

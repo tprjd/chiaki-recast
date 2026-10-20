@@ -6,8 +6,19 @@ import org.streetpea.chiaking
 Pane {
     padding: 0
     id: consolePane
+    function rememberFocus() { library.rememberFocus(); }
+    function restoreFocus() { library.restoreFocus(); }
+    StackView.onDeactivating: {
+        library.rememberFocus();
+        root.librarySelection = { profile: library.profileKey, host: library.selectedTarget ? library.selectedTarget.host : null };
+    }
     StackView.onActivated: {
-        library.forceActiveFocus(Qt.TabFocusReason);
+        const saved = root.librarySelection;
+        if (saved && saved.profile === library.profileKey && saved.host) {
+            library.selectedIdentity = library.identityOf(saved.host);
+            library.updateSelection();
+        }
+        library.restoreFocus();
         if(!Chiaki.autoConnect && !root.initialAsk && !Chiaki.window.directStream)
         {
             root.initialAsk = true;

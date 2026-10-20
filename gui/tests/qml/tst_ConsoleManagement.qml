@@ -154,7 +154,7 @@ TestCase {
         compare(connectSpy.count, 0);
         compare(screen.hosts.length, 1);
         compare(screen.hosts[0].name, "Living room");
-        verify(findChild(screen, "connectButton").activeFocus);
+        verify(findChild(screen, "consoleActionsButton").activeFocus);
     }
 
     function test_staleAcceptanceNeverDispatches_data() {

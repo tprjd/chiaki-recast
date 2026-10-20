@@ -19,6 +19,9 @@ FocusScope {
     property bool playStationController: false
     property string selectedIdentity: ""
     property var pendingManagement: null
+    property Item returnFocusItem: null
+    property string returnFocusIdentity: ""
+    property bool returnToDetails: false
     property alias searchText: consoleSearch.text
     readonly property var visibleHosts: hosts.filter(host => host && host.display !== false)
     readonly property var displayedHosts: visibleHosts.filter(host => matchesSearch(host))
@@ -93,16 +96,40 @@ FocusScope {
         selectedIdentity = identityOf(candidates[next]);
         const index = displayedHosts.findIndex(host => identityOf(host) === selectedIdentity);
         const card = cardRepeater.itemAt(index) as ConsoleCard;
-        if (card) {
-            card.focusPrimary();
-            libraryScroll.contentY = Math.max(0, Math.min(card.y, cards.height - libraryScroll.height));
-        }
-    }
-    function restoreCardFocus(identity) {
-        let index = displayedHosts.findIndex(host => identityOf(host) === identity && resolveTarget(identity));
-        if (index < 0) index = displayedHosts.findIndex(host => resolveTarget(identityOf(host)));
-        const card = cardRepeater.itemAt(index) as ConsoleCard;
         if (card) card.focusPrimary();
+    }
+    function revealControl(control) {
+        const top = control.mapToItem(libraryScroll.contentItem, 0, 0).y;
+        const bottom = top + control.height;
+        if (top < libraryScroll.contentY) libraryScroll.contentY = top;
+        else if (bottom > libraryScroll.contentY + libraryScroll.height)
+            libraryScroll.contentY = bottom - libraryScroll.height;
+    }
+    function moveFromGrid(offset) {
+        if (cardGrid.activeFocus || Window.window.activeFocusItem === library)
+            moveSelection(offset);
+    }
+    function rememberFocus() {
+        returnFocusItem = Window.window.activeFocusItem;
+        returnFocusIdentity = cardGrid.activeFocus ? selectedIdentity : "";
+        returnToDetails = returnFocusItem && returnFocusItem.objectName === "consoleActionsButton";
+    }
+    function restoreFocus() {
+        if (returnFocusItem && returnFocusItem.visible && returnFocusItem.enabled)
+            returnFocusItem.forceActiveFocus(Qt.TabFocusReason);
+        else restoreCardFocus(returnFocusIdentity || selectedIdentity, returnToDetails);
+    }
+    function restoreCardFocus(identity, details = false) {
+        let index = displayedHosts.findIndex(host => identityOf(host) === identity && resolveTarget(identity));
+        if (index < 0) {
+            index = displayedHosts.findIndex(host => resolveTarget(identityOf(host)));
+            details = false;
+        }
+        const card = cardRepeater.itemAt(index) as ConsoleCard;
+        if (card) {
+            if (details) card.focusDetails();
+            else card.focusPrimary();
+        }
         else addConsoleButton.forceActiveFocus(Qt.TabFocusReason);
     }
     function eligible(action, host) {
@@ -117,6 +144,7 @@ FocusScope {
         if (!target || !eligible(action, target.host)) return false;
         if (action === "wake") wakeRequested(target.sourceIndex);
         else {
+            rememberFocus();
             const pending = { action, identity };
             pendingManagement = pending;
             managementRequested(action, value => finishManagement(pending, true, value),
@@ -134,18 +162,18 @@ FocusScope {
             if (pending.action === "delete") deleteRequested(target.sourceIndex);
             else if (pending.action === "hide") hideRequested(target.host.mac, target.host.name || "");
             else if (pending.action === "pin") pinRequested(target.sourceIndex, value);
-            restoreCardFocus(pending.identity);
+            restoreFocus();
             return true;
         }
-        restoreCardFocus(pending.identity);
+        restoreFocus();
         return false;
     }
 
     Keys.onMenuPressed: settingsRequested()
-    Keys.onLeftPressed: moveSelection(-1)
-    Keys.onRightPressed: moveSelection(1)
-    Keys.onUpPressed: moveSelection(-cards.columns)
-    Keys.onDownPressed: moveSelection(cards.columns)
+    Keys.onLeftPressed: moveFromGrid(-1)
+    Keys.onRightPressed: moveFromGrid(1)
+    Keys.onUpPressed: moveFromGrid(-cards.columns)
+    Keys.onDownPressed: moveFromGrid(cards.columns)
     Keys.onReturnPressed: connectToTarget(selectedIdentity)
     Keys.onYesPressed: requestManagement("wake", selectedIdentity)
     Keys.onNoPressed: {
@@ -219,7 +247,7 @@ FocusScope {
                 Layout.preferredHeight: 44
                 flat: true
                 text: qsTr("Settings")
-                icon.source: "qrc:/icons/settings-20px.svg"
+                icon.source: "qrc:/icons/options.svg"
                 display: library.collapsedSidebar ? AbstractButton.IconOnly : AbstractButton.TextBesideIcon
                 font.pixelSize: 14
                 Accessible.name: qsTr("Settings")
@@ -249,6 +277,8 @@ FocusScope {
                 Layout.preferredHeight: 40
                 flat: true
                 text: library.collapsedSidebar ? "\u00d7" : qsTr("Quit")
+                icon.source: "image://svg/button-" + (library.playStationController ? "ps" : "deck") + "#moon"
+                display: library.collapsedSidebar ? AbstractButton.IconOnly : AbstractButton.TextBesideIcon
                 font.pixelSize: 14
                 Accessible.name: qsTr("Quit")
                 onClicked: library.quitRequested()
@@ -276,7 +306,7 @@ FocusScope {
                 id: addConsoleButton
                 objectName: "addConsoleButton"
                 text: qsTr("Add console")
-                icon.source: "qrc:/icons/add-24px.svg"
+                icon.source: "qrc:/icons/r3.svg"
                 font.pixelSize: 14
                 Layout.preferredHeight: 42
                 Material.roundedScale: Material.SmallScale
@@ -321,12 +351,14 @@ FocusScope {
                 visible: library.psnAvailable
                 flat: true
                 text: qsTr("Refresh PSN consoles")
+                icon.source: "qrc:/icons/r1.svg"
                 font.pixelSize: 13
                 Layout.preferredHeight: 40
                 onClicked: library.refreshPsnRequested()
             }
         }
         FocusScope {
+            id: cardGrid
             Layout.fillWidth: true
             Layout.fillHeight: true
             Flickable {
@@ -355,9 +387,13 @@ FocusScope {
                             Layout.preferredHeight: implicitHeight
                             host: modelData
                             streamerMode: library.streamerMode
+                            playStationController: library.playStationController
                             selected: library.selectedIdentity === library.identityOf(host)
                             targetEnabled: library.resolveTarget(library.identityOf(host)) !== null
-                            onSelectionRequested: library.selectedIdentity = library.identityOf(host)
+                            onSelectionRequested: control => {
+                                library.selectedIdentity = library.identityOf(host);
+                                library.revealControl(control);
+                            }
                             onActivated: library.connectToTarget(library.identityOf(host))
                             onActionsRequested: opener => {
                                 consoleDetails.identity = library.identityOf(host);
@@ -422,6 +458,7 @@ FocusScope {
                         text: library.discoveryEnabled ? qsTr("Discovery on") : qsTr("Discovery off")
                         font.pixelSize: 13
                         Layout.preferredHeight: 36
+                        onActiveFocusChanged: if (activeFocus) library.revealControl(discoveryButton)
                         onClicked: library.discoveryToggled(!library.discoveryEnabled)
                     }
                     Item { Layout.fillWidth: true }
@@ -438,12 +475,44 @@ FocusScope {
                 }
             }
         }
+        Flow {
+            objectName: "controllerHints"
+            Layout.fillWidth: true
+            visible: library.selectedTarget !== null
+            spacing: 18
+            Repeater {
+                model: ["pin", "wake", "delete", "hide"].filter(action =>
+                    library.selectedTarget && library.eligible(action, library.selectedTarget.host))
+                Row {
+                    required property string modelData
+                    spacing: 6
+                    Image {
+                        width: 24
+                        height: 24
+                        source: parent.modelData === "pin" ? "qrc:/icons/l1.svg"
+                            : "image://svg/button-" + (library.playStationController ? "ps" : "deck")
+                              + (parent.modelData === "wake" ? "#pyramid" : "#box")
+                        Accessible.ignored: true
+                    }
+                    Label {
+                        objectName: "controllerHintLabel"
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: parent.modelData === "pin" ? qsTr("PIN") : parent.modelData === "wake" ? qsTr("Wake")
+                            : parent.modelData === "delete" ? qsTr("Delete") : qsTr("Hide")
+                        font.pixelSize: 12
+                        color: "#aab6c7"
+                    }
+                }
+            }
+        }
     }
 
     ConsoleDetails {
         id: consoleDetails
         property string identity: ""
         property Item opener: null
+        property string requestedAction: ""
+        property string requestedIdentity: ""
         readonly property var target: library.resolveTarget(identity)
         onTargetChanged: if (!target) close()
         host: target ? target.host : ({})
@@ -451,15 +520,20 @@ FocusScope {
         availableActions: target ? ["pin", "wake", "delete", "hide"].filter(action => library.eligible(action, target.host)) : []
         playStationController: library.playStationController
         onManagementRequested: action => {
-            const targetIdentity = identity;
+            requestedAction = action;
+            requestedIdentity = identity;
             close();
-            Qt.callLater(() => library.requestManagement(action, targetIdentity));
         }
         onClosed: Qt.callLater(() => {
             if (opener && opener.visible) {
                 opener.focus = false;
                 opener.forceActiveFocus(Qt.TabFocusReason);
             } else library.restoreCardFocus(identity);
+            if (requestedAction) {
+                const action = requestedAction;
+                requestedAction = "";
+                library.requestManagement(action, requestedIdentity);
+            }
         })
     }
 }
