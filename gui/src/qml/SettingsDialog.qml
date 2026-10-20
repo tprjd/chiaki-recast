@@ -1883,144 +1883,135 @@ FocusScope {
 
             Item {
                 // Remote (PSN and Hole Punching)
+                id: remotePage
+                readonly property bool credentialsComplete: !!(dialog.backend.settings.psnRefreshToken
+                    && dialog.backend.settings.psnAuthToken && dialog.backend.settings.psnAuthTokenExpiry
+                    && dialog.backend.settings.psnAccountId)
+                onCredentialsCompleteChanged: {
+                    if (openPsnLogin.activeFocus || resetPsnTokens.activeFocus)
+                        Qt.callLater(function() {
+                            dialog.firstRemoteFocusableItem().forceActiveFocus(Qt.TabFocusReason);
+                        });
+                }
                 Flickable {
                     id: remoteFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "remotePage"
+                    anchors.fill: parent
                     clip: true
-                    contentWidth: Math.max(width, remoteGrid.width)
-                    contentHeight: remoteGrid.y + remoteGrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: remoteFlick.contentHeight > remoteFlick.height
-                    }
-                    GridLayout {
-                        id: remoteGrid
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                            topMargin: 30
-                        }
-                        columns: 3
-                        rowSpacing: 20
-                        columnSpacing: 10
-
-                        C.Button {
-                            id: openPsnLogin
-                            firstInFocusChain: visible
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.columnSpan: 3
-
-                            text: qsTr("Login to PSN")
-                            onClicked: {
-                                dialog.navigation.showPSNTokenDialog(false)
-                            }
-                            Material.roundedScale: Material.SmallScale
-                            visible: !dialog.backend.settings.psnRefreshToken || !dialog.backend.settings.psnAuthToken || !dialog.backend.settings.psnAuthTokenExpiry || !dialog.backend.settings.psnAccountId
-                        }
-
-                        C.Button {
-                            id: resetPsnTokens
-                            topPadding: 26
-                            leftPadding: 30
-                            rightPadding: 30
-                            bottomPadding: 26
-                            text: qsTr("Clear PSN Token")
-                            firstInFocusChain: !openPsnLogin.visible
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.columnSpan: 3
-                            onClicked: {
-                                dialog.backend.settings.psnRefreshToken = ""
-                                dialog.backend.settings.psnAuthToken = ""
-                                dialog.backend.settings.psnAuthTokenExpiry = ""
-                                dialog.backend.settings.psnAccountId = ""
-                                openPsnLogin.forceActiveFocus(Qt.TabFocusReason);
-                            }
-                            Material.roundedScale: Material.SmallScale
-                            visible: dialog.backend.settings.psnRefreshToken && dialog.backend.settings.psnAuthToken && dialog.backend.settings.psnAuthTokenExpiry && dialog.backend.settings.psnAccountId
-                        }
-
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Hole Punching Port Guessing:")
-                        }
-
-                        C.CheckBox {
-                            id: holePunchGuessingCheckbox
-                            text: qsTr("Force STUN port guessing")
-                            checked: dialog.backend.settings.portGuessingEnabled
-                            onToggled: dialog.backend.settings.portGuessingEnabled = checked
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Unchecked)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Port Guess Count:")
-                        }
-
-                        C.Slider {
-                            id: portGuessCountSlider
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 75
-                            stepSize: 1
-                            value: dialog.backend.settings.portGuessCount
-                            onMoved: dialog.backend.settings.portGuessCount = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                    contentWidth: width
+                    contentHeight: remoteLayout.height
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
+                        id: remoteLayout
+                        width: Math.max(0, remoteFlick.width - 14)
+                        spacing: 16
+                        Label { text: qsTr("Remote"); font.pixelSize: 24; font.bold: true }
+                        Label { text: qsTr("PSN access"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            font.pixelSize: 14
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                Label {
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.Wrap
+                                    text: remotePage.credentialsComplete ? qsTr("PSN account configured.") : qsTr("Log in to configure remote access through PSN.")
                                 }
-                                text: parent.value + qsTr(" guesses")
-                            }
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            Layout.leftMargin: 100
-                            text: qsTr("(75)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Port Guess Socket Count:")
-                        }
-
-                        C.Slider {
-                            id: portGuessSocketSlider
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 500
-                            stepSize: 1
-                            value: dialog.backend.settings.portGuessSocketCount
-                            onMoved: dialog.backend.settings.portGuessSocketCount = value
-                            lastInFocusChain: true
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                                C.Button {
+                                    id: openPsnLogin
+                                    objectName: "openPsnLogin"
+                                    firstInFocusChain: visible
+                                    text: qsTr("Login to PSN")
+                                    Accessible.name: text
+                                    visible: !remotePage.credentialsComplete
+                                    onClicked: dialog.navigation.showPSNTokenDialog(false)
                                 }
-                                text: parent.value + qsTr(" sockets")
+                                C.Button {
+                                    id: resetPsnTokens
+                                    objectName: "resetPsnTokens"
+                                    firstInFocusChain: visible
+                                    text: qsTr("Clear PSN Token")
+                                    Accessible.name: text
+                                    visible: remotePage.credentialsComplete
+                                    onClicked: {
+                                        dialog.backend.settings.psnRefreshToken = "";
+                                        dialog.backend.settings.psnAuthToken = "";
+                                        dialog.backend.settings.psnAuthTokenExpiry = "";
+                                        dialog.backend.settings.psnAccountId = "";
+                                        openPsnLogin.forceActiveFocus(Qt.TabFocusReason);
+                                    }
+                                }
                             }
                         }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(250)")
-                            Layout.leftMargin: 100
+                        Label { text: qsTr("Port guessing"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            font.pixelSize: 14
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                spacing: 12
+                                C.CheckBox {
+                                    id: holePunchGuessingCheckbox
+                                    objectName: "portGuessingEnabled"
+                                    Layout.fillWidth: true
+                                    contentItem: Label { text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    text: qsTr("Force STUN port guessing")
+                                    Accessible.name: text
+                                    checked: dialog.backend.settings.portGuessingEnabled
+                                    onToggled: dialog.backend.settings.portGuessingEnabled = checked
+                                }
+                                Label { text: qsTr("Default: Unchecked"); opacity: 0.65 }
+                                Label { text: qsTr("Port Guess Count"); Layout.fillWidth: true; wrapMode: Text.Wrap }
+                                C.Slider {
+                                    id: portGuessCountSlider
+                                    objectName: "portGuessCount"
+                                    Accessible.name: qsTr("Port Guess Count")
+                                    Accessible.description: qsTr("Guesses, default 75")
+                                    Layout.fillWidth: true
+                                    from: 0
+                                    to: 75
+                                    stepSize: 1
+                                    value: dialog.backend.settings.portGuessCount
+                                    onMoved: dialog.backend.settings.portGuessCount = value
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Label {
+                                        objectName: "portGuessCountValue"
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                        text: portGuessCountSlider.value + qsTr(" guesses")
+                                    }
+                                    Label { text: qsTr("Default: 75"); opacity: 0.65 }
+                                }
+                                Label { text: qsTr("Port Guess Socket Count"); Layout.fillWidth: true; wrapMode: Text.Wrap }
+                                C.Slider {
+                                    id: portGuessSocketSlider
+                                    objectName: "portGuessSocketCount"
+                                    Accessible.name: qsTr("Port Guess Socket Count")
+                                    Accessible.description: qsTr("Sockets, default 250")
+                                    Layout.fillWidth: true
+                                    from: 0
+                                    to: 500
+                                    stepSize: 1
+                                    value: dialog.backend.settings.portGuessSocketCount
+                                    onMoved: dialog.backend.settings.portGuessSocketCount = value
+                                    lastInFocusChain: true
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Label {
+                                        objectName: "portGuessSocketCountValue"
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                        text: portGuessSocketSlider.value + qsTr(" sockets")
+                                    }
+                                    Label { text: qsTr("Default: 250"); opacity: 0.65 }
+                                }
+                            }
                         }
                     }
                 }
