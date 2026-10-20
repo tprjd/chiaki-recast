@@ -2136,7 +2136,7 @@ FocusScope {
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_Up || event.key === Qt.Key_Down || event.key === Qt.Key_Escape)
                         resultList.navigate(event);
-                    else if (event.key === Qt.Key_Enter) {
+                    else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                         dialog.openSearchResult(index);
                         event.accepted = true;
                     }

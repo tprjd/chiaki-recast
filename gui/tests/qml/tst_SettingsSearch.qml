@@ -537,6 +537,26 @@ TestCase {
         compare(h.pages.currentItem.currentSection, 2);
         tryCompare(findChild(h.pages.currentItem, "placeboDebandEnabled"), "activeFocus", true);
     }
+    function test_returnActivatesResultWithoutVisualFocus() {
+        const h = createTemporaryObject(linkedHarnessComponent, testCase);
+        h.backend.window.videoPreset = 5;
+        h.settings.placeboColorAdjustmentEnabled = true;
+        h.settings.placeboColorAdjustmentPreset = 0;
+        const search = findChild(h, "settingsSearch");
+        search.text = "Brightness";
+        const results = findChild(h, "settingsSearchResults");
+        results.currentIndex = h.pages.currentItem.searchResults.findIndex(row => row.target === "placeboColorAdjustmentBrightness");
+        results.positionViewAtIndex(results.currentIndex, ListView.Contain);
+        wait(10);
+        const result = results.currentItem;
+        result.forceActiveFocus(Qt.MouseFocusReason);
+        verify(result.activeFocus);
+        verify(!result.visualFocus);
+        keyClick(Qt.Key_Return);
+        tryCompare(h.pages, "depth", 2);
+        tryCompare(findChild(h.pages.currentItem, "placeboColorAdjustmentBrightness"), "activeFocus", true);
+        compare(search.text, "");
+    }
     function test_everyCategoryAndStreamRoute() {
         const h = createTemporaryObject(harnessComponent, testCase);
         const search = findChild(h, "settingsSearch");
