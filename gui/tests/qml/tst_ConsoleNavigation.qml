@@ -100,7 +100,8 @@ TestCase {
 
     function test_tabOrderKeepsEveryActionVisible_data() {
         return [{ tag: "desktop", width: 1280, height: 720 },
-            { tag: "narrow", width: 800, height: 600 }];
+            { tag: "narrow", width: 800, height: 600 },
+            { tag: "minimum", width: 390, height: 600 }];
     }
 
     function test_tabOrderKeepsEveryActionVisible(data) {
@@ -340,16 +341,58 @@ TestCase {
 
     function test_layout_data() {
         return [{ tag: "desktop", width: 1280, height: 720, collapsed: false },
-            { tag: "narrow", width: 800, height: 600, collapsed: true }];
+            { tag: "narrow", width: 800, height: 600, collapsed: true },
+            { tag: "minimum", width: 390, height: 600, collapsed: true }];
+    }
+
+    function test_desktopSearchKeepsCompactLibrarySpacing() {
+        const screen = createTemporaryObject(screenComponent, testCase, { psnAvailable: true });
+        waitForRendering(screen);
+        const search = findChild(screen, "consoleSearch");
+        const refresh = findChild(screen, "refreshPsnButton");
+        const searchPosition = search.mapToItem(screen, 0, 0);
+        const refreshPosition = refresh.mapToItem(screen, 0, 0);
+        verify(search.width >= 230 && search.width <= 260, "B keeps desktop search compact");
+        verify(refreshPosition.x - searchPosition.x - search.width >= 100,
+            "The optional refresh command stays at the toolbar's right edge");
+    }
+
+    function test_mouseWheelScrollsLibraryWithoutConnecting_data() {
+        return [{ tag: "desktop", width: 1280, height: 720 },
+            { tag: "narrow", width: 800, height: 600 },
+            { tag: "minimum", width: 390, height: 600 }];
+    }
+
+    function test_mouseWheelScrollsLibraryWithoutConnecting(data) {
+        const hosts = [];
+        for (let index = 0; index < 12; index++) hosts.push(host("Console " + index, "mac" + index));
+        const screen = createTemporaryObject(screenComponent, testCase, {
+            width: data.width, height: data.height, hosts
+        });
+        connectSpy.target = screen;
+        waitForRendering(screen);
+        const scroll = findChild(screen, "libraryScroll");
+        compare(scroll.contentY, 0);
+        mouseWheel(scroll, scroll.width / 2, scroll.height / 2, 0, -120);
+        tryVerify(() => scroll.contentY > 0, 1000, "The mouse wheel reaches cards below the viewport");
+        compare(connectSpy.count, 0);
     }
 
     function test_layout(data) {
-        const hosts = [host("Living room", "01"), host("Bedroom", "02"), host("Studio", "03")];
+        const hosts = [host("Living room PlayStation with a long console name ".repeat(4), "01"),
+            { display: true, manual: true, address: "192.0.2.8", registered: false },
+            { display: true, discovered: false, registered: true, duid: "remote-id", name: "Remote" }];
+        for (let index = 3; index < 12; index++) hosts.push(host("Console " + index, "mac" + index));
         const screen = createTemporaryObject(screenComponent, testCase, {
             width: data.width, height: data.height, hosts, psnAvailable: true, steamAvailable: true
         });
         waitForRendering(screen);
         compare(screen.collapsedSidebar, data.collapsed);
+        const search = findChild(screen, "consoleSearch");
+        verify(search.width >= 200, "Search remains wide enough for a console name with optional commands");
+        const searchPosition = search.mapToItem(screen, 0, 0);
+        verify(searchPosition.x + search.width <= screen.width - 16,
+            "The toolbar keeps the library's right margin at the minimum width");
         for (const name of ["settingsButton", "addConsoleButton", "refreshPsnButton", "steamShortcutButton", "quitButton"]) {
             const button = findChild(screen, name);
             const position = button.mapToItem(screen, 0, 0);
@@ -386,18 +429,43 @@ TestCase {
     function test_primaryActionHasVisibleBackground() {
         const screen = createTemporaryObject(screenComponent, testCase, { hosts: [host("Living room", "01")] });
         const button = findChild(screen, "connectButton");
-        waitForRendering(button);
-        const image = grabImage(button);
-        verify(image.red(5, Math.floor(button.height / 2)) > 0.3,
+        waitForRendering(screen);
+        const image = grabImage(screen);
+        const position = button.mapToItem(screen, 0, 0);
+        let blue = 0;
+        let samples = 0;
+        for (let y = Math.ceil(position.y + 4); y < position.y + button.height - 4; y += 2)
+            for (let x = Math.ceil(position.x + 4); x < position.x + button.width - 4; x += 2) {
+                samples++;
+                if (image.red(x, y) >= 80 && image.red(x, y) <= 140
+                    && image.green(x, y) >= 150 && image.green(x, y) <= 210
+                    && image.blue(x, y) >= 225) blue++;
+            }
+        verify(blue / samples > 0.65,
             "Connect has a visible blue background with the supported software renderer");
     }
 
-    function test_consoleBodyIsReadableOnDarkCard() {
-        const screen = createTemporaryObject(screenComponent, testCase, { hosts: [host("Living room", "01")] });
+    function test_consoleBodyIsReadableOnDarkCard_data() {
+        return [{ tag: "ps4", ps5: false }, { tag: "ps5", ps5: true }];
+    }
+
+    function test_consoleBodyIsReadableOnDarkCard(data) {
+        const screen = createTemporaryObject(screenComponent, testCase, {
+            hosts: [Object.assign(host("Living room", "01"), { ps5: data.ps5 })]
+        });
         const artwork = findChild(screen, "consoleArtwork");
         tryCompare(artwork, "status", Image.Ready);
-        const image = grabImage(artwork);
-        verify(image.red(Math.floor(artwork.width / 2), Math.floor(artwork.height / 2)) > 0.8,
+        waitForRendering(screen);
+        const image = grabImage(screen);
+        const position = artwork.mapToItem(screen, 0, 0);
+        let bright = 0;
+        let samples = 0;
+        for (let y = Math.ceil(position.y); y < position.y + artwork.height; y += 2)
+            for (let x = Math.ceil(position.x); x < position.x + artwork.width; x += 2) {
+                samples++;
+                if (image.red(x, y) >= 200 && image.green(x, y) >= 200 && image.blue(x, y) >= 200) bright++;
+            }
+        verify(bright / samples > 0.20,
             "The console body contrasts with the dark artwork panel");
     }
 

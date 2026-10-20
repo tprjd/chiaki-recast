@@ -300,7 +300,7 @@ FocusScope {
         spacing: 20
         RowLayout {
             Layout.fillWidth: true
-            Label { text: qsTr("Consoles"); font.pixelSize: 35; font.bold: true }
+            Label { text: qsTr("Consoles"); font.pixelSize: library.width < 630 ? 28 : 35; font.bold: true }
             Item { Layout.fillWidth: true }
             Controls.Button {
                 id: addConsoleButton
@@ -318,14 +318,16 @@ FocusScope {
                 onClicked: library.addConsoleRequested()
             }
         }
-        RowLayout {
+        GridLayout {
             id: libraryToolbar
             Layout.fillWidth: true
             Layout.minimumHeight: 42
+            columns: library.width < 630 ? 1 : 3
             TextField {
                 id: consoleSearch
                 objectName: "consoleSearch"
                 Layout.fillWidth: true
+                Layout.maximumWidth: library.width < 630 ? Infinity : 235
                 Layout.preferredHeight: 42
                 placeholderText: qsTr("Search consoles")
                 Accessible.name: qsTr("Search consoles")
@@ -346,6 +348,7 @@ FocusScope {
                     event.accepted = true;
                 }
             }
+            Item { visible: library.width >= 630; Layout.fillWidth: true }
             Controls.Button {
                 objectName: "refreshPsnButton"
                 visible: library.psnAvailable
