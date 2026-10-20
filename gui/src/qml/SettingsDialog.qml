@@ -309,13 +309,19 @@ FocusScope {
                         required property string modelData
                         objectName: "settingsCategory" + index
                         text: modelData
+                        contentItem: Label {
+                            text: parent.text
+                            font: parent.font
+                            wrapMode: Text.Wrap
+                            verticalAlignment: Text.AlignVCenter
+                        }
                         Layout.fillWidth: true
                         checkable: true
                         autoExclusive: true
                         checked: bar.currentIndex === index
                         highlighted: checked
                         font.pixelSize: 16
-                        Layout.preferredHeight: 44
+                        Layout.preferredHeight: Math.max(44, implicitHeight)
                         background: Rectangle {
                             radius: 7
                             color: parent.checked ? "#24394c" : parent.hovered ? "#1b2633" : "transparent"
@@ -1585,6 +1591,7 @@ FocusScope {
                         id: controllersLayout
                         width: Math.max(0, controllersFlick.width - 16)
                         spacing: 14
+                        Label { text: qsTr("Controllers"); font.pixelSize: 24; font.bold: true }
                         Label { text: qsTr("Controller input"); font.pixelSize: 14; font.bold: true }
                         Frame {
                             Layout.fillWidth: true
@@ -1879,6 +1886,7 @@ FocusScope {
                         x: 16; y: 16
                         width: Math.max(0, configFlick.width - 48)
                         spacing: 14
+                        Label { text: qsTr("Config"); font.pixelSize: 24; font.bold: true }
                         Label { text: qsTr("Profiles"); font.pixelSize: 14; font.bold: true }
                         Frame {
                             Layout.fillWidth: true
