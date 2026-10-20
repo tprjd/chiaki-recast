@@ -1462,340 +1462,97 @@ FocusScope {
 
             Item {
                 // Keys
-                id: controllerMapping
                 Flickable {
                     id: keysFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "keysFlick"
+                    anchors.fill: parent
                     clip: true
-                    contentWidth: Math.max(width, keysGrid.width)
-                    contentHeight: keysGrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    function ensureItemVisible(item) {
-                        if (!item)
-                            return;
-                        const top = item.mapToItem(keysGrid, 0, 0).y;
-                        const bottom = top + item.height;
-                        if (top < contentY)
-                            contentY = top;
-                        else if (bottom > contentY + height)
-                            contentY = bottom - height;
-                    }
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: keysFlick.contentHeight > keysFlick.height
-                    }
-                    GridLayout {
-                        id: keysGrid
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        columns: 3
-                        rowSpacing: 3
-                        columnSpacing: 10
-
-                        Button {
-                            id: resetAllKeys
-                            text: "Reset All Keys"
-                            Layout.alignment: Qt.AlignRight
-                            property bool firstInFocusChain: true
-                            property bool lastInFocusChain: false
-                            onClicked: dialog.backend.settings.clearKeyMapping()
-                            Material.roundedScale: Material.SmallScale
-                            Material.background: visualFocus ? Material.accent : undefined
-                            onActiveFocusChanged: if (activeFocus) keysFlick.ensureItemVisible(this)
-
-                            Component.onDestruction: {
-                                if (visualFocus) {
-                                    let item = nextItemInFocusChain();
-                                    if (item)
-                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                }
-                            }
-                            Keys.onPressed: (event) => {
-                                switch (event.key) {
-                                case Qt.Key_Down:
-                                    if (!lastInFocusChain) {
-                                        let item = nextItemInFocusChain();
-                                        if (item) {
-                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                            keysFlick.ensureItemVisible(item);
-                                        }
-                                        for(var i = 0; i < 3; i++)
-                                        {
-                                            let item2 = item.nextItemInFocusChain();
-                                            if (item)
-                                            {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                                item = item2;
-                                            }
-                                        }
-                                        event.accepted = true;
-                                    }
-                                    break;
-                                case Qt.Key_Right:
-                                    if (!lastInFocusChain) {
-                                        let item = nextItemInFocusChain();
-                                        if (item) {
-                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                            keysFlick.ensureItemVisible(item);
-                                        }
-                                        event.accepted = true;
-                                    }
-                                    break;
-                                case Qt.Key_Return:
-                                    if (visualFocus) {
-                                        clicked();
-                                    }
-                                    event.accepted = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        CheckBox {
-                            text: qsTr("Keyboard as controller")
-                            checked: {
-                                dialog.backend.settings.keyboardEnabled
-                            }
-                            onToggled: dialog.backend.settings.keyboardEnabled = checked
-                            Layout.alignment: Qt.AlignRight
-                            property bool firstInFocusChain: false
-                            property bool lastInFocusChain: false
-                            Material.roundedScale: Material.SmallScale
-                            Material.background: visualFocus ? Material.accent : undefined
-                            onActiveFocusChanged: if (activeFocus) keysFlick.ensureItemVisible(this)
-
-                            Component.onDestruction: {
-                                if (visualFocus) {
-                                    let item = nextItemInFocusChain();
-                                    if (item)
-                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                }
-                            }
-                            Keys.onPressed: (event) => {
-                                switch (event.key) {
-                                    case Qt.Key_Left:
-                                        if (!firstInFocusChain) {
-                                            let item = nextItemInFocusChain(false);
-                                            if (item) {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                            }
-                                            event.accepted = true;
-                                        }
-                                        break;
-                                    case Qt.Key_Right:
-                                        if  (!lastInFocusChain) {
-                                            let item = nextItemInFocusChain();
-                                            if (item) {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                            }
-                                            event.accepted = true;
-                                        }
-                                        break;
-                                    case Qt.Key_Down:
-                                        if (!lastInFocusChain) {
-                                            let item = nextItemInFocusChain();
-                                            if (item) {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                            }
-                                            for(var i = 0; i < 3; i++)
-                                            {
-                                                let item2 = item.nextItemInFocusChain();
-                                                if (item)
-                                                {
-                                                    item.forceActiveFocus(Qt.TabFocusReason);
-                                                    keysFlick.ensureItemVisible(item);
-                                                    item = item2;
-                                                }
-                                            }
-                                            event.accepted = true;
-                                        }
-                                        break;
-                                    case Qt.Key_Return:
-                                        if (visualFocus) {
-                                            toggle();
-                                            toggled();
-                                        }
-                                        event.accepted = true;
-                                        break;
-                                }
-                            }
-                        }
-                        CheckBox {
-                            text: qsTr("Enable Mouse Touchpad")
-                            checked: {
-                                dialog.backend.settings.mouseTouchEnabled
-                            }
-                            onToggled: dialog.backend.settings.mouseTouchEnabled = checked
-                            Layout.alignment: Qt.AlignRight
-                            property bool firstInFocusChain: false
-                            property bool lastInFocusChain: false
-                            Material.roundedScale: Material.SmallScale
-                            Material.background: visualFocus ? Material.accent : undefined
-                            onActiveFocusChanged: if (activeFocus) keysFlick.ensureItemVisible(this)
-
-                            Component.onDestruction: {
-                                if (visualFocus) {
-                                    let item = nextItemInFocusChain();
-                                    if (item)
-                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                }
-                            }
-                            Keys.onPressed: (event) => {
-                                switch (event.key) {
-                                    case Qt.Key_Left:
-                                        if (!firstInFocusChain) {
-                                            let item = nextItemInFocusChain(false);
-                                            if (item) {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                            }
-                                            event.accepted = true;
-                                        }
-                                        break;
-                                    case Qt.Key_Down:
-                                        if (!lastInFocusChain) {
-                                            let item = nextItemInFocusChain();
-                                            if (item) {
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                                keysFlick.ensureItemVisible(item);
-                                            }
-                                            for(var i = 0; i < 3; i++)
-                                            {
-                                                let item2 = item.nextItemInFocusChain();
-                                                if (item)
-                                                {
-                                                    item.forceActiveFocus(Qt.TabFocusReason);
-                                                    keysFlick.ensureItemVisible(item);
-                                                    item = item2;
-                                                }
-                                            }
-                                            event.accepted = true;
-                                        }
-                                        break;
-                                    case Qt.Key_Return:
-                                        if (visualFocus) {
-                                            toggle();
-                                            toggled();
-                                        }
-                                        event.accepted = true;
-                                        break;
-                                }
-                            }
-                        }
-                        Repeater {
-                            id: chiakiKeys
-                            model: dialog.backend.settings.controllerMapping
-
+                    contentWidth: width
+                    contentHeight: keysLayout.height
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
+                        id: keysLayout
+                        width: Math.max(0, keysFlick.width - 14)
+                        spacing: 16
+                        Label { text: qsTr("Keys"); font.pixelSize: 24; font.bold: true }
+                        Label { text: qsTr("Keyboard and mouse"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
                             RowLayout {
-                                spacing: 20
-
-                                Label {
-                                    Layout.preferredWidth: 200
-                                    horizontalAlignment: Text.AlignRight
-                                    text: modelData.buttonName
+                                anchors.fill: parent
+                                C.CheckBox {
+                                    objectName: "keyboardEnabled"
+                                    text: qsTr("Keyboard as controller")
+                                    Accessible.name: text
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.keyboardEnabled
+                                    onToggled: dialog.backend.settings.keyboardEnabled = checked
                                 }
-
-                                Button {
-                                    property bool firstInFocusChain: false
-                                    property bool lastInFocusChain: index == (chiakiKeys.count - 1)
-                                    Layout.preferredWidth: 170
-                                    Layout.preferredHeight: 52
-                                    text: modelData.keyName
-                                    Material.roundedScale: Material.SmallScale
-                                    Material.background: visualFocus ? Material.accent : undefined
-                                    onActiveFocusChanged: if (activeFocus) keysFlick.ensureItemVisible(this)
-                                    Component.onDestruction: {
-                                        if (visualFocus) {
-                                            let item = nextItemInFocusChain();
-                                            if (item)
-                                                item.forceActiveFocus(Qt.TabFocusReason);
+                                C.CheckBox {
+                                    objectName: "mouseTouchEnabled"
+                                    text: qsTr("Enable Mouse Touchpad")
+                                    Accessible.name: text
+                                    Layout.fillWidth: true
+                                    Layout.minimumWidth: 0
+                                    contentItem: Label { font.pixelSize: 14; text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    checked: dialog.backend.settings.mouseTouchEnabled
+                                    onToggled: dialog.backend.settings.mouseTouchEnabled = checked
+                                }
+                            }
+                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Label { text: qsTr("Key assignments"); font.pixelSize: 14; font.bold: true; Layout.fillWidth: true }
+                            C.Button {
+                                font.pixelSize: 14
+                                id: resetAllKeys
+                                objectName: "resetAllKeys"
+                                text: qsTr("Reset All Keys")
+                                Accessible.name: text
+                                onClicked: dialog.backend.settings.clearKeyMapping()
+                            }
+                        }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: keysFlick.width >= 900 ? 3 : 2
+                                columnSpacing: 20
+                                rowSpacing: 6
+                                Repeater {
+                                    id: chiakiKeys
+                                    model: dialog.backend.settings.controllerMapping
+                                    RowLayout {
+                                        required property var modelData
+                                        Layout.fillWidth: true
+                                        spacing: 12
+                                        Label {
+                                            font.pixelSize: 14
+                                            Layout.minimumWidth: 0
+                                            Layout.fillWidth: true
+                                            Layout.preferredWidth: 120
+                                            text: modelData.buttonName
+                                            textFormat: Text.PlainText
+                                            wrapMode: Text.Wrap
                                         }
-                                    }
-                                    onClicked: {
-                                        keyDialog.show({
-                                            value: modelData.buttonValue,
-                                            mappingIndex: index,
-                                            callback: (name) => text = name,
-                                        });
-                                    }
-                                    Keys.onPressed: (event) => {
-                                        switch (event.key) {
-                                            case Qt.Key_Left:
-                                                if (!firstInFocusChain && ((index % 3) != 0)) {
-                                                    let item = nextItemInFocusChain(false);
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        keysFlick.ensureItemVisible(item);
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Right:
-                                                if  (!lastInFocusChain && (index % 3) != 2) {
-                                                    let item = nextItemInFocusChain();
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        keysFlick.ensureItemVisible(item);
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Up:
-                                                if (!firstInFocusChain)
-                                                {
-                                                    let item = nextItemInFocusChain(false);
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        keysFlick.ensureItemVisible(item);
-                                                    }
-                                                    for(var i = 0; i < 3; i++)
-                                                    {
-                                                        let item2 = item.nextItemInFocusChain(false);
-                                                        if (item)
-                                                        {
-                                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                                            keysFlick.ensureItemVisible(item);
-                                                            item = item2;
-                                                        }
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Down:
-                                                if (!lastInFocusChain && index < (chiakiKeys.count - 3)) {
-                                                    let item = nextItemInFocusChain();
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        keysFlick.ensureItemVisible(item);
-                                                    }
-                                                    for(var i = 0; i < 3; i++)
-                                                    {
-                                                        let item2 = item.nextItemInFocusChain();
-                                                        if (item)
-                                                        {
-                                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                                            keysFlick.ensureItemVisible(item);
-                                                            item = item2;
-                                                        }
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Return:
-                                                if (visualFocus) {
-                                                    clicked();
-                                                }
-                                                break;
+                                        C.Button {
+                                            font.pixelSize: 14
+                                            objectName: "keyMapping" + modelData.buttonValue
+                                            property string capturedKeyName: ""
+                                            Layout.preferredWidth: 120
+                                            Layout.minimumWidth: 0
+                                            text: capturedKeyName || modelData.keyName
+                                            Accessible.name: qsTr("Key for %1").arg(modelData.buttonName)
+                                            onClicked: keyDialog.show({
+                                                value: modelData.buttonValue,
+                                                opener: this,
+                                                callback: name => capturedKeyName = name
+                                            })
                                         }
                                     }
                                 }
@@ -2428,45 +2185,67 @@ FocusScope {
 
         Dialog {
             id: keyDialog
+            objectName: "keyCaptureDialog"
             focus: false
             property int buttonValue
             property var buttonCallback
-            property var keysIndex
+            property Item returnFocusItem
+            property bool captureActive: false
+            property int pressedKey: -1
             parent: Overlay.overlay
-            x: Math.round((dialog.navigation.width - width) / 2)
-            y: Math.round((dialog.navigation.height - height) / 2)
+            x: Math.round((dialog.width - width) / 2)
+            y: Math.round((dialog.height - height) / 2)
             title: qsTr("Key Capture")
             modal: true
             standardButtons: Dialog.Close
             closePolicy: Popup.CloseOnPressOutside
             onOpened: keyLabel.forceActiveFocus(Qt.TabFocusReason)
+            onAboutToHide: captureActive = false
             onClosed: {
-                let item = chiakiKeys.itemAt(keysIndex)
-                if(item)
-                {
-                    let item2 = item.children[1];
-                    if(item2)
-                        item2.forceActiveFocus(Qt.TabFocusReason);
-                }
                 keyLabel.focus = false;
                 focus = false;
+                Qt.callLater(() => {
+                    const item = returnFocusItem && returnFocusItem.visible && returnFocusItem.enabled
+                        ? returnFocusItem : resetAllKeys;
+                    if (item) item.forceActiveFocus(Qt.TabFocusReason);
+                });
             }
             Material.roundedScale: Material.MediumScale
 
             function show(opts) {
                 buttonValue = opts.value;
                 buttonCallback = opts.callback;
-                keysIndex = opts.mappingIndex;
+                returnFocusItem = opts.opener;
+                pressedKey = -1;
+                captureActive = true;
                 open();
             }
 
+            Connections {
+                target: dialog.backend.settings
+                function onCurrentProfileChanged() { keyDialog.close(); }
+                function onControllerMappingChanged() { keyDialog.close(); }
+            }
             Label {
                 id: keyLabel
+                objectName: "keyCapturePrompt"
                 focus: true
-                text: qsTr("Press any key to configure button or click close")
+                text: qsTr("Press a key to assign it. Press Escape or Close to cancel.")
+                Accessible.name: text
+                Keys.onPressed: (event) => {
+                    event.accepted = true;
+                    if (keyDialog.captureActive && !event.isAutoRepeat)
+                        keyDialog.pressedKey = event.key;
+                }
                 Keys.onReleased: (event) => {
-                    var name = dialog.backend.settings.changeControllerKey(keyDialog.buttonValue, event.key);
-                    keyDialog.buttonCallback(name);
+                    event.accepted = true;
+                    if (!keyDialog.captureActive || event.isAutoRepeat || keyDialog.pressedKey !== event.key)
+                        return;
+                    keyDialog.pressedKey = -1;
+                    if (event.key !== Qt.Key_Escape) {
+                        const name = dialog.backend.settings.changeControllerKey(keyDialog.buttonValue, event.key);
+                        keyDialog.buttonCallback(name);
+                    }
                     keyDialog.close();
                 }
             }
