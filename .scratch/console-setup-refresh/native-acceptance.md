@@ -8,8 +8,9 @@ Integration base: `c2e2acef66cec524613a1f56be5d282e27084606`
 Both native screens retain layout A, separate routes, and the existing controls.
 The acceptance correction aligns the registration header, margins, and button
 padding with manual entry. No behavior or storage format changed in ticket 04.
-The final feature review retained all four console targets and existing account
-routes. The original checkout's 18 recorded file hashes remain unchanged.
+Source review found no lost console targets or account routes. The original
+checkout's 18 recorded file hashes remain unchanged. The parent agent's final
+Standards and Spec reviews are pending and remain separate from this acceptance.
 
 ## Screen tests
 
