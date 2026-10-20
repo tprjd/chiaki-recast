@@ -25,10 +25,13 @@ DialogView {
         let ancestor = item;
         while (ancestor && ancestor !== rendererFlick.contentItem) ancestor = ancestor.parent;
         if (!ancestor) return;
-        const point = item.mapToItem(rendererFlick.contentItem, 0, 0);
+        // Keep the slider's value label visible with its control.
+        const target = item.parent && item.parent !== rendererFlick.contentItem
+                && item.parent.height <= rendererFlick.height ? item.parent : item;
+        const point = target.mapToItem(rendererFlick.contentItem, 0, 0);
         if (point.y < rendererFlick.contentY) rendererFlick.contentY = point.y;
-        else if (point.y + item.height > rendererFlick.contentY + rendererFlick.height)
-            rendererFlick.contentY = point.y + item.height - rendererFlick.height;
+        else if (point.y + target.height > rendererFlick.contentY + rendererFlick.height)
+            rendererFlick.contentY = point.y + target.height - rendererFlick.height;
     }
     Keys.onPressed: event => {
         if (event.modifiers || (event.key !== Qt.Key_PageUp && event.key !== Qt.Key_PageDown)) return;
