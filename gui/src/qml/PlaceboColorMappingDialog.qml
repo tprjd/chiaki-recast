@@ -54,18 +54,7 @@ DialogView {
     Material.background: "#11151c"
     function close() { navigation.closeDialog(); }
     function ensureFocusVisible() {
-        const item = Window.window ? Window.window.activeFocusItem : null;
-        if (!item) return;
-        let ancestor = item;
-        while (ancestor && ancestor !== colorMappingFlick.contentItem) ancestor = ancestor.parent;
-        if (!ancestor) return;
-        // Keep the slider's value label visible with its control.
-        const target = item.parent && item.parent !== colorMappingFlick.contentItem
-                && item.parent.height <= colorMappingFlick.height ? item.parent : item;
-        const point = target.mapToItem(colorMappingFlick.contentItem, 0, 0);
-        if (point.y < colorMappingFlick.contentY) colorMappingFlick.contentY = point.y;
-        else if (point.y + target.height > colorMappingFlick.contentY + colorMappingFlick.height)
-            colorMappingFlick.contentY = point.y + target.height - colorMappingFlick.height;
+        Search.ensureFocusVisible(colorMappingFlick, Window.window ? Window.window.activeFocusItem : null);
     }
     Keys.onPressed: event => {
         if (event.modifiers || (event.key !== Qt.Key_PageUp && event.key !== Qt.Key_PageDown)) return;
