@@ -4,7 +4,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Layouts
-import "controls" as Controls
 
 FocusScope {
     id: library
@@ -224,28 +223,26 @@ FocusScope {
                 }
                 Label { visible: !library.collapsedSidebar; text: "chiaki-ng"; font.pixelSize: 20; font.bold: true }
             }
-            Controls.Button {
+            ConsoleButton {
                 id: consolesButton
                 objectName: "consolesButton"
                 Layout.fillWidth: true
                 Layout.preferredHeight: 44
-                flat: true
                 text: qsTr("Consoles")
                 icon.source: "qrc:/icons/discover-24px.svg"
                 display: library.collapsedSidebar ? AbstractButton.IconOnly : AbstractButton.TextBesideIcon
                 font.pixelSize: 14
                 Accessible.name: qsTr("Consoles")
                 Material.foreground: "#69b8ff"
-                background: Rectangle { radius: 8; color: "#1d354c"; border.color: consolesButton.visualFocus ? "#69b8ff" : "transparent" }
+                highlighted: true
                 onClicked: library.restoreCardFocus(library.selectedIdentity)
                 ToolTip.visible: hovered && library.collapsedSidebar
                 ToolTip.text: text
             }
-            Controls.Button {
+            ConsoleButton {
                 objectName: "settingsButton"
                 Layout.fillWidth: true
                 Layout.preferredHeight: 44
-                flat: true
                 text: qsTr("Settings")
                 icon.source: "qrc:/icons/options.svg"
                 display: library.collapsedSidebar ? AbstractButton.IconOnly : AbstractButton.TextBesideIcon
@@ -256,11 +253,10 @@ FocusScope {
                 ToolTip.text: text
             }
             Item { Layout.fillHeight: true }
-            Controls.Button {
+            ConsoleButton {
                 objectName: "steamShortcutButton"
                 Layout.fillWidth: true
                 Layout.preferredHeight: 44
-                flat: true
                 visible: library.steamAvailable
                 text: qsTr("Steam shortcut")
                 icon.source: "qrc:/icons/l3.svg"
@@ -271,11 +267,10 @@ FocusScope {
                 ToolTip.visible: hovered
                 ToolTip.text: Accessible.name
             }
-            Controls.Button {
+            ConsoleButton {
                 objectName: "quitButton"
                 Layout.fillWidth: true
                 Layout.preferredHeight: 40
-                flat: true
                 text: library.collapsedSidebar ? "\u00d7" : qsTr("Quit")
                 icon.source: "image://svg/button-" + (library.playStationController ? "ps" : "deck") + "#moon"
                 display: library.collapsedSidebar ? AbstractButton.IconOnly : AbstractButton.TextBesideIcon
@@ -302,19 +297,13 @@ FocusScope {
             Layout.fillWidth: true
             Label { text: qsTr("Consoles"); font.pixelSize: library.width < 630 ? 28 : 35; font.bold: true }
             Item { Layout.fillWidth: true }
-            Controls.Button {
+            ConsoleButton {
                 id: addConsoleButton
                 objectName: "addConsoleButton"
                 text: qsTr("Add console")
                 icon.source: "qrc:/icons/r3.svg"
                 font.pixelSize: 14
                 Layout.preferredHeight: 42
-                Material.roundedScale: Material.SmallScale
-                background: Rectangle {
-                    radius: 8
-                    color: "transparent"
-                    border.color: addConsoleButton.visualFocus ? "#69b8ff" : "#2b323d"
-                }
                 onClicked: library.addConsoleRequested()
             }
         }
@@ -332,6 +321,22 @@ FocusScope {
                 placeholderText: qsTr("Search consoles")
                 Accessible.name: qsTr("Search consoles")
                 font.pixelSize: 14
+                leftPadding: 42
+                background: Rectangle {
+                    radius: 8
+                    color: "#181d25"
+                    border.color: consoleSearch.visualFocus ? "#69b8ff" : "#3b4655"
+                    border.width: consoleSearch.visualFocus ? 2 : 1
+                }
+                Image {
+                    objectName: "consoleSearchIcon"
+                    anchors { left: parent.left; leftMargin: 12; verticalCenter: parent.verticalCenter }
+                    width: 20
+                    height: 20
+                    sourceSize: Qt.size(width, height)
+                    source: "qrc:/icons/search-24px.svg"
+                    Accessible.ignored: true
+                }
                 Keys.priority: Keys.AfterItem
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) {
@@ -349,10 +354,9 @@ FocusScope {
                 }
             }
             Item { visible: library.width >= 630; Layout.fillWidth: true }
-            Controls.Button {
+            ConsoleButton {
                 objectName: "refreshPsnButton"
                 visible: library.psnAvailable
-                flat: true
                 text: qsTr("Refresh PSN consoles")
                 icon.source: "qrc:/icons/r1.svg"
                 font.pixelSize: 13
@@ -434,7 +438,7 @@ FocusScope {
                             : library.discoveryEnabled ? qsTr("Add a console or wait for local discovery.")
                             : qsTr("Enable discovery to find consoles on your local network.")
                     }
-                    Controls.Button {
+                    ConsoleButton {
                         objectName: "emptyStateAction"
                         Layout.alignment: Qt.AlignHCenter
                         font.pixelSize: 14
@@ -453,14 +457,15 @@ FocusScope {
                     id: libraryFooter
                     y: (emptyState.visible ? emptyState.y + emptyState.height : cards.height) + 16
                     width: parent.width
-                    Controls.Button {
+                    ConsoleButton {
                         id: discoveryButton
                         objectName: "discoveryButton"
-                        flat: true
                         icon.source: "qrc:/icons/discover-" + (library.discoveryEnabled ? "" : "off-") + "24px.svg"
                         text: library.discoveryEnabled ? qsTr("Discovery on") : qsTr("Discovery off")
-                        font.pixelSize: 13
-                        Layout.preferredHeight: 36
+                        font.pixelSize: 15
+                        icon.width: 24
+                        icon.height: 24
+                        Layout.preferredHeight: 42
                         onActiveFocusChanged: if (activeFocus) library.revealControl(discoveryButton)
                         onClicked: library.discoveryToggled(!library.discoveryEnabled)
                     }
@@ -486,27 +491,31 @@ FocusScope {
             Repeater {
                 model: ["pin", "wake", "delete", "hide"].filter(action =>
                     library.selectedTarget && library.eligible(action, library.selectedTarget.host))
-                Row {
+                ConsoleButton {
                     required property string modelData
-                    spacing: 6
-                    Image {
-                        width: 24
-                        height: 24
-                        source: parent.modelData === "pin" ? "qrc:/icons/l1.svg"
+                    objectName: modelData + "ShortcutButton"
+                    icon.width: 24
+                    icon.height: 24
+                    icon.source: modelData === "pin" ? "qrc:/icons/l1.svg"
                             : "image://svg/button-" + (library.playStationController ? "ps" : "deck")
-                              + (parent.modelData === "wake" ? "#pyramid" : "#box")
-                        Accessible.ignored: true
-                    }
-                    Label {
-                        objectName: "controllerHintLabel"
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: parent.modelData === "pin" ? qsTr("PIN") : parent.modelData === "wake" ? qsTr("Wake")
-                            : parent.modelData === "delete" ? qsTr("Delete") : qsTr("Hide")
-                        font.pixelSize: 12
-                        color: "#aab6c7"
-                    }
+                              + (modelData === "wake" ? "#pyramid" : "#box")
+                    text: modelData === "pin" ? qsTr("PIN") : modelData === "wake" ? qsTr("Wake")
+                        : modelData === "delete" ? qsTr("Delete") : qsTr("Hide")
+                    onClicked: library.requestManagement(modelData, library.selectedIdentity)
                 }
             }
+        }
+    }
+
+    // The native render-control window has a zero-size Controls overlay.
+    Rectangle {
+        objectName: "detailsBackdrop"
+        anchors.fill: parent
+        visible: consoleDetails.visible
+        color: "#b8080c14"
+        MouseArea {
+            anchors.fill: parent
+            onClicked: consoleDetails.close()
         }
     }
 
@@ -527,6 +536,11 @@ FocusScope {
             requestedIdentity = identity;
             close();
         }
+        onConnectRequested: {
+            requestedAction = "connect";
+            requestedIdentity = identity;
+            close();
+        }
         onClosed: Qt.callLater(() => {
             if (opener && opener.visible) {
                 opener.focus = false;
@@ -535,7 +549,8 @@ FocusScope {
             if (requestedAction) {
                 const action = requestedAction;
                 requestedAction = "";
-                library.requestManagement(action, requestedIdentity);
+                if (action === "connect") library.connectToTarget(requestedIdentity);
+                else library.requestManagement(action, requestedIdentity);
             }
         })
     }

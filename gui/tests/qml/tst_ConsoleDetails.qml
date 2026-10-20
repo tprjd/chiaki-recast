@@ -46,6 +46,16 @@ TestCase {
         return result;
     }
 
+    function fieldValue(item, label) {
+        if (item.objectName === "detailsFieldLabel" && item.text === label)
+            return findChild(item.parent, "detailsFieldValue").text;
+        for (const child of item.children || []) {
+            const value = fieldValue(child, label);
+            if (value !== undefined) return value;
+        }
+        return undefined;
+    }
+
     function test_detailsShowAvailableFieldsWithoutConnecting() {
         const screen = createTemporaryObject(screenComponent, testCase, { hosts: [host()] });
         connectSpy.target = screen;
@@ -56,10 +66,11 @@ TestCase {
         verify(details);
         tryCompare(details, "opened", true);
         const text = displayedText(details.contentItem);
-        for (const value of ["Living room", "Address: 192.0.2.7", "ID: 00:11:22:33:44:55",
-                            "Registration: Registered", "Route: Local network",
-                            "App: Sample game", "Title ID: PPSA00001"])
-            verify(text.indexOf(value) >= 0, value);
+        verify(text.indexOf("Living room") >= 0);
+        const expected = { Console: "PS5", Address: "192.0.2.7", ID: "00:11:22:33:44:55",
+            Registration: "Registered", Connection: "Local network", App: "Sample game", "Title ID": "PPSA00001" };
+        for (const label of Object.keys(expected))
+            compare(fieldValue(details.contentItem, label), expected[label], label);
         compare(connectSpy.count, 0);
         details.close();
     }
@@ -106,7 +117,7 @@ TestCase {
         const details = findChild(screen, "consoleDetails");
         tryCompare(details, "opened", true);
         verifyLiteralLabel(labelWithText(details.contentItem, name), name);
-        verifyLiteralLabel(labelWithText(details.contentItem, "App: " + app), "App: " + app);
+        verifyLiteralLabel(labelWithText(details.contentItem, app), app);
         details.close();
     }
 
@@ -131,11 +142,11 @@ TestCase {
             + accessibleAndTooltipText(screen) + accessibleAndTooltipText(details.contentItem);
         for (const value of ["192.0.2.7", "00:11:22:33:44:55", "private-psn-id"])
             verify(text.indexOf(value) < 0, "Streamer mode exposed " + value);
-        verify(displayedText(details.contentItem).indexOf("ID: hidden") >= 0);
+        compare(fieldValue(details.contentItem, "ID"), "hidden");
         screen.streamerMode = false;
         wait(0);
         const expected = target.duid || target.mac;
-        verify(displayedText(details.contentItem).indexOf("ID: " + expected) >= 0);
+        compare(fieldValue(details.contentItem, "ID"), expected);
         details.close();
     }
 
@@ -148,8 +159,10 @@ TestCase {
         tryCompare(details, "opened", true);
         const text = displayedText(details.contentItem);
         verify(text.indexOf("192.0.2.9") >= 0);
-        verify(text.indexOf("Route: Manual address") >= 0);
-        for (const missing of ["ID:", "Registration:", "App:", "Title ID:", "undefined", "null"])
+        compare(fieldValue(details.contentItem, "Connection"), "Manual address");
+        for (const missing of ["Console", "ID", "Registration", "App", "Title ID"])
+            compare(fieldValue(details.contentItem, missing), undefined, missing);
+        for (const missing of ["undefined", "null"])
             verify(text.indexOf(missing) < 0, missing);
         details.close();
     }

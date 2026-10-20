@@ -4,7 +4,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Layouts
-import "controls" as Controls
 
 Rectangle {
     id: card
@@ -40,9 +39,9 @@ Rectangle {
 
     Rectangle {
         id: art
-        anchors { top: parent.top; left: parent.left; right: parent.right; margins: 1 }
+        anchors { top: parent.top; left: parent.left; right: parent.right; margins: card.border.width }
         height: 180
-        radius: 14
+        radius: card.radius - card.border.width
         color: card.host.discovered && card.host.state === "standby" ? "#25252a" : "#1c2633"
         Rectangle {
             anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
@@ -132,7 +131,7 @@ Rectangle {
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
-            Controls.Button {
+            ConsoleButton {
                 id: connectButton
                 objectName: "connectButton"
                 Layout.fillWidth: true
@@ -151,29 +150,20 @@ Rectangle {
                 lastInFocusChain: true
                 sendOutput: true
                 enabled: card.targetEnabled
-                Material.background: "#69b8ff"
-                Material.foreground: "#101c29"
-                Material.roundedScale: Material.SmallScale
-                background: Rectangle {
-                    radius: 8
-                    color: connectButton.enabled ? "#69b8ff" : "#485361"
-                    border.color: connectButton.visualFocus ? "#e4f3ff" : "transparent"
-                    border.width: 2
-                }
+                primary: true
                 onActiveFocusChanged: if (activeFocus) card.selectionRequested(connectButton)
                 onClicked: card.activated()
             }
-            Controls.Button {
+            ConsoleButton {
                 id: actionsButton
                 objectName: "consoleActionsButton"
-                Layout.preferredWidth: 36
+                Layout.preferredWidth: 40
                 Layout.preferredHeight: 40
                 topInset: 0
                 bottomInset: 0
-                padding: 0
-                flat: true
-                text: "\u2026"
-                font.pixelSize: 20
+                leftPadding: 0
+                rightPadding: 0
+                icon.source: "qrc:/icons/more-24px.svg"
                 Accessible.name: qsTr("Details for %1").arg(card.consoleName)
                 ToolTip {
                     id: detailsToolTip

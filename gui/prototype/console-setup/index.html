@@ -1,0 +1,48 @@
+<!doctype html>
+<!-- PROTOTYPE ONLY: Three layouts for separate registration and manual host screens.
+     Compare ?variant=A, B, or C in the console-library context. No native actions. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>chiaki-ng · Console setup prototypes</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="setup.css">
+  <script src="setup.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#content">Skip to console setup</a>
+  <div class="shell">
+    <aside class="app-rail">
+      <a class="brand" href="../?variant=B"><span class="brand-mark">χ</span><span>chiaki<span class="accent">-ng</span></span></a>
+      <nav aria-label="Application">
+        <a class="active" href="../?variant=B"><span aria-hidden="true">▦</span><span>Consoles</span></a>
+        <a href="../settings/"><span aria-hidden="true">⚙</span><span>Settings</span></a>
+      </nav>
+      <div class="rail-foot">Remote Play, your way.<br><span>chiaki-ng</span></div>
+    </aside>
+    <main id="content" tabindex="-1"></main>
+  </div>
+  <aside class="lab" aria-label="Prototype controls">
+    <div class="lab-main">
+      <span class="lab-tag">PROTOTYPE</span>
+      <button id="previous" aria-label="Previous layout">←</button>
+      <strong id="variant-label"></strong>
+      <button id="next" aria-label="Next layout">→</button>
+      <span class="divider"></span>
+      <div class="screen-tabs" role="group" aria-label="Preview screen">
+        <button data-screen="register">Registration</button>
+        <button data-screen="manual">Manual host</button>
+      </div>
+      <label class="state-picker">State <select id="preview-state" aria-label="Preview state"></select></label>
+    </div>
+    <div class="lab-detail">
+      <span id="layout-note"></span>
+      <div><button id="sample">Fill sample</button><button id="reset">Reset</button><label><input id="privacy" type="checkbox"> Hide private values</label></div>
+    </div>
+    <div class="lab-status" id="lab-status" aria-live="polite"></div>
+  </aside>
+  <div id="notice" role="status" aria-live="polite"></div>
+</body>
+</html>

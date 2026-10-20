@@ -126,6 +126,14 @@ TestCase {
                 "Focused " + control.objectName + " is visible at " + position.y);
             keyClick(Qt.Key_Tab);
         }
+        const shortcuts = findChild(screen, "controllerHints").children.filter(item => item.objectName.endsWith("ShortcutButton"));
+        for (const control of shortcuts) {
+            verify(control.activeFocus, "Tab reaches " + control.objectName);
+            const position = control.mapToItem(screen, 0, 0);
+            verify(position.y >= 0 && position.y + control.height <= screen.height);
+            order.push(control);
+            keyClick(Qt.Key_Tab);
+        }
         for (let index = order.length - 1; index >= 0; index--) {
             keyClick(Qt.Key_Tab, Qt.ShiftModifier);
             verify(order[index].activeFocus, "Shift+Tab reaches " + index);
@@ -147,7 +155,7 @@ TestCase {
         });
         const hints = findChild(screen, "controllerHints");
         verify(hints && hints.visible, "Selected-console controller hints are visible outside details");
-        compare(descendantsNamed(hints, "controllerHintLabel").map(item => item.text), data.expected);
+        compare(hints.children.filter(item => item.objectName.endsWith("ShortcutButton")).map(item => item.text), data.expected);
         verify(findChild(screen, "connectButton").icon.source.toString().includes("#cross"));
         screen.hosts = [];
         verify(!hints.visible);
@@ -486,7 +494,11 @@ TestCase {
             { tag: "pin", changes: {}, item: "pinAction", action: "pin", keyboard: true },
             { tag: "wake", changes: { manual: true, discovered: false }, item: "wakeAction", action: "wake" },
             { tag: "delete", changes: { manual: true, discovered: false }, item: "deleteAction", action: "delete" },
-            { tag: "hide", changes: { registered: false }, item: "hideAction", action: "hide" }
+            { tag: "hide", changes: { registered: false }, item: "hideAction", action: "hide" },
+            { tag: "pin-shortcut", changes: {}, item: "pinShortcutButton", action: "pin", shortcut: true },
+            { tag: "wake-shortcut", changes: { manual: true, discovered: false }, item: "wakeShortcutButton", action: "wake", shortcut: true },
+            { tag: "delete-shortcut", changes: { manual: true, discovered: false }, item: "deleteShortcutButton", action: "delete", shortcut: true },
+            { tag: "hide-shortcut", changes: { registered: false }, item: "hideShortcutButton", action: "hide", shortcut: true }
         ];
     }
 
@@ -496,10 +508,12 @@ TestCase {
         commandSpy.signalName = data.action === "wake" ? "wakeRequested" : "managementRequested";
         commandSpy.target = screen;
         connectSpy.target = screen;
-        mouseClick(findChild(screen, "consoleActionsButton"));
         const details = findChild(screen, "consoleDetails");
-        tryCompare(details, "opened", true);
-        const action = findChild(details.contentItem, data.item);
+        if (!data.shortcut) {
+            mouseClick(findChild(screen, "consoleActionsButton"));
+            tryCompare(details, "opened", true);
+        }
+        const action = findChild(data.shortcut ? screen : details.contentItem, data.item);
         verify(action.visible && action.enabled);
         if (data.keyboard) {
             action.forceActiveFocus(Qt.TabFocusReason);
