@@ -26,6 +26,54 @@ FocusScope {
     readonly property bool compact: width < 760
     readonly property var categories: [qsTr("General"), qsTr("Video"), qsTr("Stream"),
         qsTr("Audio/Wifi"), qsTr("Consoles"), qsTr("Keys"), qsTr("Controllers"), qsTr("Remote"), qsTr("Config")]
+    property int consoleProfileEpoch: 0
+    property string consoleProfileKey: backend.settings.currentProfile
+    property var pendingConsoleAction: null
+    onConsoleProfileKeyChanged: consoleProfileEpoch++
+    function consoleIndex(hosts, mac) {
+        if (!mac) return -1;
+        let result = -1;
+        for (let index = 0; index < hosts.length; index++) {
+            if (hosts[index].mac !== mac) continue;
+            if (result !== -1) return -1;
+            result = index;
+        }
+        return result;
+    }
+    function requestConsoleAction(action, mac, opener) {
+        const hosts = action === "delete" ? backend.settings.registeredHosts : backend.hiddenHosts;
+        if (consoleIndex(hosts, mac) < 0) return;
+        const request = { mac: mac, epoch: consoleProfileEpoch, opener: opener };
+        pendingConsoleAction = request;
+        const restoreFocus = function() {
+            Qt.callLater(function() {
+                if (request.opener && request.opener.visible && request.opener.enabled)
+                    request.opener.forceActiveFocus(Qt.TabFocusReason);
+                else if (bar.currentIndex === 4)
+                    registerNewButton.forceActiveFocus(Qt.TabFocusReason);
+            });
+        };
+        const accept = function() {
+            if (pendingConsoleAction !== request) return;
+            pendingConsoleAction = null;
+            if (request.epoch === consoleProfileEpoch) {
+                const currentHosts = action === "delete" ? backend.settings.registeredHosts : backend.hiddenHosts;
+                const index = consoleIndex(currentHosts, request.mac);
+                if (index >= 0) {
+                    if (action === "delete") backend.settings.deleteRegisteredHost(index);
+                    else backend.unhideHost(request.mac);
+                }
+            }
+            restoreFocus();
+        };
+        const cancel = function() {
+            if (pendingConsoleAction !== request) return;
+            pendingConsoleAction = null;
+            restoreFocus();
+        };
+        navigation.showConfirmDialog(action === "delete" ? qsTr("Delete Console") : qsTr("Unhide Console"),
+            action === "delete" ? qsTr("Are you sure you want to delete this console?") : qsTr("Are you sure you want to unhide this console?"), accept, cancel);
+    }
     function close() { navigation.closeDialog(); }
     Keys.onEscapePressed: close()
     StackView.onDeactivating: restoreFocusItem = Window.window.activeFocusItem
@@ -745,452 +793,167 @@ FocusScope {
                 // Stream
                 Flickable {
                     id: streamFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "streamFlick"
+                    anchors.fill: parent
                     clip: true
-                    contentWidth: Math.max(width, streamGrid.width)
+                    contentWidth: width
                     contentHeight: streamGrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: streamFlick.contentHeight > streamFlick.height
-                    }
-                    GridLayout {
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
                         id: streamGrid
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        columns: 3
-                        rowSpacing: 10
-                        columnSpacing: 20
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Settings for:")
-                        }
-
-
-                    C.ComboBox {
-                        id: consoleSelection
-                        Layout.preferredWidth: 400
-                        Layout.alignment: Qt.AlignLeft
-                        model: [qsTr("PS4"), qsTr("PS5")]
-                        currentIndex: selectedConsole
-                        onActivated: (index) => selectedConsole = index
-                        firstInFocusChain: true
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                        KeyNavigation.down: {
-                            if(selectedConsole == SettingsDialog.Console.PS4)
-                                resolutionLocalPS4
-                            else
-                                resolutionLocalPS5
-
-                        }
-
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Local")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Remote")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Resolution:")
-                    }
-
-                    C.ComboBox {
-                        id: resolutionLocalPS4
-                        Layout.preferredWidth: 400
-                        model: [qsTr("360p"), qsTr("540p"), qsTr("720p (Default)"), qsTr("1080p (PS5 and PS4 Pro)")]
-                        currentIndex: dialog.backend.settings.resolutionLocalPS4 - 1
-                        onActivated: (index) => {
-                            dialog.backend.settings.resolutionLocalPS4 = index + 1
-                            dialog.backend.settings.bitrateLocalPS4 = 0
-                        }
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        KeyNavigation.right: resolutionRemotePS4
-                        KeyNavigation.down: fpsLocalPS4
-                        KeyNavigation.up: consoleSelection
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: resolutionRemotePS4
-                        Layout.preferredWidth: 400
-                        model: [qsTr("360p"), qsTr("540p"), qsTr("720p (Default)"), qsTr("1080p (PS5 and PS4 Pro)")]
-                        currentIndex: dialog.backend.settings.resolutionRemotePS4 - 1
-                        onActivated: (index) => {
-                            dialog.backend.settings.resolutionRemotePS4 = index + 1
-                            dialog.backend.settings.bitrateRemotePS4 = 0
-                        }
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        KeyNavigation.left: resolutionLocalPS4
-                        KeyNavigation.down: fpsRemotePS4
-                        KeyNavigation.up: consoleSelection
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: resolutionLocalPS5
-                        Layout.preferredWidth: 400
-                        model: [qsTr("360p"), qsTr("540p"), qsTr("720p"), qsTr("1080p (Default)")]
-                        currentIndex: dialog.backend.settings.resolutionLocalPS5 - 1
-                        onActivated: (index) => {
-                            dialog.backend.settings.resolutionLocalPS5 = index + 1
-                            dialog.backend.settings.bitrateLocalPS5 = 0
-                        }
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        KeyNavigation.right: resolutionRemotePS5
-                        KeyNavigation.up: consoleSelection
-                        KeyNavigation.down: fpsLocalPS5
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: resolutionRemotePS5
-                        Layout.preferredWidth: 400
-                        model: [qsTr("360p"), qsTr("540p"), qsTr("720p (Default)"), qsTr("1080p")]
-                        currentIndex: dialog.backend.settings.resolutionRemotePS5 - 1
-                        onActivated: (index) => {
-                            dialog.backend.settings.resolutionRemotePS5 = index + 1
-                            dialog.backend.settings.bitrateRemotePS5 = 0
-                        }
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        KeyNavigation.left: resolutionLocalPS5
-                        KeyNavigation.up: consoleSelection
-                        KeyNavigation.down: fpsRemotePS5
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("FPS:")
-                    }
-
-                    C.ComboBox {
-                        id: fpsLocalPS4
-                        Layout.preferredWidth: 400
-                        model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
-                        currentIndex: (dialog.backend.settings.fpsLocalPS4 / 30) - 1
-                        onActivated: (index) => dialog.backend.settings.fpsLocalPS4 = (index + 1) * 30
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        KeyNavigation.up: resolutionLocalPS4
-                        KeyNavigation.right: fpsRemotePS4
-                        KeyNavigation.down: bitrateLocalPS4
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: fpsRemotePS4
-                        Layout.preferredWidth: 400
-                        model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
-                        currentIndex: (dialog.backend.settings.fpsRemotePS4 / 30) - 1
-                        onActivated: (index) => dialog.backend.settings.fpsRemotePS4 = (index + 1) * 30
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        KeyNavigation.up: resolutionRemotePS4
-                        KeyNavigation.left: fpsLocalPS4
-                        KeyNavigation.down: bitrateRemotePS4
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: fpsLocalPS5
-                        Layout.preferredWidth: 400
-                        model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
-                        currentIndex: (dialog.backend.settings.fpsLocalPS5 / 30) - 1
-                        onActivated: (index) => dialog.backend.settings.fpsLocalPS5 = (index + 1) * 30
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        KeyNavigation.up: resolutionLocalPS5
-                        KeyNavigation.right: fpsRemotePS5
-                        KeyNavigation.down: bitrateLocalPS5
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: fpsRemotePS5
-                        Layout.preferredWidth: 400
-                        model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
-                        currentIndex: (dialog.backend.settings.fpsRemotePS5 / 30) - 1
-                        onActivated: (index) => dialog.backend.settings.fpsRemotePS5 = (index + 1) * 30
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        KeyNavigation.up: resolutionRemotePS5
-                        KeyNavigation.left: fpsLocalPS5
-                        KeyNavigation.down: bitrateRemotePS5
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Bitrate:")
-                    }
-
-                    C.Slider {
-                        id: bitrateLocalPS4
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        property var bitrate: {
-                            var rate = 0;
-                            switch (dialog.backend.settings.resolutionLocalPS4) {
-                            case 1: rate = 2; break; // 360p
-                            case 2: rate = 6; break; // 540p
-                            case 3: rate = 10; break; // 720p
-                            case 4: rate = 15; break; // 1080p
-                            }
-                            return rate;
-                        }
-                        Layout.preferredWidth: 200
-                        from: 2
-                        to: 100
-                        stepSize: 1
-                        value: dialog.backend.settings.bitrateLocalPS4 / 1000 ? (dialog.backend.settings.bitrateLocalPS4 / 1000) : bitrate
-                        onMoved: dialog.backend.settings.bitrateLocalPS4 = value * 1000;
-                        KeyNavigation.up: fpsLocalPS4
-                        KeyNavigation.down: bitrateLocalPS4
-                        KeyNavigation.priority: KeyNavigation.BeforeItem
-                        Label {
-                            anchors {
-                                left: parent.right
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 10
-                            }
-                            text: (parent.value) + qsTr(" Mbps") + qsTr(" (%1 Mbps)").arg(parent.bitrate.toFixed(0))
-                        }
-                    }
-
-                    C.Slider {
-                        id: bitrateRemotePS4
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        property var bitrate: {
-                            var rate = 0;
-                            switch (dialog.backend.settings.resolutionRemotePS4) {
-                            case 1: rate = 2; break; // 360p
-                            case 2: rate = 6; break; // 540p
-                            case 3: rate = 10; break; // 720p
-                            case 4: rate = 15; break; // 1080p
-                            }
-                            return rate;
-                        }
-                        Layout.preferredWidth: 200
-                        from: 2
-                        to: 100
-                        stepSize: 1
-                        value: dialog.backend.settings.bitrateRemotePS4 / 1000 ? (dialog.backend.settings.bitrateRemotePS4 / 1000) : bitrate
-                        onMoved: dialog.backend.settings.bitrateRemotePS4 = value * 1000;
-                        KeyNavigation.up: fpsRemotePS4
-                        KeyNavigation.down: bitrateRemotePS4
-                        KeyNavigation.priority: KeyNavigation.BeforeItem
-                        lastInFocusChain: true
-
-                        Label {
-                            anchors {
-                                left: parent.right
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 10
-                            }
-                            text: (parent.value) + qsTr(" Mbps") + qsTr(" (%1 Mbps)").arg(parent.bitrate.toFixed(0))
-                        }
-                    }
-
-                    C.Slider {
-                        id: bitrateLocalPS5
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        property var bitrate: {
-                            var rate = 0;
-                            switch (dialog.backend.settings.resolutionLocalPS5) {
-                            case 1: rate = 2; break; // 360p
-                            case 2: rate = 6; break; // 540p
-                            case 3: rate = 10; break; // 720p
-                            case 4: rate = 15; break; // 1080p
-                            }
-                            return rate;
-                        }
-                        Layout.preferredWidth: 200
-                        from: 2
-                        to: 100
-                        stepSize: 1
-                        value: dialog.backend.settings.bitrateLocalPS5 / 1000 ? (dialog.backend.settings.bitrateLocalPS5 / 1000) : bitrate
-                        onMoved: dialog.backend.settings.bitrateLocalPS5 = value * 1000;
-                        KeyNavigation.up: fpsLocalPS5
-                        KeyNavigation.down: codecLocalPS5
-                        KeyNavigation.priority: KeyNavigation.BeforeItem
-
-                        Label {
-                            anchors {
-                                left: parent.right
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 10
-                            }
-                            text: (parent.value) + qsTr(" Mbps") + qsTr(" (%1 Mbps)").arg(parent.bitrate.toFixed(0))
-                        }
-                    }
-
-                    C.Slider {
-                        id: bitrateRemotePS5
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        property var bitrate: {
-                            var rate = 0;
-                            switch (dialog.backend.settings.resolutionRemotePS5) {
-                            case 1: rate = 2; break; // 360p
-                            case 2: rate = 6; break; // 540p
-                            case 3: rate = 10; break; // 720p
-                            case 4: rate = 15; break; // 1080p
-                            }
-                            return rate;
-                        }
-                        Layout.preferredWidth: 200
-                        from: 2
-                        to: 100
-                        stepSize: 1
-                        value: dialog.backend.settings.bitrateRemotePS5 / 1000 ? (dialog.backend.settings.bitrateRemotePS5 / 1000) : bitrate
-                        onMoved: dialog.backend.settings.bitrateRemotePS5 = value * 1000;
-                        KeyNavigation.up: fpsRemotePS5
-                        KeyNavigation.down: codecRemotePS5
-                        KeyNavigation.priority: KeyNavigation.BeforeItem
-                        lastInFocusChain: true
-
-                        Label {
-                            anchors {
-                                left: parent.right
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 10
-                            }
-                            text: (parent.value) + qsTr(" Mbps") + qsTr(" (%1 Mbps)").arg(parent.bitrate.toFixed(0))
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Codec:")
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                    }
-
-                    C.ComboBox {
-                        id: codecLocalPS5
-                        Layout.preferredWidth: 400
-                        model: [qsTr("H264"), qsTr("H265 (Default)"), qsTr("H265 HDR")]
-                        currentIndex: dialog.backend.settings.codecLocalPS5
-                        onActivated: (index) => dialog.backend.settings.codecLocalPS5 = index
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        Keys.onReturnPressed: {
-                            if (popup.visible) {
-                                activated(highlightedIndex);
-                                popup.close();
-                            } else
-                                popup.open();
-                        }
-                        KeyNavigation.up: bitrateLocalPS5
-                        KeyNavigation.right: codecRemotePS5
-                        KeyNavigation.down: codecLocalPS5
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
+                        width: Math.max(0, streamFlick.width - 14)
+                        spacing: 16
+                        Label { text: qsTr("Stream"); font.pixelSize: 24; font.bold: true }
+                        Label { text: qsTr("Settings for"); font.pixelSize: 14 }
                         C.ComboBox {
-                            id: codecRemotePS5
-                            Layout.preferredWidth: 400
-                            model: [qsTr("H264"), qsTr("H265 (Default)"), qsTr("H265 HDR")]
-                            currentIndex: dialog.backend.settings.codecRemotePS5
-                            onActivated: (index) => dialog.backend.settings.codecRemotePS5 = index
-                            visible: selectedConsole == SettingsDialog.Console.PS5
-                            lastInFocusChain: true
-                            Keys.onReturnPressed: {
-                                if (popup.visible) {
-                                    activated(highlightedIndex);
-                                    popup.close();
-                                } else
-                                    popup.open();
+                            id: consoleSelection
+                            objectName: "consoleSelection"
+                            Accessible.name: qsTr("Console type")
+                            Layout.fillWidth: true
+                            Layout.maximumWidth: 400
+                            font.pixelSize: 14
+                            model: [qsTr("PS4"), qsTr("PS5")]
+                            currentIndex: dialog.selectedConsole
+                            onActivated: index => dialog.selectedConsole = index
+                            firstInFocusChain: true
+                            KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
+                            KeyNavigation.down: localStreamRoute.resolutionControl
+                        }
+                        GridLayout {
+                            Layout.fillWidth: true
+                            columns: streamFlick.width < 700 ? 1 : 2
+                            columnSpacing: 16
+                            rowSpacing: 16
+                            component StreamRoute: Frame {
+                                id: route
+                                required property int index
+                                property Item peer
+                                readonly property bool ps5: dialog.selectedConsole === SettingsDialog.Console.PS5
+                                readonly property string suffix: (index === 0 ? "Local" : "Remote") + (ps5 ? "PS5" : "PS4")
+                                readonly property string routeName: index === 0 ? qsTr("Local") : qsTr("Remote")
+                                property alias resolutionControl: resolution
+                                property alias fpsControl: fps
+                                property alias codecControl: codec
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                Layout.alignment: Qt.AlignTop
+                                background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    spacing: 8
+                                    Label { text: route.routeName; font.pixelSize: 18; font.bold: true }
+                                    Label { text: qsTr("Resolution"); font.pixelSize: 14 }
+                                    C.ComboBox {
+                                        id: resolution
+                                        objectName: "resolution" + route.suffix
+                                        Accessible.name: qsTr("%1 resolution").arg(route.routeName)
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        font.pixelSize: 14
+                                        model: [qsTr("360p"), qsTr("540p"), qsTr("720p"), qsTr("1080p")]
+                                        currentIndex: dialog.backend.settings["resolution" + route.suffix] - 1
+                                        onActivated: index => {
+                                            dialog.backend.settings["resolution" + route.suffix] = index + 1;
+                                            dialog.backend.settings["bitrate" + route.suffix] = 0;
+                                        }
+                                        KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
+                                        KeyNavigation.up: consoleSelection
+                                        KeyNavigation.down: fps
+                                        KeyNavigation.left: route.index === 1 && route.peer ? route.peer.resolutionControl : null
+                                        KeyNavigation.right: route.index === 0 && route.peer ? route.peer.resolutionControl : null
+                                    }
+                                    Label {
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        opacity: 0.65
+                                        text: !route.ps5 ? qsTr("Default: 720p. 1080p requires PS4 Pro.")
+                                            : route.index === 0 ? qsTr("Default: 1080p") : qsTr("Default: 720p")
+                                    }
+                                    Label { text: qsTr("Frame rate"); font.pixelSize: 14 }
+                                    C.ComboBox {
+                                        id: fps
+                                        objectName: "fps" + route.suffix
+                                        Accessible.name: qsTr("%1 frame rate").arg(route.routeName)
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        font.pixelSize: 14
+                                        model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
+                                        currentIndex: dialog.backend.settings["fps" + route.suffix] / 30 - 1
+                                        onActivated: index => dialog.backend.settings["fps" + route.suffix] = (index + 1) * 30
+                                        KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
+                                        KeyNavigation.up: resolution
+                                        KeyNavigation.down: bitrate
+                                        KeyNavigation.left: route.index === 1 && route.peer ? route.peer.fpsControl : null
+                                        KeyNavigation.right: route.index === 0 && route.peer ? route.peer.fpsControl : null
+                                    }
+                                    Label { text: qsTr("Bitrate"); font.pixelSize: 14 }
+                                    C.Slider {
+                                        id: bitrate
+                                        objectName: "bitrate" + route.suffix
+                                        Accessible.name: qsTr("%1 bitrate in Mbps").arg(route.routeName)
+                                        readonly property real automaticBitrate: {
+                                            switch (dialog.backend.settings["resolution" + route.suffix]) {
+                                            case 1: return 2;
+                                            case 2: return 6;
+                                            case 3: return 10;
+                                            case 4: return 15;
+                                            default: return 0;
+                                            }
+                                        }
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        from: 2
+                                        to: 100
+                                        stepSize: 1
+                                        value: dialog.backend.settings["bitrate" + route.suffix] / 1000 || automaticBitrate
+                                        onMoved: dialog.backend.settings["bitrate" + route.suffix] = value * 1000
+                                        KeyNavigation.priority: KeyNavigation.BeforeItem
+                                        KeyNavigation.up: fps
+                                        KeyNavigation.down: route.ps5 ? codec : bitrate
+                                    }
+                                    Label {
+                                        objectName: "bitrateDescription" + route.suffix
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: dialog.backend.settings["bitrate" + route.suffix] === 0
+                                            ? qsTr("Automatic: %1 Mbps").arg(bitrate.value)
+                                            : qsTr("%1 Mbps, default: %2 Mbps").arg(bitrate.value).arg(bitrate.automaticBitrate)
+                                    }
+                                    Label {
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        opacity: 0.65
+                                        text: qsTr("Changing resolution restores automatic bitrate.")
+                                    }
+                                    Label { text: qsTr("Codec"); font.pixelSize: 14; visible: route.ps5 }
+                                    C.ComboBox {
+                                        id: codec
+                                        objectName: "codec" + route.suffix
+                                        Accessible.name: qsTr("%1 codec").arg(route.routeName)
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        font.pixelSize: 14
+                                        model: [qsTr("H264"), qsTr("H265 (Default)"), qsTr("H265 HDR")]
+                                        visible: route.ps5
+                                        currentIndex: route.ps5 ? dialog.backend.settings[route.index === 0 ? "codecLocalPS5" : "codecRemotePS5"] : -1
+                                        onActivated: index => {
+                                            if (route.ps5)
+                                                dialog.backend.settings["codec" + route.suffix] = index;
+                                        }
+                                        KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
+                                        KeyNavigation.up: bitrate
+                                        KeyNavigation.down: codec
+                                        KeyNavigation.left: route.index === 1 && route.peer ? route.peer.codecControl : null
+                                        KeyNavigation.right: route.index === 0 && route.peer ? route.peer.codecControl : null
+                                    }
+                                }
                             }
-                            KeyNavigation.up: bitrateRemotePS5
-                            KeyNavigation.left: codecLocalPS5
-                            KeyNavigation.priority: {
-                                if(!popup.visible)
-                                    KeyNavigation.BeforeItem
-                                else
-                                    KeyNavigation.AfterItem
-                            }
+                            StreamRoute { id: localStreamRoute; index: 0; peer: remoteStreamRoute }
+                            StreamRoute { id: remoteStreamRoute; index: 1; peer: localStreamRoute }
                         }
                     }
                 }
@@ -1525,321 +1288,134 @@ FocusScope {
                 // Consoles
                 Flickable {
                     id: consolesFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
-                    clip: true
-                    contentWidth: Math.max(width, consolesLayout.width)
+                    objectName: "consolesPage"
+                    anchors.fill: parent
+                    contentWidth: width
                     contentHeight: consolesLayout.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: consolesFlick.contentHeight > consolesFlick.height
-                    }
+                    clip: true
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
                     ColumnLayout {
                         id: consolesLayout
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        spacing: 10
-
-                        Label {
-                            text: ""
-                        }
-
-                        Label {
-                            text: ""
-                        }
-
+                        width: consolesFlick.width - 12
+                        spacing: 16
+                        Label { text: qsTr("Consoles"); font.pixelSize: 24; font.bold: true }
                         C.Button {
                             id: registerNewButton
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.topMargin: 10
-                            topPadding: 26
-                            leftPadding: 30
-                            rightPadding: 30
-                            bottomPadding: 26
-                            firstInFocusChain: true
+                            font.pixelSize: 14
+                            objectName: "registerConsole"
                             text: qsTr("Register New")
+                            Accessible.name: qsTr("Register a new console")
+                            firstInFocusChain: true
                             onClicked: dialog.navigation.showRegistDialog("255.255.255.255", true)
-                            Material.roundedScale: Material.SmallScale
                         }
-
+                        Label { text: qsTr("Registered Consoles"); font.pixelSize: 14; font.bold: true }
                         Label {
-                            id: consolesLabel
-                            Layout.alignment: Qt.AlignHCenter
-                            text: qsTr("Registered Consoles")
-                            font.bold: true
+                            font.pixelSize: 14
+                            objectName: "registeredConsolesEmpty"
+                            visible: dialog.backend.settings.registeredHosts.length === 0
+                            text: qsTr("No registered consoles.")
+                            Layout.fillWidth: true
+                            wrapMode: Text.Wrap
                         }
-
-                        ListView {
-                            id: consolesView
-                            Layout.alignment: Qt.AlignHCenter
-                            height: 170
-                            onCountChanged: {
-                                consolesView.contentHeight = consolesView.count * 80 + consolesView.anchors.topMargin;
-                            }
-                            keyNavigationEnabled: false
-                            width: 700
-                            ScrollBar.vertical: ScrollBar {
-                                id: consolesScrollbar
-                                policy: ScrollBar.AlwaysOn
-                                visible: consolesView.contentHeight > consolesView.height
-                            }
-                            clip: true
+                        Repeater {
                             model: dialog.backend.settings.registeredHosts
-                            delegate: ItemDelegate {
-                                text: "%1 (%2, %3)".arg(dialog.backend.settings.streamerMode ? "hidden" : modelData.mac).arg(modelData.ps5 ? "PS5" : "PS4").arg(modelData.name)
-                                height: 80
-                                width: parent ? parent.width : 0
-                                leftPadding: autoConnectButton.width + 40
-
-                                CheckBox {
-                                    property bool firstInFocusChain: false
-                                    property bool lastInFocusChain: false
-                                    property bool lastDownInFocusChain: index > consolesView.count + hiddenConsolesView.count - 2
-
-                                    id: autoConnectButton
-                                    anchors {
-                                        left: parent.left
-                                        verticalCenter: parent.verticalCenter
-                                        leftMargin: 20
+                            Frame {
+                                font.pixelSize: 14
+                                id: registeredCard
+                                required property int index
+                                required property var modelData
+                                readonly property string displayName: dialog.backend.settings.streamerMode
+                                    ? qsTr("Registered console %1").arg(index + 1) : modelData.name
+                                objectName: "registeredConsole" + index
+                                Layout.fillWidth: true
+                                background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    spacing: 8
+                                    Label {
+                                        objectName: "registeredConsoleInfo" + registeredCard.index
+                                        text: dialog.backend.settings.streamerMode
+                                            ? "%1 (%2)".arg(registeredCard.displayName).arg(registeredCard.modelData.ps5 ? "PS5" : "PS4")
+                                            : "%1 (%2, %3)".arg(registeredCard.modelData.mac).arg(registeredCard.modelData.ps5 ? "PS5" : "PS4").arg(registeredCard.displayName)
+                                        textFormat: Text.PlainText
+                                        wrapMode: Text.WrapAnywhere
+                                        Layout.fillWidth: true
                                     }
-                                    text: qsTr("Auto-Connect")
-                                    checked: dialog.backend.settings.autoConnectMac == modelData.mac
-                                    onToggled: dialog.backend.settings.autoConnectMac = checked ? modelData.mac : "";
-
-                                    Keys.onPressed: (event) => {
-                                        switch (event.key) {
-                                        case Qt.Key_Right:
-                                            if (!lastInFocusChain) {
-                                                let item = nextItemInFocusChain();
-                                                if (item)
-                                                    item.forceActiveFocus(Qt.TabFocusReason);
-                                                event.accepted = true;
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        C.CheckBox {
+                                            id: autoConnectButton
+                                            Layout.fillWidth: true
+                                            Layout.minimumWidth: 0
+                                            contentItem: Label { text: parent.text; textFormat: Text.PlainText; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                            KeyNavigation.right: deleteConsoleButton
+                                            objectName: "autoConnectConsole" + registeredCard.index
+                                            text: qsTr("Auto-Connect")
+                                            Accessible.name: qsTr("Auto-connect to %1").arg(registeredCard.displayName)
+                                            enabled: dialog.consoleIndex(dialog.backend.settings.registeredHosts, registeredCard.modelData.mac) >= 0
+                                            checked: dialog.backend.settings.autoConnectMac === registeredCard.modelData.mac
+                                            onToggled: {
+                                                if (dialog.consoleIndex(dialog.backend.settings.registeredHosts, registeredCard.modelData.mac) >= 0)
+                                                    dialog.backend.settings.autoConnectMac = checked ? registeredCard.modelData.mac : "";
                                             }
-                                            break;
-                                        case Qt.Key_Up:
-                                            if (!firstInFocusChain) {
-                                                let item = nextItemInFocusChain(false);
-                                                if (item) {
-                                                    item.forceActiveFocus(Qt.TabFocusReason);
-                                                    dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                }
-                                                let count = index > 0 ? 2: 0;
-                                                for(var i = 0; i < count; i++)
-                                                {
-                                                    let item2 = item.nextItemInFocusChain(false);
-                                                    if (item)
-                                                    {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                        item = item2;
-                                                    }
-                                                }
-                                                event.accepted = true;
-                                            }
-                                            break;
-                                        case Qt.Key_Down:
-                                            if (!lastDownInFocusChain) {
-                                                let item = nextItemInFocusChain();
-                                                if (item) {
-                                                    item.forceActiveFocus(Qt.TabFocusReason);
-                                                    dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                }
-                                                let count = 2;
-                                                for(var i = 0; i < count; i++)
-                                                {
-                                                    let item2 = item.nextItemInFocusChain();
-                                                    if (item)
-                                                    {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                        item = item2;
-                                                    }
-                                                }
-                                                event.accepted = true;
-                                            }
-                                            break;
-                                        case Qt.Key_Return:
-                                            if (visualFocus) {
-                                                toggle();
-                                                toggled();
-                                            }
-                                            event.accepted = true;
-                                            break;
+                                        }
+                                        C.Button {
+                                            id: deleteConsoleButton
+                                            Layout.maximumWidth: registeredCard.width * 0.4
+                                            contentItem: Label { text: parent.text; textFormat: Text.PlainText; wrapMode: Text.Wrap; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                                            KeyNavigation.left: autoConnectButton
+                                            lastInFocusChain: registeredCard.index === dialog.backend.settings.registeredHosts.length - 1 && dialog.backend.hiddenHosts.length === 0
+                                            objectName: "deleteRegisteredConsole" + registeredCard.index
+                                            text: qsTr("Delete")
+                                            Accessible.name: qsTr("Delete %1").arg(registeredCard.displayName)
+                                            enabled: dialog.consoleIndex(dialog.backend.settings.registeredHosts, registeredCard.modelData.mac) >= 0
+                                            onClicked: dialog.requestConsoleAction("delete", registeredCard.modelData.mac, this)
                                         }
                                     }
-                                }
-
-                                Button {
-                                    property bool firstInFocusChain: false
-                                    property bool lastInFocusChain: index > consolesView.count + hiddenConsolesView.count - 2
-                                    Material.background: visualFocus ? Material.accent : undefined
-
-                                    Component.onDestruction: {
-                                        if (visualFocus) {
-                                            let item = nextItemInFocusChain();
-                                            if (item)
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                        }
-                                    }
-                                    Keys.onPressed: (event) => {
-                                        switch (event.key) {
-                                            case Qt.Key_Left:
-                                                if (!firstInFocusChain) {
-                                                    let item = nextItemInFocusChain(false);
-                                                    if (item)
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Up:
-                                                if (!firstInFocusChain)
-                                                {
-                                                    let item = nextItemInFocusChain(false);
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                    }
-                                                    let count = 2;
-                                                    for(var i = 0; i < count; i++)
-                                                    {
-                                                        let item2 = item.nextItemInFocusChain(false);
-                                                        if (item)
-                                                        {
-                                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                                            dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                            item = item2;
-                                                        }
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Down:
-                                                if (!lastInFocusChain) {
-                                                    let item = nextItemInFocusChain();
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                    }
-                                                    let count = index < consolesView.count - 1 ? 2: 0;
-                                                    for(var i = 0; i < count; i++)
-                                                    {
-                                                        let item2 = item.nextItemInFocusChain();
-                                                        if (item)
-                                                        {
-                                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                                            dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                            item = item2;
-                                                        }
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Return:
-                                                if (visualFocus) {
-                                                    clicked();
-                                                }
-                                                event.accepted = true;
-                                                break;
-                                        }
-                                    }
-                                    anchors {
-                                        right: parent.right
-                                        verticalCenter: parent.verticalCenter
-                                        rightMargin: 20
-                                    }
-                                    text: qsTr("Delete")
-                                    onClicked: dialog.navigation.showConfirmDialog(qsTr("Delete Console"), qsTr("Are you sure you want to delete this console?"), () => dialog.backend.settings.deleteRegisteredHost(index));
-                                    Material.roundedScale: Material.SmallScale
-                                    Material.accent: Material.Red
                                 }
                             }
                         }
-
+                        Label { text: qsTr("Hidden Consoles"); font.pixelSize: 14; font.bold: true }
                         Label {
-                            id: hiddenConsolesLabel
-                            Layout.alignment: Qt.AlignHCenter
-                            text: qsTr("Hidden Consoles")
-                            font.bold: true
+                            font.pixelSize: 14
+                            objectName: "hiddenConsolesEmpty"
+                            visible: dialog.backend.hiddenHosts.length === 0
+                            text: qsTr("No hidden consoles.")
+                            Layout.fillWidth: true
+                            wrapMode: Text.Wrap
                         }
-                        ListView {
-                            id: hiddenConsolesView
-                            Layout.alignment: Qt.AlignHCenter
-                            keyNavigationEnabled: false
-                            height: 170
-                            onCountChanged: {
-                                hiddenConsolesView.contentHeight = hiddenConsolesView.count * 80 + hiddenConsolesView.anchors.topMargin;
-                            }
-                            clip: true
-                            width: 500
-                            ScrollBar.vertical: ScrollBar {
-                                id: hiddenConsolesScrollbar
-                                policy: ScrollBar.AlwaysOn
-                                visible: hiddenConsolesView.contentHeight > hiddenConsolesView.height
-                            }
+                        Repeater {
                             model: dialog.backend.hiddenHosts
-                            delegate: ItemDelegate {
-                                text: "%1 (%2)".arg(dialog.backend.settings.streamerMode ? "hidden" : modelData.mac).arg(modelData.name)
-                                height: 80
-                                width: parent ? parent.width : 0
-
-                                Button {
-                                    property bool firstInFocusChain: false
-                                    property bool lastInFocusChain: index > hiddenConsolesView.count - 2
-                                    Material.background: visualFocus ? Material.accent : undefined
-
-                                    Component.onDestruction: {
-                                        if (visualFocus) {
-                                            let item = nextItemInFocusChain();
-                                            if (item)
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                        }
+                            Frame {
+                                font.pixelSize: 14
+                                id: hiddenCard
+                                required property int index
+                                required property var modelData
+                                readonly property string displayName: dialog.backend.settings.streamerMode
+                                    ? qsTr("Hidden console %1").arg(index + 1) : modelData.name
+                                objectName: "hiddenConsole" + index
+                                Layout.fillWidth: true
+                                background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    spacing: 8
+                                    Label {
+                                        objectName: "hiddenConsoleInfo" + hiddenCard.index
+                                        text: dialog.backend.settings.streamerMode ? hiddenCard.displayName
+                                            : "%1 (%2)".arg(hiddenCard.modelData.mac).arg(hiddenCard.displayName)
+                                        textFormat: Text.PlainText
+                                        wrapMode: Text.WrapAnywhere
+                                        Layout.fillWidth: true
                                     }
-                                    Keys.onPressed: (event) => {
-                                        switch (event.key) {
-                                            case Qt.Key_Up:
-                                                if (!firstInFocusChain)
-                                                {
-                                                    let item = nextItemInFocusChain(false);
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(hiddenConsolesView, item);
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Down:
-                                                if (!lastInFocusChain) {
-                                                    let item = nextItemInFocusChain();
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(hiddenConsolesView, item);
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Return:
-                                                if (visualFocus) {
-                                                    clicked();
-                                                }
-                                                event.accepted = true;
-                                                break;
-                                        }
+                                    C.Button {
+                                        objectName: "unhideConsole" + hiddenCard.index
+                                        lastInFocusChain: hiddenCard.index === dialog.backend.hiddenHosts.length - 1
+                                        text: qsTr("Unhide")
+                                        Accessible.name: qsTr("Unhide %1").arg(hiddenCard.displayName)
+                                        enabled: dialog.consoleIndex(dialog.backend.hiddenHosts, hiddenCard.modelData.mac) >= 0
+                                        onClicked: dialog.requestConsoleAction("unhide", hiddenCard.modelData.mac, this)
                                     }
-                                    anchors {
-                                        right: parent.right
-                                        verticalCenter: parent.verticalCenter
-                                        rightMargin: 20
-                                    }
-                                    text: qsTr("Unhide")
-                                    onClicked: dialog.navigation.showConfirmDialog(qsTr("Unhide Console"), qsTr("Are you sure you want to unhide this console?"), () => dialog.backend.unhideHost(modelData.mac));
-                                    Material.roundedScale: Material.SmallScale
-                                    Material.accent: Material.Red
                                 }
                             }
                         }
