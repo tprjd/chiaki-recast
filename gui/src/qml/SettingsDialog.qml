@@ -935,7 +935,7 @@ FocusScope {
                             background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
                             GridLayout {
                                 anchors.fill: parent
-                                columns: audiowifiFlick.width < 650 ? 1 : 2
+                                columns: 2
                                 columnSpacing: 24
                                 rowSpacing: 12
                                 Label {
@@ -1058,7 +1058,7 @@ FocusScope {
                             background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
                             GridLayout {
                                 anchors.fill: parent
-                                columns: audiowifiFlick.width < 650 ? 1 : 2
+                                columns: 2
                                 columnSpacing: 24
                                 rowSpacing: 12
                                 Label {
@@ -1169,7 +1169,7 @@ FocusScope {
                             background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
                             GridLayout {
                                 anchors.fill: parent
-                                columns: audiowifiFlick.width < 650 ? 1 : 2
+                                columns: 2
                                 columnSpacing: 24
                                 rowSpacing: 12
                                 Label {

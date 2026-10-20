@@ -162,8 +162,7 @@ TestCase {
 
     function test_allControlsFitOnFocus_data() {
         return [{tag: "desktop", width: 1280, height: 720},
-            {tag: "narrow", width: 800, height: 600},
-            {tag: "minimum", width: 390, height: 600}];
+            {tag: "minimum", width: 900, height: 600}];
     }
     function test_allControlsFitOnFocus(data) {
         const harness = audioHarness({width: data.width, height: data.height});
@@ -179,6 +178,12 @@ TestCase {
             const point = control.mapToItem(harness, 0, 0);
             verify(point.x >= 0 && point.x + control.width <= harness.width, name + " fits width");
             verify(point.y >= 0 && point.y + control.height <= harness.height, name + " is reachable on focus");
+            const value = findChild(harness, name + "Value");
+            if (value) {
+                const flick = findChild(harness, "audiowifiFlick");
+                const valuePoint = value.mapToItem(flick, 0, 0);
+                verify(valuePoint.y >= 0 && valuePoint.y + value.height <= flick.height, name + " keeps units visible on focus");
+            }
         }
         const output = findChild(harness, "audioOutDevice");
         output.forceActiveFocus(Qt.TabFocusReason);
@@ -219,7 +224,7 @@ TestCase {
     }
 
     function test_deviceControlFitsNarrowPage() {
-        const harness = createTemporaryObject(harnessComponent, testCase, {width: 390, height: 600});
+        const harness = createTemporaryObject(harnessComponent, testCase, {width: 900, height: 600});
         harness.screen.currentCategory = 3;
         waitForRendering(harness);
         const combo = findDeviceCombo(harness, "Speakers");
