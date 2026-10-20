@@ -9,8 +9,9 @@ Popup {
     id: details
     property var host: ({})
     property bool streamerMode: false
-    property bool managementAvailable: false
-    signal managementRequested(Item opener)
+    property var availableActions: []
+    property bool playStationController: false
+    signal managementRequested(string action)
     readonly property string consoleName: {
         const name = host.name || host.address || qsTr("Console");
         return streamerMode && name === host.address ? qsTr("Manual console") : name;
@@ -80,15 +81,26 @@ Popup {
                 }
             }
         }
+        Flow {
+            Layout.fillWidth: true
+            visible: details.availableActions.length > 0
+            spacing: 8
+            Repeater {
+                model: details.availableActions
+                Controls.Button {
+                    required property string modelData
+                    objectName: modelData + "Action"
+                    text: modelData === "pin" ? qsTr("Update Console Pin") : modelData === "wake" ? qsTr("Wake Up")
+                        : modelData === "delete" ? qsTr("Delete") : qsTr("Hide")
+                    icon.source: modelData === "pin" ? "qrc:/icons/l1.svg"
+                        : "image://svg/button-" + (details.playStationController ? "ps" : "deck")
+                          + (modelData === "wake" ? "#pyramid" : "#box")
+                    onClicked: details.managementRequested(modelData)
+                }
+            }
+        }
         RowLayout {
             Layout.fillWidth: true
-            Controls.Button {
-                id: manageButton
-                objectName: "consoleManageButton"
-                visible: details.managementAvailable
-                text: qsTr("Manage")
-                onClicked: details.managementRequested(manageButton)
-            }
             Item { Layout.fillWidth: true }
             Controls.Button {
                 id: closeButton

@@ -157,23 +157,21 @@ TestCase {
         return [
             { tag: "pin", changes: {}, item: "pinAction", action: "pin", keyboard: true },
             { tag: "wake", changes: { manual: true, discovered: false }, item: "wakeAction", action: "wake" },
-            { tag: "delete", changes: { manual: true, discovered: false }, item: "removeAction", action: "delete" },
-            { tag: "hide", changes: { registered: false }, item: "removeAction", action: "hide" }
+            { tag: "delete", changes: { manual: true, discovered: false }, item: "deleteAction", action: "delete" },
+            { tag: "hide", changes: { registered: false }, item: "hideAction", action: "hide" }
         ];
     }
 
     function test_managementAccess(data) {
         const target = Object.assign(host("Living room", "01"), data.changes);
         const screen = createTemporaryObject(screenComponent, testCase, { hosts: [target] });
-        commandSpy.signalName = "managementRequested";
+        commandSpy.signalName = data.action === "wake" ? "wakeRequested" : "managementRequested";
         commandSpy.target = screen;
         connectSpy.target = screen;
         mouseClick(findChild(screen, "consoleActionsButton"));
-        tryCompare(findChild(screen, "consoleDetails"), "opened", true);
-        mouseClick(findChild(screen, "consoleManageButton"));
-        const menu = findChild(screen, "consoleActionsMenu");
-        tryCompare(menu, "opened", true);
-        const action = findChild(screen, data.item);
+        const details = findChild(screen, "consoleDetails");
+        tryCompare(details, "opened", true);
+        const action = findChild(details.contentItem, data.item);
         verify(action.visible && action.enabled);
         if (data.keyboard) {
             action.forceActiveFocus(Qt.TabFocusReason);
@@ -182,12 +180,16 @@ TestCase {
             mouseClick(action);
         }
         tryCompare(commandSpy, "count", 1);
-        compare(commandSpy.signalArguments[0][0], data.action);
-        compare(commandSpy.signalArguments[0][1], screen.identityOf(target));
+        if (data.action === "wake") compare(commandSpy.signalArguments[0][0], 0);
+        else {
+            compare(commandSpy.signalArguments[0][0], data.action);
+            verify(typeof commandSpy.signalArguments[0][1] === "function");
+            commandSpy.signalArguments[0][2]();
+        }
         compare(connectSpy.count, 0);
     }
 
-    function test_escapeClosesMenuAndRestoresOpener() {
+    function test_escapeClosesDetailsAndRestoresOpener() {
         const screen = createTemporaryObject(screenComponent, testCase, { hosts: [host("Living room", "01")] });
         commandSpy.signalName = "quitRequested";
         commandSpy.target = screen;
@@ -195,14 +197,6 @@ TestCase {
         mouseClick(opener);
         const details = findChild(screen, "consoleDetails");
         tryCompare(details, "opened", true);
-        const manage = findChild(screen, "consoleManageButton");
-        mouseClick(manage);
-        const menu = findChild(screen, "consoleActionsMenu");
-        tryCompare(menu, "opened", true);
-        keyClick(Qt.Key_Escape);
-        tryCompare(menu, "opened", false);
-        tryCompare(manage, "activeFocus", true);
-        verify(details.opened);
         keyClick(Qt.Key_Escape);
         tryCompare(details, "opened", false);
         tryCompare(opener, "activeFocus", true);

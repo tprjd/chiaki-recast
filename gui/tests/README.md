@@ -140,8 +140,7 @@ The full application build and launch are pending in the integration build.
 The screen tests observe the existing connection entry point without opening
 network sessions. Real registration, standby wake-and-connect, manual
 connection, and PSN connection remain untested without console or account
-access. The existing PIN dialog still needs the delayed-target checks in
-the details ticket.
+access. These baseline results precede the management callback checks below.
 
 ## Full screen API and focus
 
@@ -159,13 +158,23 @@ The screen emits these commands:
 - `steamShortcutRequested()` opens the existing Steam shortcut dialog.
 - `discoveryToggled(enabled)` requests the new discovery state.
 - `quitRequested()` opens the existing quit confirmation.
-- `managementRequested(action, identity)` requests `pin`, `wake`, `delete`, or
-  `hide` for an opaque identity.
+- `managementRequested(action, accept, cancel)` opens the existing PIN, Delete,
+  or Hide dialog. The dialog calls `accept(pin)` for PIN, `accept()` for a
+  confirmation, or `cancel()` when dismissed.
+- `pinRequested(sourceIndex, pin)`, `wakeRequested(sourceIndex)`,
+  `deleteRequested(sourceIndex)`, and `hideRequested(mac, nickname)` are final
+  backend commands for the current resolved target.
 
-`eligible(action, host)` applies the same rules to menu and controller actions.
-MainView resolves management identities again before backend calls. Delete and
-Hide also resolve after confirmation. PIN submit still uses the existing dialog
-and requires the delayed identity check in ticket 06.
+`eligible(action, host)` applies the same rules to details and controller
+actions. `requestManagement(action, identity)` returns false for an invalid
+or ineligible target. Wake emits its final command immediately. Other actions
+emit a dialog request with callbacks for that request alone.
+
+Acceptance resolves the identity and checks eligibility again. It consumes
+the pending request before the final command. Cancel, repeated acceptance,
+and callbacks from older requests cannot dispatch a command. A profile change,
+including a switch back, invalidates saved identities. PIN submission requires
+exactly four ASCII digits. Invalid input leaves the request open for correction.
 
 `selectedIdentity` is the selected console. `selectedTarget` resolves its
 current host, source index, and nickname. `moveSelection(offset)` moves through
@@ -190,10 +199,15 @@ Rename and reorder update the popup. Removal, hidden entries, duplicate
 identities, and profile changes close it. Escape closes details and returns
 keyboard focus to the opener, a valid card, or Add console.
 
-Manage opens the temporary action menu for eligible consoles. Escape closes
-the menu first and returns focus to Manage. A management action closes both
-popups before its command runs. Ticket 06 replaces this temporary management
-route and completes delayed PIN target checks.
+Eligible PIN, Wake, Delete, and Hide controls appear directly in details.
+A control closes details before it requests a dialog or sends Wake. The
+temporary Manage control and action menu are removed. Completion returns focus
+to the target card or a valid remaining control.
+
+`showConsolePinDialog(submitPin, cancelPin)` passes callbacks to the existing
+PIN dialog instead of a saved host index. The dialog keeps its four-digit
+validator, streamer-mode echo, and existing backend storage path. Removing
+the dialog from the stack cancels an unsubmitted request.
 
 Search and counts are in `ConsoleLibrary.qml`, including `libraryToolbar`
 and the footer after the card grid. Details use
@@ -286,3 +300,24 @@ Offscreen renders at 1280 by 720 and 800 by 600 confirmed the filtered card
 width, search field, count labels, and no-match action. Full application launch,
 hardware connections, physical controllers, and Windows display scaling remain
 for integration verification.
+
+## Console management results, 2026-10-20
+
+The MSVC and Qt 6.9.3 screen target passed all 149 checks without failures,
+warnings, or skipped checks. CTest passed `chiaki-console-screen`.
+`qml/tst_ConsoleManagement.qml` exercises the production screen, dialog
+callbacks, and final backend-command signals with sample hosts.
+
+The direct Wake check failed before the details actions existed. Delete, Hide,
+and PIN checks failed before the final command signals and PIN validation.
+The checks now cover reordered targets, current Hide names, leading-zero PINs,
+invalid PIN input, cancellation, repeated acceptance, removed or hidden hosts,
+ambiguous identities, profile changes, and changed action eligibility.
+Button and controller checks use the same eligibility rules. A simulated
+backend removal verifies focus recovery after acceptance.
+
+All manual-host actions and Close fit at 800 by 600 logical pixels. An
+offscreen capture confirmed their layout. Full-application PIN persistence,
+native dialog cancellation, disposable-entry deletion and hiding, hardware
+wake behavior, physical controllers, and Windows display scaling require
+integration verification.

@@ -156,6 +156,7 @@ Item {
         confirmDialog.text = text;
         confirmDialog.callback = callback;
         confirmDialog.rejectCallback = rejectCallback;
+        confirmDialog.newDialogOpen = false;
         confirmDialog.restoreFocusItem = Window.window.activeFocusItem;
         confirmDialog.open();
     }
@@ -226,8 +227,8 @@ Item {
         stack.push(profileDialogComponent)
     }
 
-    function showConsolePinDialog(consoleIndex) {
-        stack.push(consolePinDialogComponent, {consoleIndex: consoleIndex});
+    function showConsolePinDialog(submitPin, cancelPin) {
+        stack.push(consolePinDialogComponent, {submitPin, cancelPin});
     }
 
     function showSteamShortcutDialog(fromReminder) {
