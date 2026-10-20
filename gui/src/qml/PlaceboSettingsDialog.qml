@@ -37,7 +37,7 @@ DialogView {
         } else {
             const item = dialog.Window.window ? dialog.Window.window.activeFocusItem : null;
             if (!item || !item.visible || !item.enabled)
-                Search.reveal(dialog, {target: "openPlaceboColorMapping"}, "renderer", "rendererSection" + currentSection);
+                Search.reveal(dialog, {target: item ? item.objectName : "rendererSection" + currentSection}, "renderer", "rendererSection" + currentSection);
         }
     })
     property string options_url: ""

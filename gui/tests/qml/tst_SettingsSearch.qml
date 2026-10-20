@@ -500,6 +500,43 @@ TestCase {
         tryCompare(findChild(h, "deleteRegisteredConsole0"), "activeFocus", true);
         compare(h.actions.length, 0);
     }
+    function test_noArgumentRendererEntryAndOrdinaryReturnKeepSection() {
+        const h = createTemporaryObject(linkedHarnessComponent, testCase, {width: 900, height: 600});
+        h.backend.window.videoPreset = 5;
+        findChild(h, "settingsCategory1").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
+        findChild(h, "customRendererSettings").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
+        tryCompare(h.pages, "depth", 2);
+        tryVerify(() => !h.pages.busy);
+        compare(h.pages.currentItem.currentSection, 0);
+        findChild(h.pages.currentItem, "rendererSection1").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
+        const opener = findChild(h.pages.currentItem, "placeboAntiringingStrength");
+        opener.forceActiveFocus(Qt.TabFocusReason);
+        h.showDisplaySettingsDialog();
+        tryCompare(h.pages, "depth", 3);
+        tryVerify(() => !h.pages.busy);
+        keyClick(Qt.Key_Escape);
+        tryCompare(h.pages, "depth", 2);
+        tryVerify(() => !h.pages.busy);
+        compare(h.pages.currentItem.currentSection, 1);
+        tryCompare(opener, "activeFocus", true);
+        h.settings.placeboDebandEnabled = true;
+        h.settings.placeboDebandPreset = 0;
+        findChild(h.pages.currentItem, "rendererSection2").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
+        findChild(h.pages.currentItem, "placeboDebandIterations").forceActiveFocus(Qt.TabFocusReason);
+        h.showDisplaySettingsDialog();
+        tryCompare(h.pages, "depth", 3);
+        tryVerify(() => !h.pages.busy);
+        h.settings.placeboDebandEnabled = false;
+        keyClick(Qt.Key_Escape);
+        tryCompare(h.pages, "depth", 2);
+        tryVerify(() => !h.pages.busy);
+        compare(h.pages.currentItem.currentSection, 2);
+        tryCompare(findChild(h.pages.currentItem, "placeboDebandEnabled"), "activeFocus", true);
+    }
     function test_everyCategoryAndStreamRoute() {
         const h = createTemporaryObject(harnessComponent, testCase);
         const search = findChild(h, "settingsSearch");
