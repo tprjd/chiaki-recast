@@ -40,6 +40,9 @@ TestCase {
         if (item.Accessible) result += item.Accessible.name + "\n" + item.Accessible.description + "\n";
         if (item.ToolTip) result += item.ToolTip.text + "\n";
         for (const child of item.children || []) result += accessibleAndTooltipText(child);
+        for (const child of item.data || [])
+            if (child.contentItem && child.text !== undefined)
+                result += child.text + "\n" + accessibleAndTooltipText(child.contentItem);
         return result;
     }
 
@@ -58,6 +61,52 @@ TestCase {
                             "App: Sample game", "Title ID: PPSA00001"])
             verify(text.indexOf(value) >= 0, value);
         compare(connectSpy.count, 0);
+        details.close();
+    }
+
+    function test_hostMarkupRemainsLiteralText() {
+        const name = '<a href="test:console">Room</a>';
+        const app = '<a href="test:app">Game</a>';
+        const screen = createTemporaryObject(screenComponent, testCase, {
+            hosts: [Object.assign(host(), { name, app })]
+        });
+        const nameLabel = findChild(screen, "consoleName");
+        function verifyLiteralLabel(label, expected) {
+            verify(label);
+            compare(label.text, expected);
+            compare(label.Accessible.name, expected);
+            waitForRendering(label);
+            let link = "";
+            for (let y = 1; y < label.height && !link; y += 4)
+                for (let x = 1; x < label.width && !link; x += 4)
+                    link = label.linkAt(x, y);
+            compare(link, "", "Host text must not create a rendered hyperlink");
+            compare(label.textFormat, Text.PlainText);
+        }
+        function labelWithText(item, text) {
+            if (item.text === text && typeof item.linkAt === "function") return item;
+            for (const child of item.children || []) {
+                const label = labelWithText(child, text);
+                if (label) return label;
+            }
+            return null;
+        }
+        verifyLiteralLabel(nameLabel, name);
+        mouseMove(nameLabel, 5, 5);
+        const nameTip = nameLabel.data.find(item => item.objectName === "consoleNameToolTip");
+        tryCompare(nameTip, "opened", true);
+        verifyLiteralLabel(nameTip.contentItem, name);
+        const opener = findChild(screen, "consoleActionsButton");
+        opener.hoverEnabled = true;
+        mouseMove(opener, opener.width / 2, opener.height / 2);
+        const detailsTip = opener.data.find(item => item.objectName === "consoleDetailsToolTip");
+        tryCompare(detailsTip, "opened", true);
+        verifyLiteralLabel(detailsTip.contentItem, "Details for " + name);
+        mouseClick(opener);
+        const details = findChild(screen, "consoleDetails");
+        tryCompare(details, "opened", true);
+        verifyLiteralLabel(labelWithText(details.contentItem, name), name);
+        verifyLiteralLabel(labelWithText(details.contentItem, "App: " + app), "App: " + app);
         details.close();
     }
 

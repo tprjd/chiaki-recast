@@ -269,7 +269,8 @@ TestCase {
         const nameLabel = findChild(library, "consoleName");
         compare(nameLabel.text, "Manual console");
         compare(nameLabel.Accessible.name, "Manual console");
-        compare(nameLabel.ToolTip.text, "Manual console");
+        const nameTip = nameLabel.data.find(item => item.objectName === "consoleNameToolTip");
+        compare(nameTip.text, "Manual console");
         compare(findChild(library, "connectButton").Accessible.name,
             "Connect to Manual console");
     }

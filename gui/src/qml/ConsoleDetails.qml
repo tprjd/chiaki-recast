@@ -60,6 +60,7 @@ Popup {
                 Label {
                     Layout.fillWidth: true
                     text: details.consoleName
+                    textFormat: Text.PlainText
                     font.pixelSize: 20
                     font.bold: true
                     wrapMode: Text.Wrap
@@ -71,6 +72,7 @@ Popup {
                         required property string modelData
                         Layout.fillWidth: true
                         text: modelData
+                        textFormat: Text.PlainText
                         font.pixelSize: 14
                         wrapMode: Text.Wrap
                         Accessible.name: text
