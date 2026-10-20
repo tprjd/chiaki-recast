@@ -44,21 +44,9 @@ FocusScope {
             border.width: input.activeFocus ? 2 : 1
         }
     }
-    component SetupButton: ConsoleButton {
-        id: actionButton
-        topPadding: 10
-        bottomPadding: 10
+    component RegistrationButton: SetupButton {
         Layout.maximumWidth: parent.width
-        implicitHeight: Math.max(42, contentItem.implicitHeight + topPadding + bottomPadding)
-        contentItem: Text {
-            text: actionButton.text
-            font: actionButton.font
-            color: actionButton.Material.foreground
-            textFormat: Text.PlainText
-            wrapMode: Text.Wrap
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
+        textFormat: Text.PlainText
     }
     Component.onDestruction: callbackScope.owner = null
 
@@ -189,7 +177,7 @@ FocusScope {
         RowLayout {
             Layout.fillWidth: true
             spacing: 20
-            SetupButton {
+            RegistrationButton {
                 objectName: "registrationBack"
                 text: qsTr("‹ Back")
                 Accessible.name: qsTr("Back from console registration")
@@ -336,14 +324,14 @@ FocusScope {
                                 Layout.fillWidth: true
                                 visible: !dialog.legacy && !dialog.backend.settings.psnAccountId
                                 spacing: 8
-                                SetupButton {
+                                RegistrationButton {
                                     objectName: "registrationLogin"
                                     text: qsTr("PSN sign-in")
                                     Accessible.name: text
                                     flat: true
                                     onClicked: dialog.accountRoute(true)
                                 }
-                                SetupButton {
+                                RegistrationButton {
                                     objectName: "registrationLookup"
                                     text: qsTr("Public lookup")
                                     Accessible.name: text
@@ -424,14 +412,14 @@ FocusScope {
                                 Layout.preferredWidth: Math.min(formPanel.availableWidth, cancelButton.implicitWidth + submitButton.implicitWidth + columnSpacing)
                                 Layout.maximumWidth: formPanel.availableWidth
                                 columns: cancelButton.implicitWidth + submitButton.implicitWidth + columnSpacing > width ? 1 : 2
-                                SetupButton {
+                                RegistrationButton {
                                     id: cancelButton
                                     objectName: "registrationCancel"
                                     text: qsTr("Cancel")
                                     Accessible.name: text
                                     onClicked: dialog.close()
                                 }
-                                SetupButton {
+                                RegistrationButton {
                                     id: submitButton
                                     objectName: "registrationSubmit"
                                     text: qsTr("Register console")
@@ -507,7 +495,7 @@ FocusScope {
                                 text: qsTr("Closing this screen does not cancel registration. The operation can continue in the background.")
                                 wrapMode: Text.Wrap; color: "#9ca8b9"; font.pixelSize: 12
                             }
-                            SetupButton {
+                            RegistrationButton {
                                 objectName: "registrationDiagnostics"
                                 visible: !dialog.streamerMode
                                 text: dialog.logExpanded ? qsTr("Hide diagnostics") : qsTr("Show diagnostics")
@@ -550,7 +538,7 @@ FocusScope {
                             Flow {
                                 Layout.fillWidth: true
                                 spacing: 8
-                                SetupButton {
+                                RegistrationButton {
                                     id: closeProgress
                                     objectName: "registrationCloseProgress"
                                     width: Math.min(implicitWidth, parent.width)
@@ -559,7 +547,7 @@ FocusScope {
                                     Accessible.name: text
                                     onClicked: dialog.close()
                                 }
-                                SetupButton {
+                                RegistrationButton {
                                     id: detailsButton
                                     objectName: "registrationDetails"
                                     width: Math.min(implicitWidth, parent.width)
@@ -569,7 +557,7 @@ FocusScope {
                                     primary: true
                                     onClicked: dialog.backToDetails()
                                 }
-                                SetupButton {
+                                RegistrationButton {
                                     id: closeResult
                                     objectName: "registrationCloseResult"
                                     width: Math.min(implicitWidth, parent.width)
@@ -578,7 +566,7 @@ FocusScope {
                                     Accessible.name: text
                                     onClicked: dialog.close()
                                 }
-                                SetupButton {
+                                RegistrationButton {
                                     id: doneButton
                                     objectName: "registrationDone"
                                     width: Math.min(implicitWidth, parent.width)
