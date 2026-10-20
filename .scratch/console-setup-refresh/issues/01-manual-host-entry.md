@@ -131,3 +131,18 @@ The native application build, library opener focus, isolated native persistence,
 and display scaling checks remain in ticket 04. Physical controller input and
 real pairing were not checked. The saved result follows the existing local
 settings action; it does not promise a durable disk-write result.
+
+### Integration follow-up
+
+A direct integration run omitted `QT_QPA_FONTDIR`. The supported Windows test
+environment passed. The fallback font produced an action wider than the window.
+Longer labels also reproduced clipping with the required fonts.
+
+The manual actions now wrap within the panel and stack when the row cannot fit.
+Content-size changes also reveal the focused control. The test checks the full
+control against the Flickable viewport, including the clipped top edge.
+
+The existing full screen run passed 586 checks with no failures or skipped
+checks. The final focused manual suite passed 23 checks after integration.
+The two focus-size cases also passed without the Windows font directory.
+Form and result captures retain layout A.

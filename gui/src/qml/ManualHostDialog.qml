@@ -22,6 +22,20 @@ FocusScope {
     property string profileKey: backend.settings.currentProfile
     readonly property bool privateMode: backend.settings.streamerMode
     readonly property var registeredHosts: backend.settings.registeredHosts
+    component SetupButton: ConsoleButton {
+        id: actionButton
+        topPadding: 10
+        bottomPadding: 10
+        implicitHeight: Math.max(42, contentItem.implicitHeight + topPadding + bottomPadding)
+        contentItem: Text {
+            text: actionButton.text
+            font: actionButton.font
+            color: actionButton.Material.foreground
+            wrapMode: Text.Wrap
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+    }
     onRegisteredHostsChanged: {
         if (phase !== "saved" && selectionKind === "registered" && registrationIndex() < 0)
             invalidateSelection();
@@ -113,7 +127,7 @@ FocusScope {
         RowLayout {
             Layout.fillWidth: true
             spacing: 20
-            ConsoleButton {
+            SetupButton {
                 objectName: "manualBack"
                 text: qsTr("Consoles")
                 Accessible.name: qsTr("Back to consoles")
@@ -134,6 +148,8 @@ FocusScope {
             Layout.fillHeight: true
             contentWidth: width
             contentHeight: workspace.height
+            onContentHeightChanged: Qt.callLater(dialog.revealFocus)
+            onHeightChanged: Qt.callLater(dialog.revealFocus)
             clip: true
             boundsBehavior: Flickable.StopAtBounds
             ScrollBar.vertical: ScrollBar {}
@@ -242,15 +258,28 @@ FocusScope {
                                 text: qsTr("Adding an address does not start a connection.")
                                 color: "#9ca8b9"; font.pixelSize: 12; wrapMode: Text.Wrap
                             }
-                            RowLayout {
+                            GridLayout {
+                                Layout.fillWidth: false
                                 Layout.alignment: Qt.AlignRight
-                                ConsoleButton { objectName: "manualCancel"; text: qsTr("Cancel"); onClicked: dialog.close() }
-                                ConsoleButton {
+                                Layout.preferredWidth: Math.min(panel.width, cancelButton.implicitWidth + addButton.implicitWidth + columnSpacing)
+                                Layout.maximumWidth: panel.width
+                                columns: cancelButton.implicitWidth + addButton.implicitWidth + columnSpacing > width ? 1 : 2
+                                SetupButton {
+                                    id: cancelButton
+                                    objectName: "manualCancel"
+                                    text: qsTr("Cancel")
+                                    Layout.maximumWidth: panel.width
+                                    Layout.alignment: Qt.AlignRight
+                                    onClicked: dialog.close()
+                                }
+                                SetupButton {
                                     id: addButton
                                     objectName: "manualAdd"
                                     text: qsTr("Add console")
+                                    Layout.maximumWidth: panel.width
                                     enabled: !!hostField.text.trim() && !!dialog.selectionKind && !dialog.dispatching && dialog.phase === "form"
                                     primary: true
+                                    Layout.alignment: Qt.AlignRight
                                     onClicked: dialog.save()
                                 }
                             }
@@ -282,10 +311,11 @@ FocusScope {
                                 textFormat: Text.PlainText
                                 Layout.fillWidth: true; wrapMode: Text.Wrap; color: "#9ca8b9"
                             }
-                            ConsoleButton {
+                            SetupButton {
                                 id: backToConsoles
                                 objectName: "manualBackToConsoles"
                                 text: qsTr("Back to consoles")
+                                Layout.maximumWidth: panel.width
                                 primary: true
                                 Layout.alignment: Qt.AlignRight
                                 onClicked: dialog.close()
@@ -306,10 +336,11 @@ FocusScope {
                                 text: dialog.failureText
                                 Layout.fillWidth: true; wrapMode: Text.Wrap; color: "#9ca8b9"
                             }
-                            ConsoleButton {
+                            SetupButton {
                                 id: backToDetails
                                 objectName: "manualBackToDetails"
                                 text: qsTr("Back to details")
+                                Layout.maximumWidth: panel.width
                                 Layout.alignment: Qt.AlignRight
                                 onClicked: {
                                     dialog.phase = "form";
