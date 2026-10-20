@@ -20,3 +20,5 @@ screen tests, native contract checks, native UI checks, and final code review.
 
 Use the approved test boundaries in [the spec](spec.md). Real authentication,
 console pairing, and physical controller input remain separate hardware checks.
+
+[02: Registration form](issues/02-registration-form.md) is resolved. The native guided workspace retains all console targets and account routes. It keeps native registration arguments and the current log dialog. The focused production-QML checks passed at both target sizes. Ticket 03 can replace the result dialog through the same backend and navigation boundaries.
