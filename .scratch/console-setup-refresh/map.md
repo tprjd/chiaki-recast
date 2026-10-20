@@ -22,3 +22,9 @@ Use the approved test boundaries in [the spec](spec.md). Real authentication,
 console pairing, and physical controller input remain separate hardware checks.
 
 [02: Registration form](issues/02-registration-form.md) is resolved. The native guided workspace retains all console targets and account routes. It keeps native registration arguments and the current log dialog. The focused production-QML checks passed at both target sizes. Ticket 03 can replace the result dialog through the same backend and navigation boundaries.
+
+[01: Manual host entry](issues/01-manual-host-entry.md) is resolved. The guided
+workspace preserves native save semantics and binds selection to MAC identity.
+The focused production-QML suite passed 23 checks. Form, saved result, and failure
+captures passed visual inspection at both required sizes. Native application
+acceptance remains in ticket 04.
