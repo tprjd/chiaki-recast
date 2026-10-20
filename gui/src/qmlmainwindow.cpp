@@ -2782,6 +2782,10 @@ bool QmlMainWindow::event(QEvent *event)
         }
         QGuiApplication::sendEvent(quick_window, event);
         break;
+    case QEvent::Wheel:
+        if (!session || grab_input)
+            QGuiApplication::sendEvent(quick_window, event);
+        break;
     case QEvent::MouseButtonDblClick:
         if(!settings->GetFullscreenDoubleClickEnabled())
             break;
