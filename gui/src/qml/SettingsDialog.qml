@@ -2131,6 +2131,12 @@ FocusScope {
                 highlighted: resultList.currentIndex === index
                 firstInFocusChain: true
                 lastInFocusChain: true
+                background: Rectangle {
+                    radius: 8
+                    color: parent.highlighted ? "#24394c" : parent.hovered ? "#1b2633" : "#1a202b"
+                    border.color: parent.activeFocus ? Material.accent : "#303a48"
+                    border.width: parent.activeFocus ? 2 : 1
+                }
                 Accessible.name: modelData.title
                 Accessible.description: dialog.searchContext(modelData) + ". " + modelData.description
                 onActiveFocusChanged: if (activeFocus) { resultList.currentIndex = index; resultList.navigating = true; }
@@ -2147,8 +2153,8 @@ FocusScope {
                     id: resultText
                     spacing: 4
                     Label { text: modelData.title; textFormat: Text.PlainText; font.pixelSize: 16; font.bold: true; width: parent.width; wrapMode: Text.Wrap }
-                    Label { text: dialog.searchContext(modelData); textFormat: Text.PlainText; color: "#aeb9c8"; width: parent.width; wrapMode: Text.Wrap }
-                    Label { text: modelData.description; textFormat: Text.PlainText; width: parent.width; wrapMode: Text.Wrap }
+                    Label { text: dialog.searchContext(modelData); textFormat: Text.PlainText; font.pixelSize: 14; color: "#aeb9c8"; width: parent.width; wrapMode: Text.Wrap }
+                    Label { text: modelData.description; textFormat: Text.PlainText; font.pixelSize: 14; width: parent.width; wrapMode: Text.Wrap }
                 }
             }
             Label {
