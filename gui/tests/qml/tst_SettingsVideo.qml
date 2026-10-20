@@ -150,4 +150,17 @@ TestCase {
         compare(harness.settings.decoder, "Unavailable decoder");
         compare(harness.settings.changeCount, 0);
     }
+    function test_keyboardFocusKeepsQueueValueVisible() {
+        const harness = openVideo({width: 900, height: 600});
+        harness.settings.queueDepthLimit = 2;
+        findChild(harness, "videoPreset").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Tab);
+        tryCompare(findChild(harness, "queueDepthLimit"), "activeFocus", true);
+        const value = findChild(harness, "queueDepthLimitValue");
+        compare(value.text, "2 frames");
+        const flick = findChild(harness, "videoFlick");
+        const point = value.mapToItem(flick, 0, 0);
+        verify(point.y >= 0 && point.y + value.height <= flick.height,
+            "Focused queue-depth value stays inside the scroll viewport");
+    }
 }
