@@ -27,13 +27,31 @@ Item {
         property bool controllerMappingInProgress: false
         property bool controllerMappingDefaultMapping: true
         signal controllerMappingSteamControllerSelected()
+        signal controllerMappingButtonSelected(string pressedButton)
+        property string currentControllerType: "Synthetic controller"
+        property var currentControllerMapping: []
+        property bool controllerMappingAltered: false
+        property bool enableAnalogStickMapping: false
         property QtObject window: QtObject {
             property int runtimeRendererBackend: 0
             property int videoPreset: 1
         }
         function beginControllerMapping(reset) { harness.record("beginMapping", [reset]); }
-        function controllerMappingQuit() { harness.record("quitMapping"); }
-        function controllerMappingReset() { harness.record("resetMapping"); }
+        function controllerMappingQuit() { harness.record("quitMapping"); controllerMappingInProgress = false; }
+        function controllerMappingReset() { harness.record("resetMapping"); controllerMappingInProgress = false; }
+        function controllerMappingSelectButton() { harness.record("selectButton"); }
+        function controllerMappingButtonQuit() { harness.record("quitButton"); }
+        function controllerMappingApply() { harness.record("applyMapping"); }
+        function updateButton(value, button, slot) {
+            harness.record("updateButton", [value, button, slot]);
+            controllerMappingAltered = true;
+            currentControllerMapping = currentControllerMapping.map(entry => {
+                if (entry.buttonValue !== value) return entry;
+                const buttons = entry.physicalButton.slice();
+                buttons[slot] = button;
+                return {buttonValue: entry.buttonValue, buttonName: entry.buttonName, physicalButton: buttons};
+            });
+        }
         function unhideHost(mac) { harness.record("unhide", [mac]); }
     }
     Loader {

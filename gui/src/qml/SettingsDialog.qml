@@ -1772,315 +1772,154 @@ FocusScope {
                 // Controllers
                 Flickable {
                     id: controllersFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "controllersFlick"
+                    anchors.fill: parent
+                    anchors.margins: 16
                     clip: true
-                    contentWidth: Math.max(width, controllersLayout.width)
+                    contentWidth: width
                     contentHeight: controllersLayout.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        id: controllersScrollbar
-                        policy: ScrollBar.AlwaysOn
-                        visible: controllersFlick.contentHeight > controllersFlick.height
-                    }
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
                     ColumnLayout {
                         id: controllersLayout
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        spacing: 10
-                        C.Button {
-                            Layout.alignment: Qt.AlignHCenter
-                            id: controllerMappingChange
-                            firstInFocusChain: true
-                            text: "Change Controller Mapping"
-                            onClicked: controllerMappingDialog.show({
-                                reset: false
-                            });
-                        }
-                        C.Button {
-                            Layout.alignment: Qt.AlignHCenter
-                            id: controllerMappingReset
-                            text: "Reset Controller Mapping"
-                            onClicked: controllerMappingDialog.show({
-                                reset: true
-                            });
-                        }
-
-                        RowLayout {
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Background Controller Events:")
+                        width: Math.max(0, controllersFlick.width - 16)
+                        spacing: 14
+                        Label { text: qsTr("Controller input"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                spacing: 12
+                            RowLayout {
+                                Layout.fillWidth: true
+                                C.Button {
+                                    id: controllerMappingChange
+                                    objectName: "controllerMappingChange"
+                                    firstInFocusChain: true
+                                    text: qsTr("Change controller mapping")
+                                    font.pixelSize: 14
+                                    onClicked: controllerMappingDialog.show({ reset: false })
+                                }
+                                C.Button {
+                                    id: controllerMappingReset
+                                    objectName: "controllerMappingReset"
+                                    text: qsTr("Reset controller mapping")
+                                    font.pixelSize: 14
+                                    onClicked: controllerMappingDialog.show({ reset: true })
+                                }
                             }
                             C.CheckBox {
-                                id: backgroundController
-                                text: qsTr("Process controller input when application is in background")
-                                checked: {
-                                    dialog.backend.settings.allowJoystickBackgroundEvents
-                                }
+                                objectName: "allowJoystickBackgroundEvents"
+                                text: qsTr("Process controller input in the background. Default: On")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.allowJoystickBackgroundEvents
                                 onToggled: dialog.backend.settings.allowJoystickBackgroundEvents = checked
                             }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("(Checked)")
-                            }
-                        }
-                        RowLayout {
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Dpad Touchpad Emulation")
-                            }
                             C.CheckBox {
-                                id: dpadTouch
-                                checked: dialog.backend.settings.dpadTouchEnabled
-                                onToggled: dialog.backend.settings.dpadTouchEnabled = !dialog.backend.settings.dpadTouchEnabled
-                                KeyNavigation.priority: KeyNavigation.BeforeItem
-                                KeyNavigation.up: backgroundController
-                                KeyNavigation.left: dpadTouch
-                                KeyNavigation.right: dpadTouch
-                                KeyNavigation.down: {
-                                    if(touchIncrement.visible)
-                                        touchIncrement
-                                    else
-                                        posButtons
-                                }
-                            }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("(Checked)")
-                            }
-                        }
-
-                        RowLayout {
-                            id: touchIncrementLayout
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            visible: dialog.backend.settings.dpadTouchEnabled
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Dpad Touch Increment:")
-                            }
-
-                            C.Slider {
-                                id: touchIncrement
-                                Layout.preferredWidth: 250
-                                from: 1
-                                to: 1079
-                                stepSize: 1
-                                value: dialog.backend.settings.dpadTouchIncrement
-                                onMoved: dialog.backend.settings.dpadTouchIncrement = value
-
-                                Label {
-                                    anchors {
-                                        left: parent.right
-                                        verticalCenter: parent.verticalCenter
-                                        leftMargin: 10
-                                    }
-                                    text: qsTr("%1 mm").arg(parent.value / 100)
-                                }
-                                KeyNavigation.priority: KeyNavigation.BeforeItem
-                                KeyNavigation.up: dpadTouch
-                                KeyNavigation.down: {
-                                    if(dpadShortcut1.visible)
-                                        dpadShortcut1
-                                    else
-                                        posButtons;
-                                }
-                            }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                Layout.leftMargin: 100
-                                text: qsTr("(0.3 mm)")
-                            }
-                        }
-                        RowLayout {
-                            spacing: 10
-                            visible: dialog.backend.settings.dpadTouchEnabled
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Dpad Regular/Touch Combo:")
-                            }
-
-                            C.ComboBox {
-                                id: dpadShortcut1
-                                implicitContentWidthPolicy: ComboBox.WidestText
-                                firstInFocusChain: false
-                                model: [qsTr("Not Used"), qsTr("Cross"), qsTr("Moon"), qsTr("Box"), qsTr("Pyramid"), qsTr("Dpad Left"), qsTr("Dpad Right"), qsTr("Dpad Up"), qsTr("Dpad Down"), qsTr("L1"), qsTr("R1"), qsTr("L3"), qsTr("R3"), qsTr("Options"), qsTr("Share"), qsTr("Touchpad"), qsTr("PS")]
-                                currentIndex: dialog.backend.settings.dpadTouchShortcut1
-                                onActivated: index => dialog.backend.settings.dpadTouchShortcut1 = index
-                                KeyNavigation.priority: {
-                                    if(!popup.visible)
-                                        KeyNavigation.BeforeItem
-                                    else
-                                        KeyNavigation.AfterItem
-                                }
-                                KeyNavigation.up: touchIncrement
-                                KeyNavigation.down: posButtons
-                                KeyNavigation.left: dpadShortcut1
-                                KeyNavigation.right: dpadShortcut2
-                            }
-
-                            C.ComboBox {
-                                id: dpadShortcut2
-                                implicitContentWidthPolicy: ComboBox.WidestText
-                                firstInFocusChain: false
-                                model: [qsTr("Not Used"), qsTr("Cross"), qsTr("Moon"), qsTr("Box"), qsTr("Pyramid"), qsTr("Dpad Left"), qsTr("Dpad Right"), qsTr("Dpad Up"), qsTr("Dpad Down"), qsTr("L1"), qsTr("R1"), qsTr("L3"), qsTr("R3"), qsTr("Options"), qsTr("Share"), qsTr("Touchpad"), qsTr("PS")]
-                                currentIndex: dialog.backend.settings.dpadTouchShortcut2
-                                onActivated: index => dialog.backend.settings.dpadTouchShortcut2 = index
-                                KeyNavigation.priority: {
-                                    if(!popup.visible)
-                                        KeyNavigation.BeforeItem
-                                    else
-                                        KeyNavigation.AfterItem
-                                }
-                                KeyNavigation.up: touchIncrement
-                                KeyNavigation.down: posButtons
-                                KeyNavigation.left: dpadShortcut1
-                                KeyNavigation.right: dpadShortcut3
-                            }
-
-                            C.ComboBox {
-                                id: dpadShortcut3
-                                implicitContentWidthPolicy: ComboBox.WidestText
-                                firstInFocusChain: false
-                                model: [qsTr("Not Used"), qsTr("Cross"), qsTr("Moon"), qsTr("Box"), qsTr("Pyramid"), qsTr("Dpad Left"), qsTr("Dpad Right"), qsTr("Dpad Up"), qsTr("Dpad Down"), qsTr("L1"), qsTr("R1"), qsTr("L3"), qsTr("R3"), qsTr("Options"), qsTr("Share"), qsTr("Touchpad"), qsTr("PS")]
-                                currentIndex: dialog.backend.settings.dpadTouchShortcut3
-                                onActivated: index => dialog.backend.settings.dpadTouchShortcut3 = index
-                                KeyNavigation.priority: {
-                                    if(!popup.visible)
-                                        KeyNavigation.BeforeItem
-                                    else
-                                        KeyNavigation.AfterItem
-                                }
-                                KeyNavigation.up: touchIncrement
-                                KeyNavigation.down: posButtons
-                                KeyNavigation.left: dpadShortcut2
-                                KeyNavigation.right: dpadShortcut4
-                            }
-
-                            C.ComboBox {
-                                id: dpadShortcut4
-                                implicitContentWidthPolicy: ComboBox.WidestText
-                                firstInFocusChain: false
-                                model: [qsTr("Not Used"), qsTr("Cross"), qsTr("Moon"), qsTr("Box"), qsTr("Pyramid"), qsTr("Dpad Left"), qsTr("Dpad Right"), qsTr("Dpad Up"), qsTr("Dpad Down"), qsTr("L1"), qsTr("R1"), qsTr("L3"), qsTr("R3"), qsTr("Options"), qsTr("Share"), qsTr("Touchpad"), qsTr("PS")]
-                                currentIndex: dialog.backend.settings.dpadTouchShortcut4
-                                onActivated: index => dialog.backend.settings.dpadTouchShortcut4 = index
-                                KeyNavigation.priority: {
-                                    if(!popup.visible)
-                                        KeyNavigation.BeforeItem
-                                    else
-                                        KeyNavigation.AfterItem
-                                }
-                                KeyNavigation.up: touchIncrement
-                                KeyNavigation.down: posButtons
-                                KeyNavigation.left: dpadShortcut3
-                                KeyNavigation.right: dpadShortcut4
-                            }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("(L1+R1+dpad Up)")
-                            }
-                        }
-                        RowLayout {
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Buttons By Position:")
-                            }
-
-                            C.CheckBox {
-                                id: posButtons
-                                text: qsTr("Use buttons by position instead of by label")
+                                objectName: "buttonsByPosition"
+                                text: qsTr("Interpret buttons by position. Default: Off")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
                                 checked: dialog.backend.settings.buttonsByPosition
                                 onToggled: dialog.backend.settings.buttonsByPosition = checked
-                                KeyNavigation.priority: KeyNavigation.BeforeItem
-                                KeyNavigation.up: {
-                                    if(dpadShortcut1.visible)
-                                        dpadShortcut1
-                                    else
-                                        dpadTouch;
-                                }
-                                KeyNavigation.down: rumbleHaptics
-                                KeyNavigation.left: posButtons
-                                KeyNavigation.right: posButtons
                             }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("(Unchecked)")
                             }
                         }
-                        RowLayout {
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Rumble Haptics:")
+                        Label { text: qsTr("Touchpad"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                spacing: 12
+                            C.CheckBox {
+                                objectName: "dpadTouchEnabled"
+                                text: qsTr("D-pad touchpad emulation. Default: On")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.dpadTouchEnabled
+                                onToggled: dialog.backend.settings.dpadTouchEnabled = checked
                             }
-
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                visible: dialog.backend.settings.dpadTouchEnabled
+                                Label { text: qsTr("D-pad touch increment. Default: 0.3 mm"); font.pixelSize: 14 }
+                                C.Slider {
+                                    id: touchIncrement
+                                    objectName: "dpadTouchIncrement"
+                                    Accessible.name: qsTr("D-pad touch increment")
+                                    Layout.fillWidth: true
+                                    from: 1
+                                    to: 1079
+                                    stepSize: 1
+                                    value: dialog.backend.settings.dpadTouchIncrement
+                                    onMoved: dialog.backend.settings.dpadTouchIncrement = value
+                                }
+                                Label { objectName: "dpadTouchIncrementValue"; text: qsTr("%1 mm").arg(touchIncrement.value / 100); font.pixelSize: 14 }
+                                Label { text: qsTr("D-pad regular/touch shortcut. Default: L1 + R1 + D-pad Up"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                                GridLayout {
+                                    Layout.fillWidth: true
+                                    columns: controllersFlick.width < 700 ? 2 : 4
+                                    Repeater {
+                                        model: 4
+                                        C.ComboBox {
+                                            required property int index
+                                            objectName: "dpadTouchShortcut" + (index + 1)
+                                            Accessible.name: qsTr("D-pad shortcut button %1").arg(index + 1)
+                                            font.pixelSize: 14
+                                            Layout.fillWidth: true
+                                            Layout.minimumWidth: 0
+                                            Layout.preferredWidth: 150
+                                            model: [qsTr("Not Used"), qsTr("Cross"), qsTr("Moon"), qsTr("Box"), qsTr("Pyramid"), qsTr("Dpad Left"), qsTr("Dpad Right"), qsTr("Dpad Up"), qsTr("Dpad Down"), qsTr("L1"), qsTr("R1"), qsTr("L3"), qsTr("R3"), qsTr("Options"), qsTr("Share"), qsTr("Touchpad"), qsTr("PS")]
+                                            currentIndex: dialog.backend.settings["dpadTouchShortcut" + (index + 1)]
+                                            onActivated: value => dialog.backend.settings["dpadTouchShortcut" + (index + 1)] = value
+                                        }
+                                    }
+                                }
+                            }
+                            }
+                        }
+                        Label { text: qsTr("Haptics"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                spacing: 12
+                            Label { text: qsTr("Rumble haptics. Default: Normal"); font.pixelSize: 14 }
                             C.ComboBox {
-                                id: rumbleHaptics
-                                Layout.preferredWidth: 400
+                                objectName: "rumbleHapticsIntensity"
+                                Accessible.name: qsTr("Rumble haptics intensity")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
                                 model: [qsTr("Off"), qsTr("Very Weak"), qsTr("Weak"), qsTr("Normal"), qsTr("Strong"), qsTr("Very Strong")]
                                 currentIndex: dialog.backend.settings.rumbleHapticsIntensity
-                                onActivated: (index) => dialog.backend.settings.rumbleHapticsIntensity = index;
+                                onActivated: index => dialog.backend.settings.rumbleHapticsIntensity = index
                             }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("(Normal)")
-                            }
-                        }
-                        RowLayout {
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("True Haptics Intensity:")
-                            }
-
+                            Label { text: qsTr("True haptics intensity. Default: Console setting"); font.pixelSize: 14 }
                             C.Slider {
                                 id: hapticOverride
-                                Layout.preferredWidth: 250
+                                objectName: "hapticOverride"
+                                Accessible.name: qsTr("True haptics intensity")
+                                Layout.fillWidth: true
                                 from: 0
                                 to: 2
                                 stepSize: 0.1
                                 value: dialog.backend.settings.hapticOverride
-                                onMoved: dialog.backend.settings.hapticOverride = value;
+                                onMoved: dialog.backend.settings.hapticOverride = value
                                 lastInFocusChain: true
-                                Label {
-                                    anchors {
-                                        left: parent.right
-                                        verticalCenter: parent.verticalCenter
-                                        leftMargin: 10
-                                    }
-                                    text: {
-                                        if(parent.value > 0.99 && parent.value < 1.01)
-                                            qsTr("console setting")
-                                        else
-                                            (parent.value * 100).toFixed(0) + qsTr(" % console setting")
-                                    }
-                                }
                             }
-
                             Label {
-                                Layout.alignment: Qt.AlignRight
-                                Layout.leftMargin: 250
-                                text: qsTr("(console setting)")
+                                objectName: "hapticOverrideValue"
+                                font.pixelSize: 14
+                                text: hapticOverride.value > 0.99 && hapticOverride.value < 1.01 ? qsTr("Console setting") : qsTr("%1% of console setting").arg((hapticOverride.value * 100).toFixed(0))
+                            }
                             }
                         }
                     }
@@ -2334,6 +2173,7 @@ FocusScope {
                 interval: 100
                 running: false
                 onTriggered: {
+                    if (!controllerMappingDialog.visible || !dialog.backend.controllerMappingInProgress) return;
                     if(controllerMappingDialog.resetMapping)
                     {
                         if(!dialog.backend.controllerMappingDefaultMapping)
@@ -2446,6 +2286,9 @@ FocusScope {
 
         Dialog {
             id: controllerMappingDialog
+            objectName: "controllerCapture"
+            width: 600
+            onAboutToHide: openTimer.stop()
             property bool resetFocus: true
             property bool resetMapping: false
             parent: Overlay.overlay
@@ -2484,14 +2327,22 @@ FocusScope {
                 resetMapping = opts.reset;
                 open();
             }
-            Label {
+            contentItem: Label {
                 id: controllerLabel
+                wrapMode: Text.Wrap
                 text: qsTr("Choose the controller by pressing any button on the controller")
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Escape) controllerMappingDialog.close();
+                    event.accepted = true;
+                }
+                Keys.onReleased: event => event.accepted = true
             }
         }
 
         Dialog {
             id: steamControllerMappingDialog
+            objectName: "steamControllerNotice"
+            width: 600
             property bool resetMapping: false
             parent: Overlay.overlay
             x: Math.round((dialog.navigation.width - width) / 2)
@@ -2512,7 +2363,7 @@ FocusScope {
             }
             Material.roundedScale: Material.MediumScale
 
-            Label {
+            contentItem: Label {
                 id: steamLabel
                 wrapMode: TextEdit.Wrap
                 text: qsTr("This controller is managed by Steam.\nPlease use Steam to map controller or disable Steam Input for the controller before mapping here.")
@@ -2522,16 +2373,27 @@ FocusScope {
         }
 
         Connections {
+            target: dialog.backend.settings
+            function onCurrentProfileChanged() {
+                if (controllerMappingDialog.visible) controllerMappingDialog.close();
+                if (steamControllerMappingDialog.visible) steamControllerMappingDialog.close();
+            }
+        }
+
+        Connections {
             target: dialog.backend
 
             function onControllerMappingInProgressChanged()
             {
-                if(dialog.backend.controllerMappingInProgress)
+                if (dialog.backend.controllerMappingInProgress && controllerMappingDialog.visible)
                     openTimer.start();
+                else
+                    openTimer.stop();
             }
 
             function onControllerMappingSteamControllerSelected()
             {
+                if (!controllerMappingDialog.visible) return;
                 controllerMappingDialog.resetFocus = false;
                 quitControllerMapping = false;
                 steamControllerMappingDialog.resetMapping = controllerMappingDialog.resetMapping;
