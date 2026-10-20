@@ -11,10 +11,11 @@ Rectangle {
     property var host: ({})
     property bool streamerMode: false
     property bool selected: false
+    property bool playStationController: false
     property bool targetEnabled: false
     signal activated()
     signal actionsRequested(Item opener)
-    signal selectionRequested()
+    signal selectionRequested(Item control)
     readonly property string consoleName: {
         const name = host.name || host.address || qsTr("Console");
         return streamerMode && name === host.address ? qsTr("Manual console") : name;
@@ -35,6 +36,7 @@ Rectangle {
     Accessible.name: consoleName
 
     function focusPrimary() { connectButton.forceActiveFocus(Qt.TabFocusReason); }
+    function focusDetails() { actionsButton.forceActiveFocus(Qt.TabFocusReason); }
 
     Rectangle {
         id: art
@@ -140,6 +142,7 @@ Rectangle {
                 font.pixelSize: 14
                 text: !card.host.registered ? qsTr("Register")
                     : card.host.discovered && card.host.state === "standby" ? qsTr("Wake and connect") : qsTr("Connect")
+                icon.source: card.selected ? "image://svg/button-" + (card.playStationController ? "ps" : "deck") + "#cross" : ""
                 Accessible.name: !card.host.registered ? qsTr("Register %1").arg(card.consoleName)
                     : card.host.discovered && card.host.state === "standby"
                         ? qsTr("Wake and connect to %1").arg(card.consoleName) : qsTr("Connect to %1").arg(card.consoleName)
@@ -157,7 +160,7 @@ Rectangle {
                     border.color: connectButton.visualFocus ? "#e4f3ff" : "transparent"
                     border.width: 2
                 }
-                onActiveFocusChanged: if (activeFocus) card.selectionRequested()
+                onActiveFocusChanged: if (activeFocus) card.selectionRequested(connectButton)
                 onClicked: card.activated()
             }
             Controls.Button {
@@ -190,7 +193,7 @@ Rectangle {
                 lastInFocusChain: true
                 sendOutput: true
                 enabled: card.targetEnabled
-                onActiveFocusChanged: if (activeFocus) card.selectionRequested()
+                onActiveFocusChanged: if (activeFocus) card.selectionRequested(actionsButton)
                 onClicked: card.actionsRequested(actionsButton)
             }
         }

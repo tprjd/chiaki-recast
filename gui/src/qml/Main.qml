@@ -9,6 +9,7 @@ Item {
     id: root
     property list<Item> restoreFocusItems
     property bool initialAsk: false
+    property var librarySelection: null
     readonly property bool preferSeparateStreamSettingsWindows: Chiaki.window.runtimeRendererBackend === 1 && Chiaki.session
     property bool useSeparateStreamSettingsWindows: false
     Material.theme: Material.Dark
@@ -151,7 +152,16 @@ Item {
         stack.push(manualHostDialogComponent);
     }
 
+    function rememberMainFocus() {
+        if (stack.currentItem instanceof MainView) stack.currentItem.rememberFocus();
+    }
+
+    function restoreMainFocus() {
+        if (stack.currentItem instanceof MainView) stack.currentItem.restoreFocus();
+    }
+
     function showConfirmDialog(title, text, callback, rejectCallback = null) {
+        rememberMainFocus();
         confirmDialog.title = title;
         confirmDialog.text = text;
         confirmDialog.callback = callback;
@@ -162,6 +172,7 @@ Item {
     }
 
     function showInfoDialog(title, text) {
+        rememberMainFocus();
         infoDialog.title = title;
         infoDialog.text = text;
         infoDialog.restoreFocusItem = Window.window.activeFocusItem;
@@ -174,10 +185,12 @@ Item {
     }
 
     function showRemindDialog(title, text, remotePlay, callback) {
+        rememberMainFocus();
         remindDialog.title = title;
         remindDialog.text = text;
         remindDialog.remotePlay = remotePlay;
         remindDialog.callback = callback;
+        remindDialog.newDialogOpen = false;
         remindDialog.restoreFocusItem = Window.window.activeFocusItem;
         remindDialog.open();
     }
@@ -466,8 +479,9 @@ Item {
         Material.roundedScale: Material.MediumScale
         onOpened: infoDialogLabel.forceActiveFocus(Qt.TabFocusReason)
         onClosed: {
-            if (restoreFocusItem)
+            if (restoreFocusItem && restoreFocusItem.visible && restoreFocusItem.enabled)
                 restoreFocusItem.forceActiveFocus(Qt.TabFocusReason);
+            else root.restoreMainFocus();
             infoDialogLabel.focus = false;
         }
 

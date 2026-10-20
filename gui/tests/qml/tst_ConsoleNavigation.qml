@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import QtTest
 import "../../src/qml"
 
@@ -76,6 +77,265 @@ TestCase {
     function host(name, mac) {
         return { display: true, discovered: true, registered: true, state: "ready",
             name, mac, address: "192.0.2.7", ps5: true };
+    }
+
+    function test_sidebarArrowsDoNotMoveConsoleSelection() {
+        const screen = createTemporaryObject(screenComponent, testCase, {
+            hosts: [host("Living room", "01"), host("Bedroom", "02")]
+        });
+        const settings = findChild(screen, "settingsButton");
+        settings.forceActiveFocus(Qt.TabFocusReason);
+        const selected = screen.selectedIdentity;
+        keyClick(Qt.Key_Right);
+        compare(screen.selectedIdentity, selected);
+        verify(settings.activeFocus);
+    }
+
+    function descendantsNamed(item, name) {
+        let items = item.objectName === name ? [item] : [];
+        for (const child of item.children || [])
+            items = items.concat(descendantsNamed(child, name));
+        return items;
+    }
+
+    function test_tabOrderKeepsEveryActionVisible_data() {
+        return [{ tag: "desktop", width: 1280, height: 720 },
+            { tag: "narrow", width: 800, height: 600 }];
+    }
+
+    function test_tabOrderKeepsEveryActionVisible(data) {
+        const hosts = [];
+        for (let index = 0; index < 7; index++) hosts.push(host("Console " + index, "mac" + index));
+        const screen = createTemporaryObject(screenComponent, testCase, {
+            width: data.width, height: data.height, hosts, psnAvailable: true, steamAvailable: true
+        });
+        waitForRendering(screen);
+        const order = ["consolesButton", "settingsButton", "steamShortcutButton", "quitButton",
+            "addConsoleButton", "consoleSearch", "refreshPsnButton"].map(name => findChild(screen, name));
+        for (const card of descendantsNamed(screen, "consoleCard"))
+            order.push(findChild(card, "connectButton"), findChild(card, "consoleActionsButton"));
+        order.push(findChild(screen, "discoveryButton"));
+        order[0].forceActiveFocus(Qt.TabFocusReason);
+        for (let index = 0; index < order.length; index++) {
+            const control = order[index];
+            verify(control.activeFocus, "Tab reaches " + control.objectName + " at " + index);
+            verify(control.Accessible.name.length > 0 || control.text.length > 0);
+            const position = control.mapToItem(screen, 0, 0);
+            verify(position.y >= 0 && position.y + control.height <= screen.height,
+                "Focused " + control.objectName + " is visible at " + position.y);
+            keyClick(Qt.Key_Tab);
+        }
+        for (let index = order.length - 1; index >= 0; index--) {
+            keyClick(Qt.Key_Tab, Qt.ShiftModifier);
+            verify(order[index].activeFocus, "Shift+Tab reaches " + index);
+        }
+    }
+
+    function test_selectedConsoleHintsMatchAvailableActions_data() {
+        return [
+            { tag: "local", changes: {}, expected: ["PIN"] },
+            { tag: "manual", changes: { discovered: false, manual: true }, expected: ["PIN", "Wake", "Delete"] },
+            { tag: "unregistered", changes: { registered: false }, expected: ["Hide"] },
+            { tag: "remote", changes: { discovered: false, duid: "remote-id" }, expected: ["PIN"] }
+        ];
+    }
+
+    function test_selectedConsoleHintsMatchAvailableActions(data) {
+        const screen = createTemporaryObject(screenComponent, testCase, {
+            hosts: [Object.assign(host("Living room", "01"), data.changes)]
+        });
+        const hints = findChild(screen, "controllerHints");
+        verify(hints && hints.visible, "Selected-console controller hints are visible outside details");
+        compare(descendantsNamed(hints, "controllerHintLabel").map(item => item.text), data.expected);
+        verify(findChild(screen, "connectButton").icon.source.toString().includes("#cross"));
+        screen.hosts = [];
+        verify(!hints.visible);
+    }
+
+    Component {
+        id: focusSinkComponent
+        Item { focus: true }
+    }
+    Component {
+        id: managementDialogComponent
+        Popup {
+            width: 260
+            height: 120
+            modal: true
+            focus: true
+            closePolicy: Popup.CloseOnEscape
+        }
+    }
+
+    function test_managementDialogKeepsFocusAfterDetailsClose() {
+        const screen = createTemporaryObject(screenComponent, testCase, { hosts: [host("Living room", "01")] });
+        const popup = createTemporaryObject(managementDialogComponent, screen);
+        const details = findChild(screen, "consoleDetails");
+        const opener = findChild(screen, "consoleActionsButton");
+        let cancelDialog = null;
+        screen.managementRequested.connect((action, accept, cancel) => {
+            verify(!details.visible, "Details must finish closing before the next modal opens");
+            cancelDialog = cancel;
+            popup.open();
+        });
+        popup.closed.connect(() => cancelDialog());
+        commandSpy.signalName = "quitRequested";
+        commandSpy.target = screen;
+        for (let attempt = 0; attempt < 2; attempt++) {
+            mouseClick(opener);
+            tryCompare(details, "opened", true);
+            mouseClick(findChild(details.contentItem, "pinAction"));
+            tryCompare(popup, "opened", true);
+            verify(popup.activeFocus);
+            keyClick(Qt.Key_Escape);
+            tryCompare(popup, "visible", false);
+            tryCompare(opener, "activeFocus", true);
+            compare(commandSpy.count, 0, "Escape must close the active dialog without opening Quit");
+        }
+    }
+
+    function test_returnFocusPreservesOpenerOrUsesRemainingCard_data() {
+        return [{ tag: "settings", opener: "settingsButton", remove: false },
+            { tag: "card", opener: "consoleActionsButton", remove: false },
+            { tag: "removed-card", opener: "consoleActionsButton", remove: true }];
+    }
+
+    function test_returnFocusPreservesOpenerOrUsesRemainingCard(data) {
+        const screen = createTemporaryObject(screenComponent, testCase, {
+            hosts: [host("Living room", "01"), host("Bedroom", "02")]
+        });
+        const opener = findChild(screen, data.opener);
+        opener.forceActiveFocus(Qt.TabFocusReason);
+        screen.rememberFocus();
+        const sink = createTemporaryObject(focusSinkComponent, testCase);
+        sink.forceActiveFocus();
+        if (data.remove) screen.hosts = [host("Bedroom", "02")];
+        screen.restoreFocus();
+        if (data.remove) {
+            const action = findChild(screen, "connectButton");
+            verify(action.activeFocus);
+            compare(action.Accessible.name, "Connect to Bedroom");
+        } else verify(opener.activeFocus);
+    }
+
+    function test_managementDialogReturnsToDetailsOpener() {
+        const screen = createTemporaryObject(screenComponent, testCase, { hosts: [host("Living room", "01")] });
+        const opener = findChild(screen, "consoleActionsButton");
+        mouseClick(opener);
+        const details = findChild(screen, "consoleDetails");
+        tryCompare(details, "opened", true);
+        commandSpy.signalName = "managementRequested";
+        commandSpy.target = screen;
+        mouseClick(findChild(details.contentItem, "pinAction"));
+        tryCompare(commandSpy, "count", 1);
+        tryCompare(details, "visible", false);
+        const sink = createTemporaryObject(focusSinkComponent, testCase);
+        sink.forceActiveFocus();
+        commandSpy.signalArguments[0][2]();
+        tryCompare(opener, "activeFocus", true);
+    }
+
+    function test_controllerShortcutsInDetails_data() {
+        return [
+            { tag: "pin", changes: {}, key: Qt.Key_PageUp, action: "pin", signal: "managementRequested", count: 1 },
+            { tag: "no-pin", changes: { registered: false }, key: Qt.Key_PageUp, signal: "managementRequested", count: 0 },
+            { tag: "wake", changes: { manual: true, discovered: false }, key: Qt.Key_Yes, signal: "wakeRequested", count: 1 },
+            { tag: "no-wake", changes: {}, key: Qt.Key_Yes, signal: "wakeRequested", count: 0 },
+            { tag: "delete", changes: { manual: true }, key: Qt.Key_No, action: "delete", signal: "managementRequested", count: 1 },
+            { tag: "hide", changes: { registered: false }, key: Qt.Key_No, action: "hide", signal: "managementRequested", count: 1 }
+        ];
+    }
+
+    function test_controllerShortcutsInDetails(data) {
+        const screen = createTemporaryObject(screenComponent, testCase, {
+            hosts: [Object.assign(host("Living room", "01"), data.changes)]
+        });
+        commandSpy.signalName = data.signal;
+        commandSpy.target = screen;
+        connectSpy.target = screen;
+        mouseClick(findChild(screen, "consoleActionsButton"));
+        const details = findChild(screen, "consoleDetails");
+        tryCompare(details, "opened", true);
+        keyClick(data.key);
+        if (data.count) {
+            tryCompare(commandSpy, "count", data.count);
+            if (data.action) {
+                compare(commandSpy.signalArguments[0][0], data.action);
+                commandSpy.signalArguments[0][2]();
+            }
+        } else compare(commandSpy.count, 0);
+        compare(connectSpy.count, 0);
+        details.close();
+    }
+
+    function test_detailsKeepTabAndArrowInputInsidePopup() {
+        const screen = createTemporaryObject(screenComponent, testCase, {
+            hosts: [Object.assign(host("Living room", "01"), { manual: true, discovered: false }), host("Bedroom", "02")]
+        });
+        connectSpy.target = screen;
+        mouseClick(findChild(screen, "consoleActionsButton"));
+        const details = findChild(screen, "consoleDetails");
+        tryCompare(details, "opened", true);
+        const selected = screen.selectedIdentity;
+        const close = findChild(details.contentItem, "closeDetailsButton");
+        verify(close.activeFocus);
+        keyClick(Qt.Key_Tab);
+        verify(findChild(details.contentItem, "pinAction").activeFocus);
+        keyClick(Qt.Key_Tab, Qt.ShiftModifier);
+        verify(close.activeFocus);
+        for (const key of [Qt.Key_Left, Qt.Key_Right]) keyClick(key);
+        compare(screen.selectedIdentity, selected);
+        verify(close.activeFocus);
+        keyClick(Qt.Key_Return);
+        tryCompare(details, "visible", false);
+        compare(connectSpy.count, 0);
+    }
+
+    function test_keyboardFocusChangesRenderedControl_data() {
+        return ["consolesButton", "settingsButton", "steamShortcutButton", "quitButton", "consoleSearch",
+            "addConsoleButton", "refreshPsnButton", "connectButton", "consoleActionsButton", "discoveryButton"]
+            .map(control => ({ tag: control, control, popup: false, changes: {} }))
+            .concat(["closeDetailsButton", "pinAction", "wakeAction", "deleteAction", "hideAction"]
+                .map(control => ({ tag: control, control, popup: true,
+                    changes: control === "hideAction" ? { registered: false }
+                        : { discovered: false, manual: true } })));
+    }
+
+    function test_keyboardFocusChangesRenderedControl(data) {
+        const screen = createTemporaryObject(screenComponent, testCase, {
+            hosts: [Object.assign(host("Living room", "01"), data.changes)], psnAvailable: true, steamAvailable: true
+        });
+        if (data.popup) {
+            mouseClick(findChild(screen, "consoleActionsButton"));
+            tryCompare(findChild(screen, "consoleDetails"), "opened", true);
+        }
+        const details = findChild(screen, "consoleDetails");
+        const control = findChild(data.popup ? details.contentItem : screen, data.control);
+        const sink = data.popup ? findChild(details.contentItem,
+            data.control === "closeDetailsButton" ? "pinAction" : "closeDetailsButton")
+            : createTemporaryObject(focusSinkComponent, testCase);
+        sink.forceActiveFocus();
+        waitForRendering(control);
+        const unfocused = grabImage(screen);
+        control.forceActiveFocus(Qt.TabFocusReason);
+        waitForRendering(control);
+        verify(control.activeFocus);
+        const position = control.mapToItem(screen, 0, 0);
+        function hasVisibleChange() {
+            const focused = grabImage(screen);
+            for (let y = Math.ceil(position.y); y < position.y + control.height; y += 3)
+                for (let x = Math.ceil(position.x); x < position.x + control.width; x += 3)
+                    if (focused.red(x, y) !== unfocused.red(x, y)
+                        || focused.green(x, y) !== unfocused.green(x, y)
+                        || focused.blue(x, y) !== unfocused.blue(x, y)) return true;
+            return false;
+        }
+        tryVerify(hasVisibleChange, 1000,
+            "Keyboard focus must change rendered pixels");
+        const focused = grabImage(screen);
+        if (data.control === "connectButton")
+            verify(focused.red(Math.floor(position.x + 1), Math.floor(position.y + control.height / 2)) > 200,
+                "The primary action has a bright focus border over its usual blue background");
     }
 
     function test_layout_data() {
