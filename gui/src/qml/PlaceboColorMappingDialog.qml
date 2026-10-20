@@ -71,33 +71,48 @@ DialogView {
             anchors.fill: parent
             anchors.margins: 16
             spacing: 20
-            ColumnLayout {
+            Flickable {
+                id: sectionSidebar
                 Layout.preferredWidth: 180
                 Layout.minimumWidth: 180
                 Layout.maximumWidth: 180
                 Layout.fillHeight: true
-                spacing: 4
-                Repeater {
-                    id: sections
-                    model: [qsTr("Gamut Mapping 1"), qsTr("Gamut Mapping 2"), qsTr("Tone-mapping 1"), qsTr("Tone-mapping 2"), qsTr("Tone-mapping 3")]
-                    delegate: C.Button {
-                        required property int index
-                        required property string modelData
-                        objectName: "colorMappingSection" + index
-                        Layout.fillWidth: true
-                        text: modelData
-                        Accessible.name: modelData
-                        checked: dialog.currentSection === index
-                        font.pixelSize: 14
-                        onClicked: dialog.currentSection = index
-                        background: Rectangle {
-                            radius: 6
-                            color: parent.checked ? "#233b57" : parent.hovered ? "#1a202b" : "transparent"
-                            border.color: parent.activeFocus ? "#78b8ff" : "transparent"
+                contentHeight: sectionColumn.implicitHeight
+                clip: true
+                ScrollBar.vertical: ScrollBar {}
+                ColumnLayout {
+                    id: sectionColumn
+                    width: parent.width
+                    spacing: 4
+                    Repeater {
+                        id: sections
+                        model: [qsTr("Gamut Mapping 1"), qsTr("Gamut Mapping 2"), qsTr("Tone-mapping 1"), qsTr("Tone-mapping 2"), qsTr("Tone-mapping 3")]
+                        delegate: C.Button {
+                            required property int index
+                            required property string modelData
+                            objectName: "colorMappingSection" + index
+                            Layout.fillWidth: true
+                            text: modelData
+                            contentItem: Label {
+                                text: parent.text
+                                font: parent.font
+                                wrapMode: Text.Wrap
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                            Accessible.name: modelData
+                            checked: dialog.currentSection === index
+                            font.pixelSize: 14
+                            onActiveFocusChanged: if (activeFocus)
+                                sectionSidebar.contentY = Math.max(0, Math.min(y, sectionSidebar.contentHeight - sectionSidebar.height))
+                            onClicked: dialog.currentSection = index
+                            background: Rectangle {
+                                radius: 6
+                                color: parent.checked ? "#233b57" : parent.hovered ? "#1a202b" : "transparent"
+                                border.color: parent.activeFocus ? "#78b8ff" : "transparent"
+                            }
                         }
                     }
                 }
-                Item { Layout.fillHeight: true }
             }
             Flickable {
                 id: colorMappingFlick
@@ -393,6 +408,13 @@ DialogView {
                                     Layout.minimumWidth: 0
                                     font.pixelSize: 14
                                     text: qsTr("Enable Tricubic Interpolation for 3DLUTs")
+                                    contentItem: Label {
+                                        text: parent.text
+                                        font: parent.font
+                                        wrapMode: Text.Wrap
+                                        leftPadding: parent.indicator.width + parent.spacing
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
                                     checked: dialog.backend.settings.placeboGamutMappingLut3dTricubicEnabled
                                     onToggled: dialog.backend.settings.placeboGamutMappingLut3dTricubicEnabled = checked
                                 }
