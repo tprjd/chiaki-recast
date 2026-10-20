@@ -294,9 +294,9 @@ FocusScope {
                             onSelectionRequested: library.selectedIdentity = library.identityOf(host)
                             onActivated: library.connectToTarget(library.identityOf(host))
                             onActionsRequested: opener => {
-                                actionMenu.identity = library.identityOf(host);
-                                actionMenu.opener = opener;
-                                actionMenu.popup(card, card.width - actionMenu.width, card.height - 40);
+                                consoleDetails.identity = library.identityOf(host);
+                                consoleDetails.opener = opener;
+                                consoleDetails.open();
                             }
                         }
                     }
@@ -314,6 +314,28 @@ FocusScope {
                 }
             }
         }
+    }
+
+    ConsoleDetails {
+        id: consoleDetails
+        property string identity: ""
+        property Item opener: null
+        readonly property var target: library.resolveTarget(identity)
+        onTargetChanged: if (!target) close()
+        host: target ? target.host : ({})
+        streamerMode: library.streamerMode
+        managementAvailable: target && ["pin", "wake", "delete", "hide"].some(action => library.eligible(action, target.host))
+        onManagementRequested: opener => {
+            actionMenu.identity = identity;
+            actionMenu.opener = opener;
+            actionMenu.popup(opener, 0, opener.height);
+        }
+        onClosed: Qt.callLater(() => {
+            if (opener && opener.visible) {
+                opener.focus = false;
+                opener.forceActiveFocus(Qt.TabFocusReason);
+            } else library.restoreCardFocus(identity);
+        })
     }
 
     Menu {
@@ -335,6 +357,7 @@ FocusScope {
             visible: actionMenu.target && library.eligible("pin", actionMenu.target.host)
             height: visible ? implicitHeight : 0
             onTriggered: {
+                consoleDetails.close();
                 const identity = actionMenu.identity;
                 Qt.callLater(() => library.requestManagement("pin", identity));
             }
@@ -346,6 +369,7 @@ FocusScope {
             visible: actionMenu.target && library.eligible("wake", actionMenu.target.host)
             height: visible ? implicitHeight : 0
             onTriggered: {
+                consoleDetails.close();
                 const identity = actionMenu.identity;
                 Qt.callLater(() => library.requestManagement("wake", identity));
             }
@@ -358,6 +382,7 @@ FocusScope {
             height: visible ? implicitHeight : 0
             onTriggered: {
                 if (!actionMenu.target) return;
+                consoleDetails.close();
                 const action = actionMenu.target.host.manual ? "delete" : "hide";
                 const identity = actionMenu.identity;
                 Qt.callLater(() => library.requestManagement(action, identity));

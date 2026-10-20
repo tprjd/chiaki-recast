@@ -67,7 +67,8 @@ The component accepts these properties:
 - `hosts` contains the complete current backend list in backend order.
   Hidden records remain in this input, so their source indices stay correct.
   The interim `sourceHosts` and `sourceIndices` options are removed.
-- `streamerMode` masks an address used as the console name.
+- `streamerMode` masks addresses and console IDs in details and an address
+  used as the console name. Accessible text and tooltips use the same values.
 - `profileKey` identifies the active profile. The native view binds it to
   `Chiaki.settings.currentProfile`.
 
@@ -177,16 +178,25 @@ It emits `activated()`, `actionsRequested(opener)`, and `selectionRequested()`.
 `focusPrimary()` puts visible keyboard focus on its primary action.
 The screen resolves the host identity when these signals arrive.
 
-The temporary action menu stores its target identity and opener. Escape closes
-the menu and restores the opener. Management signals run after the menu closes,
-so focus restoration does not take focus from a newly opened dialog. A profile
-change closes the menu and invalidates saved identities. Details in ticket 05
-can reuse the opener and `restoreCardFocus` fallback.
+The card's ellipsis opens `ConsoleDetails.qml` without a connection request.
+The popup shows available address, ID, registration, route, app, and title ID
+fields. ID uses the MAC when available and otherwise the PSN DUID. Missing
+fields have no row. Long details scroll while Close remains visible.
+
+Details resolve their saved identity against the current full host list.
+Rename and reorder update the popup. Removal, hidden entries, duplicate
+identities, and profile changes close it. Escape closes details and returns
+keyboard focus to the opener, a valid card, or Add console.
+
+Manage opens the temporary action menu for eligible consoles. Escape closes
+the menu first and returns focus to Manage. A management action closes both
+popups before its command runs. Ticket 06 replaces this temporary management
+route and completes delayed PIN target checks.
 
 Search and counts belong in `ConsoleLibrary.qml`, including `libraryToolbar`
-and the footer after the card grid. Details belong beside the temporary action
-menu and use the `ConsoleCard.actionsRequested(opener)` signal. Both features
-must continue to resolve identities against the full `hosts` list.
+and the footer after the card grid. Details use
+`ConsoleCard.actionsRequested(opener)`. Both features resolve identities
+against the full `hosts` list.
 
 ## Card library results, 2026-10-20
 
@@ -207,3 +217,22 @@ prototype branch and approved screenshot remain the design reference.
 The full changed application build and launch still require integration
 verification. Console hardware, PSN accounts, physical controllers, and Windows
 100%, 150%, and 200% display scaling remain untested in this ticket.
+
+## Console details results, 2026-10-20
+
+The MSVC and Qt 6.9.3 screen target passed all 77 checks, with no failures,
+warnings, or skipped checks. CTest also passed `chiaki-console-screen`.
+The details checks use the complete production screen and sample hosts.
+They cover available and missing fields, live reorder and rename, stale
+targets, profile changes, privacy, mouse and keyboard input, focus recovery,
+and long details at 800 by 600 logical pixels.
+
+The details control failed before the popup existed. Target-loss checks
+failed before popup invalidation. Long text and repeated keyboard opening
+also failed before their fixes. Offscreen captures at 1280 by 720 and
+800 by 600 confirmed the popup layout and the visible Close control.
+
+The screen test observes commands without a network session. Full-application
+verification, console hardware, PSN accounts, physical controllers, and
+Windows display scaling remain outside this ticket's checks. The existing
+management menu remains available through Manage until ticket 06 replaces it.

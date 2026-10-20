@@ -158,7 +158,9 @@ Rectangle {
                 flat: true
                 text: "\u2026"
                 font.pixelSize: 20
-                Accessible.name: qsTr("Actions for %1").arg(card.consoleName)
+                Accessible.name: qsTr("Details for %1").arg(card.consoleName)
+                ToolTip.visible: hovered
+                ToolTip.text: Accessible.name
                 firstInFocusChain: true
                 lastInFocusChain: true
                 sendOutput: true
