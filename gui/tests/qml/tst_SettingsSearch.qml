@@ -590,6 +590,44 @@ TestCase {
             return point.y >= -1 && point.y + row.height <= results.height + 1;
         }, 5000, "The entire focused result becomes visible after the native list movement settles");
     }
+    function test_freshPrerequisiteAfterCaptureAndWindowResize() {
+        const h = createTemporaryObject(linkedHarnessComponent, testCase, {startAtLibrary: true});
+        h.settings.controllerMapping = [{buttonValue: 1, buttonName: "Cross", keyName: "Existing"}];
+        h.showSettingsDialog();
+        tryVerify(() => !h.pages.busy);
+        for (let attempt = 0; attempt < 3; ++attempt) {
+            if (!attempt) searchFor(h, "Keyboard key for Cross");
+            mouseClick(findChild(h, "keyMapping1"));
+            verify(findChild(h, "keyCaptureDialog").visible);
+            keyClick(Qt.Key_Escape);
+            tryCompare(findChild(h, "keyCaptureDialog"), "visible", false);
+        }
+        const search = findChild(h, "settingsSearch");
+        search.text = "target";
+        search.forceActiveFocus(Qt.TabFocusReason);
+        for (let index = 0; index < 3; ++index) keyClick(Qt.Key_Down);
+        keyClick(Qt.Key_Escape);
+        keyClick(Qt.Key_Escape);
+        tryCompare(h.pages, "depth", 1);
+        tryVerify(() => !h.pages.busy);
+        h.width = 900; h.height = 600;
+        h.showSettingsDialog();
+        tryVerify(() => !h.pages.busy);
+        const freshSearch = findChild(h, "settingsSearch");
+        freshSearch.text = "Brightness";
+        const resultIndex = h.screen.searchResults.findIndex(row => row.target === "placeboColorAdjustmentBrightness");
+        freshSearch.forceActiveFocus(Qt.TabFocusReason);
+        for (let index = 0; index <= resultIndex; ++index) keyClick(Qt.Key_Down);
+        keyClick(Qt.Key_Return);
+        const control = findChild(h, "videoPreset");
+        const flick = findChild(h, "videoFlick");
+        tryCompare(control, "activeFocus", true);
+        wait(500);
+        const point = control.mapToItem(flick, 0, 0);
+        verify(point.y >= 0 && point.y + control.height <= flick.height,
+            "Fresh Video prerequisite stays fully inside its viewport after layout settles");
+        compare(h.pages.depth, 2);
+    }
     function test_everyCategoryAndStreamRoute() {
         const h = createTemporaryObject(harnessComponent, testCase);
         const search = findChild(h, "settingsSearch");

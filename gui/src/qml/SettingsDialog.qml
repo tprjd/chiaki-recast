@@ -2173,6 +2173,11 @@ FocusScope {
                 dialog.ensureActiveFocusVisible()
             }
         }
+        Connections {
+            target: dialog.activeSettingsFlick()
+            function onContentHeightChanged() { Qt.callLater(dialog.ensureActiveFocusVisible); }
+            function onHeightChanged() { Qt.callLater(dialog.ensureActiveFocusVisible); }
+        }
 
         Item {
             Timer {
