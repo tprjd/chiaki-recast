@@ -294,4 +294,21 @@ TestCase {
         tryCompare(pages, "busy", false);
         tryCompare(opener, "activeFocus", true);
     }
+    function test_lastSliderKeepsDisplayedValueVisible() {
+        const h = createTemporaryObject(rendererHarness, testCase, {width: 900, height: 600});
+        h.settings.placeboColorAdjustmentEnabled = true;
+        h.settings.placeboColorAdjustmentTemperature = 0.123;
+        mouseClick(findChild(h, "rendererSection4"));
+        wait(20);
+        findChild(h, "placeboColorAdjustmentGamma").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Down);
+        const temperature = findChild(h, "placeboColorAdjustmentTemperature");
+        tryCompare(temperature, "activeFocus", true);
+        const value = findChild(h, "placeboColorAdjustmentTemperatureValue");
+        compare(value.text, "0.123");
+        const viewport = findChild(h, "rendererFlick");
+        const point = value.mapToItem(viewport, 0, 0);
+        verify(point.y >= 0 && point.y + value.height <= viewport.height,
+               "The focused Temperature slider must keep its displayed value inside the viewport");
+    }
 }
