@@ -12,13 +12,13 @@ Item {
     property var actions: []
     function record(name, args) { actions = actions.concat([{name: name, args: args || []}]); }
     function closeDialog() { record("close"); }
-    function showRegistDialog() { record("register"); }
+    function showRegistDialog(host, ps5) { record("register", [host, ps5]); }
     function showDisplaySettingsDialog() { record("display"); }
     function showPlaceboSettingsDialog() { record("renderer"); }
     function showProfileDialog() { record("profiles"); }
     function showPSNTokenDialog(remote) { record("login", [remote]); }
     function showControllerMappingDialog() { record("mapping"); }
-    function showConfirmDialog(title, text, callback) { record("confirm", [title, text, callback]); }
+    function showConfirmDialog(title, text, callback, cancel) { record("confirm", [title, text, callback, cancel]); }
     FakeSettings { id: fakeSettings }
     QtObject {
         id: fakeBackend

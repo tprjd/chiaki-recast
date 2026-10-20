@@ -26,6 +26,54 @@ FocusScope {
     readonly property bool compact: width < 760
     readonly property var categories: [qsTr("General"), qsTr("Video"), qsTr("Stream"),
         qsTr("Audio/Wifi"), qsTr("Consoles"), qsTr("Keys"), qsTr("Controllers"), qsTr("Remote"), qsTr("Config")]
+    property int consoleProfileEpoch: 0
+    property string consoleProfileKey: backend.settings.currentProfile
+    property var pendingConsoleAction: null
+    onConsoleProfileKeyChanged: consoleProfileEpoch++
+    function consoleIndex(hosts, mac) {
+        if (!mac) return -1;
+        let result = -1;
+        for (let index = 0; index < hosts.length; index++) {
+            if (hosts[index].mac !== mac) continue;
+            if (result !== -1) return -1;
+            result = index;
+        }
+        return result;
+    }
+    function requestConsoleAction(action, mac, opener) {
+        const hosts = action === "delete" ? backend.settings.registeredHosts : backend.hiddenHosts;
+        if (consoleIndex(hosts, mac) < 0) return;
+        const request = { mac: mac, epoch: consoleProfileEpoch, opener: opener };
+        pendingConsoleAction = request;
+        const restoreFocus = function() {
+            Qt.callLater(function() {
+                if (request.opener && request.opener.visible && request.opener.enabled)
+                    request.opener.forceActiveFocus(Qt.TabFocusReason);
+                else if (bar.currentIndex === 4)
+                    registerNewButton.forceActiveFocus(Qt.TabFocusReason);
+            });
+        };
+        const accept = function() {
+            if (pendingConsoleAction !== request) return;
+            pendingConsoleAction = null;
+            if (request.epoch === consoleProfileEpoch) {
+                const currentHosts = action === "delete" ? backend.settings.registeredHosts : backend.hiddenHosts;
+                const index = consoleIndex(currentHosts, request.mac);
+                if (index >= 0) {
+                    if (action === "delete") backend.settings.deleteRegisteredHost(index);
+                    else backend.unhideHost(request.mac);
+                }
+            }
+            restoreFocus();
+        };
+        const cancel = function() {
+            if (pendingConsoleAction !== request) return;
+            pendingConsoleAction = null;
+            restoreFocus();
+        };
+        navigation.showConfirmDialog(action === "delete" ? qsTr("Delete Console") : qsTr("Unhide Console"),
+            action === "delete" ? qsTr("Are you sure you want to delete this console?") : qsTr("Are you sure you want to unhide this console?"), accept, cancel);
+    }
     function close() { navigation.closeDialog(); }
     Keys.onEscapePressed: close()
     StackView.onDeactivating: restoreFocusItem = Window.window.activeFocusItem
@@ -1277,321 +1325,134 @@ FocusScope {
                 // Consoles
                 Flickable {
                     id: consolesFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
-                    clip: true
-                    contentWidth: Math.max(width, consolesLayout.width)
+                    objectName: "consolesPage"
+                    anchors.fill: parent
+                    contentWidth: width
                     contentHeight: consolesLayout.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: consolesFlick.contentHeight > consolesFlick.height
-                    }
+                    clip: true
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
                     ColumnLayout {
                         id: consolesLayout
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        spacing: 10
-
-                        Label {
-                            text: ""
-                        }
-
-                        Label {
-                            text: ""
-                        }
-
+                        width: consolesFlick.width - 12
+                        spacing: 16
+                        Label { text: qsTr("Consoles"); font.pixelSize: 24; font.bold: true }
                         C.Button {
                             id: registerNewButton
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.topMargin: 10
-                            topPadding: 26
-                            leftPadding: 30
-                            rightPadding: 30
-                            bottomPadding: 26
-                            firstInFocusChain: true
+                            font.pixelSize: 14
+                            objectName: "registerConsole"
                             text: qsTr("Register New")
+                            Accessible.name: qsTr("Register a new console")
+                            firstInFocusChain: true
                             onClicked: dialog.navigation.showRegistDialog("255.255.255.255", true)
-                            Material.roundedScale: Material.SmallScale
                         }
-
+                        Label { text: qsTr("Registered Consoles"); font.pixelSize: 14; font.bold: true }
                         Label {
-                            id: consolesLabel
-                            Layout.alignment: Qt.AlignHCenter
-                            text: qsTr("Registered Consoles")
-                            font.bold: true
+                            font.pixelSize: 14
+                            objectName: "registeredConsolesEmpty"
+                            visible: dialog.backend.settings.registeredHosts.length === 0
+                            text: qsTr("No registered consoles.")
+                            Layout.fillWidth: true
+                            wrapMode: Text.Wrap
                         }
-
-                        ListView {
-                            id: consolesView
-                            Layout.alignment: Qt.AlignHCenter
-                            height: 170
-                            onCountChanged: {
-                                consolesView.contentHeight = consolesView.count * 80 + consolesView.anchors.topMargin;
-                            }
-                            keyNavigationEnabled: false
-                            width: 700
-                            ScrollBar.vertical: ScrollBar {
-                                id: consolesScrollbar
-                                policy: ScrollBar.AlwaysOn
-                                visible: consolesView.contentHeight > consolesView.height
-                            }
-                            clip: true
+                        Repeater {
                             model: dialog.backend.settings.registeredHosts
-                            delegate: ItemDelegate {
-                                text: "%1 (%2, %3)".arg(dialog.backend.settings.streamerMode ? "hidden" : modelData.mac).arg(modelData.ps5 ? "PS5" : "PS4").arg(modelData.name)
-                                height: 80
-                                width: parent ? parent.width : 0
-                                leftPadding: autoConnectButton.width + 40
-
-                                CheckBox {
-                                    property bool firstInFocusChain: false
-                                    property bool lastInFocusChain: false
-                                    property bool lastDownInFocusChain: index > consolesView.count + hiddenConsolesView.count - 2
-
-                                    id: autoConnectButton
-                                    anchors {
-                                        left: parent.left
-                                        verticalCenter: parent.verticalCenter
-                                        leftMargin: 20
+                            Frame {
+                                font.pixelSize: 14
+                                id: registeredCard
+                                required property int index
+                                required property var modelData
+                                readonly property string displayName: dialog.backend.settings.streamerMode
+                                    ? qsTr("Registered console %1").arg(index + 1) : modelData.name
+                                objectName: "registeredConsole" + index
+                                Layout.fillWidth: true
+                                background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    spacing: 8
+                                    Label {
+                                        objectName: "registeredConsoleInfo" + registeredCard.index
+                                        text: dialog.backend.settings.streamerMode
+                                            ? "%1 (%2)".arg(registeredCard.displayName).arg(registeredCard.modelData.ps5 ? "PS5" : "PS4")
+                                            : "%1 (%2, %3)".arg(registeredCard.modelData.mac).arg(registeredCard.modelData.ps5 ? "PS5" : "PS4").arg(registeredCard.displayName)
+                                        textFormat: Text.PlainText
+                                        wrapMode: Text.WrapAnywhere
+                                        Layout.fillWidth: true
                                     }
-                                    text: qsTr("Auto-Connect")
-                                    checked: dialog.backend.settings.autoConnectMac == modelData.mac
-                                    onToggled: dialog.backend.settings.autoConnectMac = checked ? modelData.mac : "";
-
-                                    Keys.onPressed: (event) => {
-                                        switch (event.key) {
-                                        case Qt.Key_Right:
-                                            if (!lastInFocusChain) {
-                                                let item = nextItemInFocusChain();
-                                                if (item)
-                                                    item.forceActiveFocus(Qt.TabFocusReason);
-                                                event.accepted = true;
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        C.CheckBox {
+                                            id: autoConnectButton
+                                            Layout.fillWidth: true
+                                            Layout.minimumWidth: 0
+                                            contentItem: Label { text: parent.text; textFormat: Text.PlainText; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                            KeyNavigation.right: deleteConsoleButton
+                                            objectName: "autoConnectConsole" + registeredCard.index
+                                            text: qsTr("Auto-Connect")
+                                            Accessible.name: qsTr("Auto-connect to %1").arg(registeredCard.displayName)
+                                            enabled: dialog.consoleIndex(dialog.backend.settings.registeredHosts, registeredCard.modelData.mac) >= 0
+                                            checked: dialog.backend.settings.autoConnectMac === registeredCard.modelData.mac
+                                            onToggled: {
+                                                if (dialog.consoleIndex(dialog.backend.settings.registeredHosts, registeredCard.modelData.mac) >= 0)
+                                                    dialog.backend.settings.autoConnectMac = checked ? registeredCard.modelData.mac : "";
                                             }
-                                            break;
-                                        case Qt.Key_Up:
-                                            if (!firstInFocusChain) {
-                                                let item = nextItemInFocusChain(false);
-                                                if (item) {
-                                                    item.forceActiveFocus(Qt.TabFocusReason);
-                                                    dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                }
-                                                let count = index > 0 ? 2: 0;
-                                                for(var i = 0; i < count; i++)
-                                                {
-                                                    let item2 = item.nextItemInFocusChain(false);
-                                                    if (item)
-                                                    {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                        item = item2;
-                                                    }
-                                                }
-                                                event.accepted = true;
-                                            }
-                                            break;
-                                        case Qt.Key_Down:
-                                            if (!lastDownInFocusChain) {
-                                                let item = nextItemInFocusChain();
-                                                if (item) {
-                                                    item.forceActiveFocus(Qt.TabFocusReason);
-                                                    dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                }
-                                                let count = 2;
-                                                for(var i = 0; i < count; i++)
-                                                {
-                                                    let item2 = item.nextItemInFocusChain();
-                                                    if (item)
-                                                    {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                        item = item2;
-                                                    }
-                                                }
-                                                event.accepted = true;
-                                            }
-                                            break;
-                                        case Qt.Key_Return:
-                                            if (visualFocus) {
-                                                toggle();
-                                                toggled();
-                                            }
-                                            event.accepted = true;
-                                            break;
+                                        }
+                                        C.Button {
+                                            id: deleteConsoleButton
+                                            Layout.maximumWidth: registeredCard.width * 0.4
+                                            contentItem: Label { text: parent.text; textFormat: Text.PlainText; wrapMode: Text.Wrap; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                                            KeyNavigation.left: autoConnectButton
+                                            lastInFocusChain: registeredCard.index === dialog.backend.settings.registeredHosts.length - 1 && dialog.backend.hiddenHosts.length === 0
+                                            objectName: "deleteRegisteredConsole" + registeredCard.index
+                                            text: qsTr("Delete")
+                                            Accessible.name: qsTr("Delete %1").arg(registeredCard.displayName)
+                                            enabled: dialog.consoleIndex(dialog.backend.settings.registeredHosts, registeredCard.modelData.mac) >= 0
+                                            onClicked: dialog.requestConsoleAction("delete", registeredCard.modelData.mac, this)
                                         }
                                     }
-                                }
-
-                                Button {
-                                    property bool firstInFocusChain: false
-                                    property bool lastInFocusChain: index > consolesView.count + hiddenConsolesView.count - 2
-                                    Material.background: visualFocus ? Material.accent : undefined
-
-                                    Component.onDestruction: {
-                                        if (visualFocus) {
-                                            let item = nextItemInFocusChain();
-                                            if (item)
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                        }
-                                    }
-                                    Keys.onPressed: (event) => {
-                                        switch (event.key) {
-                                            case Qt.Key_Left:
-                                                if (!firstInFocusChain) {
-                                                    let item = nextItemInFocusChain(false);
-                                                    if (item)
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Up:
-                                                if (!firstInFocusChain)
-                                                {
-                                                    let item = nextItemInFocusChain(false);
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                    }
-                                                    let count = 2;
-                                                    for(var i = 0; i < count; i++)
-                                                    {
-                                                        let item2 = item.nextItemInFocusChain(false);
-                                                        if (item)
-                                                        {
-                                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                                            dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                            item = item2;
-                                                        }
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Down:
-                                                if (!lastInFocusChain) {
-                                                    let item = nextItemInFocusChain();
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                    }
-                                                    let count = index < consolesView.count - 1 ? 2: 0;
-                                                    for(var i = 0; i < count; i++)
-                                                    {
-                                                        let item2 = item.nextItemInFocusChain();
-                                                        if (item)
-                                                        {
-                                                            item.forceActiveFocus(Qt.TabFocusReason);
-                                                            dialog.ensureItemVisibleInFlick(consolesView, item);
-                                                            item = item2;
-                                                        }
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Return:
-                                                if (visualFocus) {
-                                                    clicked();
-                                                }
-                                                event.accepted = true;
-                                                break;
-                                        }
-                                    }
-                                    anchors {
-                                        right: parent.right
-                                        verticalCenter: parent.verticalCenter
-                                        rightMargin: 20
-                                    }
-                                    text: qsTr("Delete")
-                                    onClicked: dialog.navigation.showConfirmDialog(qsTr("Delete Console"), qsTr("Are you sure you want to delete this console?"), () => dialog.backend.settings.deleteRegisteredHost(index));
-                                    Material.roundedScale: Material.SmallScale
-                                    Material.accent: Material.Red
                                 }
                             }
                         }
-
+                        Label { text: qsTr("Hidden Consoles"); font.pixelSize: 14; font.bold: true }
                         Label {
-                            id: hiddenConsolesLabel
-                            Layout.alignment: Qt.AlignHCenter
-                            text: qsTr("Hidden Consoles")
-                            font.bold: true
+                            font.pixelSize: 14
+                            objectName: "hiddenConsolesEmpty"
+                            visible: dialog.backend.hiddenHosts.length === 0
+                            text: qsTr("No hidden consoles.")
+                            Layout.fillWidth: true
+                            wrapMode: Text.Wrap
                         }
-                        ListView {
-                            id: hiddenConsolesView
-                            Layout.alignment: Qt.AlignHCenter
-                            keyNavigationEnabled: false
-                            height: 170
-                            onCountChanged: {
-                                hiddenConsolesView.contentHeight = hiddenConsolesView.count * 80 + hiddenConsolesView.anchors.topMargin;
-                            }
-                            clip: true
-                            width: 500
-                            ScrollBar.vertical: ScrollBar {
-                                id: hiddenConsolesScrollbar
-                                policy: ScrollBar.AlwaysOn
-                                visible: hiddenConsolesView.contentHeight > hiddenConsolesView.height
-                            }
+                        Repeater {
                             model: dialog.backend.hiddenHosts
-                            delegate: ItemDelegate {
-                                text: "%1 (%2)".arg(dialog.backend.settings.streamerMode ? "hidden" : modelData.mac).arg(modelData.name)
-                                height: 80
-                                width: parent ? parent.width : 0
-
-                                Button {
-                                    property bool firstInFocusChain: false
-                                    property bool lastInFocusChain: index > hiddenConsolesView.count - 2
-                                    Material.background: visualFocus ? Material.accent : undefined
-
-                                    Component.onDestruction: {
-                                        if (visualFocus) {
-                                            let item = nextItemInFocusChain();
-                                            if (item)
-                                                item.forceActiveFocus(Qt.TabFocusReason);
-                                        }
+                            Frame {
+                                font.pixelSize: 14
+                                id: hiddenCard
+                                required property int index
+                                required property var modelData
+                                readonly property string displayName: dialog.backend.settings.streamerMode
+                                    ? qsTr("Hidden console %1").arg(index + 1) : modelData.name
+                                objectName: "hiddenConsole" + index
+                                Layout.fillWidth: true
+                                background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    spacing: 8
+                                    Label {
+                                        objectName: "hiddenConsoleInfo" + hiddenCard.index
+                                        text: dialog.backend.settings.streamerMode ? hiddenCard.displayName
+                                            : "%1 (%2)".arg(hiddenCard.modelData.mac).arg(hiddenCard.displayName)
+                                        textFormat: Text.PlainText
+                                        wrapMode: Text.WrapAnywhere
+                                        Layout.fillWidth: true
                                     }
-                                    Keys.onPressed: (event) => {
-                                        switch (event.key) {
-                                            case Qt.Key_Up:
-                                                if (!firstInFocusChain)
-                                                {
-                                                    let item = nextItemInFocusChain(false);
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(hiddenConsolesView, item);
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Down:
-                                                if (!lastInFocusChain) {
-                                                    let item = nextItemInFocusChain();
-                                                    if (item) {
-                                                        item.forceActiveFocus(Qt.TabFocusReason);
-                                                        dialog.ensureItemVisibleInFlick(hiddenConsolesView, item);
-                                                    }
-                                                    event.accepted = true;
-                                                }
-                                                break;
-                                            case Qt.Key_Return:
-                                                if (visualFocus) {
-                                                    clicked();
-                                                }
-                                                event.accepted = true;
-                                                break;
-                                        }
+                                    C.Button {
+                                        objectName: "unhideConsole" + hiddenCard.index
+                                        lastInFocusChain: hiddenCard.index === dialog.backend.hiddenHosts.length - 1
+                                        text: qsTr("Unhide")
+                                        Accessible.name: qsTr("Unhide %1").arg(hiddenCard.displayName)
+                                        enabled: dialog.consoleIndex(dialog.backend.hiddenHosts, hiddenCard.modelData.mac) >= 0
+                                        onClicked: dialog.requestConsoleAction("unhide", hiddenCard.modelData.mac, this)
                                     }
-                                    anchors {
-                                        right: parent.right
-                                        verticalCenter: parent.verticalCenter
-                                        rightMargin: 20
-                                    }
-                                    text: qsTr("Unhide")
-                                    onClicked: dialog.navigation.showConfirmDialog(qsTr("Unhide Console"), qsTr("Are you sure you want to unhide this console?"), () => dialog.backend.unhideHost(modelData.mac));
-                                    Material.roundedScale: Material.SmallScale
-                                    Material.accent: Material.Red
                                 }
                             }
                         }
