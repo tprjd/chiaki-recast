@@ -19,5 +19,12 @@ target_compile_definitions(chiaki-console-screen-tests PRIVATE
     QUICK_TEST_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/qml")
 
 add_test(NAME chiaki-console-screen COMMAND chiaki-console-screen-tests)
+set(screen_test_environment
+    "QT_QPA_PLATFORM=offscreen"
+    "QT_QUICK_BACKEND=software"
+    "QT_QUICK_CONTROLS_CONF=${CMAKE_CURRENT_SOURCE_DIR}/../src/qml/qtquickcontrols2.conf")
+if(WIN32)
+    list(APPEND screen_test_environment "QT_QPA_FONTDIR=$ENV{WINDIR}/Fonts")
+endif()
 set_tests_properties(chiaki-console-screen PROPERTIES
-    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_BACKEND=software")
+    ENVIRONMENT "${screen_test_environment}")

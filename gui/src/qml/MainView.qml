@@ -209,15 +209,12 @@ Pane {
             visible: modelData.display
             id: delegate
             width: parent ? parent.width : 0
-            height: modelData.display ? (nativeCard.visible ? 320 : 180) : 0
+            height: modelData.display ? nativeCard.implicitHeight + 20 : 0
             highlighted: ListView.isCurrentItem
             onClicked: connectToHost()
 
             function connectToHost() {
-                if(modelData.discovered)
-                    Chiaki.connectToHost(index, modelData.name);
-                else
-                    Chiaki.connectToHost(index);
+                nativeCard.connectToTarget(nativeCard.identityOf(modelData));
             }
 
             function wakeUpHost() {
@@ -250,11 +247,11 @@ Pane {
 
                 ConsoleLibrary {
                     id: nativeCard
-                    visible: modelData.registered && modelData.discovered && modelData.state === "ready"
                     Layout.preferredWidth: 300
                     Layout.fillHeight: true
                     hosts: [modelData]
-                    sourceIndices: [index]
+                    sourceHosts: Chiaki.hosts
+                    profileKey: Chiaki.settings.currentProfile
                     streamerMode: Chiaki.settings.streamerMode
                     onConnectRequested: (sourceIndex, nickname) => Chiaki.connectToHost(sourceIndex, nickname)
                 }

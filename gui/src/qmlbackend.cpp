@@ -199,16 +199,16 @@ QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
     {
         connect(psn_auto_connect_timer, &QTimer::timeout, this, [this]
         {
-            int i = 0;
-            for (const auto &host : std::as_const(psn_hosts))
+            const auto listed_hosts = hosts();
+            for (int i = 0; i < listed_hosts.size(); i++)
             {
-                if(host.GetName() == auto_connect_nickname)
+                const auto host = listed_hosts.at(i).toMap();
+                if(!host.value("discovered").toBool() && !host.value("duid").toString().isEmpty()
+                    && host.value("name").toString() == auto_connect_nickname)
                 {
-                    int index = discovery_manager.GetHosts().size() + this->settings->GetManualHosts().size() + i;
-                    connectToHost(index);
+                    connectToHost(i);
                     return;
                 }
-                i++;
             }
             qCWarning(chiakiGui) << "Couldn't find PSN host with the requested nickname: " << auto_connect_nickname;
         });
@@ -456,16 +456,16 @@ void QmlBackend::profileChanged()
     {
         connect(psn_auto_connect_timer, &QTimer::timeout, this, [this]
         {
-            int i = 0;
-            for (const auto &host : std::as_const(psn_hosts))
+            const auto listed_hosts = hosts();
+            for (int i = 0; i < listed_hosts.size(); i++)
             {
-                if(host.GetName() == auto_connect_nickname)
+                const auto host = listed_hosts.at(i).toMap();
+                if(!host.value("discovered").toBool() && !host.value("duid").toString().isEmpty()
+                    && host.value("name").toString() == auto_connect_nickname)
                 {
-                    int index = discovery_manager.GetHosts().size() + this->settings->GetManualHosts().size() + i;
-                    connectToHost(index);
+                    connectToHost(i);
                     return;
                 }
-                i++;
             }
             qCWarning(chiakiGui) << "Couldn't find PSN host with the requested nickname: " << auto_connect_nickname;
         });
@@ -1566,6 +1566,7 @@ QmlBackend::DisplayServer QmlBackend::displayServerAt(int index) const
 {
     if (index < 0)
         return {};
+    const int source_index = index;
     auto discovered = discovery_manager.GetHosts();
     auto manual = settings->GetManualHosts();
     if (index < discovered.size()) {
@@ -1611,40 +1612,21 @@ QmlBackend::DisplayServer QmlBackend::displayServerAt(int index) const
         }
         return server;
     }
-    index -= manual.size();
-    if (index < psn_hosts.count())
-    {
-        DisplayServer server;
-
-        QMapIterator<QString, PsnHost> i(psn_hosts);
-        size_t j = 0;
-        while (i.hasNext())
-        {
-            i.next();
-            PsnHost psn_host = i.value();
-            bool hidden = false;
-            for (const auto &host : discovery_manager.GetHosts())
-            {
-                if(host.host_name == psn_host.GetName())
-                    hidden = true;
-            }
-            if(hidden)
-                continue;
-            if(j == index)
-            {
-                server.valid = true;
-                server.discovered = false;
-                server.psn_host = std::move(psn_host);
-                server.duid = i.key();
-                server.registered = true;
-                server.registered_host = settings->GetNicknameRegisteredHost(server.psn_host.GetName());
-                return server;
-            }
-            j++;
-        }
+    const auto listed_hosts = hosts();
+    if (source_index >= listed_hosts.size())
         return {};
-    }
-    return {};
+    const auto duid = listed_hosts.at(source_index).toMap().value("duid").toString();
+    const auto psn_host = psn_hosts.constFind(duid);
+    if (psn_host == psn_hosts.constEnd())
+        return {};
+    DisplayServer server;
+    server.valid = true;
+    server.discovered = false;
+    server.psn_host = psn_host.value();
+    server.duid = duid;
+    server.registered = true;
+    server.registered_host = settings->GetNicknameRegisteredHost(server.psn_host.GetName());
+    return server;
 }
 
 bool QmlBackend::sendWakeup(const DisplayServer &server)

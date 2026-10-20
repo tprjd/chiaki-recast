@@ -1,5 +1,7 @@
 #include <QtQuickTest/quicktest.h>
 #include <QQmlEngine>
+#include <QFont>
+#include <QGuiApplication>
 
 #include "qmlsvgprovider.h"
 
@@ -10,6 +12,9 @@ class ConsoleScreenSetup : public QObject
 public slots:
     void qmlEngineAvailable(QQmlEngine *engine)
     {
+#ifdef Q_OS_WIN
+        QGuiApplication::setFont(QFont("Segoe UI"));
+#endif
         engine->addImageProvider("svg", new QmlSvgProvider());
     }
 };
