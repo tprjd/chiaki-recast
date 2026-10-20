@@ -4,12 +4,27 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import org.streetpea.chiaking
 import "controls" as C
+import "SettingsSearch.js" as Search
 
 DialogView {
     id: dialog
     objectName: "controllerMappingDialog"
     property var backend: Chiaki
     property var navigation: root
+    property var searchRoute: null
+    function revealSearchRoute() {
+        if (!searchRoute || !backend.controllerMappingInProgress || !backend.currentControllerMapping.length) return;
+        const route = searchRoute;
+        searchRoute = null;
+        if (route.buttonValue !== undefined) focusMapping(route.buttonValue, route.slot);
+        else {
+            const item = Search.findItem(dialog, route.target);
+            if (item && item.visible && item.enabled) item.forceActiveFocus(Qt.TabFocusReason);
+            else analogStickMapping.forceActiveFocus(Qt.TabFocusReason);
+        }
+        ensureFocusVisible();
+    }
+    StackView.onActivated: Qt.callLater(revealSearchRoute)
     property bool finalClosing: false
     title: qsTr("Controller mapping")
     buttonVisible: false
@@ -230,6 +245,9 @@ DialogView {
             target: dialog.backend
             function onControllerMappingInProgressChanged() {
                 if (!dialog.backend.controllerMappingInProgress && !dialog.finalClosing) dialog.close();
+            }
+            function onCurrentControllerMappingChanged() {
+                if (dialog.StackView.status === StackView.Active) Qt.callLater(dialog.revealSearchRoute);
             }
             function onControllerMappingButtonSelected(pressedButton) {
                 if (!buttonDialog.acceptingInput || !dialog.backend.controllerMappingInProgress || dialog.finalClosing) return;

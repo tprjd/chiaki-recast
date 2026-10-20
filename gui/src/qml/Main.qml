@@ -204,15 +204,17 @@ Item {
         stack.push(settingsDialogComponent);
     }
 
-    function showDisplaySettingsDialog() {
-        stack.push(displaySettingsDialogComponent);
+    function showDisplaySettingsDialog(route) {
+        if (route) stack.push(displaySettingsDialogComponent, {searchRoute: route});
+        else stack.push(displaySettingsDialogComponent);
     }
 
-    function showPlaceboSettingsDialog() {
-        stack.push(placeboSettingsDialogComponent);
+    function showPlaceboSettingsDialog(route) {
+        if (route) stack.push(placeboSettingsDialogComponent, {searchRoute: route});
+        else stack.push(placeboSettingsDialogComponent);
     }
 
-    function showPlaceboColorMappingDialog() {
+    function showPlaceboColorMappingDialog(route) {
         if(placeboSettingsRect.opacity)
         {
             root.closeDialog();
@@ -230,14 +232,18 @@ Item {
                     loader.item.restoreFocusItem.forceActiveFocus(Qt.TabFocusReason);
                     loader.item.restoreFocusItem = null;
                 }
+                if (route) loader.item.revealSetting(route);
             }
         }
+        else if (route)
+            stack.push(placeboColorMappingDialogComponent, {searchRoute: route});
         else
             stack.push(placeboColorMappingDialogComponent);
     }
 
-    function showProfileDialog() {
-        stack.push(profileDialogComponent)
+    function showProfileDialog(route) {
+        if (route) stack.push(profileDialogComponent, {searchRoute: route});
+        else stack.push(profileDialogComponent)
     }
 
     function showConsolePinDialog(submitPin, cancelPin) {
@@ -252,8 +258,9 @@ Item {
         stack.push(psnTokenDialogComponent, {psnurl: psnurl, expired: expired});
     }
 
-    function showControllerMappingDialog() {
-        stack.push(controllerMappingDialogComponent)
+    function showControllerMappingDialog(route) {
+        if (route) stack.push(controllerMappingDialogComponent, {searchRoute: route});
+        else stack.push(controllerMappingDialogComponent)
     }
 
     Component.onCompleted: {

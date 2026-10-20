@@ -8,6 +8,7 @@ import QtQuick.Dialogs
 import org.streetpea.chiaking
 
 import "controls" as C
+import "SettingsSearch.js" as Search
 
 FocusScope {
     enum Console {
@@ -23,6 +24,75 @@ FocusScope {
     property var openExternal: function(url) { Qt.openUrlExternally(url); }
     property alias currentCategory: bar.currentIndex
     property Item restoreFocusItem
+    property var pendingMappingSearch: null
+    readonly property string searchQuery: searchField.text.trim().toLocaleLowerCase()
+    readonly property var searchResults: {
+        const query = searchQuery;
+        if (!query) return [];
+        return Search.entries(backend.settings).map(entry => {
+            if ((entry.page === "renderer" || entry.page === "color") && backend.window.videoPreset !== ChiakiWindow.VideoPreset.Custom)
+                entry.description += " " + qsTr("Requires the Custom render preset in Video.");
+            if (entry.page === "color" && (!backend.settings.placeboColorMappingEnabled || backend.settings.placeboColorMappingPreset !== 0))
+                entry.description += " " + qsTr("Requires Color mapping enabled and the Custom color mapping preset in Renderer.");
+            return entry;
+        }).filter(entry =>
+            (entry.title + " " + entry.description + " " + (entry.keywords || "") + " " + searchContext(entry))
+                .toLocaleLowerCase().indexOf(query) >= 0);
+    }
+    function searchContext(entry) {
+        const page = entry.page === "renderer" ? qsTr("Renderer")
+            : entry.page === "color" ? qsTr("Renderer") + " / " + qsTr("Color Mapping")
+            : entry.page === "display" ? qsTr("Display") : "";
+        return categories[entry.category] + " / " + (page ? page + " / " : "") + entry.group;
+    }
+    function selectCategory(index) {
+        searchField.clear();
+        bar.currentIndex = index;
+        focusCurrentTabFirstItem();
+    }
+    function revealSetting(category, name, consoleType, fallback, afterReveal) {
+        searchField.clear();
+        bar.currentIndex = category;
+        if (consoleType !== undefined) selectedConsole = consoleType;
+        Qt.callLater(function() {
+            let item = Search.findItem(dialog, name);
+            const consoleAction = ["autoConnectConsole", "deleteRegisteredConsole", "unhideConsole"]
+                .find(prefix => name === prefix + "0");
+            if (consoleAction) {
+                const hosts = consoleAction === "unhideConsole" ? backend.hiddenHosts : backend.settings.registeredHosts;
+                for (let index = 0; index < hosts.length; ++index) {
+                    const candidate = Search.findItem(dialog, consoleAction + index);
+                    if (candidate && candidate.visible && candidate.enabled) { item = candidate; break; }
+                }
+            }
+            if ((!item || !item.visible || !item.enabled) && fallback) item = Search.findItem(dialog, fallback);
+            if (item && item.visible && item.enabled) item.forceActiveFocus(Qt.TabFocusReason);
+            else focusCurrentTabFirstItem();
+            ensureActiveFocusVisible();
+            if (afterReveal) afterReveal(item);
+        });
+    }
+    function openSearchResult(index) {
+        const entry = searchResults[index];
+        if (!entry) return;
+        pendingMappingSearch = null;
+        if (!entry.page) {
+            revealSetting(entry.category, entry.target, entry.consoleType, entry.fallback);
+            return;
+        }
+        const opener = entry.page === "display" ? "displaySettings"
+            : entry.page === "profiles" ? "manageProfiles"
+            : entry.page === "mapping" ? "controllerMappingChange" : "customRendererSettings";
+        revealSetting(entry.category, opener, undefined, "videoPreset", function(item) {
+            if (!item || item.objectName !== opener || !item.visible || !item.enabled) return;
+            if (entry.page === "display") navigation.showDisplaySettingsDialog(entry);
+            else if (entry.page === "profiles") navigation.showProfileDialog(entry);
+            else if (entry.page === "mapping") {
+                pendingMappingSearch = entry;
+                controllerMappingDialog.show({reset: false});
+            } else navigation.showPlaceboSettingsDialog(entry);
+        });
+    }
     readonly property bool compact: width < 760
     readonly property var categories: [qsTr("General"), qsTr("Video"), qsTr("Stream"),
         qsTr("Audio/Wifi"), qsTr("Consoles"), qsTr("Keys"), qsTr("Controllers"), qsTr("Remote"), qsTr("Config")]
@@ -75,7 +145,11 @@ FocusScope {
             action === "delete" ? qsTr("Are you sure you want to delete this console?") : qsTr("Are you sure you want to unhide this console?"), accept, cancel);
     }
     function close() { navigation.closeDialog(); }
-    Keys.onEscapePressed: close()
+    Keys.onEscapePressed: {
+        if (keyDialog.visible) keyDialog.close();
+        else if (searchField.text.length) { searchField.clear(); searchField.forceActiveFocus(); }
+        else close();
+    }
     StackView.onDeactivating: restoreFocusItem = Window.window.activeFocusItem
     StackView.onActivated: {
         if (restoreFocusItem && restoreFocusItem.visible && restoreFocusItem.enabled)
@@ -201,6 +275,7 @@ FocusScope {
         return remoteFlick;
     }
     Keys.onPressed: (event) => {
+        if (searchField.activeFocus || searchQuery.length) return;
         if (event.modifiers)
             return;
         switch (event.key) {
@@ -273,6 +348,40 @@ FocusScope {
             textFormat: Text.PlainText
             elide: Text.ElideRight
         }
+        RowLayout {
+            id: searchRow
+            anchors { top: dialog.compact ? profileCompact.bottom : heading.bottom; left: parent.left; right: parent.right; topMargin: 12 }
+            spacing: 12
+            TextField {
+                id: searchField
+                objectName: "settingsSearch"
+                Layout.fillWidth: true
+                placeholderText: qsTr("Search settings")
+                Accessible.name: qsTr("Search settings")
+                onActiveFocusChanged: if (activeFocus) resultList.navigating = false
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Down && resultList.count) {
+                        resultList.currentIndex = 0;
+                        if (resultList.currentItem) resultList.currentItem.forceActiveFocus(Qt.TabFocusReason);
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                        dialog.openSearchResult(0);
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Escape && text.length) {
+                        clear();
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Up || event.key === Qt.Key_PageUp || event.key === Qt.Key_PageDown) {
+                        event.accepted = true;
+                    }
+                }
+            }
+            C.Button {
+                objectName: "clearSettingsSearch"
+                text: qsTr("Clear")
+                enabled: searchField.text.length > 0
+                onClicked: { searchField.clear(); searchField.forceActiveFocus(); }
+            }
+        }
         QtObject {
             id: bar
             property int currentIndex: 0
@@ -282,16 +391,16 @@ FocusScope {
         C.ComboBox {
             id: categorySelector
             objectName: "settingsCategorySelector"
-            anchors { top: profileCompact.bottom; left: parent.left; right: parent.right; topMargin: 8 }
+            anchors { top: searchRow.bottom; left: parent.left; right: parent.right; topMargin: 8 }
             visible: dialog.compact
             model: dialog.categories
             currentIndex: bar.currentIndex
             Accessible.name: qsTr("Settings category")
-            onActivated: index => bar.currentIndex = index
+            onActivated: index => dialog.selectCategory(index)
         }
         Flickable {
             id: sidebar
-            anchors { top: heading.bottom; left: parent.left; bottom: parent.bottom; topMargin: 24 }
+            anchors { top: searchRow.bottom; left: parent.left; bottom: parent.bottom; topMargin: 20 }
             width: 180
             visible: !dialog.compact
             contentHeight: categoryColumn.height
@@ -332,7 +441,7 @@ FocusScope {
                         }
                         Accessible.name: modelData
                         Accessible.description: highlighted ? qsTr("Selected category") : ""
-                        onClicked: bar.currentIndex = index
+                        onClicked: dialog.selectCategory(index)
                         onActiveFocusChanged: if (activeFocus) dialog.ensureItemVisibleInFlick(sidebar, this)
                     }
                 }
@@ -347,8 +456,9 @@ FocusScope {
             }
         }
         StackLayout {
+            visible: !dialog.searchQuery.length
             anchors {
-                top: dialog.compact ? categorySelector.bottom : heading.bottom
+                top: dialog.compact ? categorySelector.bottom : searchRow.bottom
                 left: dialog.compact ? parent.left : sidebar.right
                 right: parent.right
                 bottom: parent.bottom
@@ -1983,6 +2093,80 @@ FocusScope {
             }
         }
 
+        ListView {
+            id: resultList
+            objectName: "settingsSearchResults"
+            anchors { top: searchRow.bottom; left: sidebar.right; right: parent.right; bottom: parent.bottom; leftMargin: 24; topMargin: 20 }
+            visible: dialog.searchQuery.length > 0
+            clip: true
+            spacing: 8
+            model: dialog.searchResults
+            property bool navigating: false
+            currentIndex: -1
+            onModelChanged: {
+                currentIndex = -1;
+                if (navigating && dialog.searchQuery.length)
+                    Qt.callLater(() => searchField.forceActiveFocus(Qt.TabFocusReason));
+            }
+            ScrollBar.vertical: ScrollBar {}
+            function navigate(event) {
+                if (event.key === Qt.Key_Up) {
+                    if (currentIndex <= 0) searchField.forceActiveFocus();
+                    else decrementCurrentIndex();
+                } else if (event.key === Qt.Key_Down) incrementCurrentIndex();
+                else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) dialog.openSearchResult(currentIndex);
+                else if (event.key === Qt.Key_Escape) { searchField.clear(); searchField.forceActiveFocus(); }
+                else return;
+                if ((event.key === Qt.Key_Down || event.key === Qt.Key_Up) && !searchField.activeFocus && currentItem)
+                    currentItem.forceActiveFocus(Qt.TabFocusReason);
+                event.accepted = true;
+            }
+            Keys.onPressed: event => navigate(event)
+            delegate: C.Button {
+                required property int index
+                required property var modelData
+                objectName: "settingsSearchResult" + index
+                width: resultList.width - 14
+                height: resultText.implicitHeight + 24
+                highlighted: resultList.currentIndex === index
+                firstInFocusChain: true
+                lastInFocusChain: true
+                background: Rectangle {
+                    radius: 8
+                    color: parent.highlighted ? "#24394c" : parent.hovered ? "#1b2633" : "#1a202b"
+                    border.color: parent.activeFocus ? Material.accent : "#303a48"
+                    border.width: parent.activeFocus ? 2 : 1
+                }
+                Accessible.name: modelData.title
+                Accessible.description: dialog.searchContext(modelData) + ". " + modelData.description
+                onActiveFocusChanged: if (activeFocus) { resultList.currentIndex = index; resultList.navigating = true; }
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Up || event.key === Qt.Key_Down || event.key === Qt.Key_Escape)
+                        resultList.navigate(event);
+                    else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                        dialog.openSearchResult(index);
+                        event.accepted = true;
+                    }
+                }
+                onClicked: dialog.openSearchResult(index)
+                contentItem: Column {
+                    id: resultText
+                    spacing: 4
+                    Label { text: modelData.title; textFormat: Text.PlainText; font.pixelSize: 16; font.bold: true; width: parent.width; wrapMode: Text.Wrap }
+                    Label { text: dialog.searchContext(modelData); textFormat: Text.PlainText; font.pixelSize: 14; color: "#aeb9c8"; width: parent.width; wrapMode: Text.Wrap }
+                    Label { text: modelData.description; textFormat: Text.PlainText; font.pixelSize: 14; width: parent.width; wrapMode: Text.Wrap }
+                }
+            }
+            Label {
+                objectName: "settingsSearchEmpty"
+                visible: resultList.count === 0
+                width: parent.width
+                wrapMode: Text.Wrap
+                text: qsTr("No settings found. Try a setting name or description.")
+                Accessible.name: text
+            }
+        }
+
         Connections {
             target: dialog.Window.window
             function onActiveFocusItemChanged() {
@@ -2009,7 +2193,10 @@ FocusScope {
                     else
                     {
                         controllerMappingChange.forceActiveFocus(Qt.TabFocusReason);
-                        dialog.navigation.showControllerMappingDialog();
+                        const route = dialog.pendingMappingSearch;
+                        dialog.pendingMappingSearch = null;
+                        if (route) dialog.navigation.showControllerMappingDialog(route);
+                        else dialog.navigation.showControllerMappingDialog();
                         quitControllerMapping = false;
                         controllerMappingDialog.resetFocus = false;
                         controllerMappingDialog.close();
@@ -2149,6 +2336,7 @@ FocusScope {
                 dialog.backend.beginControllerMapping(resetMapping);
             }
             onClosed: {
+                dialog.pendingMappingSearch = null;
                 if(resetFocus)
                 {
                     if(resetMapping)
@@ -2221,6 +2409,7 @@ FocusScope {
         Connections {
             target: dialog.backend.settings
             function onCurrentProfileChanged() {
+                dialog.pendingMappingSearch = null;
                 if (controllerMappingDialog.visible) controllerMappingDialog.close();
                 if (steamControllerMappingDialog.visible) steamControllerMappingDialog.close();
             }
@@ -2234,12 +2423,16 @@ FocusScope {
                 if (dialog.backend.controllerMappingInProgress && controllerMappingDialog.visible)
                     openTimer.start();
                 else
+                {
                     openTimer.stop();
+                    dialog.pendingMappingSearch = null;
+                }
             }
 
             function onControllerMappingSteamControllerSelected()
             {
                 if (!controllerMappingDialog.visible) return;
+                dialog.pendingMappingSearch = null;
                 controllerMappingDialog.resetFocus = false;
                 quitControllerMapping = false;
                 steamControllerMappingDialog.resetMapping = controllerMappingDialog.resetMapping;

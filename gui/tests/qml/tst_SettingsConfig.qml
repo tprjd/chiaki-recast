@@ -13,7 +13,8 @@ TestCase {
     Component { id: harnessComponent; SettingsHarness {} }
     function test_actionsAndPrivacy() {
         const harness = createTemporaryObject(harnessComponent, testCase);
-        mouseClick(findChild(harness, "settingsCategory8"));
+        findChild(harness, "settingsCategory8").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
         const profile = findChild(harness, "configProfile");
         verify(profile);
         verify(profile.text.includes("Test profile"));
@@ -54,7 +55,8 @@ TestCase {
         harness.settings.logSanitize = true;
         harness.settings.changeCount = 0;
         harness.screenActive = true;
-        mouseClick(findChild(harness, "settingsCategory8"));
+        findChild(harness, "settingsCategory8").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
         compare(harness.settings.changeCount, 0);
         for (const name of ["logSanitize", "logVerbose"]) {
             const box = findChild(harness, name);
@@ -85,7 +87,8 @@ TestCase {
     function test_backRestoresConfigOpener() {
         const harness = createTemporaryObject(navigationHarness, testCase);
         const pages = findChild(harness, "settingsStack");
-        mouseClick(findChild(harness, "settingsCategory8"));
+        findChild(harness, "settingsCategory8").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
         const opener = findChild(harness, "manageProfiles");
         opener.forceActiveFocus(Qt.TabFocusReason);
         keyClick(Qt.Key_Return);
@@ -102,7 +105,8 @@ TestCase {
     }
     function test_bounds(data) {
         const harness = createTemporaryObject(harnessComponent, testCase, {width: data.width, height: data.height});
-        mouseClick(findChild(harness, "settingsCategory8"));
+        findChild(harness, "settingsCategory8").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
         waitForRendering(harness);
         for (const name of ["manageProfiles", "exportSettings", "importSettings", "logSanitize", "logVerbose", "aboutSettings"]) {
             const control = findChild(harness, name);

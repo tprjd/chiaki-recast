@@ -4,12 +4,42 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import org.streetpea.chiaking
 import "controls" as C
+import "SettingsSearch.js" as Search
 
 DialogView {
     id: dialog
     objectName: "placeboSettingsDialog"
     property var backend: Chiaki
     property var navigation: root
+    property var searchRoute: null
+    function revealSetting(route) {
+        if (route.page !== "color") {
+            Search.reveal(dialog, route, "renderer", "rendererSection" + currentSection);
+            return;
+        }
+        currentSection = 6;
+        Qt.callLater(function() {
+            if (!backend.settings.placeboColorMappingEnabled || backend.settings.placeboColorMappingPreset !== 0) {
+                Search.reveal(dialog, {target: "openPlaceboColorMapping"}, "renderer", "rendererSection6");
+                return;
+            }
+            const opener = Search.findItem(dialog, "openPlaceboColorMapping");
+            opener.forceActiveFocus(Qt.TabFocusReason);
+            ensureFocusVisible();
+            navigation.showPlaceboColorMappingDialog(route);
+        });
+    }
+    StackView.onActivated: Qt.callLater(function() {
+        if (searchRoute) {
+            const route = searchRoute;
+            searchRoute = null;
+            revealSetting(route);
+        } else {
+            const item = dialog.Window.window ? dialog.Window.window.activeFocusItem : null;
+            if (!item || !item.visible || !item.enabled)
+                Search.reveal(dialog, {target: item ? item.objectName : "rendererSection" + currentSection}, "renderer", "rendererSection" + currentSection);
+        }
+    })
     property string options_url: ""
     property int currentSection: 0
     title: qsTr("Renderer settings")

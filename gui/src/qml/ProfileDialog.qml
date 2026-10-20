@@ -4,12 +4,21 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import org.streetpea.chiaking
 import "controls" as C
+import "SettingsSearch.js" as Search
 
 DialogView {
     id: dialog
     objectName: "profileDialog"
     property var backend: Chiaki
     property var navigation: root
+    property var searchRoute: null
+    function revealSetting(route) { Search.reveal(dialog, route, "profiles", "profileSelection"); }
+    StackView.onActivated: Qt.callLater(function() {
+        if (!searchRoute) return;
+        const route = searchRoute;
+        searchRoute = null;
+        revealSetting(route);
+    })
     property string selectedProfile: backend.settings.currentProfile || "default"
     readonly property bool creating: selectedProfile === "create new profile"
     readonly property bool canDelete: backend.settings.profiles.indexOf(selectedProfile) >= 0
