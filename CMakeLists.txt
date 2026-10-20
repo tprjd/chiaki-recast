@@ -274,12 +274,15 @@ else()
 	message(STATUS "Setsu disabled")
 endif()
 
+if(CHIAKI_ENABLE_TESTS)
+	enable_testing()
+endif()
+
 if(CHIAKI_ENABLE_GUI)
 	add_subdirectory(gui)
 endif()
 
 if(CHIAKI_ENABLE_TESTS)
-	enable_testing()
 	add_subdirectory(test)
 endif()
 
