@@ -1491,7 +1491,6 @@ FocusScope {
                                     id: chiakiKeys
                                     model: dialog.backend.settings.controllerMapping
                                     RowLayout {
-                                        required property int index
                                         required property var modelData
                                         Layout.fillWidth: true
                                         spacing: 12
@@ -2180,7 +2179,7 @@ FocusScope {
                 Qt.callLater(() => {
                     const item = returnFocusItem && returnFocusItem.visible && returnFocusItem.enabled
                         ? returnFocusItem : resetAllKeys;
-                    item.forceActiveFocus(Qt.TabFocusReason);
+                    if (item) item.forceActiveFocus(Qt.TabFocusReason);
                 });
             }
             Material.roundedScale: Material.MediumScale
