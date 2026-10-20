@@ -18,6 +18,7 @@ FocusScope {
     property string applicationVersion: ""
     property bool playStationController: false
     property string selectedIdentity: ""
+    property var pendingManagement: null
     property alias searchText: consoleSearch.text
     readonly property var visibleHosts: hosts.filter(host => host && host.display !== false)
     readonly property var displayedHosts: visibleHosts.filter(host => matchesSearch(host))
@@ -30,13 +31,16 @@ FocusScope {
     signal steamShortcutRequested()
     signal discoveryToggled(bool enabled)
     signal quitRequested()
-    signal managementRequested(string action, string identity)
+    signal managementRequested(string action, var accept, var cancel)
+    signal wakeRequested(int sourceIndex)
+    signal deleteRequested(int sourceIndex)
+    signal hideRequested(string mac, string nickname)
+    signal pinRequested(int sourceIndex, string pin)
     implicitWidth: 1280
     implicitHeight: 720
     onDisplayedHostsChanged: updateSelection()
     onProfileKeyChanged: {
         targetEpoch++;
-        actionMenu.close();
         selectedIdentity = "";
         updateSelection();
     }
@@ -80,7 +84,6 @@ FocusScope {
             const first = displayedHosts.find(host => resolveTarget(identityOf(host)));
             selectedIdentity = first ? identityOf(first) : "";
         }
-        if (actionMenu.opened && !resolveTarget(actionMenu.identity)) actionMenu.close();
     }
     function moveSelection(offset) {
         const candidates = displayedHosts.filter(host => resolveTarget(identityOf(host)));
@@ -111,7 +114,31 @@ FocusScope {
     }
     function requestManagement(action, identity) {
         const target = resolveTarget(identity);
-        if (target && eligible(action, target.host)) managementRequested(action, identity);
+        if (!target || !eligible(action, target.host)) return false;
+        if (action === "wake") wakeRequested(target.sourceIndex);
+        else {
+            const pending = { action, identity };
+            pendingManagement = pending;
+            managementRequested(action, value => finishManagement(pending, true, value),
+                () => finishManagement(pending, false));
+        }
+        return true;
+    }
+    function finishManagement(pending, accepted, value) {
+        if (pendingManagement !== pending) return false;
+        if (accepted && pending.action === "pin"
+            && (typeof value !== "string" || !/^[0-9]{4}$/.test(value))) return false;
+        pendingManagement = null;
+        const target = resolveTarget(pending.identity);
+        if (accepted && target && eligible(pending.action, target.host)) {
+            if (pending.action === "delete") deleteRequested(target.sourceIndex);
+            else if (pending.action === "hide") hideRequested(target.host.mac, target.host.name || "");
+            else if (pending.action === "pin") pinRequested(target.sourceIndex, value);
+            restoreCardFocus(pending.identity);
+            return true;
+        }
+        restoreCardFocus(pending.identity);
+        return false;
     }
 
     Keys.onMenuPressed: settingsRequested()
@@ -421,11 +448,12 @@ FocusScope {
         onTargetChanged: if (!target) close()
         host: target ? target.host : ({})
         streamerMode: library.streamerMode
-        managementAvailable: target && ["pin", "wake", "delete", "hide"].some(action => library.eligible(action, target.host))
-        onManagementRequested: opener => {
-            actionMenu.identity = identity;
-            actionMenu.opener = opener;
-            actionMenu.popup(opener, 0, opener.height);
+        availableActions: target ? ["pin", "wake", "delete", "hide"].filter(action => library.eligible(action, target.host)) : []
+        playStationController: library.playStationController
+        onManagementRequested: action => {
+            const targetIdentity = identity;
+            close();
+            Qt.callLater(() => library.requestManagement(action, targetIdentity));
         }
         onClosed: Qt.callLater(() => {
             if (opener && opener.visible) {
@@ -433,57 +461,5 @@ FocusScope {
                 opener.forceActiveFocus(Qt.TabFocusReason);
             } else library.restoreCardFocus(identity);
         })
-    }
-
-    Menu {
-        id: actionMenu
-        objectName: "consoleActionsMenu"
-        property string identity: ""
-        property Item opener: null
-        readonly property var target: library.resolveTarget(identity)
-        onClosed: Qt.callLater(() => {
-            if (opener && opener.visible)
-                opener.forceActiveFocus(Qt.TabFocusReason);
-            else
-                library.restoreCardFocus(identity);
-        })
-        MenuItem {
-            objectName: "pinAction"
-            text: qsTr("Update Console Pin")
-            icon.source: "qrc:/icons/l1.svg"
-            visible: actionMenu.target && library.eligible("pin", actionMenu.target.host)
-            height: visible ? implicitHeight : 0
-            onTriggered: {
-                consoleDetails.close();
-                const identity = actionMenu.identity;
-                Qt.callLater(() => library.requestManagement("pin", identity));
-            }
-        }
-        MenuItem {
-            objectName: "wakeAction"
-            text: qsTr("Wake Up")
-            icon.source: "image://svg/button-" + (library.playStationController ? "ps" : "deck") + "#pyramid"
-            visible: actionMenu.target && library.eligible("wake", actionMenu.target.host)
-            height: visible ? implicitHeight : 0
-            onTriggered: {
-                consoleDetails.close();
-                const identity = actionMenu.identity;
-                Qt.callLater(() => library.requestManagement("wake", identity));
-            }
-        }
-        MenuItem {
-            objectName: "removeAction"
-            text: actionMenu.target && actionMenu.target.host.manual ? qsTr("Delete") : qsTr("Hide")
-            icon.source: "image://svg/button-" + (library.playStationController ? "ps" : "deck") + "#box"
-            visible: actionMenu.target && (library.eligible("delete", actionMenu.target.host) || library.eligible("hide", actionMenu.target.host))
-            height: visible ? implicitHeight : 0
-            onTriggered: {
-                if (!actionMenu.target) return;
-                consoleDetails.close();
-                const action = actionMenu.target.host.manual ? "delete" : "hide";
-                const identity = actionMenu.identity;
-                Qt.callLater(() => library.requestManagement(action, identity));
-            }
-        }
     }
 }

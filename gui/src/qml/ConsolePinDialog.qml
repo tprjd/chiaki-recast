@@ -8,14 +8,19 @@ import org.streetpea.chiaking
 import "controls" as C
 
 DialogView {
-    property var consoleIndex
+    required property var submitPin
+    required property var cancelPin
+    property bool completed: false
     title: qsTr("Set console pin")
     buttonText: qsTr("Set")
-    buttonEnabled: pin.acceptableInput
+    buttonEnabled: pin.acceptableInput && !completed
     onAccepted: {
-        Chiaki.setConsolePin(consoleIndex, pin.text.trim());
+        if (completed || !pin.acceptableInput) return;
+        completed = true;
+        submitPin(pin.text.trim());
         stack.pop();
     }
+    StackView.onRemoved: cancelPin()
     Item {
         GridLayout {
             anchors {

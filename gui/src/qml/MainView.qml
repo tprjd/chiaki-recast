@@ -22,26 +22,13 @@ Pane {
             }
         }
     }
-    function manageConsole(action, identity) {
-        const target = library.resolveTarget(identity);
-        if (!target || !library.eligible(action, target.host))
-            return;
+    function manageConsole(action, accept, cancel) {
         if (action === "pin") {
-            root.showConsolePinDialog(target.sourceIndex);
-        } else if (action === "wake") {
-            Chiaki.wakeUpHost(target.sourceIndex);
+            root.showConsolePinDialog(accept, cancel);
         } else if (action === "delete") {
-            root.showConfirmDialog(qsTr("Delete Console"), qsTr("Are you sure you want to delete this console?"), () => {
-                const current = library.resolveTarget(identity);
-                if (current && library.eligible("delete", current.host))
-                    Chiaki.deleteHost(current.sourceIndex);
-            });
+            root.showConfirmDialog(qsTr("Delete Console"), qsTr("Are you sure you want to delete this console?"), accept, cancel);
         } else if (action === "hide") {
-            root.showConfirmDialog(qsTr("Hide Console"), qsTr("Are you sure you want to hide this console?") + "\n\n" + qsTr("Note: You can unhide from the Consoles section of the Settings under Hidden Consoles"), () => {
-                const current = library.resolveTarget(identity);
-                if (current && library.eligible("hide", current.host))
-                    Chiaki.hideHost(current.host.mac, current.host.name);
-            });
+            root.showConfirmDialog(qsTr("Hide Console"), qsTr("Are you sure you want to hide this console?") + "\n\n" + qsTr("Note: You can unhide from the Consoles section of the Settings under Hidden Consoles"), accept, cancel);
         }
     }
 
@@ -64,6 +51,10 @@ Pane {
         onSteamShortcutRequested: root.showSteamShortcutDialog(false)
         onDiscoveryToggled: enabled => Chiaki.discoveryEnabled = enabled
         onQuitRequested: root.showConfirmDialog(qsTr("Quit"), qsTr("Are you sure you want to quit?"), () => Qt.quit())
-        onManagementRequested: (action, identity) => consolePane.manageConsole(action, identity)
+        onManagementRequested: (action, accept, cancel) => consolePane.manageConsole(action, accept, cancel)
+        onWakeRequested: sourceIndex => Chiaki.wakeUpHost(sourceIndex)
+        onDeleteRequested: sourceIndex => Chiaki.deleteHost(sourceIndex)
+        onHideRequested: (mac, nickname) => Chiaki.hideHost(mac, nickname)
+        onPinRequested: (sourceIndex, pin) => Chiaki.setConsolePin(sourceIndex, pin)
     }
 }
