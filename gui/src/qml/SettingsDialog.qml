@@ -321,7 +321,9 @@ FocusScope {
                         checked: bar.currentIndex === index
                         highlighted: checked
                         font.pixelSize: 16
-                        Layout.preferredHeight: Math.max(44, implicitHeight)
+                        topPadding: 8
+                        bottomPadding: 8
+                        Layout.preferredHeight: Math.max(44, contentItem.implicitHeight + topPadding + bottomPadding)
                         background: Rectangle {
                             radius: 7
                             color: parent.checked ? "#24394c" : parent.hovered ? "#1b2633" : "transparent"
