@@ -1,0 +1,17 @@
+{
+    "allPassed": true,
+    "controlledNativeTransportOnly": true,
+    "discoveredRouteHasNoManualSideEffect": true,
+    "discoveryDisabled": true,
+    "guardReleasedBeforeTerminalCallback": true,
+    "invalidAccountAndNativeStartRejectionHaveNoWritesOrStuckGuard": true,
+    "lastAvailableError": "Registration did not start: Memory error",
+    "manualFailureRetryContextOrderingAndDuplicateSignals": true,
+    "noSession": true,
+    "profileSwitchAndAwayBackRejectWritesAndReleaseGuard": true,
+    "reentrantProfileChangeCannotWriteManualIntoNewProfile": true,
+    "reentrantTargetChangeCannotOverwriteAnotherHost": true,
+    "removedTargetCannotOverwriteAnotherHost": true,
+    "settingsContextIsIndependent": true,
+    "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/console-contract-run03"
+}

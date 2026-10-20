@@ -10,7 +10,7 @@ The original checkout and index remain unchanged.
 | --- | --- | --- |
 | [01: Manual host entry](issues/01-manual-host-entry.md) | None | `codex/console-setup-manual` |
 | [02: Registration form](issues/02-registration-form.md) | None | `codex/console-setup-form` |
-| [03: Progress and results](issues/03-registration-progress-results.md) | 02 | Assigned after 02 merges |
+| [03: Progress and results](issues/03-registration-progress-results.md) | 02 | `codex/console-setup-results` |
 | [04: Native acceptance](issues/04-integrated-native-acceptance.md) | 01, 03 | Assigned after 01 and 03 merge |
 
 Each ticket records its status and evidence. Completion requires the integrated
@@ -40,3 +40,12 @@ workspace preserves native save semantics and binds selection to MAC identity.
 The focused production-QML suite passed 23 checks. Form, saved result, and failure
 captures passed visual inspection at both required sizes. Native application
 acceptance remains in ticket 04.
+
+[03: Progress and results](issues/03-registration-progress-results.md) is resolved.
+The panel uses native outcomes and retains form values for retry. Each form owns
+its console context and profile generation. Native guards prevent overlap,
+duplicate completion, and wrong-target or wrong-profile saves. The focused
+form suite passed 22 checks, and the result suite passed 19 checks. Controlled
+native contracts and post-exit INI checks passed. QA hooks were removed, and the
+normal application build passed. Ticket 04 can use the external native helper
+and patch recorded in ticket 03 for integrated acceptance.

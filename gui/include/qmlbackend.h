@@ -32,7 +32,8 @@ class QmlRegist : public QObject
     Q_OBJECT
 
 public:
-    QmlRegist(const ChiakiRegistInfo &regist_info, uint32_t log_mask, QObject *parent = nullptr);
+    QmlRegist(uint32_t log_mask, QObject *parent = nullptr);
+    ChiakiErrorCode start(const ChiakiRegistInfo &regist_info);
 
 signals:
     void log(ChiakiLogLevel level, const QString &msg);
@@ -183,7 +184,8 @@ public:
     Q_INVOKABLE void addManualHost(int index, const QString &address);
     Q_INVOKABLE void hideHost(const QString &mac_string, const QString &host_nickname);
     Q_INVOKABLE void unhideHost(const QString &mac_string);
-    Q_INVOKABLE bool registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QJSValue &callback);
+    Q_INVOKABLE QVariantMap createRegistrationContext() const;
+    Q_INVOKABLE bool registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QJSValue &callback, const QVariantMap &context);
     Q_INVOKABLE void connectToHost(int index, QString nickname = QString());
     Q_INVOKABLE void stopSession(bool sleep);
     Q_INVOKABLE void sessionGoHome();
@@ -243,7 +245,7 @@ signals:
     void sessionError(const QString &title, const QString &text);
     void sessionPinDialogRequested();
     void sessionStopDialogRequested();
-    void registDialogRequested(const QString &host, bool ps5, const QString &duid);
+    void registDialogRequested(const QString &host, bool ps5, const QString &duid, const QVariantMap &context);
     void psnLoginAccountIdDone(const QString &accountId);
     void psnLoginAccountIdError(const QString &error);
 
@@ -253,12 +255,12 @@ private:
 
         DiscoveryHost discovery_host;
         ManualHost manual_host;
-        bool discovered;
+        bool discovered = false;
 
         PsnHost psn_host;
         QString duid;
         RegisteredHost registered_host;
-        bool registered;
+        bool registered = false;
 
         QString GetHostAddr() const { return discovered ? discovery_host.host_addr : manual_host.GetHost(); }
         bool IsPS5() const { return discovered ? discovery_host.ps5 :
@@ -294,6 +296,8 @@ private:
     QList<QString> waking_sleeping_nicknames;
     QHash<int, QmlController*> controllers;
     DisplayServer regist_dialog_server;
+    quint64 profile_generation = 0;
+    bool registration_active = false;
     StreamSessionConnectInfo session_info = {};
     SystemdInhibit *sleep_inhibit = {};
 #ifdef Q_OS_MACOS

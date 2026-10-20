@@ -11,10 +11,12 @@ Item {
     property alias backend: fakeBackend
     property string initialHost: "console.local"
     property bool initialPs5: true
+    property var initialContext: null
     property bool screenActive: true
     property var actions: []
     property var accountCallback: null
     function closeDialog() { actions = actions.concat([{name: "close"}]); }
+    function showMainView() { actions = actions.concat([{name: "consoles"}]); }
     function returnFromAccount(id) {
         if (id) accountCallback(id);
         screenLoader.item.pop();
@@ -23,6 +25,7 @@ Item {
         id: fakeSettings
         property string psnAccountId: ""
         property bool streamerMode: false
+        property string currentProfile: "profile-a"
     }
     QtObject {
         id: fakeBackend
@@ -31,9 +34,10 @@ Item {
         property var requests: []
         property var callback: null
         signal error(string title, string text)
-        function registerHost(host, identity, pin, consolePin, broadcast, target, cb) {
+        function createRegistrationContext() { return {profile: fakeSettings.currentProfile}; }
+        function registerHost(host, identity, pin, consolePin, broadcast, target, cb, context) {
             requests = requests.concat([{host: host, identity: identity, pin: pin,
-                consolePin: consolePin, broadcast: broadcast, target: target}]);
+                consolePin: consolePin, broadcast: broadcast, target: target, context: context}]);
             callback = cb;
             if (!acceptRegistration) error("Invalid Account-ID", "Use an Account ID with eight bytes encoded as Base64.");
             return acceptRegistration;
@@ -47,6 +51,7 @@ Item {
             initialItem: RegistDialog {
                 host: harness.initialHost
                 ps5: harness.initialPs5
+                registrationContext: harness.initialContext || fakeBackend.createRegistrationContext()
                 backend: fakeBackend
                 navigation: harness
                 openAccount: function(login, callback) {
