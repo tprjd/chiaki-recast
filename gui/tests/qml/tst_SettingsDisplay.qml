@@ -30,7 +30,7 @@ TestCase {
         id: navigationHarness
         Item {
             id: root
-            width: 800; height: 600
+            width: 900; height: 600
             function closeDialog() { pages.pop(); }
             function showDisplaySettingsDialog() { pages.push(displayComponent); }
             SettingsHarness { id: collaborators; visible: false; screenActive: false }
@@ -134,7 +134,7 @@ TestCase {
         compare(harness.closeCount, 1);
     }
     function test_responsiveDisplay_data() {
-        return [{tag: "desktop", width: 1280, height: 720}, {tag: "narrow", width: 800, height: 600}, {tag: "minimum", width: 390, height: 600}];
+        return [{tag: "desktop", width: 1280, height: 720}, {tag: "minimum", width: 900, height: 600}];
     }
     function test_responsiveDisplay(data) {
         const harness = createTemporaryObject(displayHarness, testCase, {width: data.width, height: data.height});

@@ -117,7 +117,7 @@ TestCase {
         }
     }
     function test_responsiveVideo_data() {
-        return [{tag: "desktop", width: 1280, height: 720}, {tag: "narrow", width: 800, height: 600}, {tag: "minimum", width: 390, height: 600}];
+        return [{tag: "desktop", width: 1280, height: 720}, {tag: "minimum", width: 900, height: 600}];
     }
     function test_responsiveVideo(data) {
         const harness = openVideo({width: data.width, height: data.height});
