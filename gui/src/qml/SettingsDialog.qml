@@ -1566,315 +1566,154 @@ FocusScope {
                 // Controllers
                 Flickable {
                     id: controllersFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "controllersFlick"
+                    anchors.fill: parent
+                    anchors.margins: 16
                     clip: true
-                    contentWidth: Math.max(width, controllersLayout.width)
+                    contentWidth: width
                     contentHeight: controllersLayout.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        id: controllersScrollbar
-                        policy: ScrollBar.AlwaysOn
-                        visible: controllersFlick.contentHeight > controllersFlick.height
-                    }
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
                     ColumnLayout {
                         id: controllersLayout
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        spacing: 10
-                        C.Button {
-                            Layout.alignment: Qt.AlignHCenter
-                            id: controllerMappingChange
-                            firstInFocusChain: true
-                            text: "Change Controller Mapping"
-                            onClicked: controllerMappingDialog.show({
-                                reset: false
-                            });
-                        }
-                        C.Button {
-                            Layout.alignment: Qt.AlignHCenter
-                            id: controllerMappingReset
-                            text: "Reset Controller Mapping"
-                            onClicked: controllerMappingDialog.show({
-                                reset: true
-                            });
-                        }
-
-                        RowLayout {
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Background Controller Events:")
+                        width: Math.max(0, controllersFlick.width - 16)
+                        spacing: 14
+                        Label { text: qsTr("Controller input"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                spacing: 12
+                            RowLayout {
+                                Layout.fillWidth: true
+                                C.Button {
+                                    id: controllerMappingChange
+                                    objectName: "controllerMappingChange"
+                                    firstInFocusChain: true
+                                    text: qsTr("Change controller mapping")
+                                    font.pixelSize: 14
+                                    onClicked: controllerMappingDialog.show({ reset: false })
+                                }
+                                C.Button {
+                                    id: controllerMappingReset
+                                    objectName: "controllerMappingReset"
+                                    text: qsTr("Reset controller mapping")
+                                    font.pixelSize: 14
+                                    onClicked: controllerMappingDialog.show({ reset: true })
+                                }
                             }
                             C.CheckBox {
-                                id: backgroundController
-                                text: qsTr("Process controller input when application is in background")
-                                checked: {
-                                    dialog.backend.settings.allowJoystickBackgroundEvents
-                                }
+                                objectName: "allowJoystickBackgroundEvents"
+                                text: qsTr("Process controller input in the background. Default: On")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.allowJoystickBackgroundEvents
                                 onToggled: dialog.backend.settings.allowJoystickBackgroundEvents = checked
                             }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("(Checked)")
-                            }
-                        }
-                        RowLayout {
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Dpad Touchpad Emulation")
-                            }
                             C.CheckBox {
-                                id: dpadTouch
-                                checked: dialog.backend.settings.dpadTouchEnabled
-                                onToggled: dialog.backend.settings.dpadTouchEnabled = !dialog.backend.settings.dpadTouchEnabled
-                                KeyNavigation.priority: KeyNavigation.BeforeItem
-                                KeyNavigation.up: backgroundController
-                                KeyNavigation.left: dpadTouch
-                                KeyNavigation.right: dpadTouch
-                                KeyNavigation.down: {
-                                    if(touchIncrement.visible)
-                                        touchIncrement
-                                    else
-                                        posButtons
-                                }
-                            }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("(Checked)")
-                            }
-                        }
-
-                        RowLayout {
-                            id: touchIncrementLayout
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            visible: dialog.backend.settings.dpadTouchEnabled
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Dpad Touch Increment:")
-                            }
-
-                            C.Slider {
-                                id: touchIncrement
-                                Layout.preferredWidth: 250
-                                from: 1
-                                to: 1079
-                                stepSize: 1
-                                value: dialog.backend.settings.dpadTouchIncrement
-                                onMoved: dialog.backend.settings.dpadTouchIncrement = value
-
-                                Label {
-                                    anchors {
-                                        left: parent.right
-                                        verticalCenter: parent.verticalCenter
-                                        leftMargin: 10
-                                    }
-                                    text: qsTr("%1 mm").arg(parent.value / 100)
-                                }
-                                KeyNavigation.priority: KeyNavigation.BeforeItem
-                                KeyNavigation.up: dpadTouch
-                                KeyNavigation.down: {
-                                    if(dpadShortcut1.visible)
-                                        dpadShortcut1
-                                    else
-                                        posButtons;
-                                }
-                            }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                Layout.leftMargin: 100
-                                text: qsTr("(0.3 mm)")
-                            }
-                        }
-                        RowLayout {
-                            spacing: 10
-                            visible: dialog.backend.settings.dpadTouchEnabled
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Dpad Regular/Touch Combo:")
-                            }
-
-                            C.ComboBox {
-                                id: dpadShortcut1
-                                implicitContentWidthPolicy: ComboBox.WidestText
-                                firstInFocusChain: false
-                                model: [qsTr("Not Used"), qsTr("Cross"), qsTr("Moon"), qsTr("Box"), qsTr("Pyramid"), qsTr("Dpad Left"), qsTr("Dpad Right"), qsTr("Dpad Up"), qsTr("Dpad Down"), qsTr("L1"), qsTr("R1"), qsTr("L3"), qsTr("R3"), qsTr("Options"), qsTr("Share"), qsTr("Touchpad"), qsTr("PS")]
-                                currentIndex: dialog.backend.settings.dpadTouchShortcut1
-                                onActivated: index => dialog.backend.settings.dpadTouchShortcut1 = index
-                                KeyNavigation.priority: {
-                                    if(!popup.visible)
-                                        KeyNavigation.BeforeItem
-                                    else
-                                        KeyNavigation.AfterItem
-                                }
-                                KeyNavigation.up: touchIncrement
-                                KeyNavigation.down: posButtons
-                                KeyNavigation.left: dpadShortcut1
-                                KeyNavigation.right: dpadShortcut2
-                            }
-
-                            C.ComboBox {
-                                id: dpadShortcut2
-                                implicitContentWidthPolicy: ComboBox.WidestText
-                                firstInFocusChain: false
-                                model: [qsTr("Not Used"), qsTr("Cross"), qsTr("Moon"), qsTr("Box"), qsTr("Pyramid"), qsTr("Dpad Left"), qsTr("Dpad Right"), qsTr("Dpad Up"), qsTr("Dpad Down"), qsTr("L1"), qsTr("R1"), qsTr("L3"), qsTr("R3"), qsTr("Options"), qsTr("Share"), qsTr("Touchpad"), qsTr("PS")]
-                                currentIndex: dialog.backend.settings.dpadTouchShortcut2
-                                onActivated: index => dialog.backend.settings.dpadTouchShortcut2 = index
-                                KeyNavigation.priority: {
-                                    if(!popup.visible)
-                                        KeyNavigation.BeforeItem
-                                    else
-                                        KeyNavigation.AfterItem
-                                }
-                                KeyNavigation.up: touchIncrement
-                                KeyNavigation.down: posButtons
-                                KeyNavigation.left: dpadShortcut1
-                                KeyNavigation.right: dpadShortcut3
-                            }
-
-                            C.ComboBox {
-                                id: dpadShortcut3
-                                implicitContentWidthPolicy: ComboBox.WidestText
-                                firstInFocusChain: false
-                                model: [qsTr("Not Used"), qsTr("Cross"), qsTr("Moon"), qsTr("Box"), qsTr("Pyramid"), qsTr("Dpad Left"), qsTr("Dpad Right"), qsTr("Dpad Up"), qsTr("Dpad Down"), qsTr("L1"), qsTr("R1"), qsTr("L3"), qsTr("R3"), qsTr("Options"), qsTr("Share"), qsTr("Touchpad"), qsTr("PS")]
-                                currentIndex: dialog.backend.settings.dpadTouchShortcut3
-                                onActivated: index => dialog.backend.settings.dpadTouchShortcut3 = index
-                                KeyNavigation.priority: {
-                                    if(!popup.visible)
-                                        KeyNavigation.BeforeItem
-                                    else
-                                        KeyNavigation.AfterItem
-                                }
-                                KeyNavigation.up: touchIncrement
-                                KeyNavigation.down: posButtons
-                                KeyNavigation.left: dpadShortcut2
-                                KeyNavigation.right: dpadShortcut4
-                            }
-
-                            C.ComboBox {
-                                id: dpadShortcut4
-                                implicitContentWidthPolicy: ComboBox.WidestText
-                                firstInFocusChain: false
-                                model: [qsTr("Not Used"), qsTr("Cross"), qsTr("Moon"), qsTr("Box"), qsTr("Pyramid"), qsTr("Dpad Left"), qsTr("Dpad Right"), qsTr("Dpad Up"), qsTr("Dpad Down"), qsTr("L1"), qsTr("R1"), qsTr("L3"), qsTr("R3"), qsTr("Options"), qsTr("Share"), qsTr("Touchpad"), qsTr("PS")]
-                                currentIndex: dialog.backend.settings.dpadTouchShortcut4
-                                onActivated: index => dialog.backend.settings.dpadTouchShortcut4 = index
-                                KeyNavigation.priority: {
-                                    if(!popup.visible)
-                                        KeyNavigation.BeforeItem
-                                    else
-                                        KeyNavigation.AfterItem
-                                }
-                                KeyNavigation.up: touchIncrement
-                                KeyNavigation.down: posButtons
-                                KeyNavigation.left: dpadShortcut3
-                                KeyNavigation.right: dpadShortcut4
-                            }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("(L1+R1+dpad Up)")
-                            }
-                        }
-                        RowLayout {
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Buttons By Position:")
-                            }
-
-                            C.CheckBox {
-                                id: posButtons
-                                text: qsTr("Use buttons by position instead of by label")
+                                objectName: "buttonsByPosition"
+                                text: qsTr("Interpret buttons by position. Default: Off")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
                                 checked: dialog.backend.settings.buttonsByPosition
                                 onToggled: dialog.backend.settings.buttonsByPosition = checked
-                                KeyNavigation.priority: KeyNavigation.BeforeItem
-                                KeyNavigation.up: {
-                                    if(dpadShortcut1.visible)
-                                        dpadShortcut1
-                                    else
-                                        dpadTouch;
-                                }
-                                KeyNavigation.down: rumbleHaptics
-                                KeyNavigation.left: posButtons
-                                KeyNavigation.right: posButtons
                             }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("(Unchecked)")
                             }
                         }
-                        RowLayout {
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("Rumble Haptics:")
+                        Label { text: qsTr("Touchpad"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                spacing: 12
+                            C.CheckBox {
+                                objectName: "dpadTouchEnabled"
+                                text: qsTr("D-pad touchpad emulation. Default: On")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.dpadTouchEnabled
+                                onToggled: dialog.backend.settings.dpadTouchEnabled = checked
                             }
-
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                visible: dialog.backend.settings.dpadTouchEnabled
+                                Label { text: qsTr("D-pad touch increment. Default: 0.3 mm"); font.pixelSize: 14 }
+                                C.Slider {
+                                    id: touchIncrement
+                                    objectName: "dpadTouchIncrement"
+                                    Accessible.name: qsTr("D-pad touch increment")
+                                    Layout.fillWidth: true
+                                    from: 1
+                                    to: 1079
+                                    stepSize: 1
+                                    value: dialog.backend.settings.dpadTouchIncrement
+                                    onMoved: dialog.backend.settings.dpadTouchIncrement = value
+                                }
+                                Label { objectName: "dpadTouchIncrementValue"; text: qsTr("%1 mm").arg(touchIncrement.value / 100); font.pixelSize: 14 }
+                                Label { text: qsTr("D-pad regular/touch shortcut. Default: L1 + R1 + D-pad Up"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                                GridLayout {
+                                    Layout.fillWidth: true
+                                    columns: controllersFlick.width < 700 ? 2 : 4
+                                    Repeater {
+                                        model: 4
+                                        C.ComboBox {
+                                            required property int index
+                                            objectName: "dpadTouchShortcut" + (index + 1)
+                                            Accessible.name: qsTr("D-pad shortcut button %1").arg(index + 1)
+                                            font.pixelSize: 14
+                                            Layout.fillWidth: true
+                                            Layout.minimumWidth: 0
+                                            Layout.preferredWidth: 150
+                                            model: [qsTr("Not Used"), qsTr("Cross"), qsTr("Moon"), qsTr("Box"), qsTr("Pyramid"), qsTr("Dpad Left"), qsTr("Dpad Right"), qsTr("Dpad Up"), qsTr("Dpad Down"), qsTr("L1"), qsTr("R1"), qsTr("L3"), qsTr("R3"), qsTr("Options"), qsTr("Share"), qsTr("Touchpad"), qsTr("PS")]
+                                            currentIndex: dialog.backend.settings["dpadTouchShortcut" + (index + 1)]
+                                            onActivated: value => dialog.backend.settings["dpadTouchShortcut" + (index + 1)] = value
+                                        }
+                                    }
+                                }
+                            }
+                            }
+                        }
+                        Label { text: qsTr("Haptics"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                spacing: 12
+                            Label { text: qsTr("Rumble haptics. Default: Normal"); font.pixelSize: 14 }
                             C.ComboBox {
-                                id: rumbleHaptics
-                                Layout.preferredWidth: 400
+                                objectName: "rumbleHapticsIntensity"
+                                Accessible.name: qsTr("Rumble haptics intensity")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
                                 model: [qsTr("Off"), qsTr("Very Weak"), qsTr("Weak"), qsTr("Normal"), qsTr("Strong"), qsTr("Very Strong")]
                                 currentIndex: dialog.backend.settings.rumbleHapticsIntensity
-                                onActivated: (index) => dialog.backend.settings.rumbleHapticsIntensity = index;
+                                onActivated: index => dialog.backend.settings.rumbleHapticsIntensity = index
                             }
-
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("(Normal)")
-                            }
-                        }
-                        RowLayout {
-                            spacing: 10
-                            Layout.alignment: Qt.AlignHCenter
-                            Label {
-                                Layout.alignment: Qt.AlignRight
-                                text: qsTr("True Haptics Intensity:")
-                            }
-
+                            Label { text: qsTr("True haptics intensity. Default: Console setting"); font.pixelSize: 14 }
                             C.Slider {
                                 id: hapticOverride
-                                Layout.preferredWidth: 250
+                                objectName: "hapticOverride"
+                                Accessible.name: qsTr("True haptics intensity")
+                                Layout.fillWidth: true
                                 from: 0
                                 to: 2
                                 stepSize: 0.1
                                 value: dialog.backend.settings.hapticOverride
-                                onMoved: dialog.backend.settings.hapticOverride = value;
+                                onMoved: dialog.backend.settings.hapticOverride = value
                                 lastInFocusChain: true
-                                Label {
-                                    anchors {
-                                        left: parent.right
-                                        verticalCenter: parent.verticalCenter
-                                        leftMargin: 10
-                                    }
-                                    text: {
-                                        if(parent.value > 0.99 && parent.value < 1.01)
-                                            qsTr("console setting")
-                                        else
-                                            (parent.value * 100).toFixed(0) + qsTr(" % console setting")
-                                    }
-                                }
                             }
-
                             Label {
-                                Layout.alignment: Qt.AlignRight
-                                Layout.leftMargin: 250
-                                text: qsTr("(console setting)")
+                                objectName: "hapticOverrideValue"
+                                font.pixelSize: 14
+                                text: hapticOverride.value > 0.99 && hapticOverride.value < 1.01 ? qsTr("Console setting") : qsTr("%1% of console setting").arg((hapticOverride.value * 100).toFixed(0))
+                            }
                             }
                         }
                     }
@@ -1883,144 +1722,135 @@ FocusScope {
 
             Item {
                 // Remote (PSN and Hole Punching)
+                id: remotePage
+                readonly property bool credentialsComplete: !!(dialog.backend.settings.psnRefreshToken
+                    && dialog.backend.settings.psnAuthToken && dialog.backend.settings.psnAuthTokenExpiry
+                    && dialog.backend.settings.psnAccountId)
+                onCredentialsCompleteChanged: {
+                    if (openPsnLogin.activeFocus || resetPsnTokens.activeFocus)
+                        Qt.callLater(function() {
+                            dialog.firstRemoteFocusableItem().forceActiveFocus(Qt.TabFocusReason);
+                        });
+                }
                 Flickable {
                     id: remoteFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "remotePage"
+                    anchors.fill: parent
                     clip: true
-                    contentWidth: Math.max(width, remoteGrid.width)
-                    contentHeight: remoteGrid.y + remoteGrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: remoteFlick.contentHeight > remoteFlick.height
-                    }
-                    GridLayout {
-                        id: remoteGrid
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                            topMargin: 30
-                        }
-                        columns: 3
-                        rowSpacing: 20
-                        columnSpacing: 10
-
-                        C.Button {
-                            id: openPsnLogin
-                            firstInFocusChain: visible
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.columnSpan: 3
-
-                            text: qsTr("Login to PSN")
-                            onClicked: {
-                                dialog.navigation.showPSNTokenDialog(false)
-                            }
-                            Material.roundedScale: Material.SmallScale
-                            visible: !dialog.backend.settings.psnRefreshToken || !dialog.backend.settings.psnAuthToken || !dialog.backend.settings.psnAuthTokenExpiry || !dialog.backend.settings.psnAccountId
-                        }
-
-                        C.Button {
-                            id: resetPsnTokens
-                            topPadding: 26
-                            leftPadding: 30
-                            rightPadding: 30
-                            bottomPadding: 26
-                            text: qsTr("Clear PSN Token")
-                            firstInFocusChain: !openPsnLogin.visible
-                            Layout.alignment: Qt.AlignHCenter
-                            Layout.columnSpan: 3
-                            onClicked: {
-                                dialog.backend.settings.psnRefreshToken = ""
-                                dialog.backend.settings.psnAuthToken = ""
-                                dialog.backend.settings.psnAuthTokenExpiry = ""
-                                dialog.backend.settings.psnAccountId = ""
-                                openPsnLogin.forceActiveFocus(Qt.TabFocusReason);
-                            }
-                            Material.roundedScale: Material.SmallScale
-                            visible: dialog.backend.settings.psnRefreshToken && dialog.backend.settings.psnAuthToken && dialog.backend.settings.psnAuthTokenExpiry && dialog.backend.settings.psnAccountId
-                        }
-
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Hole Punching Port Guessing:")
-                        }
-
-                        C.CheckBox {
-                            id: holePunchGuessingCheckbox
-                            text: qsTr("Force STUN port guessing")
-                            checked: dialog.backend.settings.portGuessingEnabled
-                            onToggled: dialog.backend.settings.portGuessingEnabled = checked
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(Unchecked)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Port Guess Count:")
-                        }
-
-                        C.Slider {
-                            id: portGuessCountSlider
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 75
-                            stepSize: 1
-                            value: dialog.backend.settings.portGuessCount
-                            onMoved: dialog.backend.settings.portGuessCount = value
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                    contentWidth: width
+                    contentHeight: remoteLayout.height
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
+                        id: remoteLayout
+                        width: Math.max(0, remoteFlick.width - 14)
+                        spacing: 16
+                        Label { text: qsTr("Remote"); font.pixelSize: 24; font.bold: true }
+                        Label { text: qsTr("PSN access"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            font.pixelSize: 14
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                Label {
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.Wrap
+                                    text: remotePage.credentialsComplete ? qsTr("PSN account configured.") : qsTr("Log in to configure remote access through PSN.")
                                 }
-                                text: parent.value + qsTr(" guesses")
-                            }
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            Layout.leftMargin: 100
-                            text: qsTr("(75)")
-                        }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Port Guess Socket Count:")
-                        }
-
-                        C.Slider {
-                            id: portGuessSocketSlider
-                            Layout.preferredWidth: 250
-                            from: 0
-                            to: 500
-                            stepSize: 1
-                            value: dialog.backend.settings.portGuessSocketCount
-                            onMoved: dialog.backend.settings.portGuessSocketCount = value
-                            lastInFocusChain: true
-
-                            Label {
-                                anchors {
-                                    left: parent.right
-                                    verticalCenter: parent.verticalCenter
-                                    leftMargin: 10
+                                C.Button {
+                                    id: openPsnLogin
+                                    objectName: "openPsnLogin"
+                                    firstInFocusChain: visible
+                                    text: qsTr("Login to PSN")
+                                    Accessible.name: text
+                                    visible: !remotePage.credentialsComplete
+                                    onClicked: dialog.navigation.showPSNTokenDialog(false)
                                 }
-                                text: parent.value + qsTr(" sockets")
+                                C.Button {
+                                    id: resetPsnTokens
+                                    objectName: "resetPsnTokens"
+                                    firstInFocusChain: visible
+                                    text: qsTr("Clear PSN Token")
+                                    Accessible.name: text
+                                    visible: remotePage.credentialsComplete
+                                    onClicked: {
+                                        dialog.backend.settings.psnRefreshToken = "";
+                                        dialog.backend.settings.psnAuthToken = "";
+                                        dialog.backend.settings.psnAuthTokenExpiry = "";
+                                        dialog.backend.settings.psnAccountId = "";
+                                        openPsnLogin.forceActiveFocus(Qt.TabFocusReason);
+                                    }
+                                }
                             }
                         }
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("(250)")
-                            Layout.leftMargin: 100
+                        Label { text: qsTr("Port guessing"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            font.pixelSize: 14
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                spacing: 12
+                                C.CheckBox {
+                                    id: holePunchGuessingCheckbox
+                                    objectName: "portGuessingEnabled"
+                                    Layout.fillWidth: true
+                                    contentItem: Label { text: parent.text; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                    text: qsTr("Force STUN port guessing")
+                                    Accessible.name: text
+                                    checked: dialog.backend.settings.portGuessingEnabled
+                                    onToggled: dialog.backend.settings.portGuessingEnabled = checked
+                                }
+                                Label { text: qsTr("Default: Unchecked"); opacity: 0.65 }
+                                Label { text: qsTr("Port Guess Count"); Layout.fillWidth: true; wrapMode: Text.Wrap }
+                                C.Slider {
+                                    id: portGuessCountSlider
+                                    objectName: "portGuessCount"
+                                    Accessible.name: qsTr("Port Guess Count")
+                                    Accessible.description: qsTr("Guesses, default 75")
+                                    Layout.fillWidth: true
+                                    from: 0
+                                    to: 75
+                                    stepSize: 1
+                                    value: dialog.backend.settings.portGuessCount
+                                    onMoved: dialog.backend.settings.portGuessCount = value
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Label {
+                                        objectName: "portGuessCountValue"
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                        text: portGuessCountSlider.value + qsTr(" guesses")
+                                    }
+                                    Label { text: qsTr("Default: 75"); opacity: 0.65 }
+                                }
+                                Label { text: qsTr("Port Guess Socket Count"); Layout.fillWidth: true; wrapMode: Text.Wrap }
+                                C.Slider {
+                                    id: portGuessSocketSlider
+                                    objectName: "portGuessSocketCount"
+                                    Accessible.name: qsTr("Port Guess Socket Count")
+                                    Accessible.description: qsTr("Sockets, default 250")
+                                    Layout.fillWidth: true
+                                    from: 0
+                                    to: 500
+                                    stepSize: 1
+                                    value: dialog.backend.settings.portGuessSocketCount
+                                    onMoved: dialog.backend.settings.portGuessSocketCount = value
+                                    lastInFocusChain: true
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Label {
+                                        objectName: "portGuessSocketCountValue"
+                                        Layout.fillWidth: true
+                                        wrapMode: Text.Wrap
+                                        text: portGuessSocketSlider.value + qsTr(" sockets")
+                                    }
+                                    Label { text: qsTr("Default: 250"); opacity: 0.65 }
+                                }
+                            }
                         }
                     }
                 }
@@ -2030,85 +1860,106 @@ FocusScope {
                 // Config (Options such as Import/Export and Logging)
                 Flickable {
                     id: configFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "configFlick"
+                    anchors.fill: parent
                     clip: true
-                    contentWidth: Math.max(width, configGrid.width)
-                    contentHeight: configGrid.y + configGrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: configFlick.contentHeight > configFlick.height
-                    }
-                    GridLayout {
+                    contentWidth: width
+                    contentHeight: configGrid.height + 32
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
                         id: configGrid
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                            topMargin: 30
-                        }
-                        columns: 1
-                        rowSpacing: 20
-                        columnSpacing: 10
-
-                        Label {
-                            text: {
-                                if(dialog.backend.settings.currentProfile)
-                                    qsTr("Current Profile: ") + dialog.backend.settings.currentProfile
-                                else
-                                    qsTr("Current Profile: default")
+                        x: 16; y: 16
+                        width: Math.max(0, configFlick.width - 48)
+                        spacing: 14
+                        Label { text: qsTr("Profiles"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: 24
+                                Label {
+                                    objectName: "configProfile"
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.Wrap
+                                    font.pixelSize: 14
+                                    text: qsTr("Current profile: %1").arg(dialog.backend.settings.streamerMode ? qsTr("Hidden") : (dialog.backend.settings.currentProfile || qsTr("default")))
+                                }
+                                C.Button {
+                                    id: profile
+                                    objectName: "manageProfiles"
+                                    text: qsTr("Manage profiles")
+                                    Accessible.name: text
+                                    firstInFocusChain: true
+                                    font.pixelSize: 14
+                                    onClicked: dialog.navigation.showProfileDialog()
+                                    Material.roundedScale: Material.SmallScale
+                                }
                             }
                         }
-
-                        C.Button {
-                            id: profile
-                            firstInFocusChain: true
-                            text: qsTr("Manage Profiles")
-                            onClicked: {
-                                dialog.navigation.showProfileDialog()
+                        Label { text: qsTr("Settings files"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: 12
+                                C.Button {
+                                    id: exportButton
+                                    objectName: "exportSettings"
+                                    Layout.fillWidth: true
+                                    text: qsTr("Export settings to file")
+                                    Accessible.name: text
+                                    font.pixelSize: 14
+                                    onClicked: dialog.backend.settings.exportSettings()
+                                    Material.roundedScale: Material.SmallScale
+                                }
+                                C.Button {
+                                    id: importButton
+                                    objectName: "importSettings"
+                                    Layout.fillWidth: true
+                                    text: qsTr("Import settings from file")
+                                    Accessible.name: text
+                                    font.pixelSize: 14
+                                    onClicked: dialog.backend.settings.importSettings()
+                                    Material.roundedScale: Material.SmallScale
+                                }
                             }
-                            Material.roundedScale: Material.SmallScale
                         }
-
-                    C.Button {
-                        id: exportButton
-                        text: qsTr("Export settings to file")
-                        onClicked: {
-                            dialog.backend.settings.exportSettings();
-                        }
-                        Material.roundedScale: Material.SmallScale
-                    }
-
-                    C.Button {
-                        id: importButton
-                        text: qsTr("Import settings from file")
-                        onClicked: {
-                            dialog.backend.settings.importSettings();
-                        }
-                        Material.roundedScale: Material.SmallScale
-                    }
-
-                    C.Button {
-                        id: aboutButton
-                        text: qsTr("About %1-ng").arg(Qt.application.name)
-                        onClicked: aboutDialog.open()
-                        Material.roundedScale: Material.SmallScale
-                    }
-
-                    C.CheckBox {
-                        text: qsTr("Sanitize Logs (checked)")
-                        checked: dialog.backend.settings.logSanitize
-                        onToggled: dialog.backend.settings.logSanitize = checked
-                    }
-
-                        C.CheckBox {
-                            text: qsTr("Verbose Logging (unchecked)")
-                            checked: dialog.backend.settings.logVerbose
-                            lastInFocusChain: true
-                            onToggled: dialog.backend.settings.logVerbose = checked
+                        Label { text: qsTr("Diagnostics"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                C.CheckBox {
+                                    objectName: "logSanitize"
+                                    text: qsTr("Sanitize logs · Default: On")
+                                    Accessible.name: qsTr("Sanitize logs")
+                                    font.pixelSize: 14
+                                    checked: dialog.backend.settings.logSanitize
+                                    onToggled: dialog.backend.settings.logSanitize = checked
+                                }
+                                C.CheckBox {
+                                    objectName: "logVerbose"
+                                    text: qsTr("Verbose logging · Default: Off")
+                                    Accessible.name: qsTr("Verbose logging")
+                                    font.pixelSize: 14
+                                    checked: dialog.backend.settings.logVerbose
+                                    onToggled: dialog.backend.settings.logVerbose = checked
+                                }
+                                C.Button {
+                                    id: aboutButton
+                                    objectName: "aboutSettings"
+                                    text: qsTr("About %1-ng").arg(Qt.application.name)
+                                    Accessible.name: text
+                                    font.pixelSize: 14
+                                    lastInFocusChain: true
+                                    onClicked: aboutDialog.open()
+                                    Material.roundedScale: Material.SmallScale
+                                }
+                            }
                         }
                     }
                 }
@@ -2128,6 +1979,7 @@ FocusScope {
                 interval: 100
                 running: false
                 onTriggered: {
+                    if (!controllerMappingDialog.visible || !dialog.backend.controllerMappingInProgress) return;
                     if(controllerMappingDialog.resetMapping)
                     {
                         if(!dialog.backend.controllerMappingDefaultMapping)
@@ -2151,6 +2003,7 @@ FocusScope {
 
         Dialog {
             id: aboutDialog
+            objectName: "aboutDialog"
             parent: Overlay.overlay
             x: Math.round((dialog.navigation.width - width) / 2)
             y: Math.round((dialog.navigation.height - height) / 2)
@@ -2262,6 +2115,9 @@ FocusScope {
 
         Dialog {
             id: controllerMappingDialog
+            objectName: "controllerCapture"
+            width: 600
+            onAboutToHide: openTimer.stop()
             property bool resetFocus: true
             property bool resetMapping: false
             parent: Overlay.overlay
@@ -2300,14 +2156,22 @@ FocusScope {
                 resetMapping = opts.reset;
                 open();
             }
-            Label {
+            contentItem: Label {
                 id: controllerLabel
+                wrapMode: Text.Wrap
                 text: qsTr("Choose the controller by pressing any button on the controller")
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Escape) controllerMappingDialog.close();
+                    event.accepted = true;
+                }
+                Keys.onReleased: event => event.accepted = true
             }
         }
 
         Dialog {
             id: steamControllerMappingDialog
+            objectName: "steamControllerNotice"
+            width: 600
             property bool resetMapping: false
             parent: Overlay.overlay
             x: Math.round((dialog.navigation.width - width) / 2)
@@ -2328,7 +2192,7 @@ FocusScope {
             }
             Material.roundedScale: Material.MediumScale
 
-            Label {
+            contentItem: Label {
                 id: steamLabel
                 wrapMode: TextEdit.Wrap
                 text: qsTr("This controller is managed by Steam.\nPlease use Steam to map controller or disable Steam Input for the controller before mapping here.")
@@ -2338,16 +2202,27 @@ FocusScope {
         }
 
         Connections {
+            target: dialog.backend.settings
+            function onCurrentProfileChanged() {
+                if (controllerMappingDialog.visible) controllerMappingDialog.close();
+                if (steamControllerMappingDialog.visible) steamControllerMappingDialog.close();
+            }
+        }
+
+        Connections {
             target: dialog.backend
 
             function onControllerMappingInProgressChanged()
             {
-                if(dialog.backend.controllerMappingInProgress)
+                if (dialog.backend.controllerMappingInProgress && controllerMappingDialog.visible)
                     openTimer.start();
+                else
+                    openTimer.stop();
             }
 
             function onControllerMappingSteamControllerSelected()
             {
+                if (!controllerMappingDialog.visible) return;
                 controllerMappingDialog.resetFocus = false;
                 quitControllerMapping = false;
                 steamControllerMappingDialog.resetMapping = controllerMappingDialog.resetMapping;

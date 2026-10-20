@@ -1172,7 +1172,7 @@ void QmlBackend::unhideHost(const QString &mac_string)
 {
     QByteArray mac_array = QByteArray::fromHex(mac_string.toUtf8());
     const char *mac_ptr = mac_array.constData();
-    if (strlen(mac_ptr) != 6)
+    if (mac_array.size() != 6)
     {
         qCCritical(chiakiGui) << " Aborting hidden host creation because mac string couldn't be converted to a valid host mac!";
         return;
