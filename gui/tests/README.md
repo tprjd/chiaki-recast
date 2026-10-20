@@ -158,4 +158,4 @@ synthetic test inputs, not a copy of the native defaults specification.
 
 `SettingsGeneral` checks category selection, General setting writes, all four
 shortcut choices, device conditions, privacy, log access, popup Escape handling,
-and focus visibility at 1280, 800, and 390 pixels wide.
+and focus visibility at 1280 and 900 pixels wide.

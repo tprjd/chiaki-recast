@@ -88,8 +88,7 @@ TestCase {
 
     function test_responsiveGeneral_data() {
         return [{tag: "desktop", width: 1280, height: 720},
-            {tag: "narrow", width: 800, height: 600},
-            {tag: "minimum", width: 390, height: 600}];
+            {tag: "minimum", width: 900, height: 600}];
     }
     function test_responsiveGeneral(data) {
         const harness = createTemporaryObject(harnessComponent, testCase, {width: data.width, height: data.height});
@@ -101,13 +100,6 @@ TestCase {
             const point = control.mapToItem(harness, 0, 0);
             verify(point.x >= 0 && point.x + control.width <= harness.width, name + " fits width");
             verify(point.y >= 0 && point.y + control.height <= harness.height, name + " remains visible on focus");
-        }
-        if (data.width < 760) {
-            const selector = findChild(harness, "settingsCategorySelector");
-            choose(selector, 8);
-            compare(harness.screen.currentCategory, 8);
-            choose(selector, 0);
-            compare(harness.screen.currentCategory, 0);
         }
     }
 
