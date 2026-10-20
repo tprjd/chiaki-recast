@@ -59,7 +59,9 @@ FocusScope {
     function ensureItemVisibleInFlick(flick, item) {
         if (!flick || !item || !flickContainsItem(flick, item))
             return;
-        const target = flickVisibilityTarget(flick, item);
+        let target = flickVisibilityTarget(flick, item);
+        if (target.height > flick.height)
+            target = item;
         const top = target.mapToItem(flick.contentItem, 0, 0).y;
         const bottom = top + target.height;
         if (top < flick.contentY)
@@ -478,308 +480,263 @@ FocusScope {
                 // Video
                 Flickable {
                     id: videoFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "videoFlick"
+                    anchors.fill: parent
+                    anchors.margins: 16
                     clip: true
-                    contentWidth: Math.max(width, videoGrid.width)
+                    contentWidth: width
                     contentHeight: videoGrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: videoFlick.contentHeight > videoFlick.height
-                    }
-                    GridLayout {
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
                         id: videoGrid
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        columns: 3
-                        rowSpacing: 10
-                        columnSpacing: 20
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Hardware Decoder:")
-                        }
-
-                    RowLayout {
-                        Layout.preferredWidth: 400
-                        spacing: 12
-
-                        C.ComboBox {
-                            id: hwDecoderCombo
-                            Layout.preferredWidth: 220
-                            model: dialog.backend.settings.availableDecoders
-                            currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.decoder))
-                            KeyNavigation.priority: KeyNavigation.BeforeItem
-                            KeyNavigation.up: hwDecoderCombo
-                            KeyNavigation.right: zeroCopyCheck
-                            KeyNavigation.down: windowTypeCombo
-                            onActivated: (index) => dialog.backend.settings.decoder = index ? model[index] : ""
-                        }
-
-                        Label {
-                            text: qsTr("Zero-Copy")
-                        }
-
-                        C.CheckBox {
-                            id: zeroCopyCheck
-                            KeyNavigation.priority: KeyNavigation.BeforeItem
-                            KeyNavigation.up: zeroCopyCheck
-                            KeyNavigation.left: hwDecoderCombo
-                            KeyNavigation.down: windowTypeCombo
-                            checked: dialog.backend.settings.useZeroCopy
-                            onToggled: dialog.backend.settings.useZeroCopy = checked
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Auto / On)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Window Type:")
-                    }
-
-                    C.ComboBox {
-                        id: windowTypeCombo
-                        Layout.preferredWidth: 400
-                        popup.width: 500
-                        model: [qsTr("Stream Resolution"), qsTr("Custom Resolution"), qsTr("Adjust Resolution Manually"), qsTr("Fullscreen"), qsTr("Zoom [adjust zoom using slider in stream menu]"), qsTr("Stretch")]
-                        currentIndex: dialog.backend.settings.windowType
-                        onActivated: (index) => dialog.backend.settings.windowType = index;
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Fullscreen)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Custom Resolution Width")
-                        visible: dialog.backend.settings.windowType == 1
-                    }
-
-                    C.TextField {
-                        id: customResolutionWidth
-                        Layout.preferredWidth: 400
-                        visible: dialog.backend.settings.windowType == 1
-                        text: dialog.backend.settings.customResolutionWidth
-                        Material.accent: text && !validate() ? Material.Red : undefined
-                        onEditingFinished: {
-                            if (validate()) {
-                                dialog.backend.settings.customResolutionWidth = parseInt(text);
-                            } else {
-                                dialog.backend.settings.customResolutionWidth = 0;
-                                text = "";
+                        width: Math.max(0, videoFlick.width - 16)
+                        spacing: 14
+                        Label { text: qsTr("Decoding"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: videoFlick.width < 650 ? 1 : 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                            Label { text: qsTr("Hardware decoder\nDefault: Auto"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            C.ComboBox {
+                                id: hwDecoderCombo
+                                objectName: "decoder"
+                                Accessible.name: qsTr("Hardware decoder")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                Layout.preferredWidth: 300
+                                font.pixelSize: 14
+                                popup.width: width
+                                model: dialog.backend.settings.availableDecoders
+                                currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.decoder))
+                                onActivated: index => { if (index >= 0 && index < model.length) dialog.backend.settings.decoder = index ? model[index] : ""; }
+                                firstInFocusChain: true
+                            }
+                            C.CheckBox {
+                                objectName: "useZeroCopy"
+                                Layout.columnSpan: videoFlick.width < 650 ? 1 : 2
+                                Layout.fillWidth: true
+                                font.pixelSize: 14
+                                text: qsTr("Zero-copy, default: On")
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.useZeroCopy
+                                onToggled: dialog.backend.settings.useZeroCopy = checked
+                            }
                             }
                         }
-                        function validate() {
-                            var num = parseInt(text);
-                            return num >= 0 && num <= 9999;
-                        }
-                    }
+                        Label { text: qsTr("Stream window"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: videoFlick.width < 650 ? 1 : 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                            Label { text: qsTr("Window type\nDefault: Fullscreen"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            C.ComboBox {
+                                id: windowTypeCombo
+                                objectName: "windowType"
+                                Accessible.name: qsTr("Window type")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                Layout.preferredWidth: 300
+                                font.pixelSize: 14
+                                popup.width: width
+                                model: [qsTr("Stream Resolution"), qsTr("Custom Resolution"), qsTr("Adjust Resolution Manually"), qsTr("Fullscreen"), qsTr("Zoom [adjust zoom using slider in stream menu]"), qsTr("Stretch")]
+                                currentIndex: dialog.backend.settings.windowType
+                                onActivated: index => { dialog.backend.settings.windowType = index; }
 
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(1920)")
-                        visible: dialog.backend.settings.windowType == 1
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Custom Resolution Height")
-                        visible: dialog.backend.settings.windowType == 1
-                    }
-
-                    C.TextField {
-                        id: customResolutionHeight
-                        Layout.preferredWidth: 400
-                        visible: dialog.backend.settings.windowType == 1
-                        text: dialog.backend.settings.customResolutionHeight
-                        Material.accent: text && !validate() ? Material.Red : undefined
-                        onEditingFinished: {
-                            if (validate()) {
-                                dialog.backend.settings.customResolutionHeight = parseInt(text);
-                            } else {
-                                dialog.backend.settings.customResolutionHeight = 0;
-                                text = "";
+                            }
+                            Label { text: qsTr("Custom resolution width\nDefault: 1920 pixels"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true; visible: dialog.backend.settings.windowType === 1 }
+                            C.TextField {
+                                id: customResolutionWidth
+                                objectName: "customResolutionWidth"
+                                Accessible.name: qsTr("Custom resolution width in pixels")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                font.pixelSize: 14
+                                visible: dialog.backend.settings.windowType === 1
+                                text: dialog.backend.settings.customResolutionWidth
+                                property bool edited: false
+                                property string editProfile: ""
+                                onTextEdited: { edited = true; editProfile = dialog.backend.settings.currentProfile; }
+                                Material.accent: text && !validate() ? Material.Red : undefined
+                                function validate() { const number = parseInt(text); return number >= 0 && number <= 9999; }
+                                onEditingFinished: {
+                                    if (!edited) return;
+                                    edited = false;
+                                    if (editProfile === dialog.backend.settings.currentProfile) {
+                                        if (!validate()) {
+                                            dialog.backend.settings.customResolutionWidth = 0;
+                                            text = "";
+                                            return;
+                                        }
+                                        dialog.backend.settings.customResolutionWidth = parseInt(text);
+                                    }
+                                    text = Qt.binding(function() { return dialog.backend.settings.customResolutionWidth; });
+                                }
+                                Connections {
+                                    target: dialog.backend.settings
+                                    function onCurrentProfileChanged() {
+                                        customResolutionWidth.edited = false;
+                                        customResolutionWidth.text = Qt.binding(function() { return dialog.backend.settings.customResolutionWidth; });
+                                    }
+                                }
+                            }
+                            Label { text: qsTr("Custom resolution height\nDefault: 1080 pixels"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true; visible: dialog.backend.settings.windowType === 1 }
+                            C.TextField {
+                                id: customResolutionHeight
+                                objectName: "customResolutionHeight"
+                                Accessible.name: qsTr("Custom resolution height in pixels")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                font.pixelSize: 14
+                                visible: dialog.backend.settings.windowType === 1
+                                text: dialog.backend.settings.customResolutionHeight
+                                property bool edited: false
+                                property string editProfile: ""
+                                onTextEdited: { edited = true; editProfile = dialog.backend.settings.currentProfile; }
+                                Material.accent: text && !validate() ? Material.Red : undefined
+                                function validate() { const number = parseInt(text); return number >= 0 && number <= 9999; }
+                                onEditingFinished: {
+                                    if (!edited) return;
+                                    edited = false;
+                                    if (editProfile === dialog.backend.settings.currentProfile) {
+                                        if (!validate()) {
+                                            dialog.backend.settings.customResolutionHeight = 0;
+                                            text = "";
+                                            return;
+                                        }
+                                        dialog.backend.settings.customResolutionHeight = parseInt(text);
+                                    }
+                                    text = Qt.binding(function() { return dialog.backend.settings.customResolutionHeight; });
+                                }
+                                Connections {
+                                    target: dialog.backend.settings
+                                    function onCurrentProfileChanged() {
+                                        customResolutionHeight.edited = false;
+                                        customResolutionHeight.text = Qt.binding(function() { return dialog.backend.settings.customResolutionHeight; });
+                                    }
+                                }
+                            }
+                            C.CheckBox {
+                                objectName: "fullscreenDoubleClick"
+                                Layout.columnSpan: videoFlick.width < 650 ? 1 : 2
+                                Layout.fillWidth: true
+                                font.pixelSize: 14
+                                text: qsTr("Toggle fullscreen on double-click, default: Off")
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.fullscreenDoubleClick
+                                onToggled: dialog.backend.settings.fullscreenDoubleClick = checked
+                            }
+                            C.CheckBox {
+                                objectName: "hideCursor"
+                                Layout.columnSpan: videoFlick.width < 650 ? 1 : 2
+                                Layout.fillWidth: true
+                                font.pixelSize: 14
+                                text: qsTr("Hide cursor during stream, default: On")
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.hideCursor
+                                onToggled: dialog.backend.settings.hideCursor = checked
+                            }
                             }
                         }
-                        function validate() {
-                            var num = parseInt(text);
-                            return num >= 0 && num <= 9999;
-                        }
-                    }
+                        Label { text: qsTr("Rendering"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: videoFlick.width < 650 ? 1 : 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                            C.CheckBox {
+                                objectName: "vSyncEnabled"
+                                Layout.columnSpan: videoFlick.width < 650 ? 1 : 2
+                                Layout.fillWidth: true
+                                font.pixelSize: 14
+                                text: qsTr("Vertical sync, default: On")
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.vSyncEnabled
+                                onToggled: {
+                                    dialog.backend.settings.vSyncEnabled = checked;
+                                    if (dialog.backend.window.runtimeRendererBackend === 1) dialog.backend.settings.restartApplication();
+                                }
+                            }
+                            Label { text: qsTr("Render preset\nDefault: High Quality"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            C.ComboBox {
+                                id: videoPreset
+                                objectName: "videoPreset"
+                                Accessible.name: qsTr("Render preset")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                Layout.preferredWidth: 300
+                                font.pixelSize: 14
+                                popup.width: width
+                                model: [qsTr("Fast"), qsTr("Default"), qsTr("High Quality"), qsTr("High Quality + Spatial Upscaling"), qsTr("High Quality + Advanced Spatial Upscaling"), qsTr("Custom")]
+                                currentIndex: dialog.backend.settings.videoPreset
+                                onActivated: index => { dialog.backend.settings.videoPreset = index;
+                                    const presets = [ChiakiWindow.VideoPreset.Fast, ChiakiWindow.VideoPreset.Default, ChiakiWindow.VideoPreset.HighQuality, ChiakiWindow.VideoPreset.HighQualitySpatial, ChiakiWindow.VideoPreset.HighQualityAdvancedSpatial, ChiakiWindow.VideoPreset.Custom];
+                                    dialog.backend.window.videoPreset = presets[index]; }
 
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(1080)")
-                        visible: dialog.backend.settings.windowType == 1
-                    }
+                            }
+                            Label { text: qsTr("Placebo queue depth limit\nDefault: 2 frames"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                C.Slider {
+                                    objectName: "queueDepthLimit"
+                                    Accessible.name: qsTr("Placebo queue depth limit in frames")
+                                    Layout.fillWidth: true
+                                    from: 2
+                                    to: 5
+                                    stepSize: 1
+                                    value: dialog.backend.settings.queueDepthLimit
+                                    onMoved: dialog.backend.settings.queueDepthLimit = value
+                                }
+                                Label { text: qsTr("%1 frames").arg(dialog.backend.settings.queueDepthLimit); font.pixelSize: 14 }
+                            }
+                            Label { text: qsTr("Renderer backend\nDefault: Vulkan"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            C.ComboBox {
+                                id: rendererBackend
+                                objectName: "rendererBackend"
+                                Accessible.name: qsTr("Renderer backend")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                Layout.preferredWidth: 300
+                                font.pixelSize: 14
+                                popup.width: width
+                                model: [qsTr("Vulkan"), qsTr("OpenGL")]
+                                currentIndex: dialog.backend.settings.rendererBackend
+                                onActivated: index => { if (index !== dialog.backend.settings.rendererBackend) { dialog.backend.settings.rendererBackend = index; dialog.backend.settings.restartApplication(); } }
 
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Toggle Fullscreen on Double-click:")
-                    }
-
-                    C.CheckBox {
-                        checked: dialog.backend.settings.fullscreenDoubleClick
-                        onToggled: dialog.backend.settings.fullscreenDoubleClick = checked
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Unchecked)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Hide Cursor during Stream")
-                    }
-                    C.CheckBox {
-                        checked: dialog.backend.settings.hideCursor
-                        onToggled: dialog.backend.settings.hideCursor = !dialog.backend.settings.hideCursor
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Checked)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Vertical Sync:")
-                    }
-
-                    C.CheckBox {
-                        checked: dialog.backend.settings.vSyncEnabled
-                        onToggled: {
-                            dialog.backend.settings.vSyncEnabled = checked
-                            if (dialog.backend.window.runtimeRendererBackend === 1)
-                                dialog.backend.settings.restartApplication()
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Checked)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Render Preset:")
-                    }
-
-                    C.ComboBox {
-                        Layout.preferredWidth: 520
-                        model: [qsTr("Fast"), qsTr("Default"), qsTr("High Quality"), qsTr("High Quality + Spatial Upscaling"), qsTr("High Quality + Advanced Spatial Upscaling"), qsTr("Custom")]
-                        currentIndex: dialog.backend.settings.videoPreset
-                        onActivated: (index) => {
-                            dialog.backend.settings.videoPreset = index;
-                            switch (index) {
-                            case 0: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.Fast; break;
-                            case 1: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.Default; break;
-                            case 2: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.HighQuality; break;
-                            case 3: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.HighQualitySpatial; break;
-                            case 4: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.HighQualityAdvancedSpatial; break;
-                            case 5: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.Custom; break;
+                            }
+                            C.Button {
+                                id: customRendererSettings
+                                objectName: "customRendererSettings"
+                                text: qsTr("Custom renderer settings")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                visible: dialog.backend.window.videoPreset === ChiakiWindow.VideoPreset.Custom
+                                onClicked: dialog.navigation.showPlaceboSettingsDialog()
+                            }
+                            C.Button {
+                                id: displaySettings
+                                objectName: "displaySettings"
+                                text: qsTr("Display settings")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                lastInFocusChain: true
+                                onClicked: dialog.navigation.showDisplaySettingsDialog()
+                            }
                             }
                         }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(High Quality)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Placebo Queue Depth Limit")
-                    }
-
-                    C.Slider {
-                        Layout.preferredWidth: 360
-                        from: 2
-                        to: 5
-                        stepSize: 1
-                        value: dialog.backend.settings.queueDepthLimit
-                        onMoved: dialog.backend.settings.queueDepthLimit = value
-
-                        Label {
-                            anchors {
-                                left: parent.right
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 10
-                            }
-                            text: qsTr("%1 frames").arg(parent.value)
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(2)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Renderer Backend:")
-                    }
-
-                    C.ComboBox {
-                        Layout.preferredWidth: 400
-                        model: [qsTr("Vulkan"), qsTr("OpenGL")]
-                        currentIndex: dialog.backend.settings.rendererBackend
-                        onActivated: (index) => {
-                            if (index === dialog.backend.settings.rendererBackend)
-                                return;
-                            dialog.backend.settings.rendererBackend = index;
-                            dialog.backend.settings.restartApplication();
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Vulkan)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Custom Renderer Settings")
-                        visible: dialog.backend.window.videoPreset == ChiakiWindow.VideoPreset.Custom
-                    }
-
-                    C.Button {
-                        id: customRendererSettings
-                        text: qsTr("Open")
-                        onClicked: dialog.navigation.showPlaceboSettingsDialog()
-                        Material.roundedScale: Material.SmallScale
-                        visible: dialog.backend.window.videoPreset == ChiakiWindow.VideoPreset.Custom
-                    }
-
-                    Label { visible: dialog.backend.window.videoPreset == ChiakiWindow.VideoPreset.Custom }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Display Settings")
-                    }
-
-                    C.Button {
-                        id: displaySettings
-                        text: qsTr("Open")
-                        onClicked: dialog.navigation.showDisplaySettingsDialog()
-                        Material.roundedScale: Material.SmallScale
-                        lastInFocusChain: true
-                    }
-
-                        Label {}
                     }
                 }
             }
@@ -788,452 +745,167 @@ FocusScope {
                 // Stream
                 Flickable {
                     id: streamFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "streamFlick"
+                    anchors.fill: parent
                     clip: true
-                    contentWidth: Math.max(width, streamGrid.width)
+                    contentWidth: width
                     contentHeight: streamGrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: streamFlick.contentHeight > streamFlick.height
-                    }
-                    GridLayout {
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
                         id: streamGrid
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        columns: 3
-                        rowSpacing: 10
-                        columnSpacing: 20
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Settings for:")
-                        }
-
-
-                    C.ComboBox {
-                        id: consoleSelection
-                        Layout.preferredWidth: 400
-                        Layout.alignment: Qt.AlignLeft
-                        model: [qsTr("PS4"), qsTr("PS5")]
-                        currentIndex: selectedConsole
-                        onActivated: (index) => selectedConsole = index
-                        firstInFocusChain: true
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                        KeyNavigation.down: {
-                            if(selectedConsole == SettingsDialog.Console.PS4)
-                                resolutionLocalPS4
-                            else
-                                resolutionLocalPS5
-
-                        }
-
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Local")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("Remote")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Resolution:")
-                    }
-
-                    C.ComboBox {
-                        id: resolutionLocalPS4
-                        Layout.preferredWidth: 400
-                        model: [qsTr("360p"), qsTr("540p"), qsTr("720p (Default)"), qsTr("1080p (PS5 and PS4 Pro)")]
-                        currentIndex: dialog.backend.settings.resolutionLocalPS4 - 1
-                        onActivated: (index) => {
-                            dialog.backend.settings.resolutionLocalPS4 = index + 1
-                            dialog.backend.settings.bitrateLocalPS4 = 0
-                        }
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        KeyNavigation.right: resolutionRemotePS4
-                        KeyNavigation.down: fpsLocalPS4
-                        KeyNavigation.up: consoleSelection
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: resolutionRemotePS4
-                        Layout.preferredWidth: 400
-                        model: [qsTr("360p"), qsTr("540p"), qsTr("720p (Default)"), qsTr("1080p (PS5 and PS4 Pro)")]
-                        currentIndex: dialog.backend.settings.resolutionRemotePS4 - 1
-                        onActivated: (index) => {
-                            dialog.backend.settings.resolutionRemotePS4 = index + 1
-                            dialog.backend.settings.bitrateRemotePS4 = 0
-                        }
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        KeyNavigation.left: resolutionLocalPS4
-                        KeyNavigation.down: fpsRemotePS4
-                        KeyNavigation.up: consoleSelection
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: resolutionLocalPS5
-                        Layout.preferredWidth: 400
-                        model: [qsTr("360p"), qsTr("540p"), qsTr("720p"), qsTr("1080p (Default)")]
-                        currentIndex: dialog.backend.settings.resolutionLocalPS5 - 1
-                        onActivated: (index) => {
-                            dialog.backend.settings.resolutionLocalPS5 = index + 1
-                            dialog.backend.settings.bitrateLocalPS5 = 0
-                        }
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        KeyNavigation.right: resolutionRemotePS5
-                        KeyNavigation.up: consoleSelection
-                        KeyNavigation.down: fpsLocalPS5
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: resolutionRemotePS5
-                        Layout.preferredWidth: 400
-                        model: [qsTr("360p"), qsTr("540p"), qsTr("720p (Default)"), qsTr("1080p")]
-                        currentIndex: dialog.backend.settings.resolutionRemotePS5 - 1
-                        onActivated: (index) => {
-                            dialog.backend.settings.resolutionRemotePS5 = index + 1
-                            dialog.backend.settings.bitrateRemotePS5 = 0
-                        }
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        KeyNavigation.left: resolutionLocalPS5
-                        KeyNavigation.up: consoleSelection
-                        KeyNavigation.down: fpsRemotePS5
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("FPS:")
-                    }
-
-                    C.ComboBox {
-                        id: fpsLocalPS4
-                        Layout.preferredWidth: 400
-                        model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
-                        currentIndex: (dialog.backend.settings.fpsLocalPS4 / 30) - 1
-                        onActivated: (index) => dialog.backend.settings.fpsLocalPS4 = (index + 1) * 30
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        KeyNavigation.up: resolutionLocalPS4
-                        KeyNavigation.right: fpsRemotePS4
-                        KeyNavigation.down: bitrateLocalPS4
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: fpsRemotePS4
-                        Layout.preferredWidth: 400
-                        model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
-                        currentIndex: (dialog.backend.settings.fpsRemotePS4 / 30) - 1
-                        onActivated: (index) => dialog.backend.settings.fpsRemotePS4 = (index + 1) * 30
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        KeyNavigation.up: resolutionRemotePS4
-                        KeyNavigation.left: fpsLocalPS4
-                        KeyNavigation.down: bitrateRemotePS4
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: fpsLocalPS5
-                        Layout.preferredWidth: 400
-                        model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
-                        currentIndex: (dialog.backend.settings.fpsLocalPS5 / 30) - 1
-                        onActivated: (index) => dialog.backend.settings.fpsLocalPS5 = (index + 1) * 30
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        KeyNavigation.up: resolutionLocalPS5
-                        KeyNavigation.right: fpsRemotePS5
-                        KeyNavigation.down: bitrateLocalPS5
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    C.ComboBox {
-                        id: fpsRemotePS5
-                        Layout.preferredWidth: 400
-                        model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
-                        currentIndex: (dialog.backend.settings.fpsRemotePS5 / 30) - 1
-                        onActivated: (index) => dialog.backend.settings.fpsRemotePS5 = (index + 1) * 30
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        KeyNavigation.up: resolutionRemotePS5
-                        KeyNavigation.left: fpsLocalPS5
-                        KeyNavigation.down: bitrateRemotePS5
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Bitrate:")
-                    }
-
-                    C.Slider {
-                        id: bitrateLocalPS4
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        property var bitrate: {
-                            var rate = 0;
-                            switch (dialog.backend.settings.resolutionLocalPS4) {
-                            case 1: rate = 2; break; // 360p
-                            case 2: rate = 6; break; // 540p
-                            case 3: rate = 10; break; // 720p
-                            case 4: rate = 15; break; // 1080p
-                            }
-                            return rate;
-                        }
-                        Layout.preferredWidth: 200
-                        from: 2
-                        to: 100
-                        stepSize: 1
-                        value: dialog.backend.settings.bitrateLocalPS4 / 1000 ? (dialog.backend.settings.bitrateLocalPS4 / 1000) : bitrate
-                        onMoved: dialog.backend.settings.bitrateLocalPS4 = value * 1000;
-                        KeyNavigation.up: fpsLocalPS4
-                        KeyNavigation.down: bitrateLocalPS4
-                        KeyNavigation.priority: KeyNavigation.BeforeItem
-                        Label {
-                            anchors {
-                                left: parent.right
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 10
-                            }
-                            text: (parent.value) + qsTr(" Mbps") + qsTr(" (%1 Mbps)").arg(parent.bitrate.toFixed(0))
-                        }
-                    }
-
-                    C.Slider {
-                        id: bitrateRemotePS4
-                        visible: selectedConsole == SettingsDialog.Console.PS4
-                        property var bitrate: {
-                            var rate = 0;
-                            switch (dialog.backend.settings.resolutionRemotePS4) {
-                            case 1: rate = 2; break; // 360p
-                            case 2: rate = 6; break; // 540p
-                            case 3: rate = 10; break; // 720p
-                            case 4: rate = 15; break; // 1080p
-                            }
-                            return rate;
-                        }
-                        Layout.preferredWidth: 200
-                        from: 2
-                        to: 100
-                        stepSize: 1
-                        value: dialog.backend.settings.bitrateRemotePS4 / 1000 ? (dialog.backend.settings.bitrateRemotePS4 / 1000) : bitrate
-                        onMoved: dialog.backend.settings.bitrateRemotePS4 = value * 1000;
-                        KeyNavigation.up: fpsRemotePS4
-                        KeyNavigation.down: bitrateRemotePS4
-                        KeyNavigation.priority: KeyNavigation.BeforeItem
-                        lastInFocusChain: true
-
-                        Label {
-                            anchors {
-                                left: parent.right
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 10
-                            }
-                            text: (parent.value) + qsTr(" Mbps") + qsTr(" (%1 Mbps)").arg(parent.bitrate.toFixed(0))
-                        }
-                    }
-
-                    C.Slider {
-                        id: bitrateLocalPS5
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        property var bitrate: {
-                            var rate = 0;
-                            switch (dialog.backend.settings.resolutionLocalPS5) {
-                            case 1: rate = 2; break; // 360p
-                            case 2: rate = 6; break; // 540p
-                            case 3: rate = 10; break; // 720p
-                            case 4: rate = 15; break; // 1080p
-                            }
-                            return rate;
-                        }
-                        Layout.preferredWidth: 200
-                        from: 2
-                        to: 100
-                        stepSize: 1
-                        value: dialog.backend.settings.bitrateLocalPS5 / 1000 ? (dialog.backend.settings.bitrateLocalPS5 / 1000) : bitrate
-                        onMoved: dialog.backend.settings.bitrateLocalPS5 = value * 1000;
-                        KeyNavigation.up: fpsLocalPS5
-                        KeyNavigation.down: codecLocalPS5
-                        KeyNavigation.priority: KeyNavigation.BeforeItem
-
-                        Label {
-                            anchors {
-                                left: parent.right
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 10
-                            }
-                            text: (parent.value) + qsTr(" Mbps") + qsTr(" (%1 Mbps)").arg(parent.bitrate.toFixed(0))
-                        }
-                    }
-
-                    C.Slider {
-                        id: bitrateRemotePS5
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        property var bitrate: {
-                            var rate = 0;
-                            switch (dialog.backend.settings.resolutionRemotePS5) {
-                            case 1: rate = 2; break; // 360p
-                            case 2: rate = 6; break; // 540p
-                            case 3: rate = 10; break; // 720p
-                            case 4: rate = 15; break; // 1080p
-                            }
-                            return rate;
-                        }
-                        Layout.preferredWidth: 200
-                        from: 2
-                        to: 100
-                        stepSize: 1
-                        value: dialog.backend.settings.bitrateRemotePS5 / 1000 ? (dialog.backend.settings.bitrateRemotePS5 / 1000) : bitrate
-                        onMoved: dialog.backend.settings.bitrateRemotePS5 = value * 1000;
-                        KeyNavigation.up: fpsRemotePS5
-                        KeyNavigation.down: codecRemotePS5
-                        KeyNavigation.priority: KeyNavigation.BeforeItem
-                        lastInFocusChain: true
-
-                        Label {
-                            anchors {
-                                left: parent.right
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 10
-                            }
-                            text: (parent.value) + qsTr(" Mbps") + qsTr(" (%1 Mbps)").arg(parent.bitrate.toFixed(0))
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Codec:")
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                    }
-
-                    C.ComboBox {
-                        id: codecLocalPS5
-                        Layout.preferredWidth: 400
-                        model: [qsTr("H264"), qsTr("H265 (Default)"), qsTr("H265 HDR")]
-                        currentIndex: dialog.backend.settings.codecLocalPS5
-                        onActivated: (index) => dialog.backend.settings.codecLocalPS5 = index
-                        visible: selectedConsole == SettingsDialog.Console.PS5
-                        Keys.onReturnPressed: {
-                            if (popup.visible) {
-                                activated(highlightedIndex);
-                                popup.close();
-                            } else
-                                popup.open();
-                        }
-                        KeyNavigation.up: bitrateLocalPS5
-                        KeyNavigation.right: codecRemotePS5
-                        KeyNavigation.down: codecLocalPS5
-                        KeyNavigation.priority: {
-                            if(!popup.visible)
-                                KeyNavigation.BeforeItem
-                            else
-                                KeyNavigation.AfterItem
-                        }
-                    }
-
+                        width: Math.max(0, streamFlick.width - 14)
+                        spacing: 16
+                        Label { text: qsTr("Stream"); font.pixelSize: 24; font.bold: true }
+                        Label { text: qsTr("Settings for"); font.pixelSize: 14 }
                         C.ComboBox {
-                            id: codecRemotePS5
-                            Layout.preferredWidth: 400
-                            model: [qsTr("H264"), qsTr("H265 (Default)"), qsTr("H265 HDR")]
-                            currentIndex: dialog.backend.settings.codecRemotePS5
-                            onActivated: (index) => dialog.backend.settings.codecRemotePS5 = index
-                            visible: selectedConsole == SettingsDialog.Console.PS5
-                            lastInFocusChain: true
-                            Keys.onReturnPressed: {
-                                if (popup.visible) {
-                                    activated(highlightedIndex);
-                                    popup.close();
-                                } else
-                                    popup.open();
+                            id: consoleSelection
+                            objectName: "consoleSelection"
+                            Accessible.name: qsTr("Console type")
+                            Layout.fillWidth: true
+                            Layout.maximumWidth: 400
+                            font.pixelSize: 14
+                            model: [qsTr("PS4"), qsTr("PS5")]
+                            currentIndex: dialog.selectedConsole
+                            onActivated: index => dialog.selectedConsole = index
+                            firstInFocusChain: true
+                            KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
+                            KeyNavigation.down: localStreamRoute.resolutionControl
+                        }
+                        GridLayout {
+                            Layout.fillWidth: true
+                            columns: streamFlick.width < 700 ? 1 : 2
+                            columnSpacing: 16
+                            rowSpacing: 16
+                            component StreamRoute: Frame {
+                                id: route
+                                required property int index
+                                property Item peer
+                                readonly property bool ps5: dialog.selectedConsole === SettingsDialog.Console.PS5
+                                readonly property string suffix: (index === 0 ? "Local" : "Remote") + (ps5 ? "PS5" : "PS4")
+                                readonly property string routeName: index === 0 ? qsTr("Local") : qsTr("Remote")
+                                property alias resolutionControl: resolution
+                                property alias fpsControl: fps
+                                property alias codecControl: codec
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                Layout.alignment: Qt.AlignTop
+                                background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                                ColumnLayout {
+                                    anchors.fill: parent
+                                    spacing: 8
+                                    Label { text: route.routeName; font.pixelSize: 18; font.bold: true }
+                                    Label { text: qsTr("Resolution"); font.pixelSize: 14 }
+                                    C.ComboBox {
+                                        id: resolution
+                                        objectName: "resolution" + route.suffix
+                                        Accessible.name: qsTr("%1 resolution").arg(route.routeName)
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        font.pixelSize: 14
+                                        model: [qsTr("360p"), qsTr("540p"), qsTr("720p"), qsTr("1080p")]
+                                        currentIndex: dialog.backend.settings["resolution" + route.suffix] - 1
+                                        onActivated: index => {
+                                            dialog.backend.settings["resolution" + route.suffix] = index + 1;
+                                            dialog.backend.settings["bitrate" + route.suffix] = 0;
+                                        }
+                                        KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
+                                        KeyNavigation.up: consoleSelection
+                                        KeyNavigation.down: fps
+                                        KeyNavigation.left: route.index === 1 && route.peer ? route.peer.resolutionControl : null
+                                        KeyNavigation.right: route.index === 0 && route.peer ? route.peer.resolutionControl : null
+                                    }
+                                    Label {
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        opacity: 0.65
+                                        text: !route.ps5 ? qsTr("Default: 720p. 1080p requires PS4 Pro.")
+                                            : route.index === 0 ? qsTr("Default: 1080p") : qsTr("Default: 720p")
+                                    }
+                                    Label { text: qsTr("Frame rate"); font.pixelSize: 14 }
+                                    C.ComboBox {
+                                        id: fps
+                                        objectName: "fps" + route.suffix
+                                        Accessible.name: qsTr("%1 frame rate").arg(route.routeName)
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        font.pixelSize: 14
+                                        model: [qsTr("30 fps"), qsTr("60 fps (Default)")]
+                                        currentIndex: dialog.backend.settings["fps" + route.suffix] / 30 - 1
+                                        onActivated: index => dialog.backend.settings["fps" + route.suffix] = (index + 1) * 30
+                                        KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
+                                        KeyNavigation.up: resolution
+                                        KeyNavigation.down: bitrate
+                                        KeyNavigation.left: route.index === 1 && route.peer ? route.peer.fpsControl : null
+                                        KeyNavigation.right: route.index === 0 && route.peer ? route.peer.fpsControl : null
+                                    }
+                                    Label { text: qsTr("Bitrate"); font.pixelSize: 14 }
+                                    C.Slider {
+                                        id: bitrate
+                                        objectName: "bitrate" + route.suffix
+                                        Accessible.name: qsTr("%1 bitrate in Mbps").arg(route.routeName)
+                                        readonly property real automaticBitrate: {
+                                            switch (dialog.backend.settings["resolution" + route.suffix]) {
+                                            case 1: return 2;
+                                            case 2: return 6;
+                                            case 3: return 10;
+                                            case 4: return 15;
+                                            default: return 0;
+                                            }
+                                        }
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        from: 2
+                                        to: 100
+                                        stepSize: 1
+                                        value: dialog.backend.settings["bitrate" + route.suffix] / 1000 || automaticBitrate
+                                        onMoved: dialog.backend.settings["bitrate" + route.suffix] = value * 1000
+                                        KeyNavigation.priority: KeyNavigation.BeforeItem
+                                        KeyNavigation.up: fps
+                                        KeyNavigation.down: route.ps5 ? codec : bitrate
+                                    }
+                                    Label {
+                                        objectName: "bitrateDescription" + route.suffix
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        text: dialog.backend.settings["bitrate" + route.suffix] === 0
+                                            ? qsTr("Automatic: %1 Mbps").arg(bitrate.value)
+                                            : qsTr("%1 Mbps, default: %2 Mbps").arg(bitrate.value).arg(bitrate.automaticBitrate)
+                                    }
+                                    Label {
+                                        Layout.fillWidth: true
+                                        font.pixelSize: 14
+                                        wrapMode: Text.Wrap
+                                        opacity: 0.65
+                                        text: qsTr("Changing resolution restores automatic bitrate.")
+                                    }
+                                    Label { text: qsTr("Codec"); font.pixelSize: 14; visible: route.ps5 }
+                                    C.ComboBox {
+                                        id: codec
+                                        objectName: "codec" + route.suffix
+                                        Accessible.name: qsTr("%1 codec").arg(route.routeName)
+                                        Layout.fillWidth: true
+                                        Layout.minimumWidth: 0
+                                        font.pixelSize: 14
+                                        model: [qsTr("H264"), qsTr("H265 (Default)"), qsTr("H265 HDR")]
+                                        visible: route.ps5
+                                        currentIndex: route.ps5 ? dialog.backend.settings[route.index === 0 ? "codecLocalPS5" : "codecRemotePS5"] : -1
+                                        onActivated: index => {
+                                            if (route.ps5)
+                                                dialog.backend.settings["codec" + route.suffix] = index;
+                                        }
+                                        KeyNavigation.priority: popup.visible ? KeyNavigation.AfterItem : KeyNavigation.BeforeItem
+                                        KeyNavigation.up: bitrate
+                                        KeyNavigation.down: codec
+                                        KeyNavigation.left: route.index === 1 && route.peer ? route.peer.codecControl : null
+                                        KeyNavigation.right: route.index === 0 && route.peer ? route.peer.codecControl : null
+                                    }
+                                }
                             }
-                            KeyNavigation.up: bitrateRemotePS5
-                            KeyNavigation.left: codecLocalPS5
-                            KeyNavigation.priority: {
-                                if(!popup.visible)
-                                    KeyNavigation.BeforeItem
-                                else
-                                    KeyNavigation.AfterItem
-                            }
+                            StreamRoute { id: localStreamRoute; index: 0; peer: remoteStreamRoute }
+                            StreamRoute { id: remoteStreamRoute; index: 1; peer: localStreamRoute }
                         }
                     }
                 }
