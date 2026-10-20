@@ -209,7 +209,7 @@ Pane {
             visible: modelData.display
             id: delegate
             width: parent ? parent.width : 0
-            height: modelData.display ? 180 : 0
+            height: modelData.display ? (nativeCard.visible ? 320 : 180) : 0
             highlighted: ListView.isCurrentItem
             onClicked: connectToHost()
 
@@ -248,7 +248,19 @@ Pane {
                 }
                 spacing: 50
 
+                ConsoleLibrary {
+                    id: nativeCard
+                    visible: modelData.registered && modelData.discovered && modelData.state === "ready"
+                    Layout.preferredWidth: 300
+                    Layout.fillHeight: true
+                    hosts: [modelData]
+                    sourceIndices: [index]
+                    streamerMode: Chiaki.settings.streamerMode
+                    onConnectRequested: (sourceIndex, nickname) => Chiaki.connectToHost(sourceIndex, nickname)
+                }
+
                 Image {
+                    visible: !nativeCard.visible
                     Layout.fillHeight: true
                     Layout.preferredWidth: 150
                     fillMode: Image.PreserveAspectFit
@@ -261,7 +273,8 @@ Pane {
                     text: {
                         let t = "";
                         if (modelData.name)
-                            t += modelData.name + "\n";
+                            t += (Chiaki.settings.streamerMode && modelData.name === modelData.address
+                                  ? qsTr("Manual console") : modelData.name) + "\n";
                         if (modelData.address)
                             t += qsTr("Address: %1").arg(Chiaki.settings.streamerMode ? "hidden" : modelData.address);
                         if (modelData.mac)
