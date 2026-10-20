@@ -174,8 +174,16 @@ TestCase {
         control.forceActiveFocus(Qt.TabFocusReason);
         tryVerify(() => {
             const point = control.mapToItem(harness, 0, 0);
-            return point.x >= 0 && point.y >= 0 && point.x + control.width <= harness.width + 1
-                && point.y + control.height <= harness.height + 1;
+            if (point.x < 0 || point.y < 0 || point.x + control.width > harness.width + 1
+                || point.y + control.height > harness.height + 1) return false;
+            const scroll = findChild(harness, "manualScroll");
+            let ancestor = control.parent;
+            while (ancestor && ancestor !== scroll.contentItem) ancestor = ancestor.parent;
+            if (!ancestor) return true;
+            const viewportPoint = control.mapToItem(scroll, 0, 0);
+            return viewportPoint.x >= 0 && viewportPoint.y >= 0
+                && viewportPoint.x + control.width <= scroll.width + 1
+                && viewportPoint.y + control.height <= scroll.height + 1;
         }, 1000, control.objectName + " is fully visible");
         verify(control.activeFocus, control.objectName + " has focus");
         verify(control.Accessible.name || control.text);
@@ -206,8 +214,8 @@ TestCase {
         keyClick(Qt.Key_Up);
         verify(address.activeFocus, "Focus is " + harness.Window.window.activeFocusItem.objectName);
         for (const control of [address, combo, cancel, add]) checkVisible(harness, control);
-        add.text = "Add this console address to the console library";
-        cancel.text = "Cancel console setup";
+        add.text = "Add this console address to the console library ".repeat(3);
+        cancel.text = "Cancel console setup ".repeat(3);
         waitForRendering(harness);
         checkVisible(harness, add);
         checkVisible(harness, cancel);
