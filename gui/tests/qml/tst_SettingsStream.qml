@@ -40,6 +40,26 @@ TestCase {
         tryCompare(combo.popup, "visible", false);
     }
 
+    function test_keyboardFocusKeepsBitrateDescriptionVisible_data() {
+        return routes.map(route => ({tag: route, route: route}));
+    }
+    function test_keyboardFocusKeepsBitrateDescriptionVisible(data) {
+        const harness = openStream(900, 600);
+        const flick = findChild(harness, "streamFlick");
+        // Keep values visible when a header reduces the available viewport.
+        flick.anchors.topMargin = 70;
+        waitForRendering(harness);
+        choose(findChild(harness, "consoleSelection"), data.route.endsWith("PS4") ? 0 : 1);
+        findChild(harness, "fps" + data.route).forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Down);
+        tryCompare(findChild(harness, "bitrate" + data.route), "activeFocus", true);
+        const value = findChild(harness, "bitrateDescription" + data.route);
+        verify(value.text.indexOf("Mbps") >= 0);
+        const point = value.mapToItem(flick, 0, 0);
+        verify(point.y >= 0 && point.y + value.height <= flick.height,
+            "Focused bitrate description stays inside the scroll viewport");
+        compare(harness.settings.changeCount, 0);
+    }
     function test_resolutionOnlyUpdatesSelectedRoute_data() {
         return routes.map(route => ({tag: route, route: route}));
     }

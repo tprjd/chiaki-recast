@@ -108,8 +108,11 @@ FocusScope {
         if (!flick || !item || !flickContainsItem(flick, item))
             return;
         let target = flickVisibilityTarget(flick, item);
-        if (target.height > flick.height)
+        if (target.height > flick.height) {
             target = item;
+            while (target.parent && target.parent !== flick.contentItem && target.parent.height <= flick.height)
+                target = target.parent;
+        }
         const top = target.mapToItem(flick.contentItem, 0, 0).y;
         const bottom = top + target.height;
         if (top < flick.contentY)
@@ -746,7 +749,7 @@ FocusScope {
                                     value: dialog.backend.settings.queueDepthLimit
                                     onMoved: dialog.backend.settings.queueDepthLimit = value
                                 }
-                                Label { text: qsTr("%1 frames").arg(dialog.backend.settings.queueDepthLimit); font.pixelSize: 14 }
+                                Label { objectName: "queueDepthLimitValue"; text: qsTr("%1 frames").arg(dialog.backend.settings.queueDepthLimit); font.pixelSize: 14 }
                             }
                             Label { text: qsTr("Renderer backend\nDefault: Vulkan"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
                             C.ComboBox {
@@ -889,38 +892,42 @@ FocusScope {
                                         KeyNavigation.right: route.index === 0 && route.peer ? route.peer.fpsControl : null
                                     }
                                     Label { text: qsTr("Bitrate"); font.pixelSize: 14 }
-                                    C.Slider {
-                                        id: bitrate
-                                        objectName: "bitrate" + route.suffix
-                                        Accessible.name: qsTr("%1 bitrate in Mbps").arg(route.routeName)
-                                        readonly property real automaticBitrate: {
-                                            switch (dialog.backend.settings["resolution" + route.suffix]) {
-                                            case 1: return 2;
-                                            case 2: return 6;
-                                            case 3: return 10;
-                                            case 4: return 15;
-                                            default: return 0;
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 8
+                                        C.Slider {
+                                            id: bitrate
+                                            objectName: "bitrate" + route.suffix
+                                            Accessible.name: qsTr("%1 bitrate in Mbps").arg(route.routeName)
+                                            readonly property real automaticBitrate: {
+                                                switch (dialog.backend.settings["resolution" + route.suffix]) {
+                                                case 1: return 2;
+                                                case 2: return 6;
+                                                case 3: return 10;
+                                                case 4: return 15;
+                                                default: return 0;
+                                                }
                                             }
+                                            Layout.fillWidth: true
+                                            Layout.minimumWidth: 0
+                                            from: 2
+                                            to: 100
+                                            stepSize: 1
+                                            value: dialog.backend.settings["bitrate" + route.suffix] / 1000 || automaticBitrate
+                                            onMoved: dialog.backend.settings["bitrate" + route.suffix] = value * 1000
+                                            KeyNavigation.priority: KeyNavigation.BeforeItem
+                                            KeyNavigation.up: fps
+                                            KeyNavigation.down: route.ps5 ? codec : bitrate
                                         }
-                                        Layout.fillWidth: true
-                                        Layout.minimumWidth: 0
-                                        from: 2
-                                        to: 100
-                                        stepSize: 1
-                                        value: dialog.backend.settings["bitrate" + route.suffix] / 1000 || automaticBitrate
-                                        onMoved: dialog.backend.settings["bitrate" + route.suffix] = value * 1000
-                                        KeyNavigation.priority: KeyNavigation.BeforeItem
-                                        KeyNavigation.up: fps
-                                        KeyNavigation.down: route.ps5 ? codec : bitrate
-                                    }
-                                    Label {
-                                        objectName: "bitrateDescription" + route.suffix
-                                        Layout.fillWidth: true
-                                        font.pixelSize: 14
-                                        wrapMode: Text.Wrap
-                                        text: dialog.backend.settings["bitrate" + route.suffix] === 0
-                                            ? qsTr("Automatic: %1 Mbps").arg(bitrate.value)
-                                            : qsTr("%1 Mbps, default: %2 Mbps").arg(bitrate.value).arg(bitrate.automaticBitrate)
+                                        Label {
+                                            objectName: "bitrateDescription" + route.suffix
+                                            Layout.fillWidth: true
+                                            font.pixelSize: 14
+                                            wrapMode: Text.Wrap
+                                            text: dialog.backend.settings["bitrate" + route.suffix] === 0
+                                                ? qsTr("Automatic: %1 Mbps").arg(bitrate.value)
+                                                : qsTr("%1 Mbps, default: %2 Mbps").arg(bitrate.value).arg(bitrate.automaticBitrate)
+                                        }
                                     }
                                     Label {
                                         Layout.fillWidth: true
