@@ -107,7 +107,9 @@ FocusScope {
     function ensureItemVisibleInFlick(flick, item) {
         if (!flick || !item || !flickContainsItem(flick, item))
             return;
-        const target = flickVisibilityTarget(flick, item);
+        let target = flickVisibilityTarget(flick, item);
+        if (target.height > flick.height)
+            target = item;
         const top = target.mapToItem(flick.contentItem, 0, 0).y;
         const bottom = top + target.height;
         if (top < flick.contentY)
@@ -526,308 +528,263 @@ FocusScope {
                 // Video
                 Flickable {
                     id: videoFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "videoFlick"
+                    anchors.fill: parent
+                    anchors.margins: 16
                     clip: true
-                    contentWidth: Math.max(width, videoGrid.width)
+                    contentWidth: width
                     contentHeight: videoGrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: videoFlick.contentHeight > videoFlick.height
-                    }
-                    GridLayout {
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
                         id: videoGrid
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                        }
-                        columns: 3
-                        rowSpacing: 10
-                        columnSpacing: 20
-
-                        Label {
-                            Layout.alignment: Qt.AlignRight
-                            text: qsTr("Hardware Decoder:")
-                        }
-
-                    RowLayout {
-                        Layout.preferredWidth: 400
-                        spacing: 12
-
-                        C.ComboBox {
-                            id: hwDecoderCombo
-                            Layout.preferredWidth: 220
-                            model: dialog.backend.settings.availableDecoders
-                            currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.decoder))
-                            KeyNavigation.priority: KeyNavigation.BeforeItem
-                            KeyNavigation.up: hwDecoderCombo
-                            KeyNavigation.right: zeroCopyCheck
-                            KeyNavigation.down: windowTypeCombo
-                            onActivated: (index) => dialog.backend.settings.decoder = index ? model[index] : ""
-                        }
-
-                        Label {
-                            text: qsTr("Zero-Copy")
-                        }
-
-                        C.CheckBox {
-                            id: zeroCopyCheck
-                            KeyNavigation.priority: KeyNavigation.BeforeItem
-                            KeyNavigation.up: zeroCopyCheck
-                            KeyNavigation.left: hwDecoderCombo
-                            KeyNavigation.down: windowTypeCombo
-                            checked: dialog.backend.settings.useZeroCopy
-                            onToggled: dialog.backend.settings.useZeroCopy = checked
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Auto / On)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Window Type:")
-                    }
-
-                    C.ComboBox {
-                        id: windowTypeCombo
-                        Layout.preferredWidth: 400
-                        popup.width: 500
-                        model: [qsTr("Stream Resolution"), qsTr("Custom Resolution"), qsTr("Adjust Resolution Manually"), qsTr("Fullscreen"), qsTr("Zoom [adjust zoom using slider in stream menu]"), qsTr("Stretch")]
-                        currentIndex: dialog.backend.settings.windowType
-                        onActivated: (index) => dialog.backend.settings.windowType = index;
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Fullscreen)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Custom Resolution Width")
-                        visible: dialog.backend.settings.windowType == 1
-                    }
-
-                    C.TextField {
-                        id: customResolutionWidth
-                        Layout.preferredWidth: 400
-                        visible: dialog.backend.settings.windowType == 1
-                        text: dialog.backend.settings.customResolutionWidth
-                        Material.accent: text && !validate() ? Material.Red : undefined
-                        onEditingFinished: {
-                            if (validate()) {
-                                dialog.backend.settings.customResolutionWidth = parseInt(text);
-                            } else {
-                                dialog.backend.settings.customResolutionWidth = 0;
-                                text = "";
+                        width: Math.max(0, videoFlick.width - 16)
+                        spacing: 14
+                        Label { text: qsTr("Decoding"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: videoFlick.width < 650 ? 1 : 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                            Label { text: qsTr("Hardware decoder\nDefault: Auto"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            C.ComboBox {
+                                id: hwDecoderCombo
+                                objectName: "decoder"
+                                Accessible.name: qsTr("Hardware decoder")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                Layout.preferredWidth: 300
+                                font.pixelSize: 14
+                                popup.width: width
+                                model: dialog.backend.settings.availableDecoders
+                                currentIndex: Math.max(0, model.indexOf(dialog.backend.settings.decoder))
+                                onActivated: index => { if (index >= 0 && index < model.length) dialog.backend.settings.decoder = index ? model[index] : ""; }
+                                firstInFocusChain: true
+                            }
+                            C.CheckBox {
+                                objectName: "useZeroCopy"
+                                Layout.columnSpan: videoFlick.width < 650 ? 1 : 2
+                                Layout.fillWidth: true
+                                font.pixelSize: 14
+                                text: qsTr("Zero-copy, default: On")
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.useZeroCopy
+                                onToggled: dialog.backend.settings.useZeroCopy = checked
+                            }
                             }
                         }
-                        function validate() {
-                            var num = parseInt(text);
-                            return num >= 0 && num <= 9999;
-                        }
-                    }
+                        Label { text: qsTr("Stream window"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: videoFlick.width < 650 ? 1 : 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                            Label { text: qsTr("Window type\nDefault: Fullscreen"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            C.ComboBox {
+                                id: windowTypeCombo
+                                objectName: "windowType"
+                                Accessible.name: qsTr("Window type")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                Layout.preferredWidth: 300
+                                font.pixelSize: 14
+                                popup.width: width
+                                model: [qsTr("Stream Resolution"), qsTr("Custom Resolution"), qsTr("Adjust Resolution Manually"), qsTr("Fullscreen"), qsTr("Zoom [adjust zoom using slider in stream menu]"), qsTr("Stretch")]
+                                currentIndex: dialog.backend.settings.windowType
+                                onActivated: index => { dialog.backend.settings.windowType = index; }
 
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(1920)")
-                        visible: dialog.backend.settings.windowType == 1
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Custom Resolution Height")
-                        visible: dialog.backend.settings.windowType == 1
-                    }
-
-                    C.TextField {
-                        id: customResolutionHeight
-                        Layout.preferredWidth: 400
-                        visible: dialog.backend.settings.windowType == 1
-                        text: dialog.backend.settings.customResolutionHeight
-                        Material.accent: text && !validate() ? Material.Red : undefined
-                        onEditingFinished: {
-                            if (validate()) {
-                                dialog.backend.settings.customResolutionHeight = parseInt(text);
-                            } else {
-                                dialog.backend.settings.customResolutionHeight = 0;
-                                text = "";
+                            }
+                            Label { text: qsTr("Custom resolution width\nDefault: 1920 pixels"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true; visible: dialog.backend.settings.windowType === 1 }
+                            C.TextField {
+                                id: customResolutionWidth
+                                objectName: "customResolutionWidth"
+                                Accessible.name: qsTr("Custom resolution width in pixels")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                font.pixelSize: 14
+                                visible: dialog.backend.settings.windowType === 1
+                                text: dialog.backend.settings.customResolutionWidth
+                                property bool edited: false
+                                property string editProfile: ""
+                                onTextEdited: { edited = true; editProfile = dialog.backend.settings.currentProfile; }
+                                Material.accent: text && !validate() ? Material.Red : undefined
+                                function validate() { const number = parseInt(text); return number >= 0 && number <= 9999; }
+                                onEditingFinished: {
+                                    if (!edited) return;
+                                    edited = false;
+                                    if (editProfile === dialog.backend.settings.currentProfile) {
+                                        if (!validate()) {
+                                            dialog.backend.settings.customResolutionWidth = 0;
+                                            text = "";
+                                            return;
+                                        }
+                                        dialog.backend.settings.customResolutionWidth = parseInt(text);
+                                    }
+                                    text = Qt.binding(function() { return dialog.backend.settings.customResolutionWidth; });
+                                }
+                                Connections {
+                                    target: dialog.backend.settings
+                                    function onCurrentProfileChanged() {
+                                        customResolutionWidth.edited = false;
+                                        customResolutionWidth.text = Qt.binding(function() { return dialog.backend.settings.customResolutionWidth; });
+                                    }
+                                }
+                            }
+                            Label { text: qsTr("Custom resolution height\nDefault: 1080 pixels"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true; visible: dialog.backend.settings.windowType === 1 }
+                            C.TextField {
+                                id: customResolutionHeight
+                                objectName: "customResolutionHeight"
+                                Accessible.name: qsTr("Custom resolution height in pixels")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                font.pixelSize: 14
+                                visible: dialog.backend.settings.windowType === 1
+                                text: dialog.backend.settings.customResolutionHeight
+                                property bool edited: false
+                                property string editProfile: ""
+                                onTextEdited: { edited = true; editProfile = dialog.backend.settings.currentProfile; }
+                                Material.accent: text && !validate() ? Material.Red : undefined
+                                function validate() { const number = parseInt(text); return number >= 0 && number <= 9999; }
+                                onEditingFinished: {
+                                    if (!edited) return;
+                                    edited = false;
+                                    if (editProfile === dialog.backend.settings.currentProfile) {
+                                        if (!validate()) {
+                                            dialog.backend.settings.customResolutionHeight = 0;
+                                            text = "";
+                                            return;
+                                        }
+                                        dialog.backend.settings.customResolutionHeight = parseInt(text);
+                                    }
+                                    text = Qt.binding(function() { return dialog.backend.settings.customResolutionHeight; });
+                                }
+                                Connections {
+                                    target: dialog.backend.settings
+                                    function onCurrentProfileChanged() {
+                                        customResolutionHeight.edited = false;
+                                        customResolutionHeight.text = Qt.binding(function() { return dialog.backend.settings.customResolutionHeight; });
+                                    }
+                                }
+                            }
+                            C.CheckBox {
+                                objectName: "fullscreenDoubleClick"
+                                Layout.columnSpan: videoFlick.width < 650 ? 1 : 2
+                                Layout.fillWidth: true
+                                font.pixelSize: 14
+                                text: qsTr("Toggle fullscreen on double-click, default: Off")
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.fullscreenDoubleClick
+                                onToggled: dialog.backend.settings.fullscreenDoubleClick = checked
+                            }
+                            C.CheckBox {
+                                objectName: "hideCursor"
+                                Layout.columnSpan: videoFlick.width < 650 ? 1 : 2
+                                Layout.fillWidth: true
+                                font.pixelSize: 14
+                                text: qsTr("Hide cursor during stream, default: On")
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.hideCursor
+                                onToggled: dialog.backend.settings.hideCursor = checked
+                            }
                             }
                         }
-                        function validate() {
-                            var num = parseInt(text);
-                            return num >= 0 && num <= 9999;
-                        }
-                    }
+                        Label { text: qsTr("Rendering"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            GridLayout {
+                                anchors.fill: parent
+                                columns: videoFlick.width < 650 ? 1 : 2
+                                columnSpacing: 24
+                                rowSpacing: 12
+                            C.CheckBox {
+                                objectName: "vSyncEnabled"
+                                Layout.columnSpan: videoFlick.width < 650 ? 1 : 2
+                                Layout.fillWidth: true
+                                font.pixelSize: 14
+                                text: qsTr("Vertical sync, default: On")
+                                contentItem: Label { text: parent.text; font.pixelSize: 14; wrapMode: Text.Wrap; leftPadding: parent.indicator.width + parent.spacing; verticalAlignment: Text.AlignVCenter }
+                                checked: dialog.backend.settings.vSyncEnabled
+                                onToggled: {
+                                    dialog.backend.settings.vSyncEnabled = checked;
+                                    if (dialog.backend.window.runtimeRendererBackend === 1) dialog.backend.settings.restartApplication();
+                                }
+                            }
+                            Label { text: qsTr("Render preset\nDefault: High Quality"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            C.ComboBox {
+                                id: videoPreset
+                                objectName: "videoPreset"
+                                Accessible.name: qsTr("Render preset")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                Layout.preferredWidth: 300
+                                font.pixelSize: 14
+                                popup.width: width
+                                model: [qsTr("Fast"), qsTr("Default"), qsTr("High Quality"), qsTr("High Quality + Spatial Upscaling"), qsTr("High Quality + Advanced Spatial Upscaling"), qsTr("Custom")]
+                                currentIndex: dialog.backend.settings.videoPreset
+                                onActivated: index => { dialog.backend.settings.videoPreset = index;
+                                    const presets = [ChiakiWindow.VideoPreset.Fast, ChiakiWindow.VideoPreset.Default, ChiakiWindow.VideoPreset.HighQuality, ChiakiWindow.VideoPreset.HighQualitySpatial, ChiakiWindow.VideoPreset.HighQualityAdvancedSpatial, ChiakiWindow.VideoPreset.Custom];
+                                    dialog.backend.window.videoPreset = presets[index]; }
 
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(1080)")
-                        visible: dialog.backend.settings.windowType == 1
-                    }
+                            }
+                            Label { text: qsTr("Placebo queue depth limit\nDefault: 2 frames"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                C.Slider {
+                                    objectName: "queueDepthLimit"
+                                    Accessible.name: qsTr("Placebo queue depth limit in frames")
+                                    Layout.fillWidth: true
+                                    from: 2
+                                    to: 5
+                                    stepSize: 1
+                                    value: dialog.backend.settings.queueDepthLimit
+                                    onMoved: dialog.backend.settings.queueDepthLimit = value
+                                }
+                                Label { text: qsTr("%1 frames").arg(dialog.backend.settings.queueDepthLimit); font.pixelSize: 14 }
+                            }
+                            Label { text: qsTr("Renderer backend\nDefault: Vulkan"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
+                            C.ComboBox {
+                                id: rendererBackend
+                                objectName: "rendererBackend"
+                                Accessible.name: qsTr("Renderer backend")
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                Layout.preferredWidth: 300
+                                font.pixelSize: 14
+                                popup.width: width
+                                model: [qsTr("Vulkan"), qsTr("OpenGL")]
+                                currentIndex: dialog.backend.settings.rendererBackend
+                                onActivated: index => { if (index !== dialog.backend.settings.rendererBackend) { dialog.backend.settings.rendererBackend = index; dialog.backend.settings.restartApplication(); } }
 
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Toggle Fullscreen on Double-click:")
-                    }
-
-                    C.CheckBox {
-                        checked: dialog.backend.settings.fullscreenDoubleClick
-                        onToggled: dialog.backend.settings.fullscreenDoubleClick = checked
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Unchecked)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Hide Cursor during Stream")
-                    }
-                    C.CheckBox {
-                        checked: dialog.backend.settings.hideCursor
-                        onToggled: dialog.backend.settings.hideCursor = !dialog.backend.settings.hideCursor
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Checked)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Vertical Sync:")
-                    }
-
-                    C.CheckBox {
-                        checked: dialog.backend.settings.vSyncEnabled
-                        onToggled: {
-                            dialog.backend.settings.vSyncEnabled = checked
-                            if (dialog.backend.window.runtimeRendererBackend === 1)
-                                dialog.backend.settings.restartApplication()
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Checked)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Render Preset:")
-                    }
-
-                    C.ComboBox {
-                        Layout.preferredWidth: 520
-                        model: [qsTr("Fast"), qsTr("Default"), qsTr("High Quality"), qsTr("High Quality + Spatial Upscaling"), qsTr("High Quality + Advanced Spatial Upscaling"), qsTr("Custom")]
-                        currentIndex: dialog.backend.settings.videoPreset
-                        onActivated: (index) => {
-                            dialog.backend.settings.videoPreset = index;
-                            switch (index) {
-                            case 0: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.Fast; break;
-                            case 1: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.Default; break;
-                            case 2: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.HighQuality; break;
-                            case 3: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.HighQualitySpatial; break;
-                            case 4: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.HighQualityAdvancedSpatial; break;
-                            case 5: dialog.backend.window.videoPreset = ChiakiWindow.VideoPreset.Custom; break;
+                            }
+                            C.Button {
+                                id: customRendererSettings
+                                objectName: "customRendererSettings"
+                                text: qsTr("Custom renderer settings")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                visible: dialog.backend.window.videoPreset === ChiakiWindow.VideoPreset.Custom
+                                onClicked: dialog.navigation.showPlaceboSettingsDialog()
+                            }
+                            C.Button {
+                                id: displaySettings
+                                objectName: "displaySettings"
+                                text: qsTr("Display settings")
+                                font.pixelSize: 14
+                                Layout.fillWidth: true
+                                Layout.minimumWidth: 0
+                                lastInFocusChain: true
+                                onClicked: dialog.navigation.showDisplaySettingsDialog()
+                            }
                             }
                         }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(High Quality)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Placebo Queue Depth Limit")
-                    }
-
-                    C.Slider {
-                        Layout.preferredWidth: 360
-                        from: 2
-                        to: 5
-                        stepSize: 1
-                        value: dialog.backend.settings.queueDepthLimit
-                        onMoved: dialog.backend.settings.queueDepthLimit = value
-
-                        Label {
-                            anchors {
-                                left: parent.right
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 10
-                            }
-                            text: qsTr("%1 frames").arg(parent.value)
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(2)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Renderer Backend:")
-                    }
-
-                    C.ComboBox {
-                        Layout.preferredWidth: 400
-                        model: [qsTr("Vulkan"), qsTr("OpenGL")]
-                        currentIndex: dialog.backend.settings.rendererBackend
-                        onActivated: (index) => {
-                            if (index === dialog.backend.settings.rendererBackend)
-                                return;
-                            dialog.backend.settings.rendererBackend = index;
-                            dialog.backend.settings.restartApplication();
-                        }
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("(Vulkan)")
-                    }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Custom Renderer Settings")
-                        visible: dialog.backend.window.videoPreset == ChiakiWindow.VideoPreset.Custom
-                    }
-
-                    C.Button {
-                        id: customRendererSettings
-                        text: qsTr("Open")
-                        onClicked: dialog.navigation.showPlaceboSettingsDialog()
-                        Material.roundedScale: Material.SmallScale
-                        visible: dialog.backend.window.videoPreset == ChiakiWindow.VideoPreset.Custom
-                    }
-
-                    Label { visible: dialog.backend.window.videoPreset == ChiakiWindow.VideoPreset.Custom }
-
-                    Label {
-                        Layout.alignment: Qt.AlignRight
-                        text: qsTr("Display Settings")
-                    }
-
-                    C.Button {
-                        id: displaySettings
-                        text: qsTr("Open")
-                        onClicked: dialog.navigation.showDisplaySettingsDialog()
-                        Material.roundedScale: Material.SmallScale
-                        lastInFocusChain: true
-                    }
-
-                        Label {}
                     }
                 }
             }
