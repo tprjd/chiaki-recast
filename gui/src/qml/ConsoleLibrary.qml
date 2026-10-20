@@ -18,7 +18,9 @@ FocusScope {
     property string applicationVersion: ""
     property bool playStationController: false
     property string selectedIdentity: ""
-    readonly property var displayedHosts: hosts.filter(host => host && host.display !== false)
+    property alias searchText: consoleSearch.text
+    readonly property var visibleHosts: hosts.filter(host => host && host.display !== false)
+    readonly property var displayedHosts: visibleHosts.filter(host => matchesSearch(host))
     readonly property bool collapsedSidebar: width < 1000
     readonly property var selectedTarget: resolveTarget(selectedIdentity)
     signal connectRequested(int sourceIndex, string nickname)
@@ -40,6 +42,14 @@ FocusScope {
     }
     Component.onCompleted: updateSelection()
 
+    function matchesSearch(host) {
+        const name = host.name || host.address || qsTr("Console");
+        const consoleName = streamerMode && name === host.address ? qsTr("Manual console") : name;
+        const type = typeof host.ps5 === "boolean"
+            ? (host.ps5 ? "PS5 " + qsTr("PlayStation 5") : "PS4 " + qsTr("PlayStation 4")) : "";
+        const text = (consoleName + " " + type).toLowerCase();
+        return searchText.trim().toLowerCase().split(/\s+/).every(term => text.includes(term));
+    }
     function identityOf(host) {
         if (!host) return "";
         if (host.discovered)
@@ -66,24 +76,29 @@ FocusScope {
         return true;
     }
     function updateSelection() {
-        if (!resolveTarget(selectedIdentity))
-            selectedIdentity = displayedHosts.length ? identityOf(displayedHosts[0]) : "";
+        if (!resolveTarget(selectedIdentity) || !displayedHosts.some(host => identityOf(host) === selectedIdentity)) {
+            const first = displayedHosts.find(host => resolveTarget(identityOf(host)));
+            selectedIdentity = first ? identityOf(first) : "";
+        }
         if (actionMenu.opened && !resolveTarget(actionMenu.identity)) actionMenu.close();
     }
     function moveSelection(offset) {
-        if (!displayedHosts.length) return;
-        const current = displayedHosts.findIndex(host => identityOf(host) === selectedIdentity);
-        const next = Math.max(0, Math.min(displayedHosts.length - 1, current + offset));
-        selectedIdentity = identityOf(displayedHosts[next]);
-        const card = cardRepeater.itemAt(next) as ConsoleCard;
+        const candidates = displayedHosts.filter(host => resolveTarget(identityOf(host)));
+        if (!candidates.length) return;
+        const current = candidates.findIndex(host => identityOf(host) === selectedIdentity);
+        const next = Math.max(0, Math.min(candidates.length - 1, current + offset));
+        selectedIdentity = identityOf(candidates[next]);
+        const index = displayedHosts.findIndex(host => identityOf(host) === selectedIdentity);
+        const card = cardRepeater.itemAt(index) as ConsoleCard;
         if (card) {
             card.focusPrimary();
             libraryScroll.contentY = Math.max(0, Math.min(card.y, cards.height - libraryScroll.height));
         }
     }
     function restoreCardFocus(identity) {
-        const index = displayedHosts.findIndex(host => identityOf(host) === identity);
-        const card = cardRepeater.itemAt(index >= 0 ? index : 0) as ConsoleCard;
+        let index = displayedHosts.findIndex(host => identityOf(host) === identity && resolveTarget(identity));
+        if (index < 0) index = displayedHosts.findIndex(host => resolveTarget(identityOf(host)));
+        const card = cardRepeater.itemAt(index) as ConsoleCard;
         if (card) card.focusPrimary();
         else addConsoleButton.forceActiveFocus(Qt.TabFocusReason);
     }
@@ -250,7 +265,30 @@ FocusScope {
             id: libraryToolbar
             Layout.fillWidth: true
             Layout.minimumHeight: 42
-            Item { Layout.fillWidth: true }
+            TextField {
+                id: consoleSearch
+                objectName: "consoleSearch"
+                Layout.fillWidth: true
+                Layout.preferredHeight: 42
+                placeholderText: qsTr("Search consoles")
+                Accessible.name: qsTr("Search consoles")
+                font.pixelSize: 14
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) {
+                        event.accepted = false;
+                        return;
+                    }
+                    if (event.key === Qt.Key_Escape) {
+                        if (text.length) {
+                            clear();
+                            event.accepted = true;
+                        }
+                        return;
+                    }
+                    event.accepted = true;
+                }
+            }
             Controls.Button {
                 objectName: "refreshPsnButton"
                 visible: library.psnAvailable
@@ -270,13 +308,14 @@ FocusScope {
                 anchors.fill: parent
                 clip: true
                 contentWidth: width
-                contentHeight: cards.height + discoveryButton.height + 24
+                contentHeight: libraryFooter.y + libraryFooter.height + 8
                 boundsBehavior: Flickable.StopAtBounds
                 ScrollBar.vertical: ScrollBar { }
                 GridLayout {
                     id: cards
-                    width: parent.width
-                    columns: Math.max(1, Math.floor((width + 18) / 288))
+                    readonly property real cellWidth: (libraryScroll.width - columnSpacing * (columns - 1)) / columns
+                    width: Math.max(0, Math.min(columns, library.displayedHosts.length) * (cellWidth + columnSpacing) - columnSpacing)
+                    columns: Math.max(1, Math.floor((libraryScroll.width + 18) / 288))
                     columnSpacing: 18
                     rowSpacing: 18
                     Repeater {
@@ -301,16 +340,74 @@ FocusScope {
                         }
                     }
                 }
-                Controls.Button {
-                    id: discoveryButton
-                    objectName: "discoveryButton"
-                    y: cards.height + 16
-                    flat: true
-                    icon.source: "qrc:/icons/discover-" + (library.discoveryEnabled ? "" : "off-") + "24px.svg"
-                    text: library.discoveryEnabled ? qsTr("Discovery on") : qsTr("Discovery off")
-                    font.pixelSize: 13
-                    height: 36
-                    onClicked: library.discoveryToggled(!library.discoveryEnabled)
+                ColumnLayout {
+                    id: emptyState
+                    readonly property bool noMatches: library.visibleHosts.length > 0 && !!library.searchText.trim()
+                    visible: library.displayedHosts.length === 0
+                    width: Math.min(parent.width, 440)
+                    x: (parent.width - width) / 2
+                    y: 32
+                    spacing: 16
+                    Label {
+                        objectName: "emptyStateTitle"
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.Wrap
+                        font.pixelSize: 22
+                        font.bold: true
+                        text: emptyState.noMatches ? qsTr("No matching consoles")
+                            : library.discoveryEnabled ? qsTr("No consoles found") : qsTr("Discovery is off")
+                    }
+                    Label {
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.Wrap
+                        font.pixelSize: 14
+                        color: "#94a0b0"
+                        text: emptyState.noMatches ? qsTr("Try a different name or console type.")
+                            : library.discoveryEnabled ? qsTr("Add a console or wait for local discovery.")
+                            : qsTr("Enable discovery to find consoles on your local network.")
+                    }
+                    Controls.Button {
+                        objectName: "emptyStateAction"
+                        Layout.alignment: Qt.AlignHCenter
+                        font.pixelSize: 14
+                        text: emptyState.noMatches ? qsTr("Clear search")
+                            : library.discoveryEnabled ? qsTr("Add console") : qsTr("Enable discovery")
+                        onClicked: {
+                            if (emptyState.noMatches) {
+                                consoleSearch.clear();
+                                consoleSearch.forceActiveFocus(Qt.TabFocusReason);
+                            } else if (library.discoveryEnabled) library.addConsoleRequested();
+                            else library.discoveryToggled(true);
+                        }
+                    }
+                }
+                RowLayout {
+                    id: libraryFooter
+                    y: (emptyState.visible ? emptyState.y + emptyState.height : cards.height) + 16
+                    width: parent.width
+                    Controls.Button {
+                        id: discoveryButton
+                        objectName: "discoveryButton"
+                        flat: true
+                        icon.source: "qrc:/icons/discover-" + (library.discoveryEnabled ? "" : "off-") + "24px.svg"
+                        text: library.discoveryEnabled ? qsTr("Discovery on") : qsTr("Discovery off")
+                        font.pixelSize: 13
+                        Layout.preferredHeight: 36
+                        onClicked: library.discoveryToggled(!library.discoveryEnabled)
+                    }
+                    Item { Layout.fillWidth: true }
+                    Label {
+                        objectName: "consoleCount"
+                        font.pixelSize: 13
+                        color: "#94a0b0"
+                        text: library.searchText.trim()
+                            ? (library.visibleHosts.length === 1 ? qsTr("%1 of 1 console").arg(library.displayedHosts.length)
+                                : qsTr("%1 of %2 consoles").arg(library.displayedHosts.length).arg(library.visibleHosts.length))
+                            : library.visibleHosts.length === 1 ? qsTr("1 console")
+                            : qsTr("%1 consoles").arg(library.visibleHosts.length)
+                    }
                 }
             }
         }
