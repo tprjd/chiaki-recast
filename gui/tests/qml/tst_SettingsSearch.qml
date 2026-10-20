@@ -480,6 +480,26 @@ TestCase {
             tryCompare(h.pages, "depth", 1);
         }
     }
+    function test_consoleActionUsesFirstCurrentEligibleNativeControl() {
+        const h = createTemporaryObject(harnessComponent, testCase);
+        const duplicateHosts = [{mac: "DUP", name: "Duplicate1"}, {mac: "DUP", name: "Duplicate2"}, {mac: "VALID", name: "Eligible"}];
+        h.settings.registeredHosts = duplicateHosts;
+        h.backend.hiddenHosts = duplicateHosts;
+        h.settings.changeCount = 0;
+        for (const row of [["Auto-connect console", "autoConnectConsole2"], ["Delete registered console", "deleteRegisteredConsole2"], ["Unhide console", "unhideConsole2"]]) {
+            searchFor(h, row[0]);
+            tryCompare(findChild(h, row[1]), "activeFocus", true);
+        }
+        compare(h.actions.length, 0);
+        compare(h.settings.changeCount, 0);
+        const search = findChild(h, "settingsSearch");
+        search.text = "Delete registered console";
+        h.settings.registeredHosts = [{mac: "OTHER", name: "Replacement"}];
+        search.forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
+        tryCompare(findChild(h, "deleteRegisteredConsole0"), "activeFocus", true);
+        compare(h.actions.length, 0);
+    }
     function test_everyCategoryAndStreamRoute() {
         const h = createTemporaryObject(harnessComponent, testCase);
         const search = findChild(h, "settingsSearch");

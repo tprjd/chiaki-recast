@@ -56,6 +56,15 @@ FocusScope {
         if (consoleType !== undefined) selectedConsole = consoleType;
         Qt.callLater(function() {
             let item = Search.findItem(dialog, name);
+            const consoleAction = ["autoConnectConsole", "deleteRegisteredConsole", "unhideConsole"]
+                .find(prefix => name === prefix + "0");
+            if (consoleAction) {
+                const hosts = consoleAction === "unhideConsole" ? backend.hiddenHosts : backend.settings.registeredHosts;
+                for (let index = 0; index < hosts.length; ++index) {
+                    const candidate = Search.findItem(dialog, consoleAction + index);
+                    if (candidate && candidate.visible && candidate.enabled) { item = candidate; break; }
+                }
+            }
             if ((!item || !item.visible || !item.enabled) && fallback) item = Search.findItem(dialog, fallback);
             if (item && item.visible && item.enabled) item.forceActiveFocus(Qt.TabFocusReason);
             else focusCurrentTabFirstItem();
