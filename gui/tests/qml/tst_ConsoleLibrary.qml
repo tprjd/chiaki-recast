@@ -6,14 +6,14 @@ import "../../src/qml"
 TestCase {
     id: testCase
     name: "ConsoleLibrary"
-    width: 640
-    height: 480
+    width: 1280
+    height: 720
     visible: true
     when: windowShown
 
     Component {
         id: libraryComponent
-        ConsoleLibrary { width: 320; height: 360 }
+        ConsoleLibrary { width: 1280; height: 720 }
     }
 
     SignalSpy { id: connectSpy; signalName: "connectRequested" }
@@ -29,9 +29,28 @@ TestCase {
         connectSpy.clear();
     }
 
+    function atSource(host, index) {
+        const hosts = [];
+        for (let i = 0; i < index; i++)
+            hosts.push({ display: false });
+        hosts.push(host);
+        return hosts;
+    }
+
+    function namedConnectButton(item, name) {
+        if (item.objectName === "connectButton" && item.Accessible.name.indexOf(name) >= 0)
+            return item;
+        for (const child of item.children || []) {
+            const button = namedConnectButton(child, name);
+            if (button)
+                return button;
+        }
+        return null;
+    }
+
     function test_readyConsoleConnectsToSourceOnce() {
         const library = createTemporaryObject(libraryComponent, testCase, {
-            hosts: [readyHost("Living room")], sourceIndices: [7]
+            hosts: atSource(readyHost("Living room"), 7)
         });
         verify(library);
         connectSpy.target = library;
@@ -47,7 +66,7 @@ TestCase {
 
     function test_enterConnectsOnceWithVisibleFocus() {
         const library = createTemporaryObject(libraryComponent, testCase, {
-            hosts: [readyHost("Living room")], sourceIndices: [7]
+            hosts: atSource(readyHost("Living room"), 7)
         });
         connectSpy.target = library;
         const connectButton = findChild(library, "connectButton");
@@ -62,7 +81,7 @@ TestCase {
         const host = readyHost("Living room");
         host.state = "standby";
         const library = createTemporaryObject(libraryComponent, testCase, {
-            hosts: [host], sourceIndices: [4]
+            hosts: atSource(host, 4)
         });
         connectSpy.target = library;
         compare(findChild(library, "consoleStatus").text, "In standby");
@@ -93,7 +112,7 @@ TestCase {
     function test_hostCase(data) {
         const host = Object.assign(readyHost("Living room"), data.changes);
         const library = createTemporaryObject(libraryComponent, testCase, {
-            hosts: [host], sourceIndices: [6]
+            hosts: atSource(host, 6)
         });
         connectSpy.target = library;
         compare(findChild(library, "consoleStatus").text, data.status);
@@ -118,7 +137,7 @@ TestCase {
             hosts: [readyHost("Living room")], visible: false
         });
         compare(findChild(library, "consoleName").text, "Living room");
-        compare(library.implicitHeight, oneCard.implicitHeight);
+        compare(findChild(library, "libraryScroll").contentHeight, findChild(oneCard, "libraryScroll").contentHeight);
         connectSpy.target = library;
         mouseClick(findChild(library, "connectButton"));
         compare(connectSpy.count, 1);
@@ -126,7 +145,8 @@ TestCase {
 
         library.hosts = [hidden, duplicate];
         compare(findChild(library, "connectButton"), null);
-        tryCompare(library, "implicitHeight", 0);
+        const scroll = findChild(library, "libraryScroll");
+        verify(scroll.contentHeight < scroll.height);
     }
 
     function test_savedTargetFollowsHostAcrossReorderAndRename() {
@@ -145,26 +165,22 @@ TestCase {
     function test_invalidTarget_data() {
         const host = readyHost("Living room");
         return [
-            { tag: "removed", host, current: [], indices: [] },
-            { tag: "replaced-at-old-index", host, current: [Object.assign({}, host, { mac: "00:11:22:33:44:66" })], indices: [] },
-            { tag: "manual-address-reused", host: Object.assign({}, host, { discovered: false, manual: true }), current: [Object.assign({}, host, { discovered: false, manual: true, mac: "00:11:22:33:44:66" })], indices: [] },
-            { tag: "ambiguous", host, current: [host, Object.assign({}, host)], indices: [] },
-            { tag: "hidden", host, current: [Object.assign({}, host, { display: false })], indices: [] },
-            { tag: "missing-identity", host: { display: true, discovered: true, registered: true, name: "Console" }, current: [], indices: [] },
-            { tag: "invalid-source-index", host, current: [host], indices: [-1] },
-            { tag: "incomplete-source-map", host, current: [host], indices: [2, 3] }
+            { tag: "removed", host, current: [] },
+            { tag: "replaced-at-old-index", host, current: [Object.assign({}, host, { mac: "00:11:22:33:44:66" })] },
+            { tag: "manual-address-reused", host: Object.assign({}, host, { discovered: false, manual: true }), current: [Object.assign({}, host, { discovered: false, manual: true, mac: "00:11:22:33:44:66" })] },
+            { tag: "ambiguous", host, current: [host, Object.assign({}, host)] },
+            { tag: "hidden", host, current: [Object.assign({}, host, { display: false })] },
+            { tag: "missing-identity", host: { display: true, discovered: true, registered: true, name: "Console" }, current: [] },
         ];
     }
 
     function test_invalidTarget(data) {
         const library = createTemporaryObject(libraryComponent, testCase, { hosts: [data.host] });
         const target = library.identityOf(data.host);
-        library.sourceHosts = data.current;
-        library.sourceIndices = data.indices;
+        library.hosts = data.current;
         connectSpy.target = library;
         verify(!library.connectToTarget(target));
         compare(connectSpy.count, 0);
-        verify(!findChild(library, "connectButton").enabled);
     }
 
     function test_profileSwitchInvalidatesSavedTarget() {
@@ -212,7 +228,7 @@ TestCase {
         tryCompare(artwork, "status", Image.Ready);
     }
 
-    function test_cardResolvesAgainstCurrentSourceHosts_data() {
+    function test_cardUsesCurrentHostList_data() {
         return [
             { tag: "discovered", host: readyHost("Living room"), other: Object.assign(readyHost("Living room"), { mac: "00:11:22:33:44:66" }), nickname: "Bedroom" },
             { tag: "manual", host: { display: true, manual: true, discovered: false, registered: false, name: "192.0.2.7", address: "192.0.2.7", state: "unknown", duid: "" }, other: { display: true, manual: true, discovered: false, registered: false, name: "192.0.2.8", address: "192.0.2.8", state: "unknown", duid: "" }, nickname: "" },
@@ -220,16 +236,16 @@ TestCase {
         ];
     }
 
-    function test_cardResolvesAgainstCurrentSourceHosts(data) {
+    function test_cardUsesCurrentHostList(data) {
         const library = createTemporaryObject(libraryComponent, testCase, {
-            hosts: [data.host], sourceHosts: [data.host, data.other], sourceIndices: [7, 9]
+            hosts: [data.host, data.other]
         });
-        library.sourceHosts = [data.other, Object.assign({}, data.host, { name: "Bedroom" })];
-        library.sourceIndices = [9, 7];
+        library.hosts = [data.other, Object.assign({}, data.host, { name: "Bedroom" })];
+
         connectSpy.target = library;
-        mouseClick(findChild(library, "connectButton"));
+        mouseClick(namedConnectButton(library, "Bedroom"));
         compare(connectSpy.count, 1);
-        compare(connectSpy.signalArguments[0][0], 7);
+        compare(connectSpy.signalArguments[0][0], 1);
         compare(connectSpy.signalArguments[0][1], data.nickname);
     }
 
@@ -240,8 +256,9 @@ TestCase {
         const library = createTemporaryObject(libraryComponent, testCase, { hosts: [host] });
         waitForRendering(library);
         const button = findChild(library, "connectButton");
-        const position = button.mapToItem(library, 0, 0);
-        verify(position.y + button.height <= library.implicitHeight,
+        const card = findChild(library, "consoleCard");
+        const position = button.mapToItem(card, 0, 0);
+        verify(position.y + button.height <= card.height,
             "The primary action must fit inside its card");
     }
 

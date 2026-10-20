@@ -64,12 +64,9 @@ Missing console types show the neutral Console label.
 
 The component accepts these properties:
 
-- `hosts` contains the card candidates in backend order.
-- `sourceHosts` contains the complete current backend list. It defaults to
-  `hosts`. A displayed subset must keep this property bound to the full list.
-- `sourceIndices` is an optional complete index map for `sourceHosts`.
-  An empty map uses each entry's index in `sourceHosts`. An incomplete or
-  invalid map cancels the action.
+- `hosts` contains the complete current backend list in backend order.
+  Hidden records remain in this input, so their source indices stay correct.
+  The interim `sourceHosts` and `sourceIndices` options are removed.
 - `streamerMode` masks an address used as the console name.
 - `profileKey` identifies the active profile. The native view binds it to
   `Chiaki.settings.currentProfile`.
@@ -144,3 +141,69 @@ network sessions. Real registration, standby wake-and-connect, manual
 connection, and PSN connection remain untested without console or account
 access. The existing PIN dialog still needs the delayed-target checks in
 the details ticket.
+
+## Full screen API and focus
+
+`ConsoleLibrary` is now the complete production main screen. The test boundary
+remains this screen. `MainView.qml` binds backend state and handles its signals.
+The original startup reminders and StackView navigation remain in MainView.
+
+Additional state properties are `discoveryEnabled`, `psnAvailable`,
+`steamAvailable`, `applicationVersion`, and `playStationController`.
+The screen emits these commands:
+
+- `settingsRequested()` opens the existing Settings screen.
+- `addConsoleRequested()` opens the existing manual-host dialog.
+- `refreshPsnRequested()` uses the existing PSN refresh handler.
+- `steamShortcutRequested()` opens the existing Steam shortcut dialog.
+- `discoveryToggled(enabled)` requests the new discovery state.
+- `quitRequested()` opens the existing quit confirmation.
+- `managementRequested(action, identity)` requests `pin`, `wake`, `delete`, or
+  `hide` for an opaque identity.
+
+`eligible(action, host)` applies the same rules to menu and controller actions.
+MainView resolves management identities again before backend calls. Delete and
+Hide also resolve after confirmation. PIN submit still uses the existing dialog
+and requires the delayed identity check in ticket 06.
+
+`selectedIdentity` is the selected console. `selectedTarget` resolves its
+current host, source index, and nickname. `moveSelection(offset)` moves through
+visible cards and terminates with an empty list. `restoreCardFocus(identity)`
+focuses that console's primary action, a remaining card, or Add console.
+
+`ConsoleCard.qml` owns only the card appearance and its focusable controls.
+It accepts `host`, `streamerMode`, `selected`, and `targetEnabled`.
+It emits `activated()`, `actionsRequested(opener)`, and `selectionRequested()`.
+`focusPrimary()` puts visible keyboard focus on its primary action.
+The screen resolves the host identity when these signals arrive.
+
+The temporary action menu stores its target identity and opener. Escape closes
+the menu and restores the opener. Management signals run after the menu closes,
+so focus restoration does not take focus from a newly opened dialog. A profile
+change closes the menu and invalidates saved identities. Details in ticket 05
+can reuse the opener and `restoreCardFocus` fallback.
+
+Search and counts belong in `ConsoleLibrary.qml`, including `libraryToolbar`
+and the footer after the card grid. Details belong beside the temporary action
+menu and use the `ConsoleCard.actionsRequested(opener)` signal. Both features
+must continue to resolve identities against the full `hosts` list.
+
+## Card library results, 2026-10-20
+
+The standalone C++ target built with MSVC 19.44 and Qt 6.9.3. The complete screen
+suite passed. Checks include command dispatch, conditional PSN and Steam
+controls, discovery, menu actions, controller commands, empty-list navigation,
+focus restoration, and action bounds at 1280 by 720 and 800 by 600 logical pixels.
+The former index-map checks now supply complete backend host fixtures.
+
+Offscreen captures at both sizes confirmed the sidebar, dark cards, white
+console artwork, blue primary actions, and narrow sidebar controls. The console
+SVG body fill changed to white to keep it visible on the dark artwork panel.
+The card uses a local plain background because Material elevation effects do
+not render with Qt Quick's software renderer. Pixel checks cover both defects.
+
+The captures use sample hosts outside application resources. The preserved
+prototype branch and approved screenshot remain the design reference.
+The full changed application build and launch still require integration
+verification. Console hardware, PSN accounts, physical controllers, and Windows
+100%, 150%, and 200% display scaling remain untested in this ticket.
