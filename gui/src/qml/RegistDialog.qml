@@ -46,6 +46,8 @@ FocusScope {
     }
     component SetupButton: ConsoleButton {
         id: actionButton
+        topPadding: 10
+        bottomPadding: 10
         Layout.maximumWidth: parent.width
         implicitHeight: Math.max(42, contentItem.implicitHeight + topPadding + bottomPadding)
         contentItem: Text {
@@ -182,16 +184,20 @@ FocusScope {
     Rectangle { anchors.fill: parent; color: "#11151c" }
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 28
-        spacing: 14
-        SetupButton {
-            objectName: "registrationBack"
-            text: qsTr("‹ Back")
-            Accessible.name: qsTr("Back from console registration")
-            flat: true
-            onClicked: dialog.close()
+        anchors.margins: 24
+        spacing: 16
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 20
+            SetupButton {
+                objectName: "registrationBack"
+                text: qsTr("‹ Back")
+                Accessible.name: qsTr("Back from console registration")
+                flat: true
+                onClicked: dialog.close()
+            }
+            Label { text: qsTr("Register console"); font.pixelSize: 30; font.bold: true; Layout.fillWidth: true; wrapMode: Text.Wrap }
         }
-        Label { text: qsTr("Register console"); font.pixelSize: 30; font.bold: true }
         Label {
             Layout.fillWidth: true
             text: qsTr("Pair your console with your PlayStation Network account.")
