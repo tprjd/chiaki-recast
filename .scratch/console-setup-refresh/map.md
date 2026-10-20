@@ -16,6 +16,18 @@ The original checkout and index remain unchanged.
 Each ticket records its status and evidence. Completion requires the integrated
 screen tests, native contract checks, native UI checks, and final code review.
 
+## Integration evidence
+
+- The complete baseline suite passed in 407.94 seconds before feature changes.
+- Ticket 01 and its long-label correction merged at `71be21f0`.
+  [Integrated manual tests](evidence/ticket01-screen-tests.txt): 23 passed.
+  [Earlier complete screen run](evidence/ticket01-full-screen-tests.txt): 586 passed.
+- Ticket 02 merged at `8c8486ab`.
+  [Integrated registration form tests](evidence/ticket02-screen-tests.txt): 22 passed.
+
+These logs are retained here so that removing an implementation worktree does
+not remove its test evidence. Native acceptance remains ticket 04's work.
+
 ## Decisions
 
 Use the approved test boundaries in [the spec](spec.md). Real authentication,
