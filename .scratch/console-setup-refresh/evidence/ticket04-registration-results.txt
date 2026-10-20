@@ -1,0 +1,23 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::RegistrationResults::initTestCase()
+PASS   : console_screen::RegistrationResults::test_acceptedRequestShowsProgressThenSuccess()
+PASS   : console_screen::RegistrationResults::test_dismissalAndDestructionIgnoreLateCallbacks(close)
+PASS   : console_screen::RegistrationResults::test_dismissalAndDestructionIgnoreLateCallbacks(destroy)
+PASS   : console_screen::RegistrationResults::test_failureRetainsDetailsAndRetryOwnsItsResult()
+PASS   : console_screen::RegistrationResults::test_formKeepsItsOriginalConsoleContext()
+PASS   : console_screen::RegistrationResults::test_keyboardCanInspectAndLeaveDiagnostics()
+PASS   : console_screen::RegistrationResults::test_longActionsAndRenderedPanels(900-progress)
+PASS   : console_screen::RegistrationResults::test_longActionsAndRenderedPanels(900-success)
+PASS   : console_screen::RegistrationResults::test_longActionsAndRenderedPanels(900-failure)
+PASS   : console_screen::RegistrationResults::test_longActionsAndRenderedPanels(1280-progress)
+PASS   : console_screen::RegistrationResults::test_longActionsAndRenderedPanels(1280-success)
+PASS   : console_screen::RegistrationResults::test_longActionsAndRenderedPanels(1280-failure)
+PASS   : console_screen::RegistrationResults::test_longFormActionsStayInsidePanel()
+PASS   : console_screen::RegistrationResults::test_profileChangeInvalidatesFormAndInFlightResult(form)
+PASS   : console_screen::RegistrationResults::test_profileChangeInvalidatesFormAndInFlightResult(progress)
+PASS   : console_screen::RegistrationResults::test_resultsAndDiagnosticsStayReachable(minimum)
+PASS   : console_screen::RegistrationResults::test_resultsAndDiagnosticsStayReachable(normal)
+PASS   : console_screen::RegistrationResults::cleanupTestCase()
+Totals: 19 passed, 0 failed, 0 skipped, 0 blacklisted, 450ms
+********* Finished testing of console_screen *********
