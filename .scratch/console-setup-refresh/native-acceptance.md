@@ -10,7 +10,7 @@ The acceptance correction aligns the registration header, margins, and button
 padding with manual entry. No behavior or storage format changed in ticket 04.
 Source review found no lost console targets or account routes. The original
 checkout's 18 recorded file hashes remain unchanged. The parent agent's final
-Standards and Spec reviews are pending and remain separate from this acceptance.
+The [final Standards and Spec reviews](review.md) are complete with no open findings. The [cleanup verification](review-cleanup-verification.md) records the later shared-button extraction and final build.
 
 ## Screen tests
 

@@ -26,7 +26,7 @@ screen tests, native contract checks, native UI checks, and final code review.
   [Integrated registration form tests](evidence/ticket02-screen-tests.txt): 22 passed.
 
 These logs are retained here so that removing an implementation worktree does
-not remove its test evidence. Native acceptance remains ticket 04's work.
+not remove its test evidence. Native acceptance is recorded under ticket 04 below.
 
 ## Decisions
 
@@ -58,3 +58,18 @@ INI checks, and 111 framebuffer captures passed at both sizes and measured DPR
 QA hooks were removed. The normal build passed, and independent Computer Use
 confirmed the visible application and manual-entry route. The
 [acceptance record](native-acceptance.md) separates each check and its limits.
+
+## Completion
+
+The [specification](spec.md) and all four tickets are resolved. The
+[final review](review.md) has no open Standards or Spec findings. The one P3
+duplication finding is fixed by the shared SetupButton. The cleanup merged at
+`36587541` and passed 64 focused production-QML checks and the final normal build.
+See the [cleanup verification](review-cleanup-verification.md) for its source
+revision, exact binary hash, and the checks retained from native acceptance.
+
+The five implementation worktrees are archived. This integration worktree and
+all tracked evidence remain available. The original checkout and its 18
+recorded file hashes are unchanged. The final executable is in
+`C:/Users/david/.cache/chiaki-ui-native/console-setup-final-bin/`; its launcher
+supplies the runtime paths. It was not started, so the open app was untouched.

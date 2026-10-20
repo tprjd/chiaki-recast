@@ -1,6 +1,6 @@
 # Console setup: guided workspace
 
-Status: ready-for-agent
+Status: resolved
 Date: 2026-10-20
 Selected design: A, Guided workspace
 Test approach: confirmed by the user on 2026-10-20
@@ -333,5 +333,18 @@ hardware checks, not prerequisites for accepting this UI change.
   Use [Launch-chiaki.cmd](C:/Users/david/.cache/chiaki-ui-native/settings-bin/Launch-chiaki.cmd)
   for a manual launch. Process liveness alone does not confirm that the app
   window opened.
-- This specification is ready for implementation. Native implementation and
-  the acceptance checks described above have not started as part of this spec.
+- Implementation and acceptance were completed after this specification was approved.
+  The Answer below records the result.
+
+## Answer
+
+Implemented on `codex/console-setup-integration`. All four tickets are resolved.
+Both separate guided screens include the approved progress and result states.
+The [final review](review.md) has no open findings. The shared-button cleanup
+preserves the existing screen behavior and removes the one P3 duplication.
+
+The [native acceptance](native-acceptance.md) and
+[cleanup verification](review-cleanup-verification.md) distinguish the full
+suite and native checks from the focused checks and final build after cleanup.
+The original checkout and its recorded files remain unchanged. Real PSN
+authentication, console pairing, and physical controller input remain unverified.
