@@ -10,6 +10,20 @@ function findItem(parent, name) {
     return null;
 }
 
+function ensureFocusVisible(flick, item) {
+    if (!item) return;
+    let ancestor = item;
+    while (ancestor && ancestor !== flick.contentItem) ancestor = ancestor.parent;
+    if (!ancestor) return;
+    // Keep the slider's value label visible with its control.
+    const target = item.parent && item.parent !== flick.contentItem
+            && item.parent.height <= flick.height ? item.parent : item;
+    const point = target.mapToItem(flick.contentItem, 0, 0);
+    if (point.y < flick.contentY) flick.contentY = point.y;
+    else if (point.y + target.height > flick.contentY + flick.height)
+        flick.contentY = point.y + target.height - flick.height;
+}
+
 function reveal(page, route, kind, defaultTarget) {
     const catalogue = entries(page.backend.settings);
     const visited = [];
