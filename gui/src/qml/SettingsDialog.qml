@@ -2021,85 +2021,106 @@ FocusScope {
                 // Config (Options such as Import/Export and Logging)
                 Flickable {
                     id: configFlick
-                    anchors {
-                        fill: parent
-                        topMargin: 20
-                        bottomMargin: 20
-                    }
+                    objectName: "configFlick"
+                    anchors.fill: parent
                     clip: true
-                    contentWidth: Math.max(width, configGrid.width)
-                    contentHeight: configGrid.y + configGrid.height
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AlwaysOn
-                        visible: configFlick.contentHeight > configFlick.height
-                    }
-                    GridLayout {
+                    contentWidth: width
+                    contentHeight: configGrid.height + 32
+                    flickableDirection: Flickable.VerticalFlick
+                    ScrollBar.vertical: ScrollBar {}
+                    ColumnLayout {
                         id: configGrid
-                        anchors {
-                            top: parent.top
-                            horizontalCenter: parent.horizontalCenter
-                            topMargin: 30
-                        }
-                        columns: 1
-                        rowSpacing: 20
-                        columnSpacing: 10
-
-                        Label {
-                            text: {
-                                if(dialog.backend.settings.currentProfile)
-                                    qsTr("Current Profile: ") + dialog.backend.settings.currentProfile
-                                else
-                                    qsTr("Current Profile: default")
+                        x: 16; y: 16
+                        width: Math.max(0, configFlick.width - 48)
+                        spacing: 14
+                        Label { text: qsTr("Profiles"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: 24
+                                Label {
+                                    objectName: "configProfile"
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.Wrap
+                                    font.pixelSize: 14
+                                    text: qsTr("Current profile: %1").arg(dialog.backend.settings.streamerMode ? qsTr("Hidden") : (dialog.backend.settings.currentProfile || qsTr("default")))
+                                }
+                                C.Button {
+                                    id: profile
+                                    objectName: "manageProfiles"
+                                    text: qsTr("Manage profiles")
+                                    Accessible.name: text
+                                    firstInFocusChain: true
+                                    font.pixelSize: 14
+                                    onClicked: dialog.navigation.showProfileDialog()
+                                    Material.roundedScale: Material.SmallScale
+                                }
                             }
                         }
-
-                        C.Button {
-                            id: profile
-                            firstInFocusChain: true
-                            text: qsTr("Manage Profiles")
-                            onClicked: {
-                                dialog.navigation.showProfileDialog()
+                        Label { text: qsTr("Settings files"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            RowLayout {
+                                anchors.fill: parent
+                                spacing: 12
+                                C.Button {
+                                    id: exportButton
+                                    objectName: "exportSettings"
+                                    Layout.fillWidth: true
+                                    text: qsTr("Export settings to file")
+                                    Accessible.name: text
+                                    font.pixelSize: 14
+                                    onClicked: dialog.backend.settings.exportSettings()
+                                    Material.roundedScale: Material.SmallScale
+                                }
+                                C.Button {
+                                    id: importButton
+                                    objectName: "importSettings"
+                                    Layout.fillWidth: true
+                                    text: qsTr("Import settings from file")
+                                    Accessible.name: text
+                                    font.pixelSize: 14
+                                    onClicked: dialog.backend.settings.importSettings()
+                                    Material.roundedScale: Material.SmallScale
+                                }
                             }
-                            Material.roundedScale: Material.SmallScale
                         }
-
-                    C.Button {
-                        id: exportButton
-                        text: qsTr("Export settings to file")
-                        onClicked: {
-                            dialog.backend.settings.exportSettings();
-                        }
-                        Material.roundedScale: Material.SmallScale
-                    }
-
-                    C.Button {
-                        id: importButton
-                        text: qsTr("Import settings from file")
-                        onClicked: {
-                            dialog.backend.settings.importSettings();
-                        }
-                        Material.roundedScale: Material.SmallScale
-                    }
-
-                    C.Button {
-                        id: aboutButton
-                        text: qsTr("About %1-ng").arg(Qt.application.name)
-                        onClicked: aboutDialog.open()
-                        Material.roundedScale: Material.SmallScale
-                    }
-
-                    C.CheckBox {
-                        text: qsTr("Sanitize Logs (checked)")
-                        checked: dialog.backend.settings.logSanitize
-                        onToggled: dialog.backend.settings.logSanitize = checked
-                    }
-
-                        C.CheckBox {
-                            text: qsTr("Verbose Logging (unchecked)")
-                            checked: dialog.backend.settings.logVerbose
-                            lastInFocusChain: true
-                            onToggled: dialog.backend.settings.logVerbose = checked
+                        Label { text: qsTr("Diagnostics"); font.pixelSize: 14; font.bold: true }
+                        Frame {
+                            Layout.fillWidth: true
+                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+                            ColumnLayout {
+                                anchors.fill: parent
+                                C.CheckBox {
+                                    objectName: "logSanitize"
+                                    text: qsTr("Sanitize logs · Default: On")
+                                    Accessible.name: qsTr("Sanitize logs")
+                                    font.pixelSize: 14
+                                    checked: dialog.backend.settings.logSanitize
+                                    onToggled: dialog.backend.settings.logSanitize = checked
+                                }
+                                C.CheckBox {
+                                    objectName: "logVerbose"
+                                    text: qsTr("Verbose logging · Default: Off")
+                                    Accessible.name: qsTr("Verbose logging")
+                                    font.pixelSize: 14
+                                    checked: dialog.backend.settings.logVerbose
+                                    onToggled: dialog.backend.settings.logVerbose = checked
+                                }
+                                C.Button {
+                                    id: aboutButton
+                                    objectName: "aboutSettings"
+                                    text: qsTr("About %1-ng").arg(Qt.application.name)
+                                    Accessible.name: text
+                                    font.pixelSize: 14
+                                    lastInFocusChain: true
+                                    onClicked: aboutDialog.open()
+                                    Material.roundedScale: Material.SmallScale
+                                }
+                            }
                         }
                     }
                 }
@@ -2142,6 +2163,7 @@ FocusScope {
 
         Dialog {
             id: aboutDialog
+            objectName: "aboutDialog"
             parent: Overlay.overlay
             x: Math.round((dialog.navigation.width - width) / 2)
             y: Math.round((dialog.navigation.height - height) / 2)
