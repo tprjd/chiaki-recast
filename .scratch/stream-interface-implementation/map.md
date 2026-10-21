@@ -14,15 +14,15 @@ published in `fff89373`. Keep the prototype out of production integration.
 | Ticket | Delivers | Blocked by | Status |
 | --- | --- | --- | --- |
 | [01: Share the existing stream interface](issues/01-share-stream-interface.md) | Shared production menu and one test boundary, with current behavior preserved | None | resolved |
-| [02: Build the approved A toolbar](issues/02-stream-toolbar.md) | Complete descriptive toolbar, pop-ups, settings navigation, audio, Resume, and Disconnect | 01 | claimed |
+| [02: Build the approved A toolbar](issues/02-stream-toolbar.md) | Complete descriptive toolbar, pop-ups, settings navigation, audio, Resume, and Disconnect | 01 | resolved |
 | [03: Build the approved A statistics overlay](issues/03-stream-statistics.md) | Compact six-value readout with real bindings and visibility rules | 01 | resolved |
 | [04: Build the approved A session notices](issues/04-session-notices.md) | Network, blocked-content, and disabled-media notices with actions and cleanup | 01 | resolved |
-| [05: Complete native acceptance](issues/05-native-acceptance.md) | Combined native verification, regressions, and normal production build | 02, 03, 04 | ready-for-agent |
+| [05: Complete native acceptance](issues/05-native-acceptance.md) | Combined native verification, regressions, and normal production build | 02, 03, 04 | claimed |
 
 ## Work order
 
-Tickets 01, 03, and 04 are resolved. Ticket 02 remains claimed for implementation.
-Ticket 05 remains blocked by 02.
+Tickets 01 through 04 are resolved. Ticket 05 is claimed for combined native
+acceptance and the final normal production build.
 
 Shared source edits may need coordination. That is not an extra blocking edge.
 Each feature ticket must pass its own production QML checks before resolution;
@@ -86,6 +86,19 @@ Shared production content preserves input ownership and higher-priority dialogs.
 See [notice evidence](evidence/ticket04/README.md) for production QML results,
 Windows behavior, component captures, source hashes, and the normal native build.
 
-Ticket 02 remains claimed. Ticket 05 remains blocked by 02. Notice captures do not
+Ticket 02 remained claimed after ticket 04 was resolved. Notice captures do not
 establish actual OpenGL or Vulkan composition, fullscreen, physical controllers,
 live media, or further display scales. These native limits remain for ticket 05.
+
+Ticket [02](issues/02-stream-toolbar.md) is resolved in integration merge
+`81a9550e`, with final ticket commit `c685c01f`. Both renderer routes use the
+approved descriptive toolbar, one active flyout, live controls, settings links,
+Resume, and the configured disconnect policy. Captured controller keys reach
+the owned native menu or popup. The native toolbar window retains compact bounds.
+See [toolbar evidence](evidence/ticket02/README.md) for native input checks,
+component captures, long-label checks, source hashes, and post-merge QML results.
+
+Ticket [05](issues/05-native-acceptance.md) is claimed with all blockers resolved.
+It must build and verify the final combined source, including the focus-outline
+fix and notice integration that followed ticket 02's normal production build.
+The parent issue and approved specification remain unchanged.

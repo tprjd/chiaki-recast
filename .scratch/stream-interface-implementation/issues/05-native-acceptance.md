@@ -1,6 +1,6 @@
 # 05: Complete native acceptance
 
-Status: ready-for-agent
+Status: claimed
 Type: task
 Blocked by: 02, 03, 04
 
@@ -32,3 +32,7 @@ Parent and specification: [implementation map](../map.md).
 
 Tickets 02, 03, and 04 are direct blockers. Ticket 01 is already their prerequisite.
 This ticket verifies the integrated result; it does not replace feature-level tests.
+
+Claimed after tickets 02, 03, and 04 were resolved. Integration merge `81a9550e`
+contains all three features. Build and verify this final combined source, including
+the recorded focus-outline fix and notice integration after the toolbar's normal build.
