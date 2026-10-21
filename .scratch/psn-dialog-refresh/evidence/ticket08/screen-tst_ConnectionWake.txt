@@ -1,0 +1,17 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::ConnectionWake::initTestCase()
+PASS   : console_screen::ConnectionWake::test_cancelAndTimeoutCannotSendCompetingCommands()
+PASS   : console_screen::ConnectionWake::test_closedWaitDismissesAndLateResultsCannotNavigate()
+PASS   : console_screen::ConnectionWake::test_fallbackAppearsOnlyWhenThePsnRouteStarts()
+PASS   : console_screen::ConnectionWake::test_handoffKeepsAttemptOwnership()
+PASS   : console_screen::ConnectionWake::test_invalidTargetHasAUsefulReturnAndNoRetry()
+PASS   : console_screen::ConnectionWake::test_longWakeContentAndFocusRemainReachable(900x600)
+PASS   : console_screen::ConnectionWake::test_longWakeContentAndFocusRemainReachable(1280x720)
+PASS   : console_screen::ConnectionWake::test_manualWakeUsesItsOwnContextAndWaitsForActualResult()
+PASS   : console_screen::ConnectionWake::test_oldExitCannotDismissANewWait()
+PASS   : console_screen::ConnectionWake::test_startupWaitIdentifiesSelectedConsole()
+PASS   : console_screen::ConnectionWake::test_timeoutPersistsAndRetryWaitsForCleanup()
+PASS   : console_screen::ConnectionWake::cleanupTestCase()
+Totals: 13 passed, 0 failed, 0 skipped, 0 blacklisted, 4143ms
+********* Finished testing of console_screen *********

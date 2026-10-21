@@ -1,0 +1,16 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::ConsoleAppearance::initTestCase()
+PASS   : console_screen::ConsoleAppearance::test_detailsDimLibraryAndBlockBackgroundCommands()
+PASS   : console_screen::ConsoleAppearance::test_detailsPrimaryActionResolvesCurrentTargetAfterClosing()
+PASS   : console_screen::ConsoleAppearance::test_secondaryButtonsHaveVisibleOutlines(settingsButton)
+PASS   : console_screen::ConsoleAppearance::test_secondaryButtonsHaveVisibleOutlines(steamShortcutButton)
+PASS   : console_screen::ConsoleAppearance::test_secondaryButtonsHaveVisibleOutlines(quitButton)
+PASS   : console_screen::ConsoleAppearance::test_secondaryButtonsHaveVisibleOutlines(refreshPsnButton)
+PASS   : console_screen::ConsoleAppearance::test_secondaryButtonsHaveVisibleOutlines(discoveryButton)
+PASS   : console_screen::ConsoleAppearance::test_secondaryButtonsHaveVisibleOutlines(consoleActionsButton)
+PASS   : console_screen::ConsoleAppearance::test_secondaryButtonsHaveVisibleOutlines(pinShortcutButton)
+PASS   : console_screen::ConsoleAppearance::test_selectedBorderHasSameThicknessAboveAndBelowArtwork()
+PASS   : console_screen::ConsoleAppearance::cleanupTestCase()
+Totals: 12 passed, 0 failed, 0 skipped, 0 blacklisted, 6199ms
+********* Finished testing of console_screen *********

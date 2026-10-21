@@ -133,14 +133,15 @@ TestCase {
         const harness = createTemporaryObject(settingsComponent, tests);
         harness.screen.currentCategory = 8;
         const opener = findChild(harness, "aboutSettings");
+        opener.forceActiveFocus(Qt.TabFocusReason);
         for (let i = 0; i < 2; i++) {
-            opener.forceActiveFocus(Qt.TabFocusReason);
-            mouseClick(opener);
+            keyClick(Qt.Key_Return);
             const dialog = findChild(harness, "aboutDialog");
             tryCompare(dialog, "opened", true);
             keyClick(Qt.Key_Escape);
             tryCompare(dialog, "visible", false);
             tryCompare(opener, "activeFocus", true);
+            tryCompare(opener, "visualFocus", true);
         }
     }
     function test_longNoticeCanScrollWithKeyboard() {

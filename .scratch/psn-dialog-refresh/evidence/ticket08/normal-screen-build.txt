@@ -1,0 +1,1 @@
+[1/1] Linking CXX executable C:\Users\david\.cache\chiaki-ui-native\psn-dialog-final-bin\chiaki-console-screen-tests.exe

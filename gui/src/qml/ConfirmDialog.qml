@@ -63,8 +63,10 @@ Dialog {
         const done = completion;
         completion = null;
         callback = null; secondaryCallback = null; rejectCallback = null;
-        if (restoreFocusItem && restoreFocusItem.visible && restoreFocusItem.enabled)
+        if (restoreFocusItem && restoreFocusItem.visible && restoreFocusItem.enabled) {
+            restoreFocusItem.focus = false;
             restoreFocusItem.forceActiveFocus(Qt.TabFocusReason);
+        }
         else if (navigation) navigation.restoreMainFocus();
         restoreFocusItem = null;
         if (done) done();

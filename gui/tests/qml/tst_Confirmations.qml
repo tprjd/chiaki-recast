@@ -41,6 +41,7 @@ TestCase {
         compare(accepted, 0);
         compare(cancelled, 1);
         tryCompare(opener, "activeFocus", true);
+        tryCompare(opener, "visualFocus", true);
     }
     function test_explicitActions_data() {
         return ["Quit", "Delete console", "Hide console", "Unhide console"].map(label => ({tag: label, label: label}));

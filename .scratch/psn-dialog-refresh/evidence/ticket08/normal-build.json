@@ -1,0 +1,386 @@
+{
+  "integrationBase": "d565522881d22e020cd517cfb2996c0949e139a0",
+  "inputCount": 332,
+  "allProductionInputsMatch": true,
+  "executable": "C:\\Users\\david\\.cache\\chiaki-ui-native\\psn-dialog-final-bin\\chiaki.exe",
+  "executableSha256": "d9cc560bfefebdbe67fe6b10db14b965361463e497369a2af50b1361d9dc2f59",
+  "appLocalSteamDll": "C:\\Users\\david\\.cache\\chiaki-ui-native\\psn-dialog-final-bin\\libcpp-steam-tools.dll",
+  "appLocalSteamDllSha256": "911306cde3b9f04309d33f8180f4d6bb8705f2b56f034e9985e382b694d1f52a",
+  "appLocalSteamDllMatchesBuild": true,
+  "qaSymbolsAbsent": true,
+  "patchedSteamSourceSha256": "577ffb6ee58651c2708b2268861964cfc1f521ebde8e20b4c7dbd589ff20beaf",
+  "resources": [
+    {
+      "resource": "/qtquickcontrols2.conf",
+      "source": "gui/src/qml/qtquickcontrols2.conf",
+      "sha256": "afd2259524236eb8b339a63e0db0f93a548d9a44a151d62e9b08935a34f12f06"
+    },
+    {
+      "resource": "/Main.qml",
+      "source": "gui/src/qml/Main.qml",
+      "sha256": "431e53f1621c4d87f326046e4081d077cf0b6498f5107d9791195676592d52a1"
+    },
+    {
+      "resource": "/MainView.qml",
+      "source": "gui/src/qml/MainView.qml",
+      "sha256": "6038dd131dae27b3be35f00224a41813fce715e25ed826675c3e5ba046d606f8"
+    },
+    {
+      "resource": "/ConsoleLibrary.qml",
+      "source": "gui/src/qml/ConsoleLibrary.qml",
+      "sha256": "8dd460ddbbc4e601fedac7bc1426b6a33a01d13b238925442648250419ba3c8a"
+    },
+    {
+      "resource": "/ConsoleCard.qml",
+      "source": "gui/src/qml/ConsoleCard.qml",
+      "sha256": "1f9dbfd2eba81743d68c3f85e9e03f9f0fb8cded7c0a583a6102e1ab52a86a20"
+    },
+    {
+      "resource": "/ConsoleButton.qml",
+      "source": "gui/src/qml/ConsoleButton.qml",
+      "sha256": "7bf8a1aae6800125669ff11a06167efc1dcb9b5e7a02e508e18db087909d5f68"
+    },
+    {
+      "resource": "/SetupButton.qml",
+      "source": "gui/src/qml/SetupButton.qml",
+      "sha256": "27cbde094fb5f21f85fb815088a1f53fd44348f767070f28d4569242581e25af"
+    },
+    {
+      "resource": "/ConsoleDetails.qml",
+      "source": "gui/src/qml/ConsoleDetails.qml",
+      "sha256": "6efdf3dcc14969d1684c92e52c61ecc630178056dac0c0e2b85a6881de3a2952"
+    },
+    {
+      "resource": "/StreamView.qml",
+      "source": "gui/src/qml/StreamView.qml",
+      "sha256": "a25fa3de83846216f1bb49906f021e09711f362f816572d01951da5f4879507f"
+    },
+    {
+      "resource": "/StreamDisconnectDialog.qml",
+      "source": "gui/src/qml/StreamDisconnectDialog.qml",
+      "sha256": "12a4e23960fc4c6e0148c402c5ff2ca52ef8b254bedd6d9ac10876a7a70f23a4"
+    },
+    {
+      "resource": "/ConnectionView.qml",
+      "source": "gui/src/qml/ConnectionView.qml",
+      "sha256": "9f7f45a7ba5491e203529a9b0276b97d6260c2e5a7130e63859dd77903f90639"
+    },
+    {
+      "resource": "/StreamMenuWindow.qml",
+      "source": "gui/src/qml/StreamMenuWindow.qml",
+      "sha256": "158add3ef7c03c94b58b77632793d75cad1b262b67141b8d761d2db8ba3c6227"
+    },
+    {
+      "resource": "/ConfirmDialog.qml",
+      "source": "gui/src/qml/ConfirmDialog.qml",
+      "sha256": "b0738020bcd266118136dd110bc8d75a9fbf0219f5c05464c0d3d33c6763c7e8"
+    },
+    {
+      "resource": "/RendererFallbackDialog.qml",
+      "source": "gui/src/qml/RendererFallbackDialog.qml",
+      "sha256": "dea4dfc9ab6791ae21858f07a7a82ebd3cdfbbadf74d3be3636ed66161b05a88"
+    },
+    {
+      "resource": "/RegistrationMethodDialog.qml",
+      "source": "gui/src/qml/RegistrationMethodDialog.qml",
+      "sha256": "cbe9b6d3d0fc0ed88a88dfb5d9658c41adff81dde3c3e234d7939563147f1cbb"
+    },
+    {
+      "resource": "/RemindDialog.qml",
+      "source": "gui/src/qml/RemindDialog.qml",
+      "sha256": "e348385f1c2b6d6d55b3c66a8eb91dd2cb96deaa5a7e5d665d324ce735050a3a"
+    },
+    {
+      "resource": "/DialogView.qml",
+      "source": "gui/src/qml/DialogView.qml",
+      "sha256": "7d5606deeda1cf6fffaefccf7ace856aefb2e9c6a20b2a84c18537a67b20dbcf"
+    },
+    {
+      "resource": "/ManualHostDialog.qml",
+      "source": "gui/src/qml/ManualHostDialog.qml",
+      "sha256": "8b66fc7fa12499e6d6d1af53f7cb86af24c095e3649602b8d77ff4edb4197afb"
+    },
+    {
+      "resource": "/RegistDialog.qml",
+      "source": "gui/src/qml/RegistDialog.qml",
+      "sha256": "d607b05c96c2355afdf83316d647bef5eb5846e936bb6c48d4bf854be429a626"
+    },
+    {
+      "resource": "/SteamShortcutDialog.qml",
+      "source": "gui/src/qml/SteamShortcutDialog.qml",
+      "sha256": "9e87353a0fbdd74999b1ff49010420baefd3ab4140c640411fc72062408ce225"
+    },
+    {
+      "resource": "/SettingsDialog.qml",
+      "source": "gui/src/qml/SettingsDialog.qml",
+      "sha256": "55285db00e0782dac242d847266c516fd63fcf47dbf151ec58a8dc19c54ec2a2"
+    },
+    {
+      "resource": "/SettingsSearch.js",
+      "source": "gui/src/qml/SettingsSearch.js",
+      "sha256": "1136270efe6595e4cca9368887a4873d6fcf9866547c53953653a4446b439122"
+    },
+    {
+      "resource": "/DisplaySettingsDialog.qml",
+      "source": "gui/src/qml/DisplaySettingsDialog.qml",
+      "sha256": "75864fde807ffaa89f93cdd824d412a0bd53a175444251cb84005cc001e36612"
+    },
+    {
+      "resource": "/PlaceboSettingsDialog.qml",
+      "source": "gui/src/qml/PlaceboSettingsDialog.qml",
+      "sha256": "a7001f4f0f90689efa49f2f7c44c744ee2046b0100051061bf4b5bfe512c6cd1"
+    },
+    {
+      "resource": "/PlaceboColorMappingDialog.qml",
+      "source": "gui/src/qml/PlaceboColorMappingDialog.qml",
+      "sha256": "4d54a0f7503fd1d94b405a68781b8d88d8efb08f61386cd9881145066159721d"
+    },
+    {
+      "resource": "/ProfileDialog.qml",
+      "source": "gui/src/qml/ProfileDialog.qml",
+      "sha256": "3491f66f2266f672530762597f3184eb63d12d4891a7b998310972df8ffc4cfd"
+    },
+    {
+      "resource": "/ConsolePinDialog.qml",
+      "source": "gui/src/qml/ConsolePinDialog.qml",
+      "sha256": "3888834b57436e76de54e19363fc08d862fdae8ef151bbb318b44579ba0860b2"
+    },
+    {
+      "resource": "/ConsolePinContent.qml",
+      "source": "gui/src/qml/ConsolePinContent.qml",
+      "sha256": "61724a6cddd54fb7520b36d65857d28200efe2937534ea9dc96186c90a6c6461"
+    },
+    {
+      "resource": "/LiveConsolePinContent.qml",
+      "source": "gui/src/qml/LiveConsolePinContent.qml",
+      "sha256": "27d538e9ece89c75b569baa4af4bc26c556905c6eb8d928788d46216fd4b87bc"
+    },
+    {
+      "resource": "/LiveConsolePinHost.qml",
+      "source": "gui/src/qml/LiveConsolePinHost.qml",
+      "sha256": "1b47a9535182f61717d99cfde37fb07585f6209d1a13e50caff36b67324d61da"
+    },
+    {
+      "resource": "/PSNLoginDialog.qml",
+      "source": "gui/src/qml/PSNLoginDialog.qml",
+      "sha256": "95cfda0ebb422bc83cdb6e5081975a3136a89006823688699cd663cb3c0d2ab7"
+    },
+    {
+      "resource": "/PSNTokenDialog.qml",
+      "source": "gui/src/qml/PSNTokenDialog.qml",
+      "sha256": "b89db5e5461409b00fd73a4eaf2e9f0b37ee893e101c829e3b77898500b3cba8"
+    },
+    {
+      "resource": "/ControllerMappingDialog.qml",
+      "source": "gui/src/qml/ControllerMappingDialog.qml",
+      "sha256": "d57d208e17367a5a824b48edddd10c1fc512e717d589527b47f7382219a74b5a"
+    },
+    {
+      "resource": "/AutoConnectView.qml",
+      "source": "gui/src/qml/AutoConnectView.qml",
+      "sha256": "318bbe1c97a901ec303bba500dc320916e6ec0c4152dc16c2d62dfbc768e79dc"
+    },
+    {
+      "resource": "/PsnView.qml",
+      "source": "gui/src/qml/PsnView.qml",
+      "sha256": "67abe592b0848158c53648ca2742b3aed0ee88c4d7c7ccef7d87d68bf1a39661"
+    },
+    {
+      "resource": "/controls/Button.qml",
+      "source": "gui/src/qml/controls/Button.qml",
+      "sha256": "476a452c1f931a3f186aca7856a3d6745ae5ddd254edd905bf55b2550654298e"
+    },
+    {
+      "resource": "/controls/CheckBox.qml",
+      "source": "gui/src/qml/controls/CheckBox.qml",
+      "sha256": "a9fc7133672cfb7080f427839f4642e80e345ea7925cf0d49ffbbb02a1dc0918"
+    },
+    {
+      "resource": "/controls/ComboBox.qml",
+      "source": "gui/src/qml/controls/ComboBox.qml",
+      "sha256": "084a8a66182eb2610f6eaeed6a3d00f5238260be687d070b2fd2a373cd6612bf"
+    },
+    {
+      "resource": "/controls/RadioButton.qml",
+      "source": "gui/src/qml/controls/RadioButton.qml",
+      "sha256": "fecea7609115d8711e4736519c09c871f7667757dd43990d15a859dc64fd87e5"
+    },
+    {
+      "resource": "/controls/Slider.qml",
+      "source": "gui/src/qml/controls/Slider.qml",
+      "sha256": "caa6f05204e75a0d068eb15d7ce71b3d0c669ac9c77ec245795db5a80873361d"
+    },
+    {
+      "resource": "/controls/TextField.qml",
+      "source": "gui/src/qml/controls/TextField.qml",
+      "sha256": "b9e361b6d19ba8632ece7a93bc72e70876a682db73b859beb83495bcd3451938"
+    },
+    {
+      "resource": "/icons/settings-20px.svg",
+      "source": "gui/res/settings-20px.svg",
+      "sha256": "9612037446e0413c2cd043a0d4bb633d973d75941378cf809275e5cddad83d79"
+    },
+    {
+      "resource": "/icons/add-24px.svg",
+      "source": "gui/res/add-24px.svg",
+      "sha256": "0f9c3aeb08f6c1b737a0c5d71f99807f2b8c27bf938ff9801095403db0b6a3fb"
+    },
+    {
+      "resource": "/icons/search-24px.svg",
+      "source": "gui/res/search-24px.svg",
+      "sha256": "f7fdca9fdd93c0624dcfa6e2f64b2a5c7b78f1d60145a165d2b9781f09788490"
+    },
+    {
+      "resource": "/icons/more-24px.svg",
+      "source": "gui/res/more-24px.svg",
+      "sha256": "d527aba75260ddf83a7fd4476136b9af22594309e9c71e5cecf710216c2fc442"
+    },
+    {
+      "resource": "/icons/close-24px.svg",
+      "source": "gui/res/close-24px.svg",
+      "sha256": "f09698af06ea9142bbc384b3ffacee473e303ea6f79a9af763fc8ddde9938704"
+    },
+    {
+      "resource": "/icons/arrow-right-24px.svg",
+      "source": "gui/res/arrow-right-24px.svg",
+      "sha256": "3bb0bf02eb87eb8f376ac97252bc5f1c7caaac85bcf1d61c226efd2ade53d3cd"
+    },
+    {
+      "resource": "/icons/discover-24px.svg",
+      "source": "gui/res/discover-24px.svg",
+      "sha256": "2805513c42bf707a95af7d034eb865efb3aeff5463175ef02dacfa3a5339389a"
+    },
+    {
+      "resource": "/icons/discover-off-24px.svg",
+      "source": "gui/res/discover-off-24px.svg",
+      "sha256": "730912ad27e9b0b203ce1726b2f762a436dc88fb9de4cd56b56d3e7b2d837dee"
+    },
+    {
+      "resource": "/icons/chiaking.svg",
+      "source": "gui/res/chiaking.svg",
+      "sha256": "48229ecdfedc671eca564ee4aadbabb8eaf3d3a875842f654f12a822f895248c"
+    },
+    {
+      "resource": "/icons/chiaking-logo.svg",
+      "source": "gui/res/chiaking-logo.svg",
+      "sha256": "b8c4d80a2012086655365f5c7ba3e1f3c85a29a5072d52f9232efc43dd7aeaf2"
+    },
+    {
+      "resource": "/icons/chiaking-logo-white.svg",
+      "source": "gui/res/chiaking-logo-white.svg",
+      "sha256": "e5a088049809db3e61624ca3eefd94a8d1df81c619708aed0559a26f99370d59"
+    },
+    {
+      "resource": "/icons/chiaki.svg",
+      "source": "gui/res/chiaki.svg",
+      "sha256": "287894f55429f6ff4f1e7a9a82097ca679826ffc20ea6d65b1784c0389665499"
+    },
+    {
+      "resource": "/icons/chiaki_macos.svg",
+      "source": "gui/res/chiaki_macos.svg",
+      "sha256": "84c83a6c9aa457cf7b7d89baeee508bfae11cf9adf840edc5cc76f1b157feb9b"
+    },
+    {
+      "resource": "/icons/chiaking_macos.svg",
+      "source": "gui/res/chiaking_macos.svg",
+      "sha256": "e4e5e8a3fa381b0741f381204b4ff5cc9ea39c33cc614def3c5078cf1b515cbe"
+    },
+    {
+      "resource": "/icons/console-ps4.svg",
+      "source": "gui/res/console-ps4.svg",
+      "sha256": "1208212ec98eee24166d40d71766177b83c09d02ea540de1578e99fa59455a47"
+    },
+    {
+      "resource": "/icons/console-ps5.svg",
+      "source": "gui/res/console-ps5.svg",
+      "sha256": "db28857dcc12053736e86254db0e24a5f3485b1ddd02141b891dc42595a04dfb"
+    },
+    {
+      "resource": "/icons/buttons-ps.svg",
+      "source": "gui/res/buttons-ps.svg",
+      "sha256": "e86dc3433d7cc3dde6561be8ac0fe46d2d5a3be46f129b3c36d02b1d8d5d1bf7"
+    },
+    {
+      "resource": "/icons/buttons-deck.svg",
+      "source": "gui/res/buttons-deck.svg",
+      "sha256": "2cdc160b29f273aa31f6db636ccefc05f17606a10f4ea952be903d9172369e73"
+    },
+    {
+      "resource": "/icons/l1.svg",
+      "source": "gui/res/l1.svg",
+      "sha256": "f3ef83cd44533b4247da74d7b061e9acab7ddf5e17aa935f0ccb8e91d69eab3c"
+    },
+    {
+      "resource": "/icons/r1.svg",
+      "source": "gui/res/r1.svg",
+      "sha256": "e1a19749652a403aa6538a2f2a7812631c384e9ead07c986ec56898a45909318"
+    },
+    {
+      "resource": "/icons/l3.svg",
+      "source": "gui/res/l3.svg",
+      "sha256": "fc44c4a1d65f26f1025a4b2ec5c9a77cfe9d104e45c658c9f8c6bbd9642a892f"
+    },
+    {
+      "resource": "/icons/r3.svg",
+      "source": "gui/res/r3.svg",
+      "sha256": "081090428a8263bbf3259bae9bb8722e6f2a1e8bfe6b30f3759ad3686b141e86"
+    },
+    {
+      "resource": "/icons/options.svg",
+      "source": "gui/res/options.svg",
+      "sha256": "1ad50297b208378b8ecc59b0b09162a34f72b8e47c4b28b6c734fed1c8797b4b"
+    },
+    {
+      "resource": "/icons/steam_hero.png",
+      "source": "gui/res/steam_hero.png",
+      "sha256": "b7633e7d9013114004361a92186b0abebe94fc8fbed52493b5e9dc73183522ee"
+    },
+    {
+      "resource": "/icons/steam_icon.png",
+      "source": "gui/res/steam_icon.png",
+      "sha256": "c5f5f0b1d670ea60f8b86a2e8ad1371527c4571d22b2a8fff1fee2b145f1329d"
+    },
+    {
+      "resource": "/icons/steam_landscape.png",
+      "source": "gui/res/steam_landscape.png",
+      "sha256": "4966ffe6fc8117ba66f9a2d7952c424f2152f67c366f0072560821e6a3629e18"
+    },
+    {
+      "resource": "/icons/steam_logo.png",
+      "source": "gui/res/steam_logo.png",
+      "sha256": "5b63c1f40f31dc09dc06eb2ecf4025fbee5bc059f443670fa711364a96ad6070"
+    },
+    {
+      "resource": "/icons/steam_portrait.png",
+      "source": "gui/res/steam_portrait.png",
+      "sha256": "1512335f8119708dc3c8ea8fc622fc89c6e0c2fbf1150519f172fa4c0b0b5da2"
+    },
+    {
+      "resource": "/shaders/FSR.glsl",
+      "source": "gui/res/shaders/FSR.glsl",
+      "sha256": "da0ef900341515d35993d90f5f5f01e3df45f9148615e725a783488198ede675"
+    },
+    {
+      "resource": "/shaders/FSRCNNX_x2_8-0-4-1.glsl",
+      "source": "gui/res/shaders/FSRCNNX_x2_8-0-4-1.glsl",
+      "sha256": "05990107059591be7c9e52c868055e47aec4a67650ac0c0eef4abf6248b70dd8"
+    },
+    {
+      "resource": "/shaders/FSRCNNX_x2_16-0-4-1.glsl",
+      "source": "gui/res/shaders/FSRCNNX_x2_16-0-4-1.glsl",
+      "sha256": "3fad74dff41e7600f5e447e434dbc72f860677e5d4654d4e029129fd5ea834eb"
+    }
+  ],
+  "requiredScreensPresent": true,
+  "fixturesAndQaResourcesAbsent": true,
+  "submodulePins": {
+    "android/app/src/main/cpp/oboe": "0ab5b12a5bc3630a3d6c83b20eed2a669ebf7a24",
+    "switch/borealis": "93c5d3b3bf26c8dc45d8d88b03f1b4238aad13dd",
+    "test/munit": "439de4a9b136bc3b5163e73d4caf37c590bef875",
+    "third-party/cpp-steam-tools": "d36565f8eaca113efd454efe714126cd77a01512",
+    "third-party/curl": "b1ef0e1a01c0bb6ee5367bd9c186a603bde3615a",
+    "third-party/gf-complete": "fa54a4670a5705c84abf6c24b92b0cd479625478",
+    "third-party/jerasure": "505ccb4bc69eee8d7ea40a6089a056b99671134f",
+    "third-party/nanopb": "cad3c18ef15a663e30e3e43e3a752b66378adec1"
+  }
+}

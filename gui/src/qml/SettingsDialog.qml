@@ -2372,11 +2372,12 @@ FocusScope {
                 steamLabel.forceActiveFocus(Qt.TabFocusReason);
             }
             onClosed: {
-                if(resetMapping)
-                    controllerMappingReset.forceActiveFocus(Qt.TabFocusReason);
-                else
-                    controllerMappingChange.forceActiveFocus(Qt.TabFocusReason);
                 focus = false;
+                const opener = resetMapping ? controllerMappingReset : controllerMappingChange;
+                if (dialog.visible && opener.visible && opener.enabled) {
+                    opener.focus = false;
+                    opener.forceActiveFocus(Qt.TabFocusReason);
+                }
             }
             Material.roundedScale: Material.MediumScale
 

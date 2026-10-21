@@ -1,0 +1,27 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::ManualHost::initTestCase()
+PASS   : console_screen::ManualHost::test_backendRejectionKeepsDetailsAndSelection()
+PASS   : console_screen::ManualHost::test_emptyListSavesTrimmedHostnameOnceAndShowsResult()
+PASS   : console_screen::ManualHost::test_existingRegistrationRequiresChoiceAndFollowsReorder()
+PASS   : console_screen::ManualHost::test_explicitDeferredChoiceWithExistingRecords()
+PASS   : console_screen::ManualHost::test_invalidSelectionCanBeCorrectedWithoutLosingAddress(removed)
+PASS   : console_screen::ManualHost::test_invalidSelectionCanBeCorrectedWithoutLosingAddress(ambiguous)
+PASS   : console_screen::ManualHost::test_invalidSelectionCanBeCorrectedWithoutLosingAddress(profile)
+PASS   : console_screen::ManualHost::test_keyboardFocusAndLongTextAtRequiredSizes(minimum)
+PASS   : console_screen::ManualHost::test_keyboardFocusAndLongTextAtRequiredSizes(wide)
+PASS   : console_screen::ManualHost::test_longSelectorTextWraps()
+PASS   : console_screen::ManualHost::test_mouseSelectionUsesIntendedRegistration()
+PASS   : console_screen::ManualHost::test_popupEscapeAndFieldEditingKeepScreenOpen()
+PASS   : console_screen::ManualHost::test_privateSelectorAndResultMaskIdentifiers()
+PASS   : console_screen::ManualHost::test_profileChangeDuringFailureRequiresNewChoice()
+PASS   : console_screen::ManualHost::test_renderedWorkspace(900-form)
+PASS   : console_screen::ManualHost::test_renderedWorkspace(900-saved)
+PASS   : console_screen::ManualHost::test_renderedWorkspace(900-failure)
+PASS   : console_screen::ManualHost::test_renderedWorkspace(1280-form)
+PASS   : console_screen::ManualHost::test_renderedWorkspace(1280-saved)
+PASS   : console_screen::ManualHost::test_renderedWorkspace(1280-failure)
+PASS   : console_screen::ManualHost::test_whitespaceAndEditingDoNotSave()
+PASS   : console_screen::ManualHost::cleanupTestCase()
+Totals: 23 passed, 0 failed, 0 skipped, 0 blacklisted, 12346ms
+********* Finished testing of console_screen *********
