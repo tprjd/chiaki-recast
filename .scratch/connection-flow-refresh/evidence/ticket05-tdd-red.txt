@@ -18,6 +18,7 @@ FAIL!  : console_screen::tst_LiveConsolePin::compile() Type LiveConsolePinHarnes
 C:\Users\david\.codex\worktrees\connection-live-pin\chiaki-ng-ui\gui\tests\qml\tst_LiveConsolePin.qml(13) : failure location
 Totals: 0 passed, 1 failed, 0 skipped, 0 blacklisted, 1ms
 ********* Finished testing of console_screen *********
+
 ********* Start testing of console_screen *********
 Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
 PASS   : console_screen::LiveConsolePin::initTestCase()
@@ -35,65 +36,8 @@ Totals: 3 passed, 3 failed, 0 skipped, 0 blacklisted, 15516ms
 ********* Start testing of console_screen *********
 Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
 PASS   : console_screen::LiveConsolePin::initTestCase()
-PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(button)
-PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(escape)
-PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(submitting)
-PASS   : console_screen::LiveConsolePin::test_currentSessionCanSubmitOnceWithLeadingZeros()
-FAIL!  : console_screen::LiveConsolePin::test_incorrectSavedPinAndRejectionShowFreshMaskedEntry() Compared values are not the same
-   Actual   (): 0
-   Expected (): 1
-C:\Users\david\.codex\worktrees\connection-live-pin\chiaki-ng-ui\gui\tests\qml\tst_LiveConsolePin.qml(84) : failure location
-PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(0)
-PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(1)
-PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(2)
-PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(3)
-PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(4)
-PASS   : console_screen::LiveConsolePin::test_privacyHidesRevealedPinAndConsoleIdentity()
-PASS   : console_screen::LiveConsolePin::test_replacementAndRemovalClearInputWithoutSendingToNewRequest()
-FAIL!  : console_screen::LiveConsolePin::test_routeHandoffRetainsOnePromptAndReleasesAfterNativeAcceptance() 'function returned false' returned FALSE. ()
-C:\Users\david\.codex\worktrees\connection-live-pin\chiaki-ng-ui\gui\tests\qml\tst_LiveConsolePin.qml(130) : failure location
-PASS   : console_screen::LiveConsolePin::cleanupTestCase()
-Totals: 13 passed, 2 failed, 0 skipped, 0 blacklisted, 5330ms
-********* Finished testing of console_screen *********
-
-********* Start testing of console_screen *********
-Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
-PASS   : console_screen::LiveConsolePin::initTestCase()
-PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(button)
-PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(escape)
-PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(submitting)
-FAIL!  : console_screen::LiveConsolePin::test_captureGuidedWorkspace(900) Uncaught exception: Can't save to ../../.scratch/connection-flow-refresh/evidence/ticket05-A-900.png: Cannot open device for writing: The system cannot find the path specified.
-C:\Users\david\.codex\worktrees\connection-live-pin\chiaki-ng-ui\gui\tests\qml\tst_LiveConsolePin.qml(208) : failure location
-FAIL!  : console_screen::LiveConsolePin::test_captureGuidedWorkspace(1280) Uncaught exception: Can't save to ../../.scratch/connection-flow-refresh/evidence/ticket05-A-1280.png: Cannot open device for writing: The system cannot find the path specified.
-C:\Users\david\.codex\worktrees\connection-live-pin\chiaki-ng-ui\gui\tests\qml\tst_LiveConsolePin.qml(208) : failure location
-FAIL!  : console_screen::LiveConsolePin::test_captureGuidedWorkspace(compact) Uncaught exception: Can't save to ../../.scratch/connection-flow-refresh/evidence/ticket05-A-compact.png: Cannot open device for writing: The system cannot find the path specified.
-C:\Users\david\.codex\worktrees\connection-live-pin\chiaki-ng-ui\gui\tests\qml\tst_LiveConsolePin.qml(208) : failure location
-PASS   : console_screen::LiveConsolePin::test_compactWindowCloseUsesTheSameCancelAndWaits()
-QWARN  : console_screen::LiveConsolePin::test_contentAndActionsRemainReachable(900) QUnifiedTimer::stopAnimationDriver: driver is not running
-FAIL!  : console_screen::LiveConsolePin::test_contentAndActionsRemainReachable(900) 'function returned false' returned FALSE. ()
-C:\Users\david\.codex\worktrees\connection-live-pin\chiaki-ng-ui\gui\tests\qml\tst_LiveConsolePin.qml(188) : failure location
-PASS   : console_screen::LiveConsolePin::test_contentAndActionsRemainReachable(1280)
-PASS   : console_screen::LiveConsolePin::test_contentAndActionsRemainReachable(compact)
-PASS   : console_screen::LiveConsolePin::test_currentSessionCanSubmitOnceWithLeadingZeros()
-PASS   : console_screen::LiveConsolePin::test_incorrectSavedPinAndRejectionShowFreshMaskedEntry()
-PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(0)
-PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(1)
-PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(2)
-PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(3)
-PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(4)
-PASS   : console_screen::LiveConsolePin::test_privacyHidesRevealedPinAndConsoleIdentity()
-PASS   : console_screen::LiveConsolePin::test_replacementAndRemovalClearInputWithoutSendingToNewRequest()
-PASS   : console_screen::LiveConsolePin::test_routeHandoffRetainsOnePromptAndReleasesAfterNativeAcceptance()
-PASS   : console_screen::LiveConsolePin::cleanupTestCase()
-Totals: 18 passed, 4 failed, 0 skipped, 0 blacklisted, 5703ms
-********* Finished testing of console_screen *********
-
-********* Start testing of console_screen *********
-Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
-PASS   : console_screen::LiveConsolePin::initTestCase()
 FAIL!  : console_screen::LiveConsolePin::test_routeHandoffRetainsOnePromptAndReleasesAfterNativeAcceptance() 'function returned false' returned FALSE. ()
 C:\Users\david\.codex\worktrees\connection-live-pin\chiaki-ng-ui\gui\tests\qml\tst_LiveConsolePin.qml(132) : failure location
 PASS   : console_screen::LiveConsolePin::cleanupTestCase()
 Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 5208ms
 ********* Finished testing of console_screen *********
-
