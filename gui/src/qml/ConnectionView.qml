@@ -56,7 +56,7 @@ FocusScope {
         navigation.showMainView();
     }
     function focusAction() {
-        if (!visible || leaving || commandPending) return;
+        if (!visible || leaving || commandPending || retiring) return;
         if (canRetry) retryButton.forceActiveFocus(Qt.TabFocusReason);
         else if (terminal && !attempt.cleanupPending) backButton.forceActiveFocus(Qt.TabFocusReason);
         else if (canCancel) cancelButton.forceActiveFocus(Qt.TabFocusReason);
