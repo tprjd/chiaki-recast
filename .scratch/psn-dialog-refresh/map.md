@@ -8,7 +8,7 @@ Specification: [PSN sign-in and remaining dialogs](spec.md)
 
 | Ticket | Status | Blocked by |
 | --- | --- | --- |
-| [01: PSN setup and credential renewal](issues/01-psn-setup-and-renewal.md) | claimed | None |
+| [01: PSN setup and credential renewal](issues/01-psn-setup-and-renewal.md) | resolved | None |
 | [02: Account-ID retrieval for registration](issues/02-registration-account-id.md) | ready-for-agent | 01 |
 | [03: Steam shortcut creation and results](issues/03-steam-shortcut-results.md) | resolved | None |
 | [04: Startup reminder choices](issues/04-startup-reminders.md) | resolved | None |
@@ -19,8 +19,7 @@ Specification: [PSN sign-in and remaining dialogs](spec.md)
 
 ## Execution order
 
-- Tickets 01 and 06 are claimed. Ticket 07 is open and unblocked. The first eligible ticket is 07.
-- Ticket 02 starts after 01 is resolved.
+- Tickets 06 and 07 are claimed. Ticket 02 is open and unblocked. The first eligible ticket is 02.
 - Ticket 08 starts after 02, 03, 04, 05, 06, and 07 are resolved. Ticket 01 is included through 02.
 - Every feature ticket includes its own focused tests. Ticket 08 verifies the integrated production build and cross-flow behavior.
 - Shared-file overlap requires coordination, not extra blocking edges. Allow only one writer to the shared native build cache.
@@ -57,4 +56,6 @@ Final review compares the integration branch with `9b138cc43a5d667933284f1c24e8d
 2026-10-21: Resolved [ticket 03](issues/03-steam-shortcut-results.md). Merge `39bea6eb` integrates `codex/psn-steam` at `8e764707` without conflicts. Steam creation retains editable input, reports terminal results, and applies dependency fixes to a build copy. The [focused screen results](evidence/ticket03-screen-green.txt) record 21 passing checks. The [native results](evidence/ticket03-native-green.txt) verify actual writes and controlled failures in a temporary Steam directory. The [broad regression run](evidence/ticket03-screen-regressions.txt) was stopped and is incomplete. Normal application, visible native, and real Steam acceptance remain in ticket 08.
 
 2026-10-21: Resolved [ticket 04](issues/04-startup-reminders.md). Merge `2c05f543` integrates `codex/psn-reminders` at `216d5d62` without conflicts. Reminders have separate Set up now, Later, and Don't ask again choices. Dismissal preserves preferences and retains Steam-then-PSN order. The [reminder results](evidence/ticket04/reminder-final.txt) record 28 passing checks. The ticket links another 50 passing focused regression checks for confirmations, registration choices, and Steam reminder results. Visible native and integrated acceptance remain in ticket 08.
+
+2026-10-21: Resolved [ticket 01](issues/01-psn-setup-and-renewal.md). Merge `d22b035b` integrates `codex/psn-setup` at `c4fff081` without conflicts. PSN setup uses guarded native requests, masked redirect input, persistent results, and explicit closure wording. The [full screen results](evidence/ticket01-screen-full.txt) record 721 passing checks, and the [post-merge PSN results](evidence/ticket01-screen-after-merge.txt) record 10 passing checks. The [controlled native evidence](evidence/ticket01-native-contracts.json) records 125 checks, actual isolated persistence, and visible native input at both required sizes. The normal build matches source `19c81712` before integration and does not prove the final integrated build. Real PSN sign-in, physical controller input, and final integrated acceptance remain in ticket 08. Ticket 02 can now start.
 
