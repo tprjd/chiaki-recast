@@ -1,0 +1,29 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamInterface::initTestCase()
+PASS   : console_screen::StreamInterface::test_closeNativeWindow(window)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-cancel)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-escape)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-disconnect)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-sleep)
+FAIL!  : console_screen::StreamInterface::test_disconnectEntry(window-cancel) property activeFocus
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(64) : failure location
+FAIL!  : console_screen::StreamInterface::test_disconnectEntry(window-escape) property activeFocus
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(64) : failure location
+FAIL!  : console_screen::StreamInterface::test_disconnectEntry(window-disconnect) property activeFocus
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(64) : failure location
+FAIL!  : console_screen::StreamInterface::test_disconnectEntry(window-sleep) property activeFocus
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(64) : failure location
+PASS   : console_screen::StreamInterface::test_menuRoundTrip(inline)
+PASS   : console_screen::StreamInterface::test_menuRoundTrip(window)
+PASS   : console_screen::StreamInterface::cleanupTestCase()
+Totals: 9 passed, 4 failed, 0 skipped, 0 blacklisted, 27615ms
+********* Finished testing of console_screen *********

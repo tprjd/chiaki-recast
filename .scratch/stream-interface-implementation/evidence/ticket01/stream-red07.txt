@@ -1,0 +1,37 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamInterface::initTestCase()
+PASS   : console_screen::StreamInterface::test_closeNativeWindow(window)
+FAIL!  : console_screen::StreamInterface::test_controls(inline) Compared values are not the same
+   Actual   (): 64
+   Expected (): 0
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(87) : failure location
+FAIL!  : console_screen::StreamInterface::test_controls(window) Compared values are not the same
+   Actual   (): 64
+   Expected (): 0
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(87) : failure location
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-cancel)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-escape)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-disconnect)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-sleep)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(window-cancel)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(window-escape)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(window-disconnect)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(window-sleep)
+PASS   : console_screen::StreamInterface::test_menuRoundTrip(inline)
+PASS   : console_screen::StreamInterface::test_menuRoundTrip(window)
+FAIL!  : console_screen::StreamInterface::test_sessionRemoval(inline) property releases
+   Actual   (): 0
+   Expected (): 1
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(166) : failure location
+FAIL!  : console_screen::StreamInterface::test_sessionRemoval(window) property releases
+   Actual   (): 0
+   Expected (): 1
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(166) : failure location
+PASS   : console_screen::StreamInterface::test_settingsActions(inline-false)
+PASS   : console_screen::StreamInterface::test_settingsActions(inline-true)
+PASS   : console_screen::StreamInterface::test_settingsActions(window-false)
+PASS   : console_screen::StreamInterface::test_settingsActions(window-true)
+PASS   : console_screen::StreamInterface::cleanupTestCase()
+Totals: 17 passed, 4 failed, 0 skipped, 0 blacklisted, 23775ms
+********* Finished testing of console_screen *********

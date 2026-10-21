@@ -1,0 +1,22 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamInterface::initTestCase()
+FAIL!  : console_screen::StreamInterface::test_configuredDisconnect(inline-stop) Compared values are not the same
+   Actual   (): 2
+   Expected (): 1
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(260) : failure location
+FAIL!  : console_screen::StreamInterface::test_configuredDisconnect(inline-sleep) Compared values are not the same
+   Actual   (): 2
+   Expected (): 1
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(260) : failure location
+FAIL!  : console_screen::StreamInterface::test_configuredDisconnect(window-stop) Compared values are not the same
+   Actual   (): 2
+   Expected (): 1
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(260) : failure location
+FAIL!  : console_screen::StreamInterface::test_configuredDisconnect(window-sleep) Compared values are not the same
+   Actual   (): 2
+   Expected (): 1
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(260) : failure location
+PASS   : console_screen::StreamInterface::cleanupTestCase()
+Totals: 2 passed, 4 failed, 0 skipped, 0 blacklisted, 1334ms
+********* Finished testing of console_screen *********

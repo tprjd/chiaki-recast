@@ -1,0 +1,18 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamInterface::initTestCase()
+QWARN  : console_screen::StreamInterface::test_closeNativeWindow(window) file:///C:/Users/david/.codex/worktrees/stream-shared/chiaki-ng-ui/gui/src/qml/StreamMenuWindow.qml:40:5: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+FAIL!  : console_screen::StreamInterface::test_closeNativeWindow(window) property releases
+   Actual   (): 0
+   Expected (): 1
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(43) : failure location
+QWARN  : console_screen::StreamInterface::test_menuRoundTrip(inline) file:///C:/Users/david/.codex/worktrees/stream-shared/chiaki-ng-ui/gui/src/qml/StreamMenuWindow.qml:40:5: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+PASS   : console_screen::StreamInterface::test_menuRoundTrip(inline)
+QWARN  : console_screen::StreamInterface::test_menuRoundTrip(window) file:///C:/Users/david/.codex/worktrees/stream-shared/chiaki-ng-ui/gui/src/qml/StreamMenuWindow.qml:40:5: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+FAIL!  : console_screen::StreamInterface::test_menuRoundTrip(window) property activeFocus
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\stream-shared\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(36) : failure location
+PASS   : console_screen::StreamInterface::cleanupTestCase()
+Totals: 3 passed, 2 failed, 0 skipped, 0 blacklisted, 10850ms
+********* Finished testing of console_screen *********

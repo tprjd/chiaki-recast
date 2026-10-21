@@ -1,0 +1,27 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::LiveConsolePin::initTestCase()
+PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(button)
+PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(escape)
+PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(submitting)
+PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(escape-while-submitting)
+PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(ctrl-q)
+PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(right-click)
+PASS   : console_screen::LiveConsolePin::test_compactGeometryTracksHostMoveAndResize()
+PASS   : console_screen::LiveConsolePin::test_compactWindowCloseUsesTheSameCancelAndWaits()
+PASS   : console_screen::LiveConsolePin::test_contentAndActionsRemainReachable(900)
+PASS   : console_screen::LiveConsolePin::test_contentAndActionsRemainReachable(1280)
+PASS   : console_screen::LiveConsolePin::test_contentAndActionsRemainReachable(compact)
+PASS   : console_screen::LiveConsolePin::test_currentSessionCanSubmitOnceWithLeadingZeros()
+PASS   : console_screen::LiveConsolePin::test_incorrectSavedPinAndRejectionShowFreshMaskedEntry()
+PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(0)
+PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(1)
+PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(2)
+PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(3)
+PASS   : console_screen::LiveConsolePin::test_invalidInputCannotSubmit(4)
+PASS   : console_screen::LiveConsolePin::test_privacyHidesRevealedPinAndConsoleIdentity()
+PASS   : console_screen::LiveConsolePin::test_replacementAndRemovalClearInputWithoutSendingToNewRequest()
+PASS   : console_screen::LiveConsolePin::test_routeHandoffRetainsOnePromptAndReleasesAfterNativeAcceptance()
+PASS   : console_screen::LiveConsolePin::cleanupTestCase()
+Totals: 23 passed, 0 failed, 0 skipped, 0 blacklisted, 359ms
+********* Finished testing of console_screen *********
