@@ -9,7 +9,7 @@ Specification: [PSN sign-in and remaining dialogs](spec.md)
 | Ticket | Status | Blocked by |
 | --- | --- | --- |
 | [01: PSN setup and credential renewal](issues/01-psn-setup-and-renewal.md) | resolved | None |
-| [02: Account-ID retrieval for registration](issues/02-registration-account-id.md) | ready-for-agent | 01 |
+| [02: Account-ID retrieval for registration](issues/02-registration-account-id.md) | claimed | 01 |
 | [03: Steam shortcut creation and results](issues/03-steam-shortcut-results.md) | resolved | None |
 | [04: Startup reminder choices](issues/04-startup-reminders.md) | resolved | None |
 | [05: Explicit confirmations and registration choice](issues/05-confirmations-and-registration.md) | resolved | None |
