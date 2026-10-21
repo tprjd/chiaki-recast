@@ -10,18 +10,22 @@ FocusScope {
     property var backend: Chiaki
     property var navigation: root
     property bool managesAttempt: true
+    property bool retiring: false
+    property string ownedAttemptId: ""
     readonly property var attempt: backend.connectionAttempt || ({})
     readonly property string phase: attempt.phase || "connecting"
     readonly property bool psn: attempt.route === "psn"
     readonly property bool terminal: phase === "failure" || phase === "cancelled" || phase === "registered"
     readonly property bool busy: !terminal && phase !== "ready"
     readonly property bool streamerMode: backend.settings.streamerMode
+    readonly property bool wakeFlow: attempt.waitingForWake === true
+    readonly property string heading: wakeFlow ? (attempt.context === "startup" ? qsTr("Auto-connect") : qsTr("Wake console")) : psn ? qsTr("Connect over PSN") : qsTr("Connect to console")
     property string commandAttempt: ""
     property bool commandPending: false
     property bool detailsExpanded: false
     property bool leaving: false
-    readonly property bool canRetry: phase === "failure" && !attempt.cleanupPending && attempt.targetValid && !commandPending
-    readonly property bool canCancel: busy && phase !== "cancelling" && attempt.cancelable !== false && !commandPending
+    readonly property bool canRetry: !retiring && phase === "failure" && !attempt.cleanupPending && attempt.targetValid && !commandPending
+    readonly property bool canCancel: !retiring && busy && phase !== "cancelling" && attempt.cancelable !== false && !commandPending
     readonly property string consoleName: streamerMode ? qsTr("Your console") : attempt.name || qsTr("Console")
 
     component ConnectionLabel: Label {
@@ -46,13 +50,13 @@ FocusScope {
         if (!backend.retryConnection(attempt.id)) commandPending = false;
     }
     function back() {
-        if (!terminal || attempt.cleanupPending || leaving) return;
+        if (retiring || !terminal || attempt.cleanupPending || leaving || commandPending) return;
         leaving = true;
         backend.dismissConnection(attempt.id);
         navigation.showMainView();
     }
     function focusAction() {
-        if (!visible || leaving) return;
+        if (!visible || leaving || commandPending || retiring) return;
         if (canRetry) retryButton.forceActiveFocus(Qt.TabFocusReason);
         else if (terminal && !attempt.cleanupPending) backButton.forceActiveFocus(Qt.TabFocusReason);
         else if (canCancel) cancelButton.forceActiveFocus(Qt.TabFocusReason);
@@ -70,6 +74,7 @@ FocusScope {
             scroll.contentY = Math.min(Math.max(0, scroll.contentHeight - scroll.height), point.y + item.height - scroll.height + 12);
     }
     onAttemptChanged: {
+        if (!retiring) ownedAttemptId = attempt.id || "";
         if (attempt.id !== commandAttempt) {
             commandAttempt = attempt.id || "";
             commandPending = false;
@@ -79,8 +84,11 @@ FocusScope {
         Qt.callLater(focusAction);
     }
     onVisibleChanged: if (visible) Qt.callLater(focusAction)
-    Component.onCompleted: Qt.callLater(focusAction)
-    Component.onDestruction: if (managesAttempt && !leaving && attempt.id && phase !== "ready") backend.dismissConnection(attempt.id)
+    onRetiringChanged: if (!retiring) ownedAttemptId = attempt.id || ""
+    StackView.onDeactivating: retiring = true
+    StackView.onActivating: retiring = false
+    Component.onCompleted: { ownedAttemptId = attempt.id || ""; Qt.callLater(focusAction); }
+    Component.onDestruction: if (managesAttempt && !leaving && ownedAttemptId && ownedAttemptId === attempt.id && phase !== "ready") backend.dismissConnection(ownedAttemptId)
     Keys.onEscapePressed: terminal ? back() : cancel()
     Shortcut { sequence: "Ctrl+Q"; enabled: view.visible; onActivated: view.terminal ? view.back() : view.cancel() }
     MouseArea { anchors.fill: parent; acceptedButtons: Qt.RightButton; onClicked: view.terminal ? view.back() : view.cancel() }
@@ -124,11 +132,11 @@ FocusScope {
     ColumnLayout {
         anchors { left: sidebar.right; right: parent.right; top: parent.top; bottom: parent.bottom; margins: 24 }
         spacing: 16
-        ConnectionLabel { text: view.psn ? qsTr("Consoles / Connect over PSN") : qsTr("Consoles / Connect to console"); color: "#9ca8b9"; font.pixelSize: 12 }
+        ConnectionLabel { text: qsTr("Consoles / %1").arg(view.heading); color: "#9ca8b9"; font.pixelSize: 12 }
         RowLayout {
             Layout.fillWidth: true
-            ConnectionLabel { text: view.psn ? qsTr("Connect over PSN") : qsTr("Connect to console"); font.pixelSize: 30; font.bold: true }
-            Label { objectName: "connectionRoute"; text: view.psn ? qsTr("Remote connection") : qsTr("Local network"); color: "#91caff"; font.pixelSize: 13; textFormat: Text.PlainText; wrapMode: Text.Wrap; Layout.maximumWidth: 180 }
+            ConnectionLabel { objectName: "connectionHeading"; text: view.heading; font.pixelSize: 30; font.bold: true }
+            Label { objectName: "connectionRoute"; text: view.wakeFlow ? qsTr("Local discovery") : view.psn ? qsTr("Remote connection") : qsTr("Local network"); color: "#91caff"; font.pixelSize: 13; textFormat: Text.PlainText; wrapMode: Text.Wrap; Layout.maximumWidth: 180 }
         }
         ConnectionLabel { text: qsTr("Remote Play with your selected console."); color: "#9ca8b9" }
         Flickable {
@@ -175,7 +183,10 @@ FocusScope {
                             Label { visible: !view.busy; text: view.phase === "failure" ? "!" : "✓"; color: view.phase === "failure" ? "#ffb4ab" : "#8cd5b0"; font.pixelSize: 28 }
                             ConnectionLabel {
                                 objectName: "connectionTitle"; font.pixelSize: 22; font.bold: true
-                                text: view.phase === "video" ? qsTr("Waiting for video")
+                                text: view.phase === "waiting" ? qsTr("Waiting for console")
+                                    : view.phase === "waking" ? qsTr("Waiting for the console to wake")
+                                    : view.phase === "found" ? qsTr("Console found")
+                                    : view.phase === "video" ? qsTr("Waiting for video")
                                     : view.phase === "internet" ? qsTr("Waiting for internet")
                                     : view.phase === "initiating" ? qsTr("Contacting PlayStation Network")
                                     : view.phase === "linking" ? qsTr("Linking your console")
@@ -190,7 +201,10 @@ FocusScope {
                         }
                         ConnectionLabel {
                             objectName: "connectionDescription"; color: "#adb8c8"
-                            text: view.phase === "video" ? (view.psn ? qsTr("The remote connection is ready. Waiting for the first video frame.") : qsTr("The session is connected. Waiting for the first video frame."))
+                            text: view.phase === "waiting" ? qsTr("Looking for the selected console on your network.")
+                                : view.phase === "waking" ? qsTr("A wake request was sent. Waiting for the console to become available.")
+                                : view.phase === "found" ? qsTr("Continuing to the Remote Play connection.")
+                                : view.phase === "video" ? (view.psn ? qsTr("The remote connection is ready. Waiting for the first video frame.") : qsTr("The session is connected. Waiting for the first video frame."))
                                 : view.phase === "internet" ? qsTr("Waiting for an internet connection to reach PlayStation Network.")
                                 : view.phase === "initiating" ? qsTr("Preparing a remote connection to your console.")
                                 : view.phase === "linking" ? qsTr("This step must finish before cancellation is available.")
@@ -198,7 +212,7 @@ FocusScope {
                                 : view.phase === "registered" ? qsTr("Registration is complete. Return to the library to connect.")
                                 : view.phase === "data" ? qsTr("Your console is linked. Establishing the Remote Play connection.")
                                 : view.phase === "ready" ? qsTr("Opening your Remote Play stream.")
-                                : view.phase === "failure" ? (view.psn ? qsTr("Check that your console is online and available for Remote Play.") : qsTr("Check that the console is on and Remote Play is enabled."))
+                                : view.phase === "failure" ? (view.wakeFlow ? qsTr("Check the console power and network settings, then try again.") : view.psn ? qsTr("Check that your console is online and available for Remote Play.") : qsTr("Check that the console is on and Remote Play is enabled."))
                                 : view.phase === "cancelling" ? qsTr("Waiting for the current connection attempt to stop.")
                                 : view.phase === "cancelled" ? qsTr("Your console is still available in the library.")
                                 : qsTr("Opening a Remote Play session on your local network.")
@@ -216,6 +230,11 @@ FocusScope {
                                 default: return "";
                                 }
                             }).filter(text => text.length > 0).join("\n")
+                        }
+                        ConnectionLabel {
+                            objectName: "connectionFallback"; color: "#91caff"
+                            visible: view.attempt.fallback === true && view.attempt.route === "psn" && !view.wakeFlow
+                            text: qsTr("The console was not found locally. Continuing through PSN.")
                         }
                         ConnectionLabel {
                             objectName: "connectionInvalidTarget"; color: "#ffb4ab"
@@ -246,7 +265,7 @@ FocusScope {
                             ConnectionButton {
                                 id: backButton; objectName: "connectionBack"
                                 width: Math.min(implicitWidth, parent.width)
-                                visible: view.terminal; enabled: !view.attempt.cleanupPending && !view.leaving
+                                visible: view.terminal; enabled: !view.attempt.cleanupPending && !view.leaving && !view.commandPending
                                 text: qsTr("Back to consoles"); onClicked: view.back()
                             }
                             ConnectionButton {
@@ -270,11 +289,11 @@ FocusScope {
                     Layout.fillWidth: true; Layout.preferredWidth: workspace.width * 0.36; Layout.alignment: Qt.AlignTop
                     spacing: 16
                     ConnectionLabel { text: qsTr("GOOD TO KNOW"); color: "#9ca8b9"; font.pixelSize: 11; font.letterSpacing: 1.5 }
-                    ConnectionLabel { text: view.psn ? qsTr("Connect away from home") : qsTr("Ready for Remote Play"); font.pixelSize: 21; font.bold: true }
-                    ConnectionLabel { text: view.psn ? qsTr("Keep your console connected to the internet. A remote connection can take longer to start.") : qsTr("Keep your console on and connected to your local network."); color: "#adb8c8" }
+                    ConnectionLabel { text: view.wakeFlow ? qsTr("Your console may be waking") : view.psn ? qsTr("Connect away from home") : qsTr("Ready for Remote Play"); font.pixelSize: 21; font.bold: true }
+                    ConnectionLabel { text: view.wakeFlow ? qsTr("In rest mode, the console must allow network access and wake-up for Remote Play.") : view.psn ? qsTr("Keep your console connected to the internet. A remote connection can take longer to start.") : qsTr("Keep your console on and connected to your local network."); color: "#adb8c8" }
                     Rectangle { Layout.fillWidth: true; height: 1; color: "#2b323e" }
-                    ConnectionLabel { text: view.psn ? qsTr("A brief wait") : qsTr("Connection, then video"); font.bold: true }
-                    ConnectionLabel { text: view.psn ? qsTr("Some connection steps must finish before cancellation is available.") : qsTr("The session can connect before the first video frame arrives."); color: "#adb8c8" }
+                    ConnectionLabel { text: view.wakeFlow ? qsTr("Choose another console") : view.psn ? qsTr("A brief wait") : qsTr("Connection, then video"); font.bold: true }
+                    ConnectionLabel { text: view.wakeFlow ? qsTr("Cancel this attempt to return to your console library. Your saved auto-connect choice is kept.") : view.psn ? qsTr("Some connection steps must finish before cancellation is available.") : qsTr("The session can connect before the first video frame arrives."); color: "#adb8c8" }
                 }
             }
         }

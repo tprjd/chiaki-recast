@@ -10,7 +10,7 @@ Selected design: A for every screen and state
 | [01: Local connection progress, cancellation, and retry](issues/01-local-connection.md) | None | resolved |
 | [02: Save a console login PIN](issues/02-saved-console-pin.md) | None | resolved |
 | [03: PSN connection progress and recovery](issues/03-psn-connection.md) | 01 | claimed |
-| [04: Auto-connect and console wake-up](issues/04-auto-connect-wake.md) | 01 | claimed |
+| [04: Auto-connect and console wake-up](issues/04-auto-connect-wake.md) | 01 | resolved |
 | [05: Live console login PIN across connection routes](issues/05-live-console-pin.md) | 01, 02 | claimed |
 | [06: Integrated connection and PIN native acceptance](issues/06-native-acceptance.md) | 03, 04, 05 | ready-for-agent |
 
@@ -31,10 +31,11 @@ The production baseline is the completed console-setup integration branch with s
 | 05 | 20–28, 29, 33–45 |
 | 06 | Integrated acceptance of all 45 stories |
 
-The parent specification remains unchanged. Tickets 03, 04, and 05 are in progress on `codex/connection-flow-integration`.
+The parent specification remains unchanged. Tickets 03 and 05 are in progress on `codex/connection-flow-integration`.
 
 ## Decisions
 
 - [01: Local connection progress, cancellation, and retry](issues/01-local-connection.md) is resolved. Merged `4327e9ac` with the shared attempt contract, local A progress, guarded retry, and cancellation cleanup. [Local tests](evidence/ticket01-ConnectionLocal-final.txt) passed 11 checks. [Native run 12](evidence/ticket01-native-contracts.json) passed with ten starts, four stops, and no sleep dispatch. The [normal build](evidence/ticket01-production-build.json) passed. Visible native input and integrated acceptance remain with ticket 06.
 - [02: Save a console login PIN](issues/02-saved-console-pin.md) is resolved. Merged `9f2b3bfb` with the reusable A form, guarded console target, and confirmed save outcome. [PIN tests](evidence/ticket02-ConsolePin-final.txt) passed 23 checks, [management tests](evidence/ticket02-ConsoleManagement-final.txt) passed 44 checks, and [native save evidence](evidence/ticket02-native-save.json) confirms isolated persistence after process exit. Native visual and integrated acceptance remain with ticket 06.
 - [03: PSN connection progress and recovery](issues/03-psn-connection.md) implementation is integrated from `1cc42ee8`. [Native checks](evidence/ticket03-native-contracts.json) passed 64 assertions, the retained QML results passed 188 checks, and [post-exit persistence](evidence/ticket03-post-exit.json) passed five checks. Ticket 03 remains claimed until ticket 05 proves pending PIN continuity through the integrated PSN-to-stream transition.
+- [04: Auto-connect and console wake-up](issues/04-auto-connect-wake.md) is resolved. Merged `77039744` with A's startup and wake progress, validated retry, and cancellation. [Native evidence](evidence/ticket04-native-contracts.json) passed 40 assertions, and [post-exit persistence](evidence/ticket04-native-post-exit.json) passed five checks. The normal build covers revision `2a854392`. The later shared exit and focus guard passed [13 wake checks](evidence/ticket04-qml-green.txt) and [11 local checks](evidence/ticket04-ConnectionLocal-final.txt). Ticket 05 owns the integrated build; ticket 06 owns visible native acceptance.
