@@ -1,0 +1,24 @@
+{
+    "currentScreen": "StreamView_QMLTYPE_48",
+    "failedCheck": "A clean native stop before readiness must finish cancellation",
+    "firstAttempt": {
+        "address": "192.0.2.42",
+        "cancelable": true,
+        "cleanupPending": true,
+        "errorText": "",
+        "errorTitle": "",
+        "id": "1",
+        "name": "Synthetic target",
+        "phase": "connecting",
+        "presented": true,
+        "ps5": true,
+        "registrationOnly": false,
+        "route": "local",
+        "targetValid": true,
+        "waitingForWake": false
+    },
+    "grabCount": 0,
+    "hostCount": 2,
+    "localConnectingVideoReadyNormalQuit": true,
+    "startCount": 1
+}

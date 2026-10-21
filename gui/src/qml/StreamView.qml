@@ -12,8 +12,12 @@ Item {
     id: view
 
     readonly property var hostWindow: view.Window.window
-    property bool sessionError: false
-    property bool sessionLoading: true
+    readonly property bool managedConnection: Chiaki.connectionAttempt.route === "local" && Chiaki.connectionAttempt.presented
+    property bool legacySessionError: false
+    property bool legacySessionLoading: true
+    readonly property bool sessionError: managedConnection ? Chiaki.connectionAttempt.phase === "failure" : legacySessionError
+    readonly property bool sessionLoading: managedConnection ? Chiaki.connectionAttempt.phase !== "ready" && !sessionError : legacySessionLoading
+    property bool connectionInputGrabbed: false
     property list<Item> restoreFocusItems
     readonly property bool useSeparateMenuWindow: Chiaki.window.runtimeRendererBackend === 1
     readonly property int streamMenuHeight: 200
@@ -68,6 +72,7 @@ Item {
     StackView.onDeactivated: Chiaki.window.keepVideo = false
 
     Component.onCompleted: updateSeparateMenuGeometry()
+    Component.onDestruction: if (connectionInputGrabbed) Chiaki.window.releaseInput()
     onWidthChanged: updateSeparateMenuGeometry()
     onHeightChanged: updateSeparateMenuGeometry()
     onUseSeparateMenuWindowChanged: updateSeparateMenuGeometry()
@@ -88,6 +93,8 @@ Item {
 
         property real lastToggleTime: 0
         function toggle() {
+            if (view.managedConnection && Chiaki.connectionAttempt.phase !== "ready")
+                return;
             var now = Date.now();
             if (now - lastToggleTime < 200)
                 return;
@@ -116,7 +123,7 @@ Item {
         id: loadingView
         anchors.fill: parent
         color: "black"
-        opacity: sessionError || sessionLoading || (Chiaki.settings.audioVideoDisabled & 0x02) ? 1.0 : 0.0
+        opacity: !view.managedConnection && (sessionError || sessionLoading) || (!sessionLoading && !sessionError && (Chiaki.settings.audioVideoDisabled & 0x02)) ? 1.0 : 0.0
         visible: opacity
 
         Behavior on opacity { NumberAnimation { duration: 250 } }
@@ -209,6 +216,23 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 20
                 visible: text
+            }
+        }
+    }
+
+    ConnectionView {
+        id: connectionView
+        anchors.fill: parent
+        managesAttempt: view.managedConnection
+        visible: view.managedConnection && Chiaki.connectionAttempt.phase !== "ready"
+        enabled: visible
+        onVisibleChanged: {
+            if (visible && !view.connectionInputGrabbed) {
+                Chiaki.window.grabInput();
+                view.connectionInputGrabbed = true;
+            } else if (!visible && view.connectionInputGrabbed) {
+                Chiaki.window.releaseInput();
+                view.connectionInputGrabbed = false;
             }
         }
     }
@@ -1206,6 +1230,15 @@ Item {
         target: Chiaki
 
         function onSessionChanged() {
+            if (view.managedConnection) {
+                view.connectionInputGrabbed = false;
+                if (connectionView.visible) {
+                    Chiaki.window.grabInput();
+                    view.connectionInputGrabbed = true;
+                }
+                if (!Chiaki.session && Chiaki.connectionAttempt.phase === "ready") root.showMainView();
+                return;
+            }
             if (!Chiaki.session) {
                 if (errorTitleLabel.text)
                     closeTimer.start();
@@ -1215,8 +1248,9 @@ Item {
         }
 
         function onSessionError(title, text) {
-            sessionError = true;
-            sessionLoading = false;
+            if (view.managedConnection) return;
+            legacySessionError = true;
+            legacySessionLoading = false;
             errorTitleLabel.text = title;
             errorTextLabel.text = text;
             closeTimer.start();
@@ -1247,8 +1281,8 @@ Item {
         target: Chiaki.window
 
         function onHasVideoChanged() {
-            if (Chiaki.window.hasVideo)
-                sessionLoading = false;
+            if (Chiaki.window.hasVideo && !view.managedConnection)
+                legacySessionLoading = false;
         }
 
         function onMenuRequested() {
@@ -1261,8 +1295,8 @@ Item {
         target: Chiaki.session
 
         function onConnectedChanged() {
-            if (Chiaki.settings.audioVideoDisabled & 0x02)
-                sessionLoading = false;
+            if (Chiaki.session && Chiaki.session.connected && !view.managedConnection && (Chiaki.settings.audioVideoDisabled & 0x02))
+                legacySessionLoading = false;
         }
     }
 }

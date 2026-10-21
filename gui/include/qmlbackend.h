@@ -53,10 +53,10 @@ class PsnConnectionWorker : public QObject
     Q_OBJECT
 
 public:
-    void ConnectPsnConnection(StreamSession *session, const QString &duid, const bool &ps5);
+    void ConnectPsnConnection(StreamSession *session, const QString &duid, const bool &ps5, quint64 attempt_id);
 
 signals:
-    void resultReady(const ChiakiErrorCode &err);
+    void resultReady(StreamSession *session, quint64 attempt_id, const ChiakiErrorCode &err);
 };
 
 #ifdef CHIAKI_HAVE_WEBENGINE
@@ -82,6 +82,7 @@ class QmlBackend : public QObject
     Q_PROPERTY(QmlMainWindow* window READ qmlWindow CONSTANT)
     Q_PROPERTY(QmlSettings* settings READ qmlSettings CONSTANT)
     Q_PROPERTY(StreamSession* session READ qmlSession NOTIFY sessionChanged)
+    Q_PROPERTY(QVariantMap connectionAttempt READ connectionAttempt NOTIFY connectionAttemptChanged)
     Q_PROPERTY(QList<QmlController*> controllers READ qmlControllers NOTIFY controllersChanged)
     Q_PROPERTY(bool discoveryEnabled READ discoveryEnabled WRITE setDiscoveryEnabled NOTIFY discoveryEnabledChanged)
     Q_PROPERTY(QVariantList hosts READ hosts NOTIFY hostsChanged)
@@ -156,7 +157,8 @@ public:
 
     void psnConnector();
 
-    void createSession(const StreamSessionConnectInfo &connect_info);
+    void createSession(const StreamSessionConnectInfo &connect_info, const QVariantMap &target = {});
+    QVariantMap connectionAttempt() const;
 
     void psnSessionStart();
 
@@ -188,6 +190,9 @@ public:
     Q_INVOKABLE bool registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QJSValue &callback, const QVariantMap &context);
     Q_INVOKABLE void connectToHost(int index, QString nickname = QString());
     Q_INVOKABLE void stopSession(bool sleep);
+    Q_INVOKABLE bool retryConnection(const QString &attempt_id);
+    Q_INVOKABLE bool cancelConnection(const QString &attempt_id);
+    Q_INVOKABLE bool dismissConnection(const QString &attempt_id);
     Q_INVOKABLE void sessionGoHome();
     Q_INVOKABLE void enterPin(const QString &pin);
     Q_INVOKABLE QUrl psnLoginUrl() const;
@@ -219,7 +224,8 @@ public:
 
 signals:
     void sessionChanged(StreamSession *session);
-    void psnConnect(StreamSession *session, const QString &duid, const bool &ps5);
+    void connectionAttemptChanged();
+    void psnConnect(StreamSession *session, const QString &duid, const bool &ps5, quint64 attempt_id);
     void showPsnView();
     void connectStateChanged();
     void controllersChanged();
@@ -243,7 +249,7 @@ signals:
 
     void error(const QString &title, const QString &text);
     void sessionError(const QString &title, const QString &text);
-    void sessionPinDialogRequested();
+    void sessionPinDialogRequested(bool incorrect);
     void sessionStopDialogRequested();
     void registDialogRequested(const QString &host, bool ps5, const QString &duid, const QVariantMap &context);
     void psnLoginAccountIdDone(const QString &accountId);
@@ -268,6 +274,12 @@ private:
     };
 
     DisplayServer displayServerAt(int index) const;
+    static QVariantMap connectionTargetKey(const QVariantMap &host);
+    int resolveConnectionTarget() const;
+    bool connectionTargetValid() const;
+    void beginConnection(const StreamSessionConnectInfo &info, const QVariantMap &target);
+    void failConnection(const QString &title, const QString &text);
+    void setConnectionPhase(const QString &phase);
     bool sendWakeup(const DisplayServer &server);
     bool sendWakeup(const QString &host, const QByteArray &regist_key, bool ps5);
     void updateControllers();
@@ -297,6 +309,12 @@ private:
     QHash<int, QmlController*> controllers;
     DisplayServer regist_dialog_server;
     quint64 profile_generation = 0;
+    quint64 connection_generation = 0;
+    quint64 connection_profile_generation = 0;
+    QVariantMap connection_attempt;
+    QVariantMap connection_target;
+    bool connection_cancelled = false;
+    bool connection_dismissed = false;
     bool registration_active = false;
     StreamSessionConnectInfo session_info = {};
     SystemdInhibit *sleep_inhibit = {};

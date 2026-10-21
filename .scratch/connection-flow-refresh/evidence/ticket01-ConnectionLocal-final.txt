@@ -1,0 +1,15 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::ConnectionLocal::initTestCase()
+PASS   : console_screen::ConnectionLocal::test_cancelStopsOnceAndWaitsForTheNativeResult()
+PASS   : console_screen::ConnectionLocal::test_disabledCancelCannotBeBypassed()
+PASS   : console_screen::ConnectionLocal::test_failureKeepsDetailsAndWaitsForCleanupBeforeRetry()
+PASS   : console_screen::ConnectionLocal::test_localProgressShowsConsoleRouteAndRealState()
+PASS   : console_screen::ConnectionLocal::test_longContentAndActionsRemainReachable(900x600)
+PASS   : console_screen::ConnectionLocal::test_longContentAndActionsRemainReachable(1280x720)
+PASS   : console_screen::ConnectionLocal::test_streamerModeHidesNamesAddressesAndBackendDetails()
+PASS   : console_screen::ConnectionLocal::test_targetOrProfileInvalidationDisablesRetry()
+PASS   : console_screen::ConnectionLocal::test_viewRemovalDismissesTheAttemptAndCannotNavigateLater()
+PASS   : console_screen::ConnectionLocal::cleanupTestCase()
+Totals: 11 passed, 0 failed, 0 skipped, 0 blacklisted, 4353ms
+********* Finished testing of console_screen *********

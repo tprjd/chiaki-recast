@@ -4,7 +4,7 @@
 
 **Blocked by:** 01: Local connection progress, cancellation, and retry; 02: Save a console login PIN.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 Parent: Connection progress and console login PIN: guided workspace. Specification commit: `cb1f76e9`.
 Selected design: A on prototype branch `codex/prototype-connection-flows`, implementation commit `7a0111b6`.

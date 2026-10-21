@@ -168,3 +168,28 @@ synthetic test inputs, not a copy of the native defaults specification.
 `SettingsGeneral` checks category selection, General setting writes, all four
 shortcut choices, device conditions, privacy, log access, popup Escape handling,
 and focus visibility at 1280 and 900 pixels wide.
+
+## Local connection tests
+
+`ConnectionHarness.qml` loads the production `ConnectionView.qml` with a
+supplied backend and navigation object. `StreamView.qml` uses this same
+component for local connection progress. The renderer is outside this test.
+
+`ConnectionLocal` checks connecting, video waiting, persistent failure,
+cleanup-gated retry, cancellation, disabled actions, privacy, view removal,
+and action focus at 900 by 600 and 1280 by 720 logical pixels. Native events
+control readiness and cleanup. Presentation timers do not complete either task.
+
+The backend exposes `connectionAttempt` and three commands that accept its
+opaque string `id`: `cancelConnection`, `retryConnection`, and
+`dismissConnection`. Each command returns whether it accepted the action.
+The native backend resolves the target again before retry. A changed profile
+invalidates the target even after a switch back to the previous profile.
+
+The native contract checks and source manifests are in
+`.scratch/connection-flow-refresh/evidence/ticket01-*`. These checks use real
+session objects with isolated settings and controlled transport calls.
+They cover event ownership, actual retry and stop dispatch, and direct entry
+that has no library row. A hidden native window cannot verify visible input
+capture, display scaling, or physical controllers. Ticket 06 covers visible
+native acceptance. Real transport checks need a console.

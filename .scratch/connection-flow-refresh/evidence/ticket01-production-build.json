@@ -1,0 +1,21 @@
+{
+  "productionSourceMatchesWorktree": true,
+  "qaTokensAbsent": true,
+  "exe": "C:\\Users\\david\\.cache\\chiaki-ui-native\\connection-local-bin\\chiaki.exe",
+  "sha256": "b20cade6c374a1c96b4cd85a6ed0f4e306ce9c3891650cd9af435a1a7f2da746",
+  "sources": {
+    "gui/include/qmlbackend.h": "c33e308264c24dcd560e1d96231f9eb02cc1e17b5cc2ca67715f9278063aaabf",
+    "gui/src/qml/ConnectionView.qml": "db646b0e7b91cde6a5d94c9d8c66027caf2526275542ce216e117f265434b9a5",
+    "gui/src/qml/ConsoleLibrary.qml": "8dd460ddbbc4e601fedac7bc1426b6a33a01d13b238925442648250419ba3c8a",
+    "gui/src/qml/ConsolePinContent.qml": "87c2575ebae45a74ac97422b30be0513864710fa17f2f90c09d61e92b494c5d5",
+    "gui/src/qml/ConsolePinDialog.qml": "3888834b57436e76de54e19363fc08d862fdae8ef151bbb318b44579ba0860b2",
+    "gui/src/qml/Main.qml": "dfcaf33197f79c5e47cb2644e96d091fd7518a0070078e4b083b394316b2ba8a",
+    "gui/src/qml/MainView.qml": "c437a633b59ab45a258207aa6a170788565fee2f2f9f9ec3f1c24aebfe37a531",
+    "gui/src/qml/StreamView.qml": "d45f9967b1bb971218a694e64ef8d1dd8ebed1b4b40fa1714e80261af92c2882",
+    "gui/src/qml/qml.qrc": "e30e6bba7350c4f6d68aae5d62dd354b0f3e000ea67afc5fae99a90b4d15259c",
+    "gui/src/qmlbackend.cpp": "194205eb608e554ca3553d2acb94b1be67a386873200abce1e067dde30c58de3"
+  },
+  "normalBuild": "passed",
+  "nativeControlledRun": "connection-contract-run12",
+  "visibleNativeInput": "Not checked: hidden QWindow keeps effective item visibility false. Ticket06 covers this."
+}

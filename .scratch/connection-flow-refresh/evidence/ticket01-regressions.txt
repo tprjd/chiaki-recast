@@ -1,0 +1,11 @@
+tst_ConsoleAppearance: Totals: 12 passed, 0 failed, 0 skipped, 0 blacklisted, 6182ms
+tst_ConsoleDetails: Totals: 17 passed, 0 failed, 0 skipped, 0 blacklisted, 21441ms
+tst_ConsoleLibrary: Totals: 35 passed, 0 failed, 0 skipped, 0 blacklisted, 166ms
+tst_ConsoleManagement: Totals: 43 passed, 0 failed, 0 skipped, 0 blacklisted, 20295ms
+tst_ConsoleNavigation: Totals: 71 passed, 0 failed, 0 skipped, 0 blacklisted, 30242ms
+tst_ConsoleSearch: Totals: 28 passed, 0 failed, 0 skipped, 0 blacklisted, 249ms
+tst_ManualHost: Totals: 23 passed, 0 failed, 0 skipped, 0 blacklisted, 12290ms
+tst_RegistrationForm: Totals: 22 passed, 0 failed, 0 skipped, 0 blacklisted, 2624ms
+tst_RegistrationResults: Totals: 19 passed, 0 failed, 0 skipped, 0 blacklisted, 446ms
+ConsolePin after merge: Totals: 23 passed, 0 failed, 0 skipped, 0 blacklisted, 4719ms
+ConsoleManagement after merge: Totals: 44 passed, 0 failed, 0 skipped, 0 blacklisted, 20328ms

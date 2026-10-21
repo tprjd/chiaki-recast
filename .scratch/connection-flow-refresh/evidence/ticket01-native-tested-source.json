@@ -1,0 +1,20 @@
+{
+  "gui/CMakeLists.txt": "3688434de4d348088ee432d06b2ed9b74e680df49482f77d17aa56a39b4a4ea8",
+  "gui/src/main.cpp": "1d4797cc51583d3d1e15831eb5fa8e1556049e25e8bc7ed19869482ab82b1a57",
+  "gui/src/settings.cpp": "c5d37cf2ba289c7b9f6dd366437c22b5130749303229a382bcda0890e3f05c71",
+  "gui/src/sessionlog.cpp": "978a417804cf77454833bee24e5410b7bd3843bdc750ab192fe52e5203bdc963",
+  "gui/include/streamsession.h": "416c4ddeb204028fd76aad060832734b55117c655d6c9ac4519e6d883b5c4830",
+  "gui/src/streamsession.cpp": "3543a2dc20963f0674cb4819d77eadc1cf9788d4972baf93d030958643c18421",
+  "gui/include/qmlmainwindow.h": "cf061c9d91fa7760b4aefbffb1b94e1c5db8448d11ba599b917d705337c98e20",
+  "gui/src/qmlmainwindow.cpp": "3d68a203661b5d66ed2ba1917ba47a9c9ebb8e14136efbf4ad820bf02ea2f3fd",
+  "gui/include/qmlbackend.h": "c279867b155bc265407b3f521a7a1677929b99352089760fcdd87c034b7aa314",
+  "gui/src/qmlbackend.cpp": "1aee8e873d216444173fe041d4b7939012eac8857d07f3f6f66cee9b37cc8f29",
+  "gui/src/qml/Main.qml": "dfcaf33197f79c5e47cb2644e96d091fd7518a0070078e4b083b394316b2ba8a",
+  "gui/src/qml/StreamView.qml": "d45f9967b1bb971218a694e64ef8d1dd8ebed1b4b40fa1714e80261af92c2882",
+  "gui/src/qml/ConnectionView.qml": "db646b0e7b91cde6a5d94c9d8c66027caf2526275542ce216e117f265434b9a5",
+  "gui/src/qml/qml.qrc": "e30e6bba7350c4f6d68aae5d62dd354b0f3e000ea67afc5fae99a90b4d15259c",
+  "gui/src/qml/ConsoleLibrary.qml": "8dd460ddbbc4e601fedac7bc1426b6a33a01d13b238925442648250419ba3c8a",
+  "gui/src/qml/ConsolePinContent.qml": "87c2575ebae45a74ac97422b30be0513864710fa17f2f90c09d61e92b494c5d5",
+  "gui/src/qml/ConsolePinDialog.qml": "3888834b57436e76de54e19363fc08d862fdae8ef151bbb318b44579ba0860b2",
+  "gui/src/qml/MainView.qml": "c437a633b59ab45a258207aa6a170788565fee2f2f9f9ec3f1c24aebfe37a531"
+}

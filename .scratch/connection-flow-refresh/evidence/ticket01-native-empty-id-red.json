@@ -1,0 +1,3 @@
+{
+    "failedCheck": "An empty startup ID must not own cancellation or dismissal"
+}

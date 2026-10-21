@@ -141,6 +141,7 @@ Item {
     }
 
     function showStreamView() {
+        if (stack.currentItem instanceof StreamView) return;
         stack.replace(stack.get(0), streamViewComponent);
     }
 
@@ -265,7 +266,7 @@ Item {
     }
 
     Component.onCompleted: {
-        if (Chiaki.session)
+        if (Chiaki.session || (Chiaki.connectionAttempt.presented && Chiaki.connectionAttempt.route === "local"))
             stack.replace(stack.get(0), streamViewComponent, {}, StackView.Immediate);
         else if (Chiaki.autoConnect)
             stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
@@ -278,6 +279,7 @@ Item {
 
     StackView {
         id: stack
+        objectName: "mainNavigation"
         anchors.fill: parent
         hoverEnabled: false
         initialItem: mainViewComponent
@@ -545,6 +547,12 @@ Item {
     Connections {
         target: Chiaki
 
+        function onConnectionAttemptChanged() {
+            const attempt = Chiaki.connectionAttempt;
+            if (attempt.presented && attempt.route === "local" && attempt.phase !== "ready" && !attempt.waitingForWake && !Chiaki.autoConnect)
+                root.showStreamView();
+        }
+
         function onSessionChanged() {
             if (Chiaki.session)
                 root.showStreamView();
@@ -563,6 +571,8 @@ Item {
         }
 
         function onError(title, text) {
+            const attempt = Chiaki.connectionAttempt;
+            if (attempt.presented && attempt.errorTitle === title && attempt.errorText === text) return;
             errorTitleLabel.text = title;
             errorTextLabel.text = text;
             errorHideTimer.start();
