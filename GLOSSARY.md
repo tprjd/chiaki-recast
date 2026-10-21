@@ -21,3 +21,15 @@ The transition of a console from rest mode so that it becomes available for Remo
 **Sign-in redirect URL**:
 The complete browser URL returned after PSN sign-in. It contains the authorization code used to complete sign-in in Chiaki Recast.
 _Avoid_: Token, token string
+
+**Stream input owner**:
+A local interaction that temporarily blocks console controls during Remote Play. Several stream input owners can be active at the same time.
+
+**Stream input presentation**:
+One open-to-close occurrence of a stream input owner. A presentation can remain visible after it releases console input.
+
+**Keyboard and mouse mapping**:
+The conversion of PC key presses, mouse buttons, and mouse movement into PlayStation controller input for a Remote Play session.
+
+**Gameplay capture**:
+The mode in which Recast directs keyboard and mouse input to the game. Leaving this mode returns mouse control to the desktop and releases held game inputs.
