@@ -18,7 +18,7 @@ Item {
     function showPlaceboColorMappingDialog(route) { pages.push(colorComponent, {searchRoute: route || null}); }
     function showProfileDialog(route) { pages.push(profileComponent, {searchRoute: route || null}); }
     function showControllerMappingDialog(route) { pages.push(mappingComponent, {searchRoute: route || null}); }
-    function showConfirmDialog(title, text, accept, cancel) { collaborators.showConfirmDialog(title, text, accept, cancel); }
+    function showConfirmDialog(title, text, actionText, accept, cancel) { collaborators.showConfirmDialog(title, text, actionText, accept, cancel); }
     function showRegistDialog(host, ps5) { collaborators.showRegistDialog(host, ps5); }
     SettingsHarness { id: collaborators; visible: false; screenActive: false }
     StackView {

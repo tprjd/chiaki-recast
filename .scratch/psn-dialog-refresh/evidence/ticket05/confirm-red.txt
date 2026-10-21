@@ -1,0 +1,12 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::Confirmations::initTestCase()
+QWARN  : console_screen::Confirmations::test_cancelHasInitialFocusAndEnterCancels() file:///C:/Users/david/.codex/worktrees/psn-confirmations/chiaki-ng-ui/gui/src/qml/ConfirmDialog.qml:16: ReferenceError: root is not defined
+QWARN  : console_screen::Confirmations::test_cancelHasInitialFocusAndEnterCancels() file:///C:/Users/david/.codex/worktrees/psn-confirmations/chiaki-ng-ui/gui/src/qml/ConfirmDialog.qml:15: ReferenceError: root is not defined
+QWARN  : console_screen::Confirmations::test_cancelHasInitialFocusAndEnterCancels() file:///C:/Users/david/.codex/worktrees/psn-confirmations/chiaki-ng-ui/gui/src/qml/ConfirmDialog.qml:79: ReferenceError: root is not defined
+QWARN  : console_screen::Confirmations::test_cancelHasInitialFocusAndEnterCancels() file:///C:/Users/david/.codex/worktrees/psn-confirmations/chiaki-ng-ui/gui/src/qml/ConfirmDialog.qml:100: ReferenceError: root is not defined
+FAIL!  : console_screen::Confirmations::test_cancelHasInitialFocusAndEnterCancels() 'The confirmation has an explicit Cancel action' returned FALSE. ()
+C:\Users\david\.codex\worktrees\psn-confirmations\chiaki-ng-ui\gui\tests\qml\tst_Confirmations.qml(33) : failure location
+PASS   : console_screen::Confirmations::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 2391ms
+********* Finished testing of console_screen *********
