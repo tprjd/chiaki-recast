@@ -1711,9 +1711,11 @@ bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const 
     return true;
 }
 
-void QmlBackend::autoRegister()
+void QmlBackend::autoRegister(const QVariantMap &context)
 {
-    if (regist_dialog_generation != profile_generation || session || connection_token)
+    if (regist_dialog_generation != profile_generation || session || connection_token
+            || context.value("profileGeneration").toULongLong() != profile_generation
+            || !context.contains("automaticRequest") || context.value("automaticRequest").toULongLong() != automatic_registration_request)
         return;
     const auto &server = regist_dialog_server;
     if (!server.valid || server.duid.isEmpty())
@@ -1730,6 +1732,7 @@ void QmlBackend::autoRegister()
     }
     if (target.isEmpty())
         return;
+    ++automatic_registration_request;
     resume_session = false;
     StreamSessionConnectInfo info(settings, server.discovery_host.target, QString(), server.discovery_host.host_name,
         QByteArray(), QByteArray(), QString(), server.duid, true, false, false, false);
@@ -1812,6 +1815,7 @@ void QmlBackend::connectToHost(int index, QString nickname)
         regist_dialog_server = server;
         regist_dialog_generation = profile_generation;
         auto context = createRegistrationContext();
+        context["automaticRequest"] = QVariant::fromValue(++automatic_registration_request);
         context["discovered"] = server.discovered;
         if(!server.discovered)
         {
