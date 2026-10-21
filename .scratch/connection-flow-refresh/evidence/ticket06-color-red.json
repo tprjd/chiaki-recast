@@ -1,0 +1,154 @@
+{
+    "captureTrace": [
+    ],
+    "captures": [
+        {
+            "active": true,
+            "attemptId": "1",
+            "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+            "discoveryEnabled": false,
+            "dpr": 1.5,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "connectionCancel",
+                "width": 206.9375,
+                "x": 124,
+                "y": 411
+            },
+            "height": 600,
+            "image": "900-connection-progress.png",
+            "inputCount": 0,
+            "phase": "connecting",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "pinPhase": "",
+            "requestId": "",
+            "screen": "XG32UCWMG",
+            "screenDpr": 1.5,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-color-red",
+            "transientParentIsHost": false,
+            "visible": true,
+            "width": 900,
+            "x": 30,
+            "y": 40
+        },
+        {
+            "active": true,
+            "attemptId": "1",
+            "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+            "discoveryEnabled": false,
+            "dpr": 1.5,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "pinDone",
+                "width": 62,
+                "x": 536,
+                "y": 338
+            },
+            "height": 600,
+            "image": "900-saved-result.png",
+            "inputCount": 0,
+            "phase": "cancelled",
+            "physicalHeight": 900,
+            "physicalWidth": 1350,
+            "pinHeadingBounds": {
+                "height": 30,
+                "truncated": false,
+                "width": 362,
+                "x": 236,
+                "y": 231
+            },
+            "pinPhase": "",
+            "requestId": "",
+            "screen": "XG32UCWMG",
+            "screenDpr": 1.5,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-color-red",
+            "transientParentIsHost": false,
+            "visible": true,
+            "width": 900,
+            "x": 30,
+            "y": 40
+        },
+        {
+            "active": true,
+            "attemptId": "2",
+            "captureMethod": "QQuickWindow.grabWindow",
+            "discoveryEnabled": false,
+            "dpr": 1.5,
+            "exposed": true,
+            "focus": {
+                "height": 54,
+                "name": "consoleLoginPin",
+                "width": 185,
+                "x": 46,
+                "y": 326
+            },
+            "height": 560,
+            "image": "900-live-form.png",
+            "inputCount": 1,
+            "phase": "connecting",
+            "physicalHeight": 840,
+            "physicalWidth": 1080,
+            "pinHeadingBounds": {
+                "height": 60,
+                "truncated": false,
+                "width": 336,
+                "x": 91,
+                "y": 175
+            },
+            "pinPhase": "form",
+            "requestId": "1",
+            "screen": "XG32UCWMG",
+            "screenDpr": 1.5,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-color-red",
+            "transientParentIsHost": true,
+            "visible": true,
+            "width": 720,
+            "x": 120,
+            "y": 60
+        }
+    ],
+    "failedCheck": "Pending PIN blocks background settings and menu commands",
+    "hostGeometry": {
+        "active": true,
+        "dpr": 1.5,
+        "exposed": true,
+        "height": 600,
+        "screen": "XG32UCWMG",
+        "screenDpr": 1.5,
+        "visible": true,
+        "width": 900,
+        "x": 30,
+        "y": 40
+    },
+    "pinGeometry": {
+        "active": true,
+        "dpr": 1.5,
+        "exposed": true,
+        "height": 560,
+        "screen": "XG32UCWMG",
+        "screenDpr": 1.5,
+        "visible": true,
+        "width": 720,
+        "x": 120,
+        "y": 60
+    },
+    "requestedRenderer": "opengl",
+    "runtimeRendererBackend": 1,
+    "screens": [
+        {
+            "dpr": 1.5,
+            "height": 1440,
+            "name": "XG32UCWMG",
+            "width": 2560
+        },
+        {
+            "dpr": 1.5,
+            "height": 960,
+            "name": "VG270U",
+            "width": 1707
+        }
+    ]
+}

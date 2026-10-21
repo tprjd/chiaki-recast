@@ -1,9 +1,10 @@
 # Connection progress and console login PIN: guided workspace
 
-Status: ready-for-agent
+Status: resolved
 Date: 2026-10-20
 Selected design: A, Guided workspace, for all screens and states
 Test approach: confirmed by the user on 2026-10-20
+Completion: [Integrated connection and PIN acceptance](acceptance.md)
 
 ## Problem Statement
 

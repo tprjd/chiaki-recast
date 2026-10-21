@@ -1,0 +1,126 @@
+{
+    "allPassed": true,
+    "captureTrace": [
+    ],
+    "captures": [
+        {
+            "active": true,
+            "attemptId": "1",
+            "captureMethod": "QQuickWindow.grabWindow",
+            "discoveryEnabled": false,
+            "dpr": 1,
+            "exposed": true,
+            "focus": {
+                "height": 54,
+                "name": "consoleLoginPin",
+                "width": 185,
+                "x": 46,
+                "y": 294
+            },
+            "height": 560,
+            "image": "900-live-form.png",
+            "inputCount": 1,
+            "phase": "connecting",
+            "physicalHeight": 560,
+            "physicalWidth": 720,
+            "pinHeadingBounds": {
+                "height": 30,
+                "truncated": false,
+                "width": 336,
+                "x": 91,
+                "y": 175
+            },
+            "pinPhase": "form",
+            "requestId": "1",
+            "screen": "XG32UCWMG",
+            "screenDpr": 1,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-manual01",
+            "transientParentIsHost": true,
+            "visible": true,
+            "width": 720,
+            "x": 120,
+            "y": 60
+        },
+        {
+            "active": true,
+            "attemptId": "1",
+            "captureMethod": "QQuickWindow.grabWindow",
+            "discoveryEnabled": false,
+            "dpr": 1,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "pinBack",
+                "width": 129,
+                "x": 298,
+                "y": 263
+            },
+            "height": 560,
+            "image": "900-manual-cancelled.png",
+            "inputCount": 1,
+            "phase": "cancelled",
+            "physicalHeight": 560,
+            "physicalWidth": 720,
+            "pinHeadingBounds": {
+                "height": 30,
+                "truncated": false,
+                "width": 336,
+                "x": 91,
+                "y": 175
+            },
+            "pinPhase": "cancelled",
+            "requestId": "1",
+            "screen": "XG32UCWMG",
+            "screenDpr": 1,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-manual01",
+            "transientParentIsHost": true,
+            "visible": true,
+            "width": 720,
+            "x": 120,
+            "y": 60
+        }
+    ],
+    "hostGeometry": {
+        "active": true,
+        "dpr": 1,
+        "exposed": true,
+        "height": 600,
+        "screen": "XG32UCWMG",
+        "screenDpr": 1,
+        "visible": true,
+        "width": 900,
+        "x": 30,
+        "y": 40
+    },
+    "manualCompleted": true,
+    "manualReady": true,
+    "manualStage": "cancelled",
+    "pinGeometry": {
+        "active": true,
+        "dpr": 1,
+        "exposed": true,
+        "height": 560,
+        "screen": "XG32UCWMG",
+        "screenDpr": 1,
+        "visible": true,
+        "width": 720,
+        "x": 120,
+        "y": 60
+    },
+    "requestedRenderer": "opengl",
+    "runtimeRendererBackend": 1,
+    "screens": [
+        {
+            "dpr": 1,
+            "height": 2160,
+            "name": "XG32UCWMG",
+            "width": 3840
+        },
+        {
+            "dpr": 1,
+            "height": 1440,
+            "name": "VG270U",
+            "width": 2560
+        }
+    ]
+}

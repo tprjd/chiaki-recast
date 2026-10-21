@@ -168,6 +168,18 @@ TestCase {
         mouseClick(findChild(harness.dialog, "pinBack"));
         tryVerify(() => !harness.dialog);
     }
+    function test_sidebarActionExpandsForLongLabels() {
+        const dialog = open();
+        dialog.width = 900; dialog.height = 600;
+        const button = findChild(dialog, "pinConsoles");
+        button.text = "Return to all registered consoles";
+        tryVerify(() => button.height > 42, 1000, "Long sidebar text needs a second line");
+        button.forceActiveFocus(Qt.TabFocusReason);
+        const position = button.mapToItem(dialog, 0, 0);
+        verify(position.x >= 0 && position.y >= 0);
+        verify(position.x + button.width <= dialog.width);
+        verify(position.y + button.height <= dialog.height);
+    }
     function test_expandedTextRemainsReachable_data() {
         return [{tag: "900", w: 900, h: 600}, {tag: "1280", w: 1280, h: 720}];
     }
