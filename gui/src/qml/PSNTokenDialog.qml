@@ -1,428 +1,249 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import QtQuick.Controls.Material
-
 import org.streetpea.chiaking
-
 import "controls" as C
 
-DialogView {
+FocusScope {
     id: dialog
-    property var psnurl
-    property var expired
-    property bool closing: false
-    title: {
-        if(expired)
-            qsTr("Credentials Expired: Refresh PSN Remote Connection")
-        else
-            qsTr("Setup Automatic PSN Remote Connection")
+    objectName: "psnSetup"
+    property var backend: Chiaki
+    property var navigation: root
+    property string psnurl: ""
+    property bool expired: false
+    property bool preferEmbedded: Qt.platform.os === "windows"
+    property var createBrowser: function(parent) {
+        return Qt.createQmlObject('import QtQuick; import QtWebEngine; WebEngineView { profile { offTheRecord: false; storageName: "psn-token" } settings { touchIconsEnabled: true; localContentCanAccessRemoteUrls: true } onContextMenuRequested: request => request.accepted = true }', parent, "psnBrowser");
     }
-    buttonText: qsTr("Setup")
-    buttonEnabled: url.text.trim()
-    buttonVisible: false
-    onAccepted: {
-        logDialog.open()
-        Chiaki.initPsnAuth(url.text.trim(), function(msg, ok, done) {
-            if(ok)
-                Chiaki.settings.remotePlayAsk = false;
-            if (!done)
-                logArea.text += msg + "\n";
-            else
-            {
-                logArea.text += msg + "\n";
-                logDialog.standardButtons = Dialog.Close;
-            }
-        });
+    property var browser: null
+    property bool externalBrowser: false
+    property bool revealed: false
+    property bool detailsExpanded: false
+    property bool leaving: false
+    property bool retiring: false
+    property string ownedAttemptId: ""
+    property string completedAttemptId: ""
+    readonly property var attempt: backend.psnAuthAttempt || ({})
+    readonly property bool ownsAttempt: ownedAttemptId.length > 0 && attempt.id === ownedAttemptId
+    readonly property string phase: ownsAttempt ? attempt.phase || "form" : "form"
+    readonly property bool busy: phase === "exchanging" || phase === "account"
+    readonly property bool success: phase === "success"
+    readonly property bool failure: phase === "failure"
+    readonly property bool privateMode: backend.settings.streamerMode
+    signal completed(string accountId)
+
+    component PsnLabel: Label {
+        Layout.fillWidth: true
+        wrapMode: Text.Wrap
+        textFormat: Text.PlainText
+        font.pixelSize: 14
+        color: "#adb8c8"
     }
-    StackView.onActivated: {
-        Chiaki.settings.remotePlayAsk = true;
-        nativeTokenForm.visible = true;
-        nativeTokenForm.forceActiveFocus(Qt.TabFocusReason);
-        if(Qt.platform.os == "linux" || Qt.platform.os == "osx")
-            extBrowserButton.clicked();
+    component PsnButton: SetupButton { textFormat: Text.PlainText; width: Math.min(implicitWidth, parent.width) }
+
+    function focusAction() {
+        if (leaving || retiring || !visible) return;
+        if (busy || success) closeButton.forceActiveFocus(Qt.TabFocusReason);
+        else if (failure) freshButton.forceActiveFocus(Qt.TabFocusReason);
+        else if (externalBrowser) { redirect.readOnly = false; redirect.forceActiveFocus(Qt.TabFocusReason); }
+        else externalButton.forceActiveFocus(Qt.TabFocusReason);
+    }
+    function ensureFocusVisible() {
+        const item = Window.window ? Window.window.activeFocusItem : null;
+        if (!item) return;
+        let ancestor = item;
+        while (ancestor && ancestor !== workspace) ancestor = ancestor.parent;
+        if (!ancestor) return;
+        const y = item.mapToItem(workspace, 0, 0).y;
+        if (y < scroll.contentY) scroll.contentY = y;
+        else if (y + item.height > scroll.contentY + scroll.height) scroll.contentY = y + item.height - scroll.height;
+    }
+    function useExternal() {
+        if (busy || leaving || retiring) return;
+        if (browser) browser.stop();
+        externalBrowser = true;
+        psnurl = backend.openPsnLink() || String(backend.psnLoginUrl());
+        Qt.callLater(focusAction);
+    }
+    function freshSignIn() {
+        if (busy || leaving || retiring) return;
+        ownedAttemptId = "";
+        detailsExpanded = false;
+        redirect.text = "";
+        revealed = false;
+        if (externalBrowser || !browser) useExternal();
+        else browser.url = backend.psnLoginUrl();
+    }
+    function submit(value) {
+        if (busy || leaving || retiring) return;
+        revealed = false;
+        detailsExpanded = false;
+        const id = backend.startPsnAuth(value);
+        if (id) ownedAttemptId = id;
+        Qt.callLater(focusAction);
     }
     function close() {
-        if(webView.web)
-        {
-            dialog.closing = true;
-            if(Chiaki.settings.remotePlayAsk)
-                reloadTimer.start();
-            else
-                cacheClearTimer.start();
+        if (leaving || retiring) return;
+        leaving = true;
+        revealed = false;
+        redirect.text = "";
+        if (browser) {
+            if (backend.settings.remotePlayAsk) backend.clearCookies(browser.profile);
+            browser.profile.clearHttpCache();
+            browser.stop();
         }
-        else
-            root.closeDialog();
+        navigation.closeDialog();
     }
-
-    Item {
-        Item {
-            id: nativeTokenForm
-            visible: false
-            Keys.onPressed: (event) => {
-                if (event.modifiers)
-                    return;
-                switch (event.key) {
-                case Qt.Key_PageUp:
-                    reloadButton.clicked();
-                    event.accepted = true;
-                    break;
-                case Qt.Key_PageDown:
-                    extBrowserButton.clicked();
-                    event.accepted = true;
-                    break;
-                }
-            }
-            anchors.fill: parent
-            ToolBar {
-                id: psnTokenToolbar
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    right: parent.right
-                }
-                height: 80
-
-                RowLayout {
-                    anchors {
-                        fill: parent
-                        leftMargin: 10
-                        rightMargin: 10
-                    }
-                    Button {
-                        id: reloadButton
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: 350
-                        flat: true
-                        text: "reload + clear cookies"
-                        Image {
-                            anchors {
-                                left: parent.left
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 12
-                            }
-                            width: 28
-                            height: 28
-                            sourceSize: Qt.size(width, height)
-                            source: "qrc:/icons/l1.svg"
-                        }
-                        onClicked: reloadTimer.start()
-                        Material.roundedScale: Material.SmallScale
-                        focusPolicy: Qt.NoFocus
-                    }
-                    ProgressBar {
-                        id: browserProgresss
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: 300
-                        from: 0
-                        to: 100
-                        value: webView.web.loadProgress
-                        Material.roundedScale: Material.SmallScale
-                        focusPolicy: Qt.NoFocus
-                    }
-                    Button {
-                        id: extBrowserButton
-                        Layout.fillHeight: true
-                        Layout.preferredWidth: 300
-                        flat: true
-                        Image {
-                            anchors {
-                                left: parent.left
-                                verticalCenter: parent.verticalCenter
-                                leftMargin: 12
-                            }
-                            width: 28
-                            height: 28
-                            sourceSize: Qt.size(width, height)
-                            source: "qrc:/icons/r1.svg"
-                        }
-                        focusPolicy: Qt.NoFocus
-                        text: "Use external browser"
-                        onClicked: {
-                            nativeTokenForm.visible = false;
-                            psnTokenToolbar.visible = false;
-                            nativeErrorGrid.visible = false;
-                            webView.visible = false;
-                            linkgrid.visible = true;
-                            dialog.buttonVisible = true;
-                            psnurl = Chiaki.openPsnLink();
-                            if(psnurl)
-                            {
-                                openurl.selectAll();
-                                openurl.copy();
-                            }
-                            pasteUrl.forceActiveFocus(Qt.TabFocusReason);
-                        }
-                    }
-                }
-            }
-            Timer {
-                id: reloadTimer
-                interval: 0
-                running: false
-                onTriggered: {
-                    Chiaki.clearCookies(webView.web.profile);
-                    webView.web.profile.clearHttpCache();
-                }
-            }
-
-            Timer {
-                id: cacheClearTimer
-                interval: 0
-                running: false
-                onTriggered: {
-                    webView.web.profile.clearHttpCache();
-                }
-            }
-
-            GridLayout {
-                id: nativeErrorGrid
-                visible: false
-                anchors {
-                    top: psnTokenToolbar.bottom
-                    left: parent.left
-                    right: parent.right
-                    topMargin: 50
-                }
-                columns: 2
-                rowSpacing: 10
-                columnSpacing: 20
-                Label {
-                    id: nativeErrorHeader
-                    text: "Retrieving PSN account ID failed with error: "
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 400
-                    Layout.leftMargin: 20
-                }
-
-                Label {
-                    id: nativeErrorLabel
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 400
-                    Layout.leftMargin: 20
-                }
-
-                Label {
-                    id: retryButton
-                    text: "Retry process"
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: 300
-                    Layout.leftMargin: 20
-                }
-                C.Button {
-                    firstInFocusChain: true
-                    lastInFocusChain: true
-                    text: "Retry"
-                    onClicked: {
-                        nativeErrorGrid.visible = false;
-                        nativeErrorLabel.text = "";
-                        nativeErrorLabel.visible = false;
-                        webView.visible = true;
-                        webView.web.url = Chiaki.psnLoginUrl();
-                    }
-                    Layout.preferredWidth: 200
-                    Layout.fillHeight: true
-                    Layout.leftMargin: 20
-                }
-            }
-            Item {
-                id: webView
-                property Item web: null
-                anchors {
-                    top: psnTokenToolbar.bottom
-                    bottom: parent.bottom
-                    left: parent.left
-                    right: parent.right
-                    leftMargin: 10
-                    rightMargin: 10
-                }
-                property bool started: false
-                Component.onCompleted: {
-                    try {
-                        web = Qt.createQmlObject("
-                        import QtWebEngine
-                        import QtQuick.Controls
-                        import org.streetpea.chiaking
-                        WebEngineView {
-                            profile {
-                                offTheRecord: false
-                                storageName: 'psn-token'
-                                onClearHttpCacheCompleted: {
-                                    if(dialog.closing)
-                                        root.closeDialog();
-                                    else
-                                        webView.web.reload();
-                                }
-                            }
-                            settings {
-                                // Load larger touch icons
-                                touchIconsEnabled: true
-                                localContentCanAccessRemoteUrls: true
-                            }
-
-                            onContextMenuRequested: (request) => request.accepted = true;
-                            onNavigationRequested: (request) => {
-                                if (Chiaki.checkPsnRedirectURL(request.url)) {
-                                    logDialog.open()
-                                    Chiaki.initPsnAuth(request.url, function(msg, ok, done) {
-                                        if (!done)
-                                            logArea.text += msg + '\n';
-                                        else
-                                        {
-                                            logArea.text += msg + '\n';
-                                            logDialog.standardButtons = Dialog.Close;
-                                        }
-                                    });
-                                    request.reject();
-                                }
-                                else
-                                    request.accept();
-                            }
-                            onCertificateError: console.error(error.description);
-                        }", webView, "webView");
-                        Chiaki.setWebEngineHints(web.profile);
-                        web.url = Chiaki.psnLoginUrl();
-                        web.anchors.fill = webView;
-                    } catch (error) {
-                        console.error('Create webengine view failed with error:' + error);
-                        extBrowserButton.clicked();
-                    }
-                }
-            }
+    function startBrowser() {
+        if (busy || leaving || retiring) return;
+        if (!preferEmbedded) { useExternal(); return; }
+        try {
+            browser = createBrowser(browserHost);
+            if (!browser) throw new Error("Browser unavailable");
+            browser.anchors.fill = browserHost;
+            backend.setWebEngineHints(browser.profile);
+            browser.navigationRequested.connect(function(request) {
+                if (backend.checkPsnRedirectURL(request.url)) { request.reject(); dialog.submit(request.url); }
+                else request.accept();
+            });
+            browser.profile.clearHttpCacheCompleted.connect(function() {
+                if (!dialog.leaving && !dialog.retiring && dialog.browser) dialog.browser.reload();
+            });
+            browser.url = backend.psnLoginUrl();
+        } catch (error) {
+            if (browser) { browser.destroy(); browser = null; }
+            useExternal();
         }
-        GridLayout {
-            id: linkgrid
-            visible: false
-            anchors {
-                top: parent.top
-                horizontalCenter: parent.horizontalCenter
-                topMargin: 50
-            }
-            columns: 2
-            rowSpacing: 10
-            columnSpacing: 20
-
-            Label {
-                text: qsTr("Open Web Browser with copied URL")
-                visible: psnurl
-            }
-
-            TextField {
-                id: openurl
-                text: psnurl
-                echoMode: Chiaki.settings.streamerMode ? TextInput.Password : TextInput.Normal
-                visible: false
-                Layout.preferredWidth: 400
-            }
-
-            C.Button {
-                id: copyUrl
-                text: qsTr("Click to Re-Copy URL")
-                onClicked: {
-                    openurl.selectAll()
-                    openurl.copy()
-                }
-                KeyNavigation.priority: KeyNavigation.BeforeItem
-                KeyNavigation.up: copyUrl
-                KeyNavigation.down: url
-                visible: psnurl
-            }
-
-            Label {
-                text: qsTr("Redirect URL from Web Browser")
-            }
-
-            TextField {
-                id: url
-                echoMode: Chiaki.settings.streamerMode ? TextInput.Password : TextInput.Normal
-                Layout.preferredWidth: 400
-                KeyNavigation.priority: {
-                    if(readOnly)
-                        KeyNavigation.BeforeItem
-                    else
-                        KeyNavigation.AfterItem
-                }
-                KeyNavigation.up: {
-                    if(psnurl)
-                        copyUrl
-                    else
-                        url
-                }
-                KeyNavigation.down: url
-                KeyNavigation.right: pasteUrl
-                C.Button {
-                    id: pasteUrl
-                    text: qsTr("Click to Paste URL")
-                    anchors {
-                        left: parent.right
-                        verticalCenter: parent.verticalCenter
-                        leftMargin: 10
-                    }
-                    onClicked: url.paste()
-                    KeyNavigation.priority: KeyNavigation.BeforeItem
-                    KeyNavigation.left: url
-                    KeyNavigation.up: {
-                        if(psnurl)
-                            copyUrl
-                        else
-                            pasteUrl
-                    }
-                    KeyNavigation.down: pasteUrl
-                }
-            }
+    }
+    function reloadBrowser() {
+        if (!browser || busy || leaving || retiring) return;
+        backend.clearCookies(browser.profile);
+        browser.profile.clearHttpCache();
+    }
+    onPrivateModeChanged: if (privateMode) revealed = false
+    onAttemptChanged: {
+        if (!ownsAttempt || leaving || retiring) return;
+        if (success && completedAttemptId !== ownedAttemptId) {
+            completedAttemptId = ownedAttemptId;
+            completed(attempt.accountId || "");
         }
-
-        Item {
-            Dialog {
-                id: logDialog
-                parent: Overlay.overlay
-                x: Math.round((root.width - width) / 2)
-                y: Math.round((root.height - height) / 2)
-                title: qsTr("Create PSN Automatic Remote Connection Token")
-                modal: true
-                closePolicy: Popup.NoAutoClose
-                standardButtons: Dialog.Cancel
-                Material.roundedScale: Material.MediumScale
-                onOpened: logArea.forceActiveFocus(Qt.TabFocusReason)
-                onClosed: root.showMainView();
-
-                Flickable {
-                    id: logFlick
-                    implicitWidth: 600
-                    implicitHeight: 400
-                    clip: true
-                    contentWidth: logArea.contentWidth
-                    contentHeight: logArea.contentHeight
-                    flickableDirection: Flickable.AutoFlickIfNeeded
-                    ScrollBar.vertical: ScrollBar {
-                        id: logScrollbar
-                        policy: ScrollBar.AlwaysOn
-                        visible: logFlick.contentHeight > logFlick.implicitHeight
-                    }
-
-                    Label {
-                        id: logArea
-                        width: logFlick.width
-                        wrapMode: TextEdit.Wrap
-                        Keys.onReturnPressed: if (logDialog.standardButtons == Dialog.Close) logDialog.close()
-                        Keys.onEscapePressed: logDialog.close()
-                        Keys.onPressed: (event) => {
-                            switch (event.key) {
-                            case Qt.Key_Up:
-                                if(logScrollbar.position > 0.001)
-                                    logFlick.flick(0, 500);
-                                event.accepted = true;
-                                break;
-                            case Qt.Key_Down:
-                                if(logScrollbar.position < 1.0 - logScrollbar.size - 0.001)
-                                    logFlick.flick(0, -500);
-                                event.accepted = true;
-                                break;
-                            }
-                        }
-                    }
-                }
+        Qt.callLater(focusAction);
+    }
+    Component.onCompleted: {
+        if (attempt.phase === "exchanging" || attempt.phase === "account") ownedAttemptId = attempt.id;
+        else startBrowser();
+        Qt.callLater(focusAction);
+    }
+    Component.onDestruction: {
+        if (browser) {
+            browser.stop();
+            if (!leaving) {
+                if (backend.settings.remotePlayAsk) backend.clearCookies(browser.profile);
+                browser.profile.clearHttpCache();
             }
         }
     }
+    StackView.onDeactivating: retiring = true
+    Keys.onEscapePressed: close()
+    Keys.onMenuPressed: if (externalBrowser && !busy && !success) submit(redirect.text.trim())
+    Keys.onPressed: event => {
+        if (event.modifiers) return;
+        if (event.key === Qt.Key_PageUp) { reloadBrowser(); event.accepted = true; }
+        else if (event.key === Qt.Key_PageDown) { useExternal(); event.accepted = true; }
+    }
+    Connections { target: dialog.Window.window; function onActiveFocusItemChanged() { Qt.callLater(dialog.ensureFocusVisible); } }
+
+    Rectangle { anchors.fill: parent; color: "#11151c" }
+    ColumnLayout {
+        anchors.fill: parent; anchors.margins: dialog.width < 1000 ? 24 : 32
+        spacing: 16
+        PsnLabel { text: qsTr("Settings / PSN remote access"); font.pixelSize: 12 }
+        PsnLabel { objectName: "psnHeading"; text: dialog.expired ? qsTr("Renew PSN credentials") : qsTr("Set up PSN remote access"); font.pixelSize: 30; font.bold: true; color: "#ffffff" }
+        PsnLabel { objectName: "psnExplanation"; text: dialog.expired ? qsTr("Your saved PSN credentials expired. Sign in again to use Remote Play away from home.") : qsTr("Sign in to PlayStation Network to use Remote Play away from home.") }
+        Flickable {
+            id: scroll
+            objectName: "psnScroll"
+            Layout.fillWidth: true; Layout.fillHeight: true
+            contentWidth: width; contentHeight: workspace.implicitHeight
+            clip: true; boundsBehavior: Flickable.StopAtBounds
+            ScrollBar.vertical: ScrollBar {}
+            onHeightChanged: Qt.callLater(dialog.ensureFocusVisible)
+            onContentHeightChanged: Qt.callLater(dialog.ensureFocusVisible)
+            ColumnLayout {
+                id: workspace
+                width: scroll.width
+                spacing: 18
+                Rectangle {
+                    Layout.fillWidth: true
+                    implicitHeight: panel.implicitHeight + 40
+                    color: "#171b23"; radius: 12; border.color: "#2b323e"
+                    ColumnLayout {
+                        id: panel
+                        anchors { left: parent.left; right: parent.right; top: parent.top; margins: 20 }
+                        spacing: 16
+                        PsnLabel {
+                            objectName: "psnStatus"
+                            text: dialog.busy ? (dialog.phase === "account" ? qsTr("Retrieving your Account ID") : qsTr("Completing PSN sign-in")) : dialog.success ? qsTr("PSN remote access is ready") : dialog.failure ? qsTr("PSN sign-in did not finish") : qsTr("Sign in with your browser")
+                            font.pixelSize: 22; font.bold: true; color: dialog.success ? "#80dcb0" : dialog.failure ? "#ffb4ab" : "#ffffff"
+                        }
+                        BusyIndicator { visible: dialog.busy; running: visible; Layout.preferredWidth: 40; Layout.preferredHeight: 40 }
+                        PsnLabel {
+                            objectName: "psnStorage"
+                            text: qsTr("Sign-in saves PSN authentication credentials and your Account ID in the current profile. These credentials allow remote access to your consoles.")
+                        }
+                        PsnLabel {
+                            objectName: "psnCloseExplanation"
+                            visible: dialog.busy
+                            text: qsTr("You can close this screen. Sign-in can still finish and save credentials in this profile while the app is open.")
+                        }
+                        PsnLabel { visible: dialog.success; text: qsTr("Your credentials and Account ID are saved. You can now close this screen.") }
+                        PsnLabel { objectName: "psnFailure"; visible: dialog.failure; color: "#ffb4ab"; text: dialog.failure ? attempt.message || qsTr("Check your connection, then try again or start a fresh sign-in.") : "" }
+                        ColumnLayout {
+                            visible: !dialog.busy && !dialog.success
+                            Layout.fillWidth: true
+                            spacing: 12
+                            Flow {
+                                Layout.fillWidth: true; spacing: 10
+                                PsnButton { id: externalButton; objectName: "psnExternal"; text: dialog.externalBrowser ? qsTr("Open sign-in browser") : qsTr("Use external browser"); onClicked: dialog.useExternal() }
+                                PsnButton { objectName: "psnReload"; visible: !dialog.externalBrowser; text: qsTr("Reload and clear cookies"); onClicked: dialog.reloadBrowser() }
+                                PsnButton { objectName: "psnCopy"; visible: dialog.externalBrowser; text: qsTr("Copy sign-in link"); onClicked: { linkCopy.selectAll(); linkCopy.copy(); } }
+                            }
+                            Item {
+                                id: browserHost
+                                objectName: "psnBrowserHost"
+                                visible: !dialog.externalBrowser && !dialog.failure
+                                Layout.fillWidth: true; Layout.preferredHeight: visible ? Math.max(260, scroll.height - 210) : 0
+                            }
+                            PsnLabel { visible: dialog.externalBrowser; text: qsTr("After sign-in, copy the complete final URL from your browser address bar. Paste it below. Use the full URL, including its authorization code.") }
+                            PsnLabel { visible: dialog.externalBrowser; text: qsTr("Sign-in redirect URL"); color: "#ffffff" }
+                            C.TextField {
+                                id: redirect
+                                objectName: "psnRedirect"
+                                visible: dialog.externalBrowser
+                                Layout.fillWidth: true
+                                Accessible.name: qsTr("Sign-in redirect URL")
+                                echoMode: dialog.revealed && !dialog.privateMode ? TextInput.Normal : TextInput.Password
+                                inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+                                selectByMouse: true
+                                background: Rectangle { implicitHeight: 46; color: "#11151c"; radius: 7; border.color: redirect.activeFocus ? "#63b7ff" : "#3a4352"; border.width: redirect.activeFocus ? 2 : 1 }
+                            }
+                            Flow {
+                                visible: dialog.externalBrowser
+                                Layout.fillWidth: true; spacing: 10
+                                PsnButton { objectName: "psnPaste"; text: qsTr("Paste"); onClicked: { redirect.readOnly = false; redirect.paste(); } }
+                                PsnButton { objectName: "psnReveal"; text: dialog.revealed ? qsTr("Hide") : qsTr("Show"); enabled: !dialog.privateMode; onClicked: dialog.revealed = !dialog.revealed }
+                                PsnButton { objectName: "psnSubmit"; text: dialog.failure ? qsTr("Retry") : qsTr("Complete sign-in"); primary: true; onClicked: dialog.submit(redirect.text.trim()) }
+                            }
+                        }
+                        PsnButton { id: freshButton; objectName: "psnFresh"; visible: dialog.failure; text: qsTr("Start fresh sign-in"); onClicked: dialog.freshSignIn() }
+                        PsnButton { objectName: "psnDetailsToggle"; visible: dialog.failure && !!attempt.errorText; text: dialog.detailsExpanded ? qsTr("Hide details") : qsTr("Technical details"); flat: true; onClicked: dialog.detailsExpanded = !dialog.detailsExpanded }
+                        PsnLabel { objectName: "psnDetails"; visible: dialog.failure && dialog.detailsExpanded; text: dialog.privateMode ? qsTr("Details are hidden in streamer mode.") : attempt.errorText || "" }
+                        PsnButton { id: closeButton; objectName: "psnClose"; text: dialog.busy || dialog.success || dialog.failure ? qsTr("Close") : qsTr("Cancel"); onClicked: dialog.close() }
+                    }
+                }
+                PsnLabel { text: qsTr("Use the same PlayStation account as your console. The Sony sign-in page and your external browser can show account details.") }
+            }
+        }
+    }
+    TextEdit { id: linkCopy; visible: false; text: dialog.psnurl }
 }

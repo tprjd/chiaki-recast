@@ -1,0 +1,10 @@
+{
+  "allOriginalSourceHashesRestored": true,
+  "checkedPaths": 49,
+  "originalRuntimeOutputSetting": "CMAKE_RUNTIME_OUTPUT_DIRECTORY:UNINITIALIZED=C:\\Users\\david\\.cache\\chiaki-ui-native/console-setup-final-bin",
+  "normalApplicationRebuilt": true,
+  "screenTestTargetRebuilt": true,
+  "qaCacheReleased": true,
+  "normalBuildLog": "C:\\Users\\david\\.codex\\worktrees\\psn-setup\\chiaki-ng-ui\\build\\psn-native\\normal-build.log",
+  "restoredBuildLog": "C:\\Users\\david\\.codex\\worktrees\\psn-setup\\chiaki-ng-ui\\build\\psn-native\\restored-build.log"
+}
