@@ -1,0 +1,18 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::SteamShortcut::initTestCase()
+QWARN  : console_screen::SteamShortcut::test_defaultsAndNameValidation() QFontDatabase: Cannot find font directory C:/Users/david/.cache/chiaki-native-qt/6.9.3/msvc2022_64/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QWARN  : console_screen::SteamShortcut::test_defaultsAndNameValidation() file:///C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/gui/tests/qml/tst_SteamShortcut.qml: Setting initial properties failed: SteamShortcutDialog does not have a property called backend
+QWARN  : console_screen::SteamShortcut::test_defaultsAndNameValidation() file:///C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/gui/tests/qml/tst_SteamShortcut.qml: Setting initial properties failed: SteamShortcutDialog does not have a property called navigation
+QWARN  : console_screen::SteamShortcut::test_defaultsAndNameValidation() file:///C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/gui/src/qml/SteamShortcutDialog.qml:80: TypeError: Cannot read property 'currentProfile' of null
+QWARN  : console_screen::SteamShortcut::test_defaultsAndNameValidation() file:///C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/gui/src/qml/SteamShortcutDialog.qml:113: ReferenceError: root is not defined
+QWARN  : console_screen::SteamShortcut::test_defaultsAndNameValidation() file:///C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/gui/src/qml/SteamShortcutDialog.qml:112: ReferenceError: root is not defined
+QWARN  : console_screen::SteamShortcut::test_defaultsAndNameValidation() file:///C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/gui/src/qml/SteamShortcutDialog.qml:166: ReferenceError: root is not defined
+QWARN  : console_screen::SteamShortcut::test_defaultsAndNameValidation() file:///C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/gui/src/qml/SteamShortcutDialog.qml:165: ReferenceError: root is not defined
+QWARN  : console_screen::SteamShortcut::test_defaultsAndNameValidation() file:///C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/gui/src/qml/SteamShortcutDialog.qml:69: TypeError: Cannot read property 'currentProfile' of null
+FAIL!  : console_screen::SteamShortcut::test_defaultsAndNameValidation() Uncaught exception: Cannot read property 'text' of null
+C:\Users\david\.codex\worktrees\psn-steam\chiaki-ng-ui\gui\tests\qml\tst_SteamShortcut.qml(30) : failure location
+PASS   : console_screen::SteamShortcut::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 13ms
+********* Finished testing of console_screen *********

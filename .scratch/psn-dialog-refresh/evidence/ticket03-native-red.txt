@@ -1,0 +1,39 @@
+**********************************************************************
+** Visual Studio 2022 Developer PowerShell v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+-- The CXX compiler identification is MSVC 19.44.35228.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Found WrapVulkanHeaders: C:/VulkanSDK/1.4.357.0/Include
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Configuring done (2.1s)
+-- Generating done (0.2s)
+-- Build files have been written to: C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/build/steam-native
+[1/11] Automatic MOC and UIC for target cpp-steam-tools
+[2/11] Building CXX object steam-tools\CMakeFiles\cpp-steam-tools.dir\cpp-steam-tools_autogen\mocs_compilation.cpp.obj
+[3/11] Building CXX object steam-tools\CMakeFiles\cpp-steam-tools.dir\src\steamshortcutentry.cpp.obj
+[4/11] Building CXX object steam-tools\CMakeFiles\cpp-steam-tools.dir\src\vdfstatemachine.cpp.obj
+[5/11] Building CXX object steam-tools\CMakeFiles\cpp-steam-tools.dir\src\steamtools.cpp.obj
+[6/11] Linking CXX shared library steam-tools\cpp-steam-tools.dll
+[7/11] Automatic RCC for ../../res/resources.qrc
+[8/11] Building CXX object CMakeFiles\chiaki-steam-shortcut-tests.dir\chiaki-steam-shortcut-tests_autogen\R7WXIOLRXR\qrc_resources.cpp.obj
+[9/11] Building CXX object CMakeFiles\chiaki-steam-shortcut-tests.dir\command.cpp.obj
+[10/11] Building CXX object CMakeFiles\chiaki-steam-shortcut-tests.dir\main.cpp.obj
+[11/11] Linking CXX executable chiaki-steam-shortcut-tests.exe
+PASS isolated Steam directory exists
+PASS temporary fixture written
+PASS temporary fixture written
+FAIL new shortcut has exactly one terminal result

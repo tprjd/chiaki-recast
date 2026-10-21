@@ -1,0 +1,3 @@
+Internal ctest changing into directory: C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/build/gui-screen
+Test project C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/build/gui-screen
+    Start 1: chiaki-console-screen
