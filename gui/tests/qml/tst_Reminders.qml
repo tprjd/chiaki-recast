@@ -169,12 +169,17 @@ TestCase {
         compare(harness.routes.length, 0);
     }
     function test_steamSetupReturnsToNextReminder_data() {
-        return ["cancel", "success", "failure"].map(outcome => ({tag: outcome, outcome: outcome}));
+        const rows = [];
+        for (const outcome of ["cancel", "success", "failure"])
+            for (const complete of [false, true]) rows.push({tag: outcome + (complete ? "-configured" : "-setup"), outcome, complete});
+        return rows;
     }
     function test_steamSetupReturnsToNextReminder(data) {
         const harness = createTemporaryObject(harnessComponent, tests, {openSteamScreen: true});
         harness.settings.addSteamShortcutAsk = true;
         harness.settings.remotePlayAsk = true;
+        for (const name of ["psnRefreshToken", "psnAuthToken", "psnAuthTokenExpiry", "psnAccountId"])
+            harness.settings[name] = data.complete ? "synthetic" : "";
         harness.started = true;
         tryCompare(harness.dialog, "opened", true);
         keyClick(Qt.Key_Down);
@@ -198,12 +203,14 @@ TestCase {
             findChild(steam, data.outcome === "success" ? "steamDone" : "steamClose").forceActiveFocus(Qt.TabFocusReason);
         }
         keyClick(Qt.Key_Return);
-        tryCompare(harness.dialog, "remotePlay", true);
-        tryCompare(harness.dialog, "opened", true);
-        compare(harness.prompts, ["steam", "psn"]);
+        if (!data.complete) {
+            tryCompare(harness.dialog, "remotePlay", true);
+            tryCompare(harness.dialog, "opened", true);
+        }
+        compare(harness.prompts, data.complete ? ["steam"] : ["steam", "psn"]);
         compare(harness.settings.addSteamShortcutAsk, data.outcome !== "success");
-        verify(harness.settings.remotePlayAsk);
-        keyClick(Qt.Key_Escape);
+        compare(harness.settings.remotePlayAsk, !data.complete);
+        if (!data.complete) keyClick(Qt.Key_Escape);
         tryCompare(harness.dialog, "visible", false);
         tryCompare(harness.pages, "depth", 1);
         tryCompare(findChild(harness, "addConsoleButton"), "activeFocus", true);

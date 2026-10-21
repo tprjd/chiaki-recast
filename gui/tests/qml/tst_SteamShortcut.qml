@@ -41,6 +41,12 @@ TestCase {
     }
     Component { id: component; SteamShortcutDialog {} }
     Component { id: harnessComponent; SteamShortcutHarness {} }
+    RemindDialog {
+        id: psnReminder
+        backend: fakeBackend
+        navigation: ({showRemindDialog: (title, message, remote, action) => { reminders++; reminderAction = action; },
+            showPSNTokenDialog: () => signIns++})
+    }
     function open(profile = "Guest") {
         events = []; calls = []; closes = 0; reminders = 0; signIns = 0; reminderAction = null;
         fakeBackend.throwOnCreate = false;
@@ -50,8 +56,7 @@ TestCase {
         settings.chosenPath = "C:/synthetic/Steam";
         return createTemporaryObject(component, tests, {width: tests.width, height: tests.height,
             backend: fakeBackend, navigation: {closeDialog: () => closes++,
-                showRemindDialog: (title, message, remote, action) => { reminders++; reminderAction = action; },
-                showPSNTokenDialog: () => signIns++}});
+                showPsnReminder: () => psnReminder.offerPsnReminder()}});
     }
     function test_defaultsAndNameValidation() {
         const dialog = open();
@@ -285,6 +290,7 @@ TestCase {
         verify(settings.addSteamShortcutAsk);
         verify(findChild(dialog, "steamResultMessage").text.indexOf("Check the details") >= 0);
         fakeBackend.throwOnCreate = false;
+        waitForRendering(dialog);
         mouseClick(findChild(dialog, "steamRetry"));
         tryVerify(() => calls.length === 1);
         events[0]("Succeeded after correcting folder", true, true);

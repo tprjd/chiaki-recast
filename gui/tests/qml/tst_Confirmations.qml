@@ -173,4 +173,40 @@ TestCase {
         keyClick(Qt.Key_Escape);
         tryCompare(dialog, "visible", false);
     }
+    function test_longTextScrollsFromFocusedActions_data() {
+        const rows = [];
+        for (const width of [900, 1280])
+            for (const secondary of [false, true]) rows.push({tag: width + (secondary ? "-reminder" : "-confirmation"), width, secondary});
+        return rows;
+    }
+    function test_longTextScrollsFromFocusedActions(data) {
+        tests.width = data.width; tests.height = data.width === 900 ? 600 : 720;
+        const dialog = openDialog({title: "Long translated instructions", text: "Read the complete instructions before you choose an action. ".repeat(120),
+            actionText: "Set up now", secondaryActionText: data.secondary ? "Don't ask again" : ""});
+        const scroll = dialog.contentItem;
+        verify(scroll.contentHeight > scroll.height);
+        const cancel = findChild(dialog.footer, "confirmationCancel");
+        tryCompare(cancel, "activeFocus", true);
+        verify(cancel.visualFocus);
+        // Page keys also come from the controller shoulder buttons.
+        keyClick(Qt.Key_PageDown);
+        tryVerify(() => scroll.contentItem.contentY > 0, 1000, "Long instructions scroll while Cancel keeps focus");
+        verify(cancel.activeFocus && cancel.visualFocus);
+        const lower = scroll.contentItem.contentY;
+        keyClick(Qt.Key_PageUp);
+        tryVerify(() => scroll.contentItem.contentY < lower);
+        const names = ["confirmationAction", "confirmationCancel"];
+        if (data.secondary) names.push("confirmationSecondaryAction");
+        for (const name of names) {
+            const action = findChild(dialog.footer, name);
+            for (let count = 0; count < 8 && !action.activeFocus; count++) keyClick(Qt.Key_Tab);
+            verify(action.activeFocus && action.visualFocus, "Tab reaches " + name);
+            keyClick(Qt.Key_PageDown);
+            verify(scroll.contentItem.contentY > 0);
+        }
+        compare(accepted, 0); compare(cancelled, 0);
+        keyClick(Qt.Key_Escape);
+        tryCompare(dialog, "visible", false);
+        compare(accepted, 0); compare(cancelled, 1);
+    }
 }

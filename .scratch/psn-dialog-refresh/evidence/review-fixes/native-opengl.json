@@ -1,0 +1,136 @@
+{
+  "allPassed": true,
+  "captures": [
+    {
+      "dpr": 1.25,
+      "file": "opengl/900-shared-confirmation.png",
+      "height": 600,
+      "method": "OpenGL render control framebuffer",
+      "physicalHeight": 750,
+      "physicalWidth": 1125,
+      "separate": false,
+      "width": 900,
+      "sha256": "273973260176d33ad07c684d6cf7bb2c10cd4edd50e55c5df85b2365eea96e38"
+    },
+    {
+      "dpr": 1.25,
+      "file": "opengl/900-shared-reminder.png",
+      "height": 600,
+      "method": "OpenGL render control framebuffer",
+      "physicalHeight": 750,
+      "physicalWidth": 1125,
+      "separate": false,
+      "width": 900,
+      "sha256": "a161594f4303986ce73b7c37f08c80e921e33fbe7eed9988c421c4ffd32bb185"
+    },
+    {
+      "dpr": 1.25,
+      "file": "opengl/900-long-reminder-scroll.png",
+      "height": 600,
+      "method": "OpenGL render control framebuffer",
+      "physicalHeight": 750,
+      "physicalWidth": 1125,
+      "separate": false,
+      "width": 900,
+      "sha256": "55ac6673fe9435eed9d730106df03d0460a4ac1e741af49909a4330bc022ff8d"
+    },
+    {
+      "dpr": 1.25,
+      "file": "opengl/1280-shared-confirmation.png",
+      "height": 720,
+      "method": "OpenGL render control framebuffer",
+      "physicalHeight": 900,
+      "physicalWidth": 1600,
+      "separate": false,
+      "width": 1280,
+      "sha256": "5aaeea3188be8a672803d58a17fa78fa908273d3374ff261a8816b710eeeadd4"
+    },
+    {
+      "dpr": 1.25,
+      "file": "opengl/1280-shared-reminder.png",
+      "height": 720,
+      "method": "OpenGL render control framebuffer",
+      "physicalHeight": 900,
+      "physicalWidth": 1600,
+      "separate": false,
+      "width": 1280,
+      "sha256": "2b0a6595ce6dfaf4b65ff4fe855bc9d4910542da89aaba3a159243f70c255abc"
+    },
+    {
+      "dpr": 1.25,
+      "file": "opengl/1280-long-reminder-scroll.png",
+      "height": 720,
+      "method": "OpenGL render control framebuffer",
+      "physicalHeight": 900,
+      "physicalWidth": 1600,
+      "separate": false,
+      "width": 1280,
+      "sha256": "b710bddbe50d9eae5ebfa15b3fb1a62f909fcc5f6b4821ce8caf0555a32f1491"
+    },
+    {
+      "dpr": 1.25,
+      "file": "opengl/900-cancel-focus.png",
+      "height": 348,
+      "method": "QQuickWindow.grabWindow",
+      "physicalHeight": 435,
+      "physicalWidth": 690,
+      "separate": true,
+      "width": 552,
+      "sha256": "c0d76af7f2f50868b391f46e1964ac41c59424cbb1dbb00edae56b5c83449b12"
+    },
+    {
+      "dpr": 1.25,
+      "file": "opengl/1280-cancel-focus.png",
+      "height": 348,
+      "method": "QQuickWindow.grabWindow",
+      "physicalHeight": 435,
+      "physicalWidth": 690,
+      "separate": true,
+      "width": 552,
+      "sha256": "c0d76af7f2f50868b391f46e1964ac41c59424cbb1dbb00edae56b5c83449b12"
+    }
+  ],
+  "checks": 357,
+  "dialogSizing": {
+    "height": 316,
+    "hostHeight": 720,
+    "hostWidth": 1280,
+    "parentClass": "QQuickRootItem",
+    "parentHeight": 348,
+    "parentWidth": 552,
+    "sceneHeight": 720,
+    "sceneWidth": 1280,
+    "width": 520
+  },
+  "lastBounds": {
+    "height": 42,
+    "name": "confirmationSecondaryAction",
+    "parentHeight": 146,
+    "parentWidth": 464,
+    "visible": true,
+    "width": 464
+  },
+  "nativeRect": {
+    "bottom": 718,
+    "clientLeft": 505,
+    "clientTop": 283,
+    "left": 505,
+    "qtHeight": 348,
+    "qtWidth": 552,
+    "qtX": 404,
+    "qtY": 226,
+    "right": 1195,
+    "top": 283
+  },
+  "renderDiagnostics": {
+    "quickPaints": 2172,
+    "renderCalls": 1182,
+    "swapchain": true,
+    "texture": true
+  },
+  "runtimeRendererBackend": 1,
+  "sleepRequests": 2,
+  "stopRequests": 4,
+  "transport": "Real QmlBackend and StreamSession handlers, controlled native Start, Stop and GoToBed boundaries",
+  "nativeRunDirectory": "C:\\Users\\david\\.cache\\chiaki-ui-native\\psn-review-opengl125"
+}

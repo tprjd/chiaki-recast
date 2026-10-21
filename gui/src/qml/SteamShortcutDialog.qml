@@ -47,14 +47,9 @@ FocusScope {
         closed = true;
         callbackScope.owner = null;
         const navigate = navigation;
-        const settings = backend.settings;
-        const nextReminder = fromReminder && settings.remotePlayAsk;
+        const nextReminder = fromReminder && backend.settings.remotePlayAsk;
         navigate.closeDialog();
-        if (nextReminder) {
-            if (!settings.psnRefreshToken || !settings.psnAuthToken || !settings.psnAuthTokenExpiry || !settings.psnAccountId)
-                navigate.showRemindDialog(qsTr("PSN sign-in"), qsTr("Sign in to PSN to register consoles automatically and use Remote Play outside your home network. Sign-in saves your account credentials in chiaki-ng. You can also set this up later in Settings, under Config."), true, () => navigate.showPSNTokenDialog(false));
-            else settings.remotePlayAsk = false;
-        }
+        if (nextReminder) navigate.showPsnReminder();
     }
     function submit() {
         if (closed || busy || phase === "success" || !validName) return;
