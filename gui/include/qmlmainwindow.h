@@ -118,6 +118,7 @@ public:
 
     Q_INVOKABLE void grabInput();
     Q_INVOKABLE void releaseInput();
+    Q_INVOKABLE void releaseMenuPointerGrab(QWindow *menuWindow);
 
 public slots:
     void resetPlaceboQueue();

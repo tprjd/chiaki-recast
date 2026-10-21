@@ -527,6 +527,13 @@ bool QmlMainWindow::directStream() const
     return direct_stream;
 }
 
+void QmlMainWindow::releaseMenuPointerGrab(QWindow *menuWindow)
+{
+    // Qt's popup owner otherwise captures clicks outside the stream controls.
+    if (menuWindow && menuWindow->transientParent() == this)
+        menuWindow->setMouseGrabEnabled(false);
+}
+
 QmlMainWindow::VideoMode QmlMainWindow::videoMode() const
 {
     return video_mode;
@@ -1731,7 +1738,7 @@ renderer_backend_ready:
     backend = new QmlBackend(settings, this);
     connect(backend, &QmlBackend::sessionChanged, this, [this, exit_app_on_stream_exit](StreamSession *s) {
         const bool preserve_input = !backend->sessionPinRequest().isEmpty()
-            || (s && backend->connectionAttempt().value("route") == "psn");
+            || (s && (session || backend->connectionAttempt().value("route") == "psn"));
         session = s;
         stream_session_active.storeRelease(s ? 1 : 0);
         if (!preserve_input)

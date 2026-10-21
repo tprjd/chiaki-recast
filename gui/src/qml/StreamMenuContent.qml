@@ -35,6 +35,10 @@ FocusScope {
         enter: Transition {}
         exit: Transition {}
         background: Rectangle { radius: 8; color: "#a6090e15"; border.color: "#24ffffff" }
+        function focusItem(item) {
+            if (content.separate) streamWindow.releaseMenuPointerGrab(content.Window.window);
+            item.forceActiveFocus(Qt.TabFocusReason);
+        }
         onClosed: Qt.callLater(() => {
             if (menuController.open && !menuController.flyout) {
                 if (content.separate) content.Window.window.requestActivate();
@@ -192,7 +196,7 @@ FocusScope {
         opener: pictureButton
         objectName: "streamPicturePopup"
         visible: menuController.open && menuController.flyout === "picture"
-        onOpened: fitButton.forceActiveFocus(Qt.TabFocusReason)
+        onOpened: focusItem(fitButton)
         contentItem: ColumnLayout {
             Keys.onEscapePressed: menuController.dismiss()
             Keys.onMenuPressed: menuController.close()
@@ -281,7 +285,7 @@ FocusScope {
         objectName: "streamQualityPopup"
         opener: qualityButton
         visible: menuController.open && menuController.flyout === "quality"
-        onOpened: presetRepeater.itemAt(Math.max(0, streamWindow.videoPreset - 1)).forceActiveFocus(Qt.TabFocusReason)
+        onOpened: focusItem(presetRepeater.itemAt(Math.max(0, streamWindow.videoPreset - 1)))
         contentItem: ColumnLayout {
             spacing: 4
             Keys.onEscapePressed: menuController.dismiss()
