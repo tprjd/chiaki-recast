@@ -29,6 +29,7 @@
     <file>KeyboardMousePage.qml</file>
     <file>KeyboardMouseSettingsDialog.qml</file>
     <file>MouseResponsePane.qml</file>
+    <file>KeyboardMouseBindingsPane.qml</file>
     <file>SettingsSearch.js</file>
     <file>DisplaySettingsDialog.qml</file>
     <file>PlaceboSettingsDialog.qml</file>

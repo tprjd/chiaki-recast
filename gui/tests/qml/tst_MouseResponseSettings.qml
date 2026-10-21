@@ -50,5 +50,15 @@ TestCase {
         compare(h.settings.mouseCameraEnabled, true);
         waitForRendering(h);
         grabImage(h).save("build/mouse-response-minimum.png");
+        h.settings.keyboardMouseBindings = [{action: 4, name: "Cross", group: 1,
+            primary: Qt.Key_Space, alternative: 0, primaryName: "Space", alternativeName: "Add"}];
+        search.text = "Cross primary binding";
+        search.forceActiveFocus();
+        keyClick(Qt.Key_Return);
+        tryVerify(() => findChild(h, "keyboardMouseBinding4_0") !== null);
+        const binding = findChild(h, "keyboardMouseBinding4_0");
+        tryCompare(binding, "activeFocus", true);
+        compare(findChild(h, "keyboardMouseTabs").currentIndex, 1);
+        verify(!findChild(h, "keyboardMouseBindingDialog").opened);
     }
 }

@@ -10,6 +10,7 @@ QtObject {
     property real mouseVerticalSensitivity: 1
     property real mouseDeadZoneCompensation: 0
     property bool mouseInvertVertical: false
+    property var keyboardMouseBindings: []
     readonly property real mouseSensitivityMinimum: 0.05
     readonly property real mouseSensitivityMaximum: 8
     readonly property real mouseCompensationMaximum: 0.5

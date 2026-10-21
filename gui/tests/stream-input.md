@@ -160,3 +160,41 @@ On 2026-10-21, this optional test failed its foreground-window precondition
 before injection. It provides no Raw Input delivery evidence. Physical mouse
 movement, display changes, capture API failure injection, and live console
 acceptance remain unverified.
+
+## Editable keyboard and mouse bindings
+
+`Settings::GetKeyboardMouseBindings()` returns 22 pairs of input IDs. Zero means
+unassigned. Positive IDs are Qt keys. Negative IDs are Qt mouse-button values.
+`SetKeyboardMouseBindings()` rejects reserved keys, unsupported inputs, and
+duplicates. Invalid saved data uses the validated defaults without changing the
+legacy keyboard or mouse-touchpad settings.
+
+`QmlSettings::changeKeyboardMouseBinding()` returns an error or the existing
+action when an input is occupied. A confirmed move clears the old slot and saves
+the new slot in one settings value. The capture-start path supplies a validated
+binding snapshot to `StreamSession::SetKeyboardMouseBindings()`. Edits take effect
+on the next capture. That path samples every assigned key for held-input
+quarantine.
+
+On Windows, printable keys use the unmodified key identity. Shifted punctuation
+and Backtab cannot create a separate binding or leave an input held when Shift
+changes. Alt and Windows keys cannot be assigned. These keys remain available
+for Windows shortcuts, which release gameplay capture. F8 and F11 remain
+reserved for capture and fullscreen. The assignment dialog receives those keys
+to explain their purpose.
+
+The `chiaki-gameplay-bindings` test checks persisted edits through the settings
+bridge and mapped output through the production stream session. The writer is
+destroyed before the persistence reader starts. The test covers all five mouse
+buttons, two held alternatives, recapture snapshots, custom held keys, shifted
+key identity, reserved keys, conflicts, clearing, and malformed stored data.
+
+The desktop `chiaki-gameplay-binding-editor` test mounts the production pane in
+the real main window with an active session and a blocking input owner. It
+checks reserved-key feedback through the native window route, conflict cancellation and movement, explicit Tab assignment, clearing,
+middle-button assignment, focus return, and settings-object replacement.
+Ticket 03 supplies the shared page, tab controls, saved message, and live-stream
+mount. Their combined layout and search checks must run after integration.
+
+These tests do not prove physical keyboard or mouse delivery, Windows foreground
+capture, or gameplay. No new native gameplay evidence is recorded here.

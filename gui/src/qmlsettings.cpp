@@ -1734,6 +1734,55 @@ void QmlSettings::deleteProfile(QString profile)
         settings->DeleteProfile(std::move(profile));
 }
 
+QVariantList QmlSettings::keyboardMouseBindings() const
+{
+    static const char *names[] = {QT_TR_NOOP("Left stick up"), QT_TR_NOOP("Left stick down"),
+        QT_TR_NOOP("Left stick left"), QT_TR_NOOP("Left stick right"), QT_TR_NOOP("Cross"),
+        QT_TR_NOOP("Circle"), QT_TR_NOOP("Square"), QT_TR_NOOP("Triangle"), "L1", "R1", "L2", "R2", "L3", "R3",
+        QT_TR_NOOP("D-pad up"), QT_TR_NOOP("D-pad down"), QT_TR_NOOP("D-pad left"), QT_TR_NOOP("D-pad right"),
+        QT_TR_NOOP("Options"), QT_TR_NOOP("Create"), QT_TR_NOOP("Touchpad click"), "PS"};
+    const auto bindings = settings->GetKeyboardMouseBindings();
+    QVariantList result;
+    for(int i = 0; i < int(bindings.size()); ++i) {
+        const int group = i < 4 ? 0 : i < 8 ? 1 : i < 14 ? 2 : i < 18 ? 3 : 4;
+        result.append(QVariantMap{{"action", i}, {"name", tr(names[i])}, {"group", group},
+            {"primary", bindings[i][0]}, {"alternative", bindings[i][1]},
+            {"primaryName", KeyboardMouseInputName(bindings[i][0])},
+            {"alternativeName", KeyboardMouseInputName(bindings[i][1])}});
+    }
+    return result;
+}
+
+QVariantMap QmlSettings::changeKeyboardMouseBinding(int action, int slot, int input, bool move)
+{
+    input = NormalizeKeyboardMouseKey(input);
+    QVariantMap result{{"error", ""}, {"conflict", -1}, {"name", ""}};
+    if(action < 0 || action >= 22 || slot < 0 || slot > 1 || !ValidKeyboardMouseInput(input)) {
+        result["error"] = input == Qt::Key_F8 ? tr("F8 is reserved for gameplay capture and release.")
+            : input == Qt::Key_F11 ? tr("F11 is reserved for fullscreen.")
+            : input == Qt::Key_Alt || input == Qt::Key_Meta ? tr("Alt and Windows keys are reserved for Windows shortcuts.")
+            : tr("This input cannot be assigned.");
+        return result;
+    }
+    auto bindings = settings->GetKeyboardMouseBindings();
+    for(int i = 0; i < 22; ++i) for(int j = 0; j < 2; ++j) {
+        if(!input || bindings[i][j] != input || (i == action && j == slot)) continue;
+        if(!move) {
+            result["conflict"] = i;
+            result["name"] = keyboardMouseBindings()[i].toMap()["name"];
+            return result;
+        }
+        bindings[i][j] = 0;
+    }
+    bindings[action][slot] = input;
+    if(!settings->SetKeyboardMouseBindings(bindings)) {
+        result["error"] = tr("This input cannot be assigned.");
+        return result;
+    }
+    emit keyboardMouseBindingsChanged();
+    return result;
+}
+
 QVariantList QmlSettings::controllerMapping() const
 {
     QVariantList out;
@@ -1867,6 +1916,7 @@ void QmlSettings::refreshAllKeys()
 {
     emit mouseResponseChanged();
     emit mouseCameraEnabledChanged();
+    emit keyboardMouseBindingsChanged();
     emit remotePlayAskChanged();
     emit addSteamShortcutAskChanged();
     emit hideCursorChanged();
