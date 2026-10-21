@@ -1,0 +1,22 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::StreamNotices::initTestCase()
+PASS   : console_screen::StreamNotices::test_blockedActionAndClearance(inline)
+PASS   : console_screen::StreamNotices::test_blockedActionAndClearance(window)
+PASS   : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(inline-2)
+PASS   : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(inline-3)
+PASS   : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(window-2)
+PASS   : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(window-3)
+PASS   : console_screen::StreamNotices::test_networkThresholdAndAudio(inline)
+PASS   : console_screen::StreamNotices::test_networkThresholdAndAudio(window)
+FAIL!  : console_screen::StreamNotices::test_warningTimingAndSessionReplacement(inline) Compared values are not the same
+   Actual   (): true
+   Expected (): false
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(155) : failure location
+FAIL!  : console_screen::StreamNotices::test_warningTimingAndSessionReplacement(window) Compared values are not the same
+   Actual   (): true
+   Expected (): false
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(155) : failure location
+PASS   : console_screen::StreamNotices::cleanupTestCase()
+Totals: 10 passed, 2 failed, 0 skipped, 0 blacklisted, 6482ms
+********* Finished testing of console_screen *********

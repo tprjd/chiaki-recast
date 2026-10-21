@@ -14,6 +14,9 @@
     <file>StreamMenuWindow.qml</file>
     <file>StreamMenuContent.qml</file>
     <file>StreamStatsContent.qml</file>
+    <file>StreamNotice.qml</file>
+    <file>StreamPassiveNotices.qml</file>
+    <file>StreamActionNotice.qml</file>
     <file>ConfirmDialog.qml</file>
     <file>RendererFallbackDialog.qml</file>
     <file>RegistrationMethodDialog.qml</file>

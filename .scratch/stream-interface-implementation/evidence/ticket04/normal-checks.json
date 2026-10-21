@@ -1,0 +1,13 @@
+{
+  "sourceRevision": "91264688ddcbbc14b0dd0183365707cf56a58a0d",
+  "integrationBase": "a91d1d658990aa8718af874a9ee891ae090fd012",
+  "inputCount": 341,
+  "allProductionInputsMatch": true,
+  "newNoticeResourcesPresent": true,
+  "fixturesAndPrototypeAbsent": true,
+  "nativeQaSymbolsAbsent": true,
+  "screenTestNotLinkedIntoChiaki": true,
+  "executable": "C:\\Users\\david\\.cache\\chiaki-ui-native\\stream-notices-normal-bin\\chiaki.exe",
+  "executableSha256": "b16acfc8784d3054524d70a23d8a32698f58bbbb9ad5d95d0d60bf0bf55334ca",
+  "steamDllSha256": "b8736e4eec5508e39057631f8fd8be8a6512c6a380237d834672f26cb90a494b"
+}
