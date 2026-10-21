@@ -1,0 +1,55 @@
+{
+  "suites": [
+    {
+      "suite": "StreamInterface",
+      "passed": 37,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "Disconnect",
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "LiveConsolePin",
+      "passed": 23,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "ConnectionLocal",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "ConnectionPsn",
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "ConnectionWake",
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "SettingsDisplay",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "SettingsRenderer",
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "passed": 171,
+  "failed": 0,
+  "skipped": 0
+}

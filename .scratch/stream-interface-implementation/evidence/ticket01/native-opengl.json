@@ -1,0 +1,107 @@
+{
+    "allPassed": true,
+    "captures": [
+        {
+            "dpr": 1.25,
+            "file": "900-shared-confirmation.png",
+            "height": 600,
+            "method": "OpenGL render control framebuffer",
+            "physicalHeight": 750,
+            "physicalWidth": 1125,
+            "separate": false,
+            "width": 900
+        },
+        {
+            "dpr": 1.25,
+            "file": "900-shared-reminder.png",
+            "height": 600,
+            "method": "OpenGL render control framebuffer",
+            "physicalHeight": 750,
+            "physicalWidth": 1125,
+            "separate": false,
+            "width": 900
+        },
+        {
+            "dpr": 1.25,
+            "file": "1280-shared-confirmation.png",
+            "height": 720,
+            "method": "OpenGL render control framebuffer",
+            "physicalHeight": 900,
+            "physicalWidth": 1600,
+            "separate": false,
+            "width": 1280
+        },
+        {
+            "dpr": 1.25,
+            "file": "1280-shared-reminder.png",
+            "height": 720,
+            "method": "OpenGL render control framebuffer",
+            "physicalHeight": 900,
+            "physicalWidth": 1600,
+            "separate": false,
+            "width": 1280
+        },
+        {
+            "dpr": 1.25,
+            "file": "900-cancel-focus.png",
+            "height": 348,
+            "method": "QQuickWindow.grabWindow",
+            "physicalHeight": 435,
+            "physicalWidth": 690,
+            "separate": true,
+            "width": 552
+        },
+        {
+            "dpr": 1.25,
+            "file": "1280-cancel-focus.png",
+            "height": 348,
+            "method": "QQuickWindow.grabWindow",
+            "physicalHeight": 435,
+            "physicalWidth": 690,
+            "separate": true,
+            "width": 552
+        }
+    ],
+    "checks": 347,
+    "dialogSizing": {
+        "height": 316,
+        "hostHeight": 720,
+        "hostWidth": 1280,
+        "parentClass": "QQuickRootItem",
+        "parentHeight": 348,
+        "parentWidth": 552,
+        "sceneHeight": 720,
+        "sceneWidth": 1280,
+        "width": 520
+    },
+    "lastBounds": {
+        "height": 42,
+        "name": "confirmationSecondaryAction",
+        "parentHeight": 146,
+        "parentWidth": 464,
+        "visible": true,
+        "width": 464
+    },
+    "nativeRect": {
+        "bottom": 718,
+        "clientLeft": 505,
+        "clientTop": 283,
+        "left": 505,
+        "qtHeight": 348,
+        "qtWidth": 552,
+        "qtX": 404,
+        "qtY": 226,
+        "right": 1195,
+        "top": 283
+    },
+    "renderDiagnostics": {
+        "quickPaints": 2776,
+        "renderCalls": 1480,
+        "swapchain": true,
+        "texture": true
+    },
+    "runtimeRendererBackend": 1,
+    "sleepRequests": 2,
+    "stopRequests": 4,
+    "transport": "Real QmlBackend and StreamSession handlers, controlled native Start, Stop and GoToBed boundaries"
+}

@@ -1,0 +1,6 @@
+{
+  "allStagedInputsMatchWorktree": true,
+  "inputCount": 336,
+  "fixturesAndPrototypeAbsentFromQmlResources": true,
+  "testCppAndNativeHooksAbsentFromNormalTarget": true
+}

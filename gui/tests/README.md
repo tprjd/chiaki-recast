@@ -311,6 +311,49 @@ OpenGL and Vulkan render-target captures verify the current dialog pixels.
 Desktop compositor capture was unavailable in that session. Real console power
 changes, physical controllers, and broader display scaling need final acceptance.
 
+## Composed stream interface checks
+
+`StreamHarness` loads production `StreamView`, `StreamMenuWindow`,
+`StreamMenuContent`, `StreamStatsContent`, `ConnectionView`, and
+`StreamDisconnectDialog`. The application uses native defaults for the four
+supplied properties on `StreamView`:
+
+| Property | Native default |
+| --- | --- |
+| `backend` | `Chiaki` |
+| `settings` | `backend.settings` |
+| `streamWindow` | `backend.window` |
+| `navigation` | `root` |
+
+The fixture supplies session, connection-attempt, PIN-request, settings, and
+window state. Its `window.menuRequested()` enters the real menu signal handler.
+`window.grabs` and `window.releases` record input ownership. `backend.commands`
+records session and connection commands. `actions` records linked navigation.
+Set `screenActive` to false to destroy the complete stream interface.
+The test-only `StreamTestWindow` preserves the native `QWindow` contract and
+uppercase `ZoomFactor` property. It is registered only by the screen runner.
+
+`StreamInterface` covers both renderer routes, initial focus, Escape, native
+window close, repeat input, destruction, focus return, volume endpoints and an
+intermediate value, microphone state, picture modes, zoom endpoints and saved
+values, all five presets, linked settings, configured disconnect choices,
+disconnect-dialog outcomes, session replacement, and null-session cleanup.
+It checks connection, PIN, and disconnect exclusions. The existing statistics
+visibility is checked across menu closure.
+
+`StreamMenuContent.qml` owns the shared controls and actions. Both menu hosts
+load the same component supplied by `StreamView`. `menuState` in `StreamView`
+owns menu closure and input capture. `StreamMenuWindow` owns its native window
+and focus timer. `StreamStatsContent.qml` is the existing shared statistics
+presentation. Its inline and separate-window wrappers remain in `StreamView`.
+Notices remain in `StreamView` and use the same supplied state.
+
+The baseline replay files are in
+`.scratch/stream-interface-implementation/evidence/ticket01/`.
+They include real Vulkan and OpenGL menu-to-disconnect checks with isolated
+settings and intercepted transport. These checks do not prove desktop
+composition, live media, physical controllers, or other display scales.
+
 ## Steam shortcut checks
 
 `SteamShortcut` loads the production `SteamShortcutDialog.qml` with a supplied

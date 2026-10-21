@@ -2,8 +2,20 @@
 #include <QQmlEngine>
 #include <QFont>
 #include <QGuiApplication>
+#include <QQuickWindow>
 
 #include "qmlsvgprovider.h"
+
+class StreamTestWindow : public QQuickWindow
+{
+    Q_OBJECT
+    Q_PROPERTY(double ZoomFactor MEMBER zoomFactor NOTIFY zoomFactorChanged)
+public:
+    using QQuickWindow::QQuickWindow;
+    double zoomFactor = 0;
+signals:
+    void zoomFactorChanged();
+};
 
 class ConsoleScreenSetup : public QObject
 {
@@ -17,6 +29,7 @@ public slots:
 #ifdef Q_OS_WIN
         QGuiApplication::setFont(QFont("Segoe UI"));
 #endif
+        qmlRegisterType<StreamTestWindow>("Chiaki.Test", 1, 0, "StreamTestWindow");
         engine->addImportPath(QStringLiteral(QUICK_TEST_SOURCE_DIR "/../imports"));
         engine->addImageProvider("svg", new QmlSvgProvider());
     }

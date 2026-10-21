@@ -12,6 +12,8 @@
     <file>StreamDisconnectDialog.qml</file>
     <file>ConnectionView.qml</file>
     <file>StreamMenuWindow.qml</file>
+    <file>StreamMenuContent.qml</file>
+    <file>StreamStatsContent.qml</file>
     <file>ConfirmDialog.qml</file>
     <file>RendererFallbackDialog.qml</file>
     <file>RegistrationMethodDialog.qml</file>
