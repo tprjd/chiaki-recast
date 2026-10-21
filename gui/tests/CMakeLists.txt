@@ -8,9 +8,18 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 endif()
 
 find_package(Qt6 REQUIRED COMPONENTS QuickTest Quick Svg)
+find_package(Qt6 REQUIRED COMPONENTS Test)
+
+add_executable(chiaki-stream-input-tests streaminput.cpp
+    ../include/streaminputownership.h ../src/streaminputownership.cpp)
+target_include_directories(chiaki-stream-input-tests PRIVATE ../include)
+target_link_libraries(chiaki-stream-input-tests PRIVATE Qt6::Test Qt6::Quick)
+add_test(NAME chiaki-stream-input COMMAND chiaki-stream-input-tests)
+set_tests_properties(chiaki-stream-input PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_BACKEND=software")
 
 add_executable(chiaki-console-screen-tests
     main.cpp
+    ../include/streaminputownership.h ../src/streaminputownership.cpp
     ../src/qmlsvgprovider.cpp
     ../res/resources.qrc)
 target_include_directories(chiaki-console-screen-tests PRIVATE ../include)
@@ -28,3 +37,14 @@ if(WIN32)
 endif()
 set_tests_properties(chiaki-console-screen PROPERTIES
     ENVIRONMENT "${screen_test_environment}")
+
+if(TARGET chiaki-gui AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_executable(chiaki-stream-input-native-tests streaminputnative.cpp)
+    target_link_libraries(chiaki-stream-input-native-tests PRIVATE chiaki-gui Qt6::Test)
+    target_link_options(chiaki-stream-input-native-tests PRIVATE "-Wl,--wrap=chiaki_session_set_controller_state")
+    add_test(NAME chiaki-stream-input-desktop COMMAND chiaki-stream-input-native-tests)
+    set_tests_properties(chiaki-stream-input-desktop PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-stream-input-vulkan COMMAND chiaki-stream-input-native-tests)
+    set_tests_properties(chiaki-stream-input-vulkan PROPERTIES LABELS desktop
+        ENVIRONMENT "CHIAKI_INPUT_TEST_RENDERER=vulkan")
+endif()

@@ -10,6 +10,7 @@ Window {
     id: streamMenuWindow
 
     property Component menuContent
+    property string presentation: ""
     property bool open: false
     property bool closing: false
     property bool flyoutOpen: false
@@ -17,7 +18,7 @@ Window {
 
     signal closeRequested()
     signal menuCloseRequested()
-    signal closeAnimationFinished()
+    signal closeAnimationFinished(string presentation)
 
     onClosing: event => { event.accepted = false; closeRequested(); }
 
@@ -53,13 +54,20 @@ Window {
     }
 
     onOpenChanged: {
-        if (!open) closeTimer.restart();
+        if (!open && presentation) closeTimerComponent.createObject(streamMenuWindow, {presentation: presentation}).start();
     }
 
-    Timer {
-        id: closeTimer
-        interval: 250
-        onTriggered: streamMenuWindow.closeAnimationFinished()
+    Component {
+        id: closeTimerComponent
+        Timer {
+            property string presentation: ""
+            interval: 250
+            onTriggered: {
+                if (!streamMenuWindow.open && presentation === streamMenuWindow.presentation)
+                    streamMenuWindow.closeAnimationFinished(presentation);
+                destroy();
+            }
+        }
     }
 
     Timer {

@@ -1,6 +1,6 @@
 # Stream input ownership implementation specification
 
-Status: ready-for-agent
+Status: claimed
 
 Decision: [ADR 0001: Give stream input an owner lifecycle](../../docs/adr/0001-stream-input-ownership.md)
 
@@ -247,3 +247,72 @@ Implementation is complete when all callers use the lifecycle module, duplicated
 ownership policy is removed, and the required native and QML checks pass.
 Any unavailable desktop or hardware check must be named in the completion report.
 This specification does not itself implement or validate the refactor.
+
+
+## Answer
+
+Implementation is available on `codex/kbm-input-ownership`. Acceptance remains
+open. Do not mark this prerequisite resolved from the checks below.
+
+`QmlMainWindow.streamInput` now owns presentation identities, input capture,
+saved return focus, notice focus retention, destruction cleanup, and session
+capture reset and managed-connection rearm. All production raw input-counter
+callers now use `present`, `dismiss`, and `settled`. Menu and popup completion
+adapters keep the identity from the start of their close. Native pending key
+work also checks its capture generation. The existing spontaneous-event and
+timestamp guards remain in place. StreamSession's feedback order and button
+release condition are unchanged.
+
+The `chiaki-gui` object target supplies the same production objects to the app
+and the maintained native test executable. A private test boundary controls the
+backend session pointer and its existing change signal. The test creates real
+StreamSession objects without starting transport. GNU linker wrapping observes
+outgoing controller state. The QML fixtures delegate ownership behavior to the
+production module and retain their lifecycle-balance observations.
+
+Checks on 2026-10-21:
+
+- The first native tracer failed configuration because the new production module
+  did not exist. Its first green run passed duplicate-open and overlap checks.
+- The maintained ownership test passes its four behavior cases, plus Qt setup
+  and cleanup. Cases cover overlap, duplicate opens, obsolete close callbacks,
+  destruction, reentrancy, and capture preservation and reset.
+- The application and both maintained native test executables build with GNU
+  UCRT64, Qt 6.11.2, FFmpeg, SDL2, and libplacebo 7.360.1.
+- `ctest --test-dir build/input-native -R '^chiaki-stream-input' --output-on-failure`
+  passes all three registered tests. The desktop runs use OpenGL and Vulkan.
+  They check real session replacement, Display settings, Renderer settings,
+  Color Mapping return, main-view exit, cursor state, blocked feedback, and
+  resumption through both production button-release gates.
+- One affected QML behavior pass selected StreamInterface, StreamNotices,
+  LiveConsolePin, and Disconnect lifecycle scenarios. It passed 62 checks and
+  found ten Disconnect fixture focus failures. The fixture now gives its opener
+  initial focus. A run of only the ten failed choices passes all ten, plus setup
+  and cleanup. The other 62 selected checks were not repeated.
+- Earlier focused runs confirmed the native menu focus correction and eight
+  notice checks for initial content, renderer handoff, focus return, and
+  destruction. The standalone Qt 6.9.3 screen target still builds.
+- A repository search finds no production or fixture `grabInput`, `releaseInput`,
+  `grab_input`, caller capture flags, or shared return-focus stacks.
+  `git diff --check` passes.
+
+Limits and outstanding acceptance:
+
+- A separate Win32 SendInput attempt returned success but did not observe mapped
+  console feedback. That attempt preceded the consistent backend-session test
+  boundary. This does not prove an OS input defect or an environment cause.
+  The route remains unverified. The deterministic desktop target reports
+  `spontaneousKeys` as skipped unless explicitly enabled. Its key injection sends
+  down and up together, including on assertion failure.
+- The complete native connection, PSN retirement, legacy-error timeout, pending
+  key cancellation, native child-window selection, and obsolete adapter-event
+  matrix has not been completed. The focused tests are not full acceptance.
+- The full notice render matrix was not repeated. An earlier exploratory Qt
+  6.9.3 pass reported two compact-warning width failures and one documented
+  offscreen passive-window skip. No notice layout values changed in this work.
+- Live console input, console sleep, physical controllers, desktop composition,
+  and display scaling have not been checked. No hardware pass is claimed.
+
+Repeatable configure, build, native, and separate OS-key commands are in
+[`gui/tests/stream-input.md`](../../gui/tests/stream-input.md). The full existing
+QML target and its scenarios remain available.

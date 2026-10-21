@@ -148,6 +148,7 @@ struct MicBuf
 class StreamSession : public QObject
 {
 	friend class StreamSessionPrivate;
+	friend class StreamInputNativeTest;
 
 	Q_OBJECT
 	Q_PROPERTY(QString host READ GetHost CONSTANT)

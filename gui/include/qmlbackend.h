@@ -80,6 +80,7 @@ private:
 #endif
 class QmlBackend : public QObject
 {
+    friend class StreamInputNativeTest;
     Q_OBJECT
     Q_PROPERTY(QmlMainWindow* window READ qmlWindow CONSTANT)
     Q_PROPERTY(QmlSettings* settings READ qmlSettings CONSTANT)

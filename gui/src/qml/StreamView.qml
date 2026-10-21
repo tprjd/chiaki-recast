@@ -22,8 +22,8 @@ Item {
     property bool legacySessionLoading: true
     readonly property bool sessionError: managedConnection ? view.backend.connectionAttempt.phase === "failure" : legacySessionError
     readonly property bool sessionLoading: managedConnection ? view.backend.connectionAttempt.phase !== "ready" && !sessionError : legacySessionLoading
-    property bool connectionInputGrabbed: false
-    property list<Item> restoreFocusItems
+    property string connectionPresentation: ""
+    property string legacyErrorPresentation: ""
     readonly property bool useSeparateMenuWindow: view.streamWindow.runtimeRendererBackend === 1
     readonly property int streamMenuHeight: useSeparateMenuWindow ? separateMenuWindow.menuHeight : inlineMenuContent.item ? inlineMenuContent.item.implicitHeight : 80
     readonly property real streamMenuWidth: Math.min(820, Math.max(0, view.width - 28))
@@ -35,21 +35,6 @@ Item {
     property int separateStatsY: 0
     property int separateStatsWidth: 0
     property int separateStatsHeight: 0
-
-    function grabInput(item) {
-        view.streamWindow.grabInput();
-        restoreFocusItems.push(hostWindow ? hostWindow.activeFocusItem : null);
-        if (item)
-            item.forceActiveFocus(Qt.TabFocusReason);
-    }
-
-    function releaseInput() {
-        if (!restoreFocusItems.length) return;
-        view.streamWindow.releaseInput();
-        let item = restoreFocusItems.pop();
-        if (item && item.visible)
-            item.forceActiveFocus(Qt.TabFocusReason);
-    }
 
     function updateSeparateMenuGeometry() {
         if (!hostWindow)
@@ -73,17 +58,12 @@ Item {
     Component.onCompleted: {
         updateSeparateMenuGeometry();
     }
-    Component.onDestruction: {
-        menuState.releaseInput();
-        view.releaseNoticeInput(false);
-        if (connectionInputGrabbed) view.streamWindow.releaseInput();
-    }
     onWidthChanged: updateSeparateMenuGeometry()
     onStreamMenuHeightChanged: updateSeparateMenuGeometry()
     onHeightChanged: updateSeparateMenuGeometry()
     onUseSeparateMenuWindowChanged: {
         updateSeparateMenuGeometry();
-        if (actionNoticeVisible) noticeFocusTimer.restart();
+        if (actionNoticeVisible) view.focusNotice();
     }
 
     Connections {
@@ -109,22 +89,27 @@ Item {
         id: menuState
         property bool closing: false
         property bool open: false
-        property bool inputGrabbed: false
+        property string presentation: ""
+        property string closingPresentation: ""
+        property var context: view
+        readonly property bool separate: view.useSeparateMenuWindow
         property string flyout: ""
-        property var returnFocusItem: null
         property bool disconnectPending: false
         property string settingsTarget: ""
         onClosingChanged: {
+            const closeId = closingPresentation;
             if (!closing && disconnectPending) {
                 disconnectPending = false;
                 // Let the native menu hide before the modal dialog takes focus.
                 Qt.callLater(() => {
+                    if (closeId !== closingPresentation || closeId !== presentation || open) return;
                     if (!view.backend.sessionPinRequest.id && view.backend.session && !view.sessionLoading && !view.sessionError) sessionStopDialog.open();
                 });
             }
             if (!closing && settingsTarget) {
                 const target = settingsTarget;
                 Qt.callLater(() => {
+                    if (closeId !== closingPresentation || closeId !== presentation || open) return;
                     if (settingsTarget === target && !disconnectPending && !sessionStopDialog.opened
                             && view.backend.session && !view.backend.sessionPinRequest.id && !view.sessionLoading && !view.sessionError) {
                         if (target === "display") view.navigation.openDisplaySettings();
@@ -149,9 +134,7 @@ Item {
                 if (useSeparateMenuWindow) {
                     view.updateSeparateMenuGeometry();
                 }
-                returnFocusItem = view.hostWindow ? view.hostWindow.activeFocusItem : null;
-                view.grabInput(null);
-                inputGrabbed = true;
+                presentation = view.streamWindow.streamInput.present(menuState, "menu", null);
                 open = true;
             }
         }
@@ -160,9 +143,17 @@ Item {
             if (!open || closing)
                 return;
             flyout = "";
+            closingPresentation = presentation;
+            const id = presentation;
+            const complete = function() {
+                if (inlineMenuAnimation.running) return;
+                inlineMenuAnimation.runningChanged.disconnect(complete);
+                if (!view.useSeparateMenuWindow) menuState.finishClose(id);
+            };
+            inlineMenuAnimation.runningChanged.connect(complete);
             closing = true;
             open = false;
-            releaseInput();
+            view.streamWindow.streamInput.dismiss(closingPresentation);
         }
         function openSettings(target) {
             settingsTarget = target;
@@ -172,10 +163,10 @@ Item {
             if (flyout) flyout = "";
             else close();
         }
-        function releaseInput() {
-            if (!inputGrabbed) return;
-            inputGrabbed = false;
-            view.releaseInput();
+        function finishClose(id) {
+            if (!id || id !== closingPresentation || id !== presentation) return;
+            closing = false;
+            view.streamWindow.streamInput.settled(id);
         }
     }
 
@@ -237,7 +228,7 @@ Item {
                 }
                 font.pixelSize: 24
                 visible: text
-                onVisibleChanged: if (visible) view.grabInput(errorTitleLabel)
+                onVisibleChanged: if (visible) view.legacyErrorPresentation = view.streamWindow.streamInput.present(errorTitleLabel, "legacy-error", errorTitleLabel)
                 Keys.onReturnPressed: view.navigation.showMainView()
                 Keys.onEscapePressed: view.navigation.showMainView()
             }
@@ -265,12 +256,12 @@ Item {
         visible: view.managedConnection && view.backend.connectionAttempt.phase !== "ready"
         enabled: visible
         onVisibleChanged: {
-            if (visible && !view.connectionInputGrabbed) {
-                view.streamWindow.grabInput();
-                view.connectionInputGrabbed = true;
-            } else if (!visible && view.connectionInputGrabbed) {
-                view.streamWindow.releaseInput();
-                view.connectionInputGrabbed = false;
+            if (visible) view.connectionPresentation = view.streamWindow.streamInput.present(connectionView, "connection", null);
+            else {
+                const id = view.connectionPresentation;
+                view.streamWindow.streamInput.dismiss(id);
+                view.streamWindow.streamInput.settled(id);
+                view.connectionPresentation = "";
             }
         }
     }
@@ -333,48 +324,37 @@ Item {
         && !!view.backend.session && view.backend.session.cantDisplay
     readonly property bool actionNoticeVisible: noticesReady && !(menuState.open || menuState.closing)
         && (videoDisabled || blockedContent)
-    property bool noticeInputGrabbed: false
-    property var noticeReturnFocusItem: null
+    property string noticePresentation: ""
 
     function focusNotice() {
         if (!actionNoticeVisible) return;
         const item = useSeparateMenuWindow ? actionWindowContent.item : actionNoticeInline.item;
-        if (useSeparateMenuWindow) actionNoticeWindow.requestActivate();
-        else if (view.hostWindow && view.hostWindow.visible) view.hostWindow.requestActivate();
-        else view.streamWindow.requestActivate();
-        if (item) item.initialFocusItem.forceActiveFocus(Qt.TabFocusReason);
+        noticePresentation = view.streamWindow.streamInput.present(view, "notice", null);
+        noticeFocusTimer.presentation = noticePresentation;
+        noticeFocusTimer.restart();
     }
-    function releaseNoticeInput(restoreFocus) {
-        // A notice can yield after a menu or dialog has already captured input.
-        if (!noticeInputGrabbed) return;
-        noticeInputGrabbed = false;
-        view.streamWindow.releaseInput();
-        if (restoreFocus) {
-            const item = noticeReturnFocusItem;
-            Qt.callLater(() => {
-                if (!view.noticesReady || view.actionNoticeVisible || menuState.open || menuState.closing) return;
-                if (view.hostWindow && view.hostWindow.visible) view.hostWindow.requestActivate();
-                else view.streamWindow.requestActivate();
-                if (item && item.visible) item.forceActiveFocus(Qt.TabFocusReason);
-            });
+    Timer {
+        id: noticeFocusTimer
+        property string presentation: ""
+        interval: 0
+        onTriggered: {
+            if (presentation !== view.noticePresentation || !view.actionNoticeVisible) return;
+            const item = view.useSeparateMenuWindow ? actionWindowContent.item : actionNoticeInline.item;
+            if (view.useSeparateMenuWindow) actionNoticeWindow.requestActivate();
+            else if (view.hostWindow && view.hostWindow.visible) view.hostWindow.requestActivate();
+            else view.streamWindow.requestActivate();
+            if (item) item.initialFocusItem.forceActiveFocus(Qt.TabFocusReason);
         }
-        if (restoreFocus || !view.backend.session || !(blockedContent || videoDisabled))
-            noticeReturnFocusItem = null;
     }
     onActionNoticeVisibleChanged: {
-        if (actionNoticeVisible) {
-            if (!noticeInputGrabbed) {
-                if (!noticeReturnFocusItem)
-                    noticeReturnFocusItem = view.hostWindow ? view.hostWindow.activeFocusItem : null;
-                view.streamWindow.grabInput();
-                noticeInputGrabbed = true;
-            }
-            noticeFocusTimer.restart();
-        } else {
-            releaseNoticeInput(noticesReady && !(menuState.open || menuState.closing));
+        if (actionNoticeVisible) focusNotice();
+        else {
+            const id = noticePresentation;
+            view.streamWindow.streamInput.dismiss(id);
+            view.streamWindow.streamInput.settled(id);
+            noticePresentation = "";
         }
     }
-    Timer { id: noticeFocusTimer; interval: 0; onTriggered: view.focusNotice() }
     Component {
         id: actionNoticeContent
         StreamActionNotice {
@@ -409,8 +389,8 @@ Item {
         y: view.streamWindow.y + view.streamWindow.height - height - 72
         width: Math.min(360, view.width - 36)
         height: actionWindowContent.item ? actionWindowContent.item.implicitHeight : 0
-        onVisibleChanged: if (visible) { requestActivate(); noticeFocusTimer.restart(); }
-        onActiveChanged: if (active && visible) noticeFocusTimer.restart()
+        onVisibleChanged: if (visible) { requestActivate(); view.focusNotice(); }
+        onActiveChanged: if (active && visible) view.focusNotice()
         onClosing: event => { event.accepted = false; view.streamWindow.close(); }
         Shortcut { sequence: "Ctrl+O"; enabled: actionNoticeWindow.visible; onActivated: menuState.toggle() }
         Loader {
@@ -486,10 +466,6 @@ Item {
             NumberAnimation {
                 id: inlineMenuAnimation
                 duration: 250
-                onRunningChanged: {
-                    if (!running && !menuState.open)
-                        menuState.closing = false;
-                }
             }
         }
 
@@ -511,18 +487,12 @@ Item {
         width: separateMenuWidth > 0 ? separateMenuWidth : view.width
         height: streamMenuHeight
         open: useSeparateMenuWindow && menuState.open
+        presentation: menuState.presentation
         flyoutOpen: !!menuState.flyout
         closing: useSeparateMenuWindow && menuState.closing
         onCloseRequested: menuState.dismiss()
         onMenuCloseRequested: menuState.close()
-        onCloseAnimationFinished: {
-            menuState.closing = false;
-            if (!view.settingsOpen && !menuState.settingsTarget && !sessionStopDialog.opened && !view.backend.sessionPinRequest.id && !view.sessionLoading && !menuState.open && !view.actionNoticeVisible) {
-                if (view.streamWindow) view.streamWindow.requestActivate();
-                if (menuState.returnFocusItem && menuState.returnFocusItem.visible)
-                    menuState.returnFocusItem.forceActiveFocus(Qt.TabFocusReason);
-            }
-        }
+        onCloseAnimationFinished: id => menuState.finishClose(id)
     }
 
     StreamDisconnectDialog {
@@ -530,11 +500,7 @@ Item {
         objectName: "streamDisconnectDialog"
         backend: view.backend
         hostWindow: view.streamWindow
-        onInputRequested: view.grabInput(null)
-        onInputReleased: {
-            view.releaseInput();
-            if (view.actionNoticeVisible) noticeFocusTimer.restart();
-        }
+
     }
 
     Timer {
@@ -556,12 +522,6 @@ Item {
                 menuState.close();
             }
             if (view.managedConnection) {
-                if (!view.backend.sessionPinRequest.id
-                        && (!view.backend.session || view.backend.connectionAttempt.route !== "psn")) view.connectionInputGrabbed = false;
-                if (connectionView.visible && !view.connectionInputGrabbed) {
-                    view.streamWindow.grabInput();
-                    view.connectionInputGrabbed = true;
-                }
                 if (!view.backend.session && view.backend.connectionAttempt.phase === "ready") view.navigation.showMainView();
                 return;
             }

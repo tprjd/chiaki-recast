@@ -5,15 +5,9 @@ import org.streetpea.chiaking
 Item {
     id: view
     objectName: "psnConnectionView"
-    property bool connectionInputGrabbed: false
+    property string presentation: ""
     StackView.onDeactivating: progress.retiring = true
     StackView.onActivating: progress.retiring = false
-    Component.onCompleted: {
-        Chiaki.window.grabInput();
-        connectionInputGrabbed = true;
-    }
-    Component.onDestruction: {
-        if (connectionInputGrabbed) Chiaki.window.releaseInput();
-    }
+    Component.onCompleted: presentation = Chiaki.window.streamInput.present(view, "psn", null)
     ConnectionView { id: progress; anchors.fill: parent; managesAttempt: phase !== "video" && phase !== "ready" }
 }

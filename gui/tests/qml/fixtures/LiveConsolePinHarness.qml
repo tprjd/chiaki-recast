@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import Chiaki.Test 1.0
 import "../../../src/qml"
 
 Item {
@@ -15,11 +16,10 @@ Item {
     QtObject { id: settings; property bool streamerMode: false }
     QtObject {
         id: window
-        property int grabs: 0
-        property int releases: 0
+        property StreamInputFixture streamInput: StreamInputFixture {}
+        readonly property int grabs: streamInput.grabs
+        readonly property int releases: streamInput.releases
         property int runtimeRendererBackend: 0
-        function grabInput() { grabs++; }
-        function releaseInput() { releases++; }
     }
     QtObject {
         id: fakeBackend

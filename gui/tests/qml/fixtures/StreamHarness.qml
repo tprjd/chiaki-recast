@@ -16,16 +16,17 @@ Item {
     property bool streamSettingsOpen: false
     property alias settingsFocusItem: settingsFocusItem
     property int gameClicks: 0
+    property string settingsPresentation: ""
     function showMainView() { actions = actions.concat(["consoles"]); }
     function openStreamSettings() {
         streamSettingsOpen = true;
-        streamWindow.grabInput();
+        settingsPresentation = streamWindow.streamInput.present(settingsFocusItem, "display", null);
         if (nativeHost) streamWindow.requestActivate();
         settingsFocusItem.forceActiveFocus(Qt.TabFocusReason);
     }
     function openDisplaySettings() { actions = actions.concat(["display"]); openStreamSettings(); }
     function openPlaceboSettings() { actions = actions.concat(["renderer"]); openStreamSettings(); }
-    function closeStreamSettings() { streamSettingsOpen = false; streamWindow.releaseInput(); opener.forceActiveFocus(Qt.TabFocusReason); }
+    function closeStreamSettings() { streamSettingsOpen = false; streamWindow.streamInput.dismiss(settingsPresentation); streamWindow.streamInput.settled(settingsPresentation); }
     QtObject {
         id: liveSession
         property bool connected: true
@@ -63,11 +64,10 @@ Item {
         property int droppedFrames: 3
         property real queueDepthAverage: 1.2
         property real pendingFrameAge: 0.016
-        property int grabs: 0
-        property int releases: 0
+        property StreamInputFixture streamInput: StreamInputFixture {}
+        readonly property int grabs: streamInput.grabs
+        readonly property int releases: streamInput.releases
         signal menuRequested()
-        function grabInput() { grabs++; }
-        function releaseInput() { releases++; }
         function close() {
             if (settings.disconnectAction === 2) fakeBackend.sessionStopDialogRequested();
             else fakeBackend.stopSession(settings.disconnectAction === 1);

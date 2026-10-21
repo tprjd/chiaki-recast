@@ -2,6 +2,7 @@
 
 #include "streamsession.h"
 #include "settings.h"
+#include "streaminputownership.h"
 
 #include <QMutex>
 #include <QAtomicInteger>
@@ -45,6 +46,7 @@ class QOpenGLFramebufferObject;
 class QmlMainWindow : public QWindow
 {
     Q_OBJECT
+    Q_PROPERTY(StreamInputOwnership *streamInput READ streamInput CONSTANT)
     Q_PROPERTY(bool hasVideo READ hasVideo NOTIFY hasVideoChanged)
     Q_PROPERTY(int droppedFrames READ droppedFrames NOTIFY droppedFramesChanged)
     Q_PROPERTY(bool keepVideo READ keepVideo WRITE setKeepVideo NOTIFY keepVideoChanged)
@@ -116,8 +118,7 @@ public:
     VideoPreset videoPreset() const;
     void setVideoPreset(VideoPreset mode);
 
-    Q_INVOKABLE void grabInput();
-    Q_INVOKABLE void releaseInput();
+    StreamInputOwnership *streamInput() const { return stream_input; }
 
 public slots:
     void resetPlaceboQueue();
@@ -194,7 +195,7 @@ private:
     bool direct_stream = false;
     bool keep_video = false;
     RenderBackend render_backend = RenderBackend::Vulkan;
-    int grab_input = 0;
+    StreamInputOwnership *stream_input = nullptr;
     int dropped_frames = 0;
     bool is_window_adjustable = false;
     bool is_stream_window_adjustable = false;
@@ -301,4 +302,5 @@ private:
     } vk_funcs;
 
     friend class QmlBackend;
+    friend class StreamInputNativeTest;
 };

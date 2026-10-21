@@ -504,25 +504,6 @@ void QmlMainWindow::setKeepVideo(bool keep)
     emit keepVideoChanged();
 }
 
-void QmlMainWindow::grabInput()
-{
-    setCursor(Qt::ArrowCursor);
-    grab_input++;
-    if (session)
-        session->BlockInput(grab_input);
-}
-
-void QmlMainWindow::releaseInput()
-{
-    if (!grab_input)
-        return;
-    grab_input--;
-    if (!grab_input && has_video && settings->GetHideCursor())
-        setCursor(Qt::BlankCursor);
-    if (session)
-        session->BlockInput(grab_input);
-}
-
 bool QmlMainWindow::directStream() const
 {
     return direct_stream;
@@ -754,7 +735,7 @@ void QmlMainWindow::presentFrame(ChiakiFfmpegFrame frame, int32_t frames_lost)
 
     if (!has_video) {
         has_video = true;
-        if (!grab_input && settings->GetHideCursor())
+        if (!stream_input->blocked() && settings->GetHideCursor())
             setCursor(Qt::BlankCursor);
         emit hasVideoChanged();
     }
@@ -1236,7 +1217,7 @@ bool QmlMainWindow::queueStoredFrame(AVFrame *frame, double pts, float duration,
 
     if (!has_video) {
         has_video = true;
-        if (!grab_input && settings->GetHideCursor())
+        if (!stream_input->blocked() && settings->GetHideCursor())
             setCursor(Qt::BlankCursor);
         emit hasVideoChanged();
     }
@@ -1729,16 +1710,18 @@ renderer_backend_ready:
         qml_engine->setIncubationController(quick_window->incubationController());
     connect(qml_engine, &QQmlEngine::quit, this, &QWindow::close);
 
+    stream_input = new StreamInputOwnership(this, quick_window, this);
+    connect(stream_input, &StreamInputOwnership::captureChanged, this, [this](bool blocked) {
+        if (blocked) setCursor(Qt::ArrowCursor);
+        else if (has_video && this->settings->GetHideCursor()) setCursor(Qt::BlankCursor);
+        if (session) session->BlockInput(blocked);
+    });
     backend = new QmlBackend(settings, this);
     connect(backend, &QmlBackend::sessionChanged, this, [this, exit_app_on_stream_exit](StreamSession *s) {
-        const bool preserve_input = !backend->sessionPinRequest().isEmpty()
-            || (s && (session || backend->connectionAttempt().value("route") == "psn"));
         session = s;
+        stream_input->sessionChanged(s != nullptr, !backend->sessionPinRequest().isEmpty(),
+            backend->connectionAttempt().value("route") == "psn");
         stream_session_active.storeRelease(s ? 1 : 0);
-        if (!preserve_input)
-            grab_input = 0;
-        if (session)
-            session->BlockInput(grab_input);
         update_timer->stop();
         dropped_frames_current.storeRelaxed(0);
         dropped_frames = 0;
@@ -2781,7 +2764,7 @@ bool QmlMainWindow::event(QEvent *event)
     case QEvent::MouseButtonRelease:
         if (static_cast<QMouseEvent*>(event)->source() != Qt::MouseEventNotSynthesized)
             return true;
-        if (session && !grab_input) {
+        if (session && !stream_input->blocked()) {
             if (event->type() == QEvent::MouseMove)
                 session->HandleMouseMoveEvent(static_cast<QMouseEvent*>(event), width(), height());
             else if (event->type() == QEvent::MouseButtonPress)
@@ -2793,13 +2776,13 @@ bool QmlMainWindow::event(QEvent *event)
         QGuiApplication::sendEvent(quick_window, event);
         break;
     case QEvent::Wheel:
-        if (!session || grab_input)
+        if (!session || stream_input->blocked())
             QGuiApplication::sendEvent(quick_window, event);
         break;
     case QEvent::MouseButtonDblClick:
         if(!settings->GetFullscreenDoubleClickEnabled())
             break;
-        if (session && !grab_input) {
+        if (session && !stream_input->blocked()) {
             if (windowState() != Qt::WindowFullScreen)
                 fullscreenTime();
             else
@@ -2810,7 +2793,7 @@ bool QmlMainWindow::event(QEvent *event)
         if (handleShortcut(static_cast<QKeyEvent*>(event)))
             return true;
     case QEvent::KeyRelease:
-        if (session && !grab_input) {
+        if (session && !stream_input->blocked()) {
             QKeyEvent *e = static_cast<QKeyEvent*>(event);
             if (!e->spontaneous()) {
                 QGuiApplication::sendEvent(quick_window, event);
@@ -2820,7 +2803,7 @@ bool QmlMainWindow::event(QEvent *event)
                 session->HandleKeyboardEvent(e);
             return true;
         }
-        if (session && grab_input) {
+        if (session && stream_input->blocked()) {
             auto *focused = QGuiApplication::focusWindow();
             for (auto *popup : QGuiApplication::topLevelWindows()) {
                 if (!popup->isVisible() || (popup->type() != Qt::Popup && popup->type() != Qt::Tool)
@@ -2842,12 +2825,14 @@ bool QmlMainWindow::event(QEvent *event)
                     // Tool windows accept keys after Qt reports their native focus.
                     auto *pending = new QObject(focused);
                     auto key = std::shared_ptr<QEvent>(event->clone());
+                    const auto capture = stream_input->captureGeneration;
                     connect(qGuiApp, &QGuiApplication::focusWindowChanged, pending,
-                        [this, focused, pending, key](QWindow *active) mutable {
+                        [this, focused, pending, key, capture](QWindow *active) mutable {
                             auto copy = std::exchange(key, {});
                             if (!copy) return;
                             pending->deleteLater();
-                            if (active == focused && focused->isVisible() && session && grab_input) {
+                            if (active == focused && focused->isVisible() && session && stream_input->blocked()
+                                    && capture == stream_input->captureGeneration) {
                                 if (auto *item = focused->property("lastFocusItem").value<QQuickItem *>()) {
                                     if (item->window() == focused && item->isVisible())
                                         item->forceActiveFocus(Qt::OtherFocusReason);
@@ -2859,6 +2844,7 @@ bool QmlMainWindow::event(QEvent *event)
                         if (!visible) delete pending;
                     });
                     connect(backend, &QmlBackend::sessionChanged, pending, [pending] { delete pending; });
+                    connect(this, &QObject::destroyed, pending, [pending] { delete pending; });
                     focused->requestActivate();
                     return true;
                 }
@@ -2871,7 +2857,7 @@ bool QmlMainWindow::event(QEvent *event)
     case QEvent::TouchBegin:
     case QEvent::TouchUpdate:
     case QEvent::TouchEnd:
-        if (session && !grab_input) {
+        if (session && !stream_input->blocked()) {
             session->HandleTouchEvent(static_cast<QTouchEvent*>(event), width(), height());
             return true;
         }

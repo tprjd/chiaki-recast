@@ -290,7 +290,7 @@ TestCase {
         const action = findChild(host, "streamNoticeAction");
         if (data.priority === "destroy") {
             h.screenActive = false;
-            compare(h.window.grabs, h.window.releases);
+            tryCompare(h.window, "releases", h.window.grabs);
             return;
         }
         if (data.priority === "disconnect") h.backend.sessionStopDialogRequested();
@@ -390,7 +390,7 @@ TestCase {
         compare(findChild(host, "streamActionNotice").title, "Audio and video disabled");
         compare(h.window.grabs, 1);
         h.screenActive = false;
-        compare(h.window.releases, 1);
+        tryCompare(h.window, "releases", 1);
     }
     function test_passiveInput_data() { return routes(); }
     function test_passiveInput(data) {

@@ -7,7 +7,7 @@ import org.streetpea.chiaking
 
 Item {
     id: root
-    property list<Item> restoreFocusItems
+    property string settingsPresentation: ""
     property bool initialAsk: false
     property var librarySelection: null
     readonly property bool preferSeparateStreamSettingsWindows: Chiaki.window.runtimeRendererBackend === 1 && Chiaki.session
@@ -30,18 +30,14 @@ Item {
         }
         return "image://svg/button-%1#%2".arg(type).arg(name);
     }
-    function grabInput(item) {
-        Chiaki.window.grabInput();
-        restoreFocusItems.push(Window.window.activeFocusItem);
-        if (item)
-            item.forceActiveFocus(Qt.TabFocusReason);
+    function presentSettings(loader, role) {
+        settingsPresentation = Chiaki.window.streamInput.present(loader, role, loader);
     }
-
-    function releaseInput() {
-        Chiaki.window.releaseInput();
-        let item = restoreFocusItems.pop();
-        if (item && item.visible)
-            item.forceActiveFocus(Qt.TabFocusReason);
+    function dismissSettings() {
+        const id = settingsPresentation;
+        Chiaki.window.streamInput.dismiss(id);
+        Chiaki.window.streamInput.settled(id);
+        settingsPresentation = "";
     }
 
     function openDisplaySettings() {
@@ -53,7 +49,7 @@ Item {
             if(placeboSettingsRect.opacity || displaySettingsRect.opacity || colorMappingSettingsRect.opacity)
                 closeDialog();
             displaySettingsRect.opacity = 0.8;
-            grabInput(loader);
+            presentSettings(loader, "display");
             if (!loader.item.restoreFocusItem) {
                 let item = loader.item.mainItem.nextItemInFocusChain();
                 if (item)
@@ -74,7 +70,7 @@ Item {
             if(placeboSettingsRect.opacity || displaySettingsRect.opacity || colorMappingSettingsRect.opacity)
                 closeDialog();
             placeboSettingsRect.opacity = 0.8;
-            grabInput(loader);
+            presentSettings(loader, "renderer");
             if (!loader.item.restoreFocusItem) {
                 let item = loader.item.mainItem.nextItemInFocusChain();
                 if (item)
@@ -91,18 +87,18 @@ Item {
         displaySettingsRect.opacity = 0.0;
         const loader = useSeparateStreamSettingsWindows ? separateDisplaySettingsLoader : displaySettingsLoader;
         loader.item.restoreFocusItem = Window.window.activeFocusItem;
-        releaseInput();
+        dismissSettings();
         useSeparateStreamSettingsWindows = false;
        }
        else if(placeboSettingsRect.opacity) {
         placeboSettingsRect.opacity = 0.0;
         const loader = useSeparateStreamSettingsWindows ? separatePlaceboSettingsLoader : placeboSettingsLoader;
         loader.item.restoreFocusItem = Window.window.activeFocusItem;
-        releaseInput();
+        dismissSettings();
         useSeparateStreamSettingsWindows = false;
        }
        else if(colorMappingSettingsRect.opacity) {
-        releaseInput();
+        dismissSettings();
         colorMappingSettingsRect.opacity = 0.0;
         const loader = useSeparateStreamSettingsWindows ? separateColorMappingSettingsLoader : colorMappingSettingsLoader;
         loader.item.restoreFocusItem = Window.window.activeFocusItem;
@@ -117,21 +113,21 @@ Item {
             displaySettingsRect.opacity = 0.0;
             const loader = useSeparateStreamSettingsWindows ? separateDisplaySettingsLoader : displaySettingsLoader;
             loader.item.restoreFocusItem = Window.window.activeFocusItem;
-            releaseInput();
+            dismissSettings();
             useSeparateStreamSettingsWindows = false;
         }
         else if(placeboSettingsRect.opacity) {
             placeboSettingsRect.opacity = 0.0;
             const loader = useSeparateStreamSettingsWindows ? separatePlaceboSettingsLoader : placeboSettingsLoader;
             loader.item.restoreFocusItem = Window.window.activeFocusItem;
-            releaseInput();
+            dismissSettings();
             useSeparateStreamSettingsWindows = false;
         }
         else if(colorMappingSettingsRect.opacity) {
             colorMappingSettingsRect.opacity = 0.0;
             const loader = useSeparateStreamSettingsWindows ? separateColorMappingSettingsLoader : colorMappingSettingsLoader;
             loader.item.restoreFocusItem = Window.window.activeFocusItem;
-            releaseInput();
+            dismissSettings();
             useSeparateStreamSettingsWindows = false;
         }
         if (stack.depth > 1)
@@ -230,7 +226,7 @@ Item {
             const loader = useSeparateStreamSettingsWindows ? separateColorMappingSettingsLoader : colorMappingSettingsLoader;
             if(loader.status == Loader.Ready)
             {
-                grabInput(loader);
+                presentSettings(loader, "color-mapping");
                 colorMappingSettingsRect.opacity = 0.8;
                 if (!loader.item.restoreFocusItem) {
                     let item = loader.item.mainItem.nextItemInFocusChain();

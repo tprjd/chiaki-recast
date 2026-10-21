@@ -9,26 +9,16 @@ Item {
     property var hostWindow: host.Window.window
     readonly property bool separate: backend.window.runtimeRendererBackend === 1
     readonly property bool opened: dialog.visible
-    property bool inputGrabbed: false
-    signal inputRequested()
-    signal inputReleased()
+    property string presentation: ""
 
     function open() {
         if (opened) return;
-        inputGrabbed = true;
-        inputRequested();
+        presentation = backend.window.streamInput.present(host, "disconnect", null);
         dialog.callback = () => backend.stopSession(true);
         dialog.secondaryCallback = () => backend.stopSession(false);
         if (separate) stopWindow.show();
         dialog.open();
     }
-    function releaseInput() {
-        if (!inputGrabbed) return;
-        inputGrabbed = false;
-        inputReleased();
-    }
-    Component.onDestruction: releaseInput()
-
     ConfirmDialog {
         id: dialog
         parent: host.separate ? stopWindow.contentItem : Overlay.overlay
@@ -36,16 +26,24 @@ Item {
         text: qsTr("Choose whether to put the console into sleep mode when you disconnect. Cancel keeps the session running.")
         actionText: qsTr("Disconnect and sleep")
         secondaryActionText: qsTr("Disconnect")
-    }
-    Connections {
-        target: dialog
-        function onClosed() {
-            if (stopWindow.visible) {
-                stopWindow.hide();
-                if (host.hostWindow) host.hostWindow.requestActivate();
-            }
-            host.releaseInput();
+        onAboutToHide: {
+            const id = host.presentation;
+            const complete = function() {
+                dialog.closed.disconnect(complete);
+                host.finishClose(id);
+            };
+            dialog.closed.connect(complete);
         }
+    }
+    function finishClose(id) {
+        if (!id || id !== presentation || dialog.visible) return;
+        if (stopWindow.visible) {
+            stopWindow.hide();
+            if (hostWindow) hostWindow.requestActivate();
+        }
+        backend.window.streamInput.dismiss(id);
+        backend.window.streamInput.settled(id);
+        presentation = "";
     }
     Window {
         id: stopWindow

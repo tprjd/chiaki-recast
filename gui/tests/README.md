@@ -300,7 +300,7 @@ all choices, Escape, close, repeated input, disabled actions, keyboard and
 controller key mappings, return focus, and long text at 900 by 600 and
 1280 by 720. Both routes use the production `ConfirmDialog` and `SetupButton`.
 
-`StreamView` retains its native input capture handlers. The separate dialog uses
+`StreamDisconnectDialog` uses the native stream input owner lifecycle. The separate dialog uses
 the actual native host window for ownership and centering. `Main` binds its
 overlay size to its viewport because the render-control Quick window is hidden.
 
@@ -343,12 +343,14 @@ visibility is checked across menu closure.
 
 `StreamMenuContent.qml` owns the shared controls and actions. Both menu hosts
 load the same component supplied by `StreamView`. `menuState` in `StreamView`
-owns menu closure and input capture. `StreamMenuWindow` owns its native window
+owns menu closure. `QmlMainWindow.streamInput` owns input capture and return focus.
+`StreamMenuWindow` owns its native window
 and focus timer. `StreamStatsContent.qml` is the existing shared statistics
 presentation. Its inline and separate-window wrappers remain in `StreamView`.
 `StreamNotice`, `StreamPassiveNotices`, and `StreamActionNotice` share notice
 content between the inline and native window hosts. `StreamView` owns their
-conditions, warning timer, input capture, and guarded session actions.
+conditions, warning timer, and guarded session actions. The native ownership
+module owns notice input capture and saved return focus.
 
 `StreamNotices` checks the configured packet-loss threshold and 400 ms warning
 pulse, audio and network stacking, blocked content, disabled video, combined

@@ -13,8 +13,7 @@ FocusScope {
     readonly property bool blocking: !!request.id
     readonly property bool separate: backend.window.runtimeRendererBackend === 1
     property string currentId: ""
-    property bool inputGrabbed: false
-    property var restoreFocusItem: null
+    property string presentation: ""
     visible: blocking
     z: 1000
 
@@ -28,25 +27,12 @@ FocusScope {
         separateLoader.active = !!request.id && separate;
     }
     function updateInput() {
-        if (request.id && !inputGrabbed) {
-            restoreFocusTimer.stop();
-            restoreFocusItem = host.Window.window ? host.Window.window.activeFocusItem : null;
-            backend.window.grabInput();
-            inputGrabbed = true;
-        } else if (!request.id && inputGrabbed) {
-            backend.window.releaseInput();
-            inputGrabbed = false;
-            restoreFocusTimer.restart();
-        }
-    }
-    Timer {
-        id: restoreFocusTimer
-        interval: 0
-        onTriggered: {
-            if (host.restoreFocusItem && host.restoreFocusItem.visible && host.restoreFocusItem.enabled)
-                host.restoreFocusItem.forceActiveFocus(Qt.TabFocusReason);
-            else if (host.navigation.restoreMainFocus) host.navigation.restoreMainFocus();
-            host.restoreFocusItem = null;
+        if (request.id) presentation = backend.window.streamInput.present(host, "pin", null);
+        else {
+            const id = presentation;
+            backend.window.streamInput.dismiss(id);
+            backend.window.streamInput.settled(id);
+            presentation = "";
         }
     }
     function cancel() {
@@ -57,7 +43,6 @@ FocusScope {
     onSeparateChanged: updateContent()
     Component.onCompleted: { updateInput(); updateContent(); }
     Component.onDestruction: {
-        if (inputGrabbed) backend.window.releaseInput();
         if (request.id && (request.phase === "form" || request.phase === "submitting"))
             backend.cancelSessionPin(request.id);
     }
