@@ -1138,13 +1138,17 @@ void QmlBackend::wakeUpHost(int index, QString nickname)
     sendWakeup(server);
 }
 
-void QmlBackend::setConsolePin(int index, QString console_pin)
+bool QmlBackend::setConsolePin(int index, QString console_pin)
 {
+    if (console_pin.size() != 4 || !QRegularExpression(QStringLiteral("^[0-9]{4}$")).match(console_pin).hasMatch())
+        return false;
     auto server = displayServerAt(index);
-    if (!server.valid)
-        return;
+    if (!server.valid || !server.registered)
+        return false;
+    const auto generation = profile_generation;
     server.registered_host.SetConsolePin(server.registered_host, std::move(console_pin));
     settings->AddRegisteredHost(server.registered_host);
+    return generation == profile_generation;
 }
 
 void QmlBackend::addManualHost(int index, const QString &address)

@@ -90,8 +90,8 @@ backend handlers and dialogs.
 | `steamShortcutRequested()` | Opens the Steam shortcut dialog |
 | `discoveryToggled(enabled)` | Changes local discovery |
 | `quitRequested()` | Opens the quit confirmation |
-| `managementRequested(action, accept, cancel)` | Opens PIN, Delete, or Hide with callbacks for this request |
-| `pinRequested(sourceIndex, pin)` | Stores the accepted four-digit PIN |
+| `managementRequested(action, accept, cancel, consoleName)` | Opens PIN, Delete, or Hide with callbacks for this request; `consoleName()` resolves the current name |
+| `pinRequested(sourceIndex, pin)` | Default test observation when no native `savePin` callback is supplied |
 | `wakeRequested(sourceIndex)` | Sends the explicit manual-host wake request |
 | `deleteRequested(sourceIndex)` | Deletes the resolved manual host |
 | `hideRequested(mac, nickname)` | Hides the resolved eligible discovered host |
@@ -100,6 +100,15 @@ A management dialog calls `accept(pin)` for PIN, `accept()` for Delete or Hide,
 or `cancel()` when dismissed. PIN requires exactly four ASCII digits and keeps
 leading zeroes. Invalid PIN input leaves the request open. Cancellation,
 repeated acceptance, and callbacks from older requests cannot send a command.
+
+`MainView` supplies `savePin(sourceIndex, pin)` with the native boolean save
+outcome. A PIN acceptance returns true only when this callback confirms the
+save. `ConsolePinDialog` then shows the saved result. It uses the production
+`ConsolePinContent` for validation, masked entry, explicit reveal, privacy,
+focus, and the guided workspace. The live PIN route can use this same content.
+`ConsolePinHarness` composes the library and saved PIN dialog with a supplied
+save outcome. `ConsolePin` tests both the form and its guarded library callbacks,
+including target changes and return focus. Test assertions do not print PINs.
 
 `identityOf(host)` returns an opaque profile-scoped identity.
 `resolveTarget(identity)` returns the current `host`, `sourceIndex`, and

@@ -8,7 +8,7 @@ Selected design: A for every screen and state
 | Ticket | Blocked by | Status |
 | --- | --- | --- |
 | [01: Local connection progress, cancellation, and retry](issues/01-local-connection.md) | None | claimed |
-| [02: Save a console login PIN](issues/02-saved-console-pin.md) | None | claimed |
+| [02: Save a console login PIN](issues/02-saved-console-pin.md) | None | resolved |
 | [03: PSN connection progress and recovery](issues/03-psn-connection.md) | 01 | ready-for-agent |
 | [04: Auto-connect and console wake-up](issues/04-auto-connect-wake.md) | 01 | ready-for-agent |
 | [05: Live console login PIN across connection routes](issues/05-live-console-pin.md) | 01, 02 | ready-for-agent |
@@ -31,4 +31,8 @@ The production baseline is the completed console-setup integration branch with s
 | 05 | 20–28, 29, 33–45 |
 | 06 | Integrated acceptance of all 45 stories |
 
-The parent specification remains unchanged. Tickets 01 and 02 are in progress on `codex/connection-flow-integration`.
+The parent specification remains unchanged. Ticket 01 is in progress on `codex/connection-flow-integration`.
+
+## Decisions
+
+- [02: Save a console login PIN](issues/02-saved-console-pin.md) is resolved. Merged `9f2b3bfb` with the reusable A form, guarded console target, and confirmed save outcome. [PIN tests](evidence/ticket02-ConsolePin-final.txt) passed 23 checks, [management tests](evidence/ticket02-ConsoleManagement-final.txt) passed 44 checks, and [native save evidence](evidence/ticket02-native-save.json) confirms isolated persistence after process exit. Native visual and integrated acceptance remain with ticket 06.

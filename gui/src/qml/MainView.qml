@@ -33,9 +33,9 @@ Pane {
             }
         }
     }
-    function manageConsole(action, accept, cancel) {
+    function manageConsole(action, accept, cancel, consoleName) {
         if (action === "pin") {
-            root.showConsolePinDialog(accept, cancel);
+            root.showConsolePinDialog(accept, cancel, consoleName);
         } else if (action === "delete") {
             root.showConfirmDialog(qsTr("Delete Console"), qsTr("Are you sure you want to delete this console?"), accept, cancel);
         } else if (action === "hide") {
@@ -62,10 +62,10 @@ Pane {
         onSteamShortcutRequested: root.showSteamShortcutDialog(false)
         onDiscoveryToggled: enabled => Chiaki.discoveryEnabled = enabled
         onQuitRequested: root.showConfirmDialog(qsTr("Quit"), qsTr("Are you sure you want to quit?"), () => Qt.quit())
-        onManagementRequested: (action, accept, cancel) => consolePane.manageConsole(action, accept, cancel)
+        onManagementRequested: (action, accept, cancel, consoleName) => consolePane.manageConsole(action, accept, cancel, consoleName)
         onWakeRequested: sourceIndex => Chiaki.wakeUpHost(sourceIndex)
         onDeleteRequested: sourceIndex => Chiaki.deleteHost(sourceIndex)
         onHideRequested: (mac, nickname) => Chiaki.hideHost(mac, nickname)
-        onPinRequested: (sourceIndex, pin) => Chiaki.setConsolePin(sourceIndex, pin)
+        savePin: (sourceIndex, pin) => Chiaki.setConsolePin(sourceIndex, pin)
     }
 }

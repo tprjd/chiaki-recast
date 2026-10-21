@@ -194,7 +194,7 @@ public:
     Q_INVOKABLE bool checkPsnRedirectURL(const QUrl &url) const;
     Q_INVOKABLE bool handlePsnLoginRedirect(const QUrl &url);
     Q_INVOKABLE void stopAutoConnect();
-    Q_INVOKABLE void setConsolePin(int index, QString console_pin);
+    Q_INVOKABLE bool setConsolePin(int index, QString console_pin);
     Q_INVOKABLE QString openPsnLink();
     Q_INVOKABLE QString openPlaceboOptionsLink();
     Q_INVOKABLE void initPsnAuth(const QUrl &url, const QJSValue &callback);
