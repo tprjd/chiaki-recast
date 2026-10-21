@@ -164,6 +164,20 @@ need the full application and the relevant hardware or account. Native display
 scaling also needs a separate full-application check. A passing build alone
 does not verify any of these behaviors.
 
+## Confirmation and registration method tests
+
+`ConfirmationHarness.qml` loads production `MainView.qml` or `SettingsDialog.qml`
+with the production `ConfirmDialog.qml`. Tests supply the backend and navigation.
+`showConfirmDialog(title, text, actionText, accept, cancel)` requires an explicit
+action label. Cancel and Escape call only `cancel` after the popup closes.
+
+`Confirmations` checks labels, visible initial Cancel focus, keyboard navigation,
+disabled actions, repeated input, focus return, and current console targets.
+`RegistrationMethod` checks automatic, manual, and cancelled outcomes through
+production `RegistrationMethodDialog.qml`. Both suites check long text at
+900 by 600 and 1280 by 720. Backend commands are controlled test observations.
+Real registration and native input capture require separate acceptance checks.
+
 ## Settings screen tests
 
 `SettingsHarness.qml` loads the production Settings screen with synthetic

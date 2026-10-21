@@ -49,8 +49,8 @@ TestCase {
         const harness = openConsoles();
         const button = findChild(harness, data.action === "delete" ? "deleteRegisteredConsole0" : "unhideConsole0");
         press(button);
-        const accept = harness.actions[0].args[2];
-        const cancel = harness.actions[0].args[3];
+        const accept = harness.actions[0].args[3];
+        const cancel = harness.actions[0].args[4];
         if (data.change === "removed") {
             if (data.action === "delete") harness.settings.registeredHosts = [hosts()[1]];
             else harness.backend.hiddenHosts = [];
@@ -75,7 +75,7 @@ TestCase {
     function test_unhideUsesOriginalIdentityOnceAndRestoresFallbackFocus() {
         const harness = openConsoles();
         press(findChild(harness, "unhideConsole0"));
-        const accept = harness.actions[0].args[2];
+        const accept = harness.actions[0].args[3];
         harness.backend.hiddenHosts = [{mac: "another", name: "Other"}, {mac: "112233445566", name: "Renamed"}];
         wait(1);
         accept();
@@ -88,7 +88,7 @@ TestCase {
     function test_cancelAfterProfileChangeRestoresValidFocus() {
         const harness = openConsoles();
         press(findChild(harness, "deleteRegisteredConsole0"));
-        const cancel = harness.actions[0].args[3];
+        const cancel = harness.actions[0].args[4];
         harness.settings.currentProfile = "Another profile";
         harness.settings.registeredHosts = [];
         harness.backend.hiddenHosts = [];
@@ -189,7 +189,7 @@ TestCase {
         const harness = openConsoles();
         press(withText(harness, "Delete")[0]);
         compare(harness.actions[0].name, "confirm");
-        const accept = harness.actions[0].args[2];
+        const accept = harness.actions[0].args[3];
         harness.settings.registeredHosts = [hosts()[1], hosts()[0]];
         wait(1);
         accept();

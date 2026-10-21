@@ -18,7 +18,7 @@ Item {
     function showProfileDialog() { record("profiles"); }
     function showPSNTokenDialog(remote) { record("login", [remote]); }
     function showControllerMappingDialog() { record("mapping"); }
-    function showConfirmDialog(title, text, callback, cancel) { record("confirm", [title, text, callback, cancel]); }
+    function showConfirmDialog(title, text, actionText, callback, cancel) { record("confirm", [title, text, actionText, callback, cancel]); }
     FakeSettings { id: fakeSettings }
     QtObject {
         id: fakeBackend

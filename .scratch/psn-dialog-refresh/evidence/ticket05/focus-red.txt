@@ -1,0 +1,8 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::Confirmations::initTestCase()
+FAIL!  : console_screen::Confirmations::test_cancelHasInitialFocusAndEnterCancels() 'Cancel has visible keyboard focus when the dialog opens' returned FALSE. ()
+C:\Users\david\.codex\worktrees\psn-confirmations\chiaki-ng-ui\gui\tests\qml\tst_Confirmations.qml(38) : failure location
+PASS   : console_screen::Confirmations::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 2445ms
+********* Finished testing of console_screen *********
