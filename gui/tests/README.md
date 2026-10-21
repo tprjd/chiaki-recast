@@ -205,6 +205,8 @@ The same attempt ID continues through local or PSN handoff.
 
 These tests check repeated input, cleanup before retry, closed views, invalid
 targets, streamer mode, and action focus at 900 by 600 and 1280 by 720.
+The real `StackView` check verifies that an old view cannot dismiss a new
+attempt or take focus during its exit transition.
 The fake backend supplies native results. It does not simulate discovery,
 wake packets, or a session. Isolated native checks cover those handlers with
 transport disabled. Real console wake-up still needs a console.

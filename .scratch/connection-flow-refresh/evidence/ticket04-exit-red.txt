@@ -1,0 +1,10 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::ConnectionWake::initTestCase()
+FAIL!  : console_screen::ConnectionWake::test_oldExitCannotDismissANewWait() Compared values are not the same
+   Actual   (): 1
+   Expected (): 0
+C:\Users\david\.codex\worktrees\connection-wake\chiaki-ng-ui\gui\tests\qml\tst_ConnectionWake.qml(101) : failure location
+PASS   : console_screen::ConnectionWake::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 333ms
+********* Finished testing of console_screen *********
