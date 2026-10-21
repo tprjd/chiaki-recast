@@ -1,6 +1,6 @@
 # 05: Explicit confirmations and registration choice
 
-Status: ready-for-agent
+Status: claimed
 Type: task
 Blocked by: None (can start immediately)
 
