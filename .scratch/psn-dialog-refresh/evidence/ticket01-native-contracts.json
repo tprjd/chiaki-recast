@@ -1,0 +1,46 @@
+{
+    "actualNativePersistence": true,
+    "allPassed": true,
+    "captures": [
+        {
+            "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+            "dpr": 1.25,
+            "file": "form-900x600.png",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "physicalHeight": 750,
+            "physicalWidth": 1125
+        },
+        {
+            "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+            "dpr": 1.25,
+            "file": "success-900x600.png",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "physicalHeight": 750,
+            "physicalWidth": 1125
+        },
+        {
+            "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+            "dpr": 1.25,
+            "file": "form-1280x720.png",
+            "logicalHeight": 720,
+            "logicalWidth": 1280,
+            "physicalHeight": 900,
+            "physicalWidth": 1600
+        },
+        {
+            "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+            "dpr": 1.25,
+            "file": "success-1280x720.png",
+            "logicalHeight": 720,
+            "logicalWidth": 1280,
+            "physicalHeight": 900,
+            "physicalWidth": 1600
+        }
+    ],
+    "checks": 125,
+    "controlledResponses": true,
+    "realPsnRequests": 0,
+    "visibleNativeChecks": true
+}

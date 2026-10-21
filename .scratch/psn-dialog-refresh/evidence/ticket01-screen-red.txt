@@ -1,0 +1,20 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QWARN  : console_screen::tst_PsnSetup::compile() 
+  C:\Users\david\.codex\worktrees\psn-setup\chiaki-ng-ui\gui\tests\qml\tst_PsnSetup.qml produced 2 error(s):
+    C:\Users\david\.codex\worktrees\psn-setup\chiaki-ng-ui\gui\tests\qml\tst_PsnSetup.qml:10,39: Type PsnSetupHarness unavailable
+    C:\Users\david\.codex\worktrees\psn-setup\chiaki-ng-ui\gui\tests\qml\fixtures\PsnSetupHarness.qml:38,9: Cannot assign to non-existent property "preferEmbedded"
+  Working directory: C:\Users\david\.codex\worktrees\psn-setup\chiaki-ng-ui
+  Import paths:
+    'C:\Users\david\.codex\worktrees\psn-setup\chiaki-ng-ui\gui\tests\imports'
+    'C:\Users\david\.codex\worktrees\psn-setup\chiaki-ng-ui\build\gui-screen'
+    'qrc:\qt-project.org\imports'
+    'qrc:\qt\qml'
+    'C:\Users\david\.cache\chiaki-native-qt\6.9.3\msvc2022_64\qml'
+  Plugin paths:
+    '.'
+
+FAIL!  : console_screen::tst_PsnSetup::compile() Type PsnSetupHarness unavailable
+C:\Users\david\.codex\worktrees\psn-setup\chiaki-ng-ui\gui\tests\qml\tst_PsnSetup.qml(10) : failure location
+Totals: 0 passed, 1 failed, 0 skipped, 0 blacklisted, 1479ms
+********* Finished testing of console_screen *********

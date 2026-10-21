@@ -8,6 +8,7 @@ Item {
     property alias screen: screen
     property var actions: []
     property bool browserAvailable: false
+    property bool browserHintsFail: false
     property bool embedded: false
     property bool screenActive: true
     property var browserCommands: []
@@ -34,7 +35,7 @@ Item {
             return psnAuthAttempt.id;
         }
         function change(values) { psnAuthAttempt = Object.assign({}, psnAuthAttempt, values); }
-        function setWebEngineHints(profile) {}
+        function setWebEngineHints(profile) { if (harness.browserHintsFail) throw new Error("Controlled browser initialization failure"); }
         function clearCookies(profile) { harness.browserCommands = harness.browserCommands.concat(["cookies"]); }
     }
     PSNTokenDialog {

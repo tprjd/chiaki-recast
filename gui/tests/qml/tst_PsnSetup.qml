@@ -102,6 +102,11 @@ TestCase {
         const fallback = createTemporaryObject(harnessComponent, testCase, {embedded: true});
         verify(control(fallback, "Redirect").visible);
         compare(fallback.backend.commands[0], "browser");
+        const partial = createTemporaryObject(harnessComponent, testCase, {embedded: true, browserAvailable: true, browserHintsFail: true});
+        verify(control(partial, "Redirect").visible);
+        compare(partial.screen.browser, null);
+        control(partial, "Close").clicked();
+        compare(partial.actions.length, 1);
         const h = createTemporaryObject(harnessComponent, testCase, {embedded: true, browserAvailable: true});
         verify(!control(h, "Redirect").visible);
         compare(h.backend.commands.length, 0);
