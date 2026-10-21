@@ -1,0 +1,22 @@
+{
+  "cancelButtonEscapeAndWindowClose": true,
+  "cancelReentryScopesNativeStop": true,
+  "captureTrace": [
+    "grab 1 phase=failure pin=",
+    "session count=1 preserve=0 pin=",
+    "grab 1 phase=connecting pin=",
+    "grab 2 phase=linking pin=form",
+    "release 1 phase=video pin=form",
+    "grab 2 phase=video pin=form",
+    "session count=2 preserve=1 pin=form",
+    "release 1 phase=video pin=form"
+  ],
+  "failedCheck": "Handoff preserves exactly the PIN capture and any active stream progress capture",
+  "hiddenHandoffCaptureCount": 1,
+  "hiddenLocalProgressCaptures": 0,
+  "hiddenStreamProgressCaptures": 1,
+  "profileInvalidation": true,
+  "savedPinRejectionCorrectionAndAcceptedHandoff": true,
+  "staleOwnershipAndSubmitReentry": true,
+  "expectedHandoffCaptureCount": 2
+}

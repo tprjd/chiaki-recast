@@ -1,0 +1,530 @@
+{
+  "testedProductionRevision": "a19f26f1b24844cbc2b050957e9b511b66a3093a",
+  "nativeSourceBase": "c2e2acef66cec524613a1f56be5d282e27084606",
+  "rawHelperRevisionNote": "Raw checks retain the initial base label. The staged QML included the header change in a19f26f1 before all final native runs. Source hashes below identify the tested production files.",
+  "productionQmlSha256": {
+    "gui/src/qml/RegistDialog.qml": "28bd38c0f7cc94a72eb9e75c05063d1cc1d5f6f6278174210978d72bf12597da",
+    "gui/src/qml/ManualHostDialog.qml": "71a1ea753a53282466a19ced8a2952d70d7dcb9f6dec306dd217810069687ada",
+    "gui/src/qml/Main.qml": "48e8d1d05d04845c559c2a18b7df6b5b298048609a5d76ba1419652ce32e49b4"
+  },
+  "captureMethod": "Production QQuickRenderControl OpenGL framebuffer",
+  "runs": [
+    {
+      "name": "console-ui-final-dpr1",
+      "logicalSizes": [
+        [
+          900,
+          600
+        ],
+        [
+          1280,
+          720
+        ]
+      ],
+      "measuredDpr": 1,
+      "expandedLabels": false,
+      "captureCount": 37,
+      "boundedFocusControls": 30,
+      "checks": "native-previews/console-ui-final-dpr1/checks.json",
+      "persistedArrays": "native-previews/console-ui-final-dpr1/persisted-arrays.json"
+    },
+    {
+      "name": "console-ui-final-dpr1_5",
+      "logicalSizes": [
+        [
+          900,
+          600
+        ],
+        [
+          1280,
+          720
+        ]
+      ],
+      "measuredDpr": 1.5,
+      "expandedLabels": true,
+      "captureCount": 37,
+      "boundedFocusControls": 30,
+      "checks": "native-previews/console-ui-final-dpr1_5/checks.json",
+      "persistedArrays": "native-previews/console-ui-final-dpr1_5/persisted-arrays.json"
+    },
+    {
+      "name": "console-ui-final-dpr2",
+      "logicalSizes": [
+        [
+          900,
+          600
+        ],
+        [
+          1280,
+          720
+        ]
+      ],
+      "measuredDpr": 2,
+      "expandedLabels": false,
+      "captureCount": 37,
+      "boundedFocusControls": 30,
+      "checks": "native-previews/console-ui-final-dpr2/checks.json",
+      "persistedArrays": "native-previews/console-ui-final-dpr2/persisted-arrays.json"
+    }
+  ],
+  "inspectedCaptures": [
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-manual-form.png",
+      "sha256": "e021c1dd959c80bf354ee53cb9660158487d4970ff27a4cd2ef2796d4058fbeb"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-manual-form-actions.png",
+      "sha256": "a7c2a69d88956d97f11544a4babd7ddf48d73e8bfefdcabb5a089604bc0ae47b"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-manual-saved-existing.png",
+      "sha256": "1cfd1bafcfc3dc79f0715a8f9daff4b9984fe77a96c4db7de0eb88a5e13a4142"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-manual-saved-deferred.png",
+      "sha256": "b00c7a70449fe36fb19ea010b6e2bb2f90b5b77a6f4a8de0077f13f6dc165c0d"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-manual-failure.png",
+      "sha256": "18ead972df20b56b058ca72cd7ba292f8a9edaa075ae76e91fc901bc919b1648"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-registration-form.png",
+      "sha256": "18e9cfe8cd5463917876c43f3921dd24106b61db0b5d6b3f434b819d7c0b5fd4"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-registration-form-actions.png",
+      "sha256": "ea64bae858c15282e9f3f63f50c67b746cd33b3a6e64fb68316e8b731a4f0485"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-registration-progress.png",
+      "sha256": "520e7c9b8a57534b55bedfef936b1b3d4464c2308177d567dc9872e352fce9e5"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-registration-progress-log.png",
+      "sha256": "b16929fc1aa0551beef52cf20de7f30445e04bb4635a43f50c0c77a11c9c5a53"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-registration-failure.png",
+      "sha256": "77157a3ad48563f7276f619cf0a103523e6c577ae209d4a1d54387792534811f"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-registration-success.png",
+      "sha256": "1377f3c24b29283a43d756f8d279032779d9f5db10d191980d37cfe168ff9d2e"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-private-manual-form.png",
+      "sha256": "8031c05279d890ebbabc38940a8adc6f00ccab76b247f95eb465fe702c12a904"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-private-manual-saved.png",
+      "sha256": "1035cc6f3d3f6fc8e0c65976d7973ff7e083eb48855f110de307ebd79145b219"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-private-registration-form.png",
+      "sha256": "485317b773d547d86ce8c7471c04e61320f107a456cda0e9e6c3b4108da2bab2"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-private-registration-progress.png",
+      "sha256": "10de9fe40d911619654a721845f4643a30c6b034106fbbaa59ce0d0bed9f5755"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-private-registration-failure.png",
+      "sha256": "621579faaa7559e5c001011932c93bc24859b779fd31260499b800338dbfe895"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-private-registration-success.png",
+      "sha256": "9b29b030813816436ebf69390b86117be8e1fb2898cd9ae119abdae46c26215d"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/900x600-library-return.png",
+      "sha256": "bf4a64c0321952b1856f989f438f2bbbf853e6f8e66f7dfca349ff67781ccf4c"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-manual-form.png",
+      "sha256": "bae23bcc8c8ad51c44b07090e679967a34b4f3db0df514afbcd903c688261021"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-manual-form-actions.png",
+      "sha256": "d1eb5ecbe741e50608da96d106bfbdff5eebf749681c74fc93d5918289811eb0"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-manual-saved-existing.png",
+      "sha256": "2628bdc85362c5d07ad05c280a292fb774cfa4c639e07381a200d25fd684a7ea"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-manual-saved-deferred.png",
+      "sha256": "d57da5cb3d146d68e899dbe38aa1402ecaa32f800c7da9cfa9af4f420f6a03bd"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-manual-failure.png",
+      "sha256": "a94775ef39ef055ca9c323645324cd5b1d61330e771267d9e6916619d4fd3ece"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-registration-form.png",
+      "sha256": "a64625a85acafd65e4e5032dbaafb749637d8dc0be1b1d0e3a6ab1cf38262a27"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-registration-form-actions.png",
+      "sha256": "adfc853235b2d559586b1519168aa63e46f3057e8b86f580cadf0c6c0a83523c"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-registration-progress.png",
+      "sha256": "7932047f3bc14395b9223ef695d802f7459eaff252d7caaa50cda09f018de597"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-registration-progress-log.png",
+      "sha256": "72d451f1ba6cb7e3be7b1106e1260a93535c6b3a63ad8ba1c7d1fe3ccb1d9c32"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-registration-failure.png",
+      "sha256": "d35501027ba98975dff44b483ec7190427d1ea4ec1bb71bfcbaac62598539258"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-registration-success.png",
+      "sha256": "8c69da7f3263404ab5bda73ce4e2839cf488c0b54617b47a205d2e1c1701dbf0"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-private-manual-form.png",
+      "sha256": "532814b2cadfddb7c65f41dfbf22ef7c7bb118e39e8ff573569a6143b69c0aae"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-private-manual-saved.png",
+      "sha256": "9403d529e50d6f65f2ef2263d96a2db34329ebb4f4c67befee8761988060578d"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-private-registration-form.png",
+      "sha256": "b958d2f59e76230fe4f5b97583abce890232af551174d0098d9e069cad9e4543"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-private-registration-progress.png",
+      "sha256": "80f61950bbedab2e355b8485b2502ab748edfb19075f86bb08095d91b08ba3da"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-private-registration-failure.png",
+      "sha256": "445a9d0a0ada929a684917bfaa4f80569a0fa49a67fe0f2721390ea39a4eba59"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-private-registration-success.png",
+      "sha256": "1230cd12f09efa05e1bc2a88f48d325d472cc7e66e81f0be1e3e99d098516e6d"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/1280x720-library-return.png",
+      "sha256": "724b43931c0bc1f831be6043426145a265abfeb5d5ee8a1d3aad5689259bb97a"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1/lifecycle-profile-invalid.png",
+      "sha256": "5ae615fdad78c9bbce7da84da469c1f2da176ad2d620361bc1ba2b9b2deecb45"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-manual-form.png",
+      "sha256": "821740bbbf31623901e52cd531ac82c4b94785d31859bd4c092b224bf64ae748"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-manual-form-actions.png",
+      "sha256": "897b554b9edf7e3189a3debbd99324c3aab836799a79967ad8c36a037748a8a2"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-manual-saved-existing.png",
+      "sha256": "294dadfbf21643a5d46272d44df06b25c4b4cd43cb8ce6ee1a87c62dfaae6d27"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-manual-saved-deferred.png",
+      "sha256": "133521defc5152f67b2e00e6a4e0d751ede8bda54b8ed75e04fe584073340214"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-manual-failure.png",
+      "sha256": "7e04a6e98fe2694ffb0ac499e077711b4de0a72a085d68d36144db6d01a17879"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-registration-form.png",
+      "sha256": "106e743bc8d5ac94fdf460a8f94d4d7d8b41b3bf16448b158d5fbc72c0da73ca"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-registration-form-actions.png",
+      "sha256": "90d0cb37187b8e9382389ec87f1fde4fc4217104eeb116d78345bcee0c1af781"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-registration-progress.png",
+      "sha256": "80eb8006ca6086e30e0ab40ef5ba4c1ab6664dae2b4199405061a19425c2eaac"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-registration-progress-log.png",
+      "sha256": "6c12e824a02d71a34d207e2a12e6f30de94655317a5a0689dcd451f2a3a32c1d"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-registration-failure.png",
+      "sha256": "344b70899eb7d91a53e97e841dcda7a7335cfc1fa2c79dc9fb0cd5b746dfc2a2"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-registration-success.png",
+      "sha256": "fb006fe3459a400b878245d188d5132b6f0a21155aa0c91cf290f43d56df8f12"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-private-manual-form.png",
+      "sha256": "c8eca72f4fe0d6119704f80a72b2545f4a45f55ba2f58190c559d0e9e033799a"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-private-manual-saved.png",
+      "sha256": "b4d182bc0f4fe66118611c55bf35136cf6bc49ab9f24e7c9390f2258dd56b484"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-private-registration-form.png",
+      "sha256": "665adac12e1f2b155eb9135c895d4aba1ac90a0a18c56e5aca1d98b32ee9f7e1"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-private-registration-progress.png",
+      "sha256": "82ac79cc47f1f75a369aae8acc2f94621796b9b2e02ff4ea19b90edf5d8c4505"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-private-registration-failure.png",
+      "sha256": "12ddf128ffa7e0b8f592136c69b0205e8314d4638de7129df7eb30814d2d7bf1"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-private-registration-success.png",
+      "sha256": "f9449e0115c18203abfd76dd7d225adf10f38d30f5c7e7dfff9b0f6b00b981ca"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/900x600-library-return.png",
+      "sha256": "f2d2e60b8065e38317d246c3f5006dd4b20b4779c4655a7b1f315e1e93f1e070"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-manual-form.png",
+      "sha256": "8a820e6732a6900a75c0b1ba93c7c4e99f848bdd45f9bb7313cc0cc9ebe2e783"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-manual-form-actions.png",
+      "sha256": "42f1f64b443e952a2b4780155bbb1ca0646e14c25357e6cacbddc45a57ee5490"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-manual-saved-existing.png",
+      "sha256": "c7c49e74ac5da0781eb5d46ab9f32c09fc4815f898e5044a8118f242edf6f34a"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-manual-saved-deferred.png",
+      "sha256": "9306eee679ea0ab92f27a303a949df3b17732947963dd0dc31256373fbe04f99"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-manual-failure.png",
+      "sha256": "0d756a9e509736167865b1f0fc25065f59438418def50ee656a88ffdffa45c34"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-registration-form.png",
+      "sha256": "7de1972f96c3fd8ce0940e2a5256e2d0937570755cd71cc7452c50646e78535e"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-registration-form-actions.png",
+      "sha256": "6827d8522158a8b9c3e128f2115a875c60c7571c45bd9f783df9a97154db05d8"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-registration-progress.png",
+      "sha256": "8d463b87e7caaa9303d52cfbf530ae228f70dee0590395a212c53f15476238e1"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-registration-progress-log.png",
+      "sha256": "869fd66919f28cd82b2c2f3b6a682be7aee5da7782dec7036e263ac86fbd639d"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-registration-failure.png",
+      "sha256": "ef0f95f5247543113e9b9d56061c560d45fd56882a78b60d175138fa76cb38f6"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-registration-success.png",
+      "sha256": "06e8dc2bd7d0c49a37caaa20955f546cc0b152fb6eb74e933274776170634769"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-private-manual-form.png",
+      "sha256": "4c789bd63e790377d49952147a8a1717ae9c1ecf33c8d00c6a3269acb24024cb"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-private-manual-saved.png",
+      "sha256": "ee91f8036188e1b0f24437a5ebb30c7147778aba0ea32367123561050409fbc6"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-private-registration-form.png",
+      "sha256": "d1026193122304164c50e3f25399abba597fa2391518f2ab60afd4f8995454f8"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-private-registration-progress.png",
+      "sha256": "096b2e68b8a09be639ee3baa18df8bef4763885e08dd504be368920ccd68525c"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-private-registration-failure.png",
+      "sha256": "811da7a4a0b6029b9e8dae704caa4d834f9af99f064c1ba869aceaf48a7fea99"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-private-registration-success.png",
+      "sha256": "26e7efd257129a54907c4c1d471cfeed8844d69f699fadb2a0adf51b9ec4d012"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/1280x720-library-return.png",
+      "sha256": "b35ff4cacf475e29efee29b6e5936a80e50d2b3d5d0ddadbf67607abc7168e77"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr1_5/lifecycle-profile-invalid.png",
+      "sha256": "d5439c829bb60006f3ba43a9c3b876781d6dd8f3747392538489656892937d9c"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-manual-form.png",
+      "sha256": "14ce59eb948eaf14c724f2627f1d03735bc71b63e7662e779c5405feef9c9d62"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-manual-form-actions.png",
+      "sha256": "ca6f8e270f0cfb1e94cfebf0850313a4da5cc9868c2e4b914c1db6901ce7af7e"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-manual-saved-existing.png",
+      "sha256": "4244c27589a56990a8cd1fd52b3599bc8873a8b86aa28140351e52c89547e281"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-manual-saved-deferred.png",
+      "sha256": "6c6f9855e739423dacf5bee580dae039cf2fb0e1cbcb1692d9fd91a07346bfa6"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-manual-failure.png",
+      "sha256": "01731e34f5947fca9493a9ff1cda935fa6312c17228b50072d575dedfb93157e"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-registration-form.png",
+      "sha256": "916cf8f3d4fb0d14165ebe3f4f043ab639730abb79e49c9936f1e8d2830e32a3"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-registration-form-actions.png",
+      "sha256": "6f97c45c70270d5ec40edcc395abe09689b37a8b779bcdae3c352932fee0e86b"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-registration-progress.png",
+      "sha256": "de20320e889be00197d4b635cf90711da36b6c04039aa3b97d81d9fc4572f8a9"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-registration-progress-log.png",
+      "sha256": "53784606d1fdbdc6cb9fb0a975ab55147b5b96f1e0dc55249a0530f0664fbdcd"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-registration-failure.png",
+      "sha256": "b63cfdc81fd31f4713c99b979af6a6341317a7e0afff7b74a0ce0b08e6798c1a"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-registration-success.png",
+      "sha256": "aa5073d645490c6b54bcff1b26da66498d41934eda98aae2dd13dfe81703167f"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-private-manual-form.png",
+      "sha256": "163adfe1a213b9f8f79d28e5a795c7b9b273a339e38d6f58a2f5b756755a5ab2"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-private-manual-saved.png",
+      "sha256": "e0233d69e672d34d72fadcc8884eda2dd47b52b2373a612bb7cb73cd81f9730d"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-private-registration-form.png",
+      "sha256": "aef8cdae7846a750e07e9dc67973b12256b8759ae47e15992247a2649846c119"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-private-registration-progress.png",
+      "sha256": "2fdbe0f2102a6352bde86e149e97901f1e069bf2995962e3b336d1f7e7a98008"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-private-registration-failure.png",
+      "sha256": "720154f900af744a483a8d7809ff7bcc37140f4da32ab3043edac8607cfd203d"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-private-registration-success.png",
+      "sha256": "3240e0e0fc05a097e33a2d2c7ffb3fc32656ec91a7b4140afb11e020d53f3fab"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/900x600-library-return.png",
+      "sha256": "241a787598adc48eb1987088f959d36e54e68fc493c9a549c364839b9f58d444"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-manual-form.png",
+      "sha256": "8e4a3f67b18d389fadefc2201e426c4a78a8018ebf41b7838946c0fa1f535f01"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-manual-form-actions.png",
+      "sha256": "1611f7baa75aa12aad4a4a2f4a591beee51816fde622356378f289b11963e1cd"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-manual-saved-existing.png",
+      "sha256": "64f5d673fb3b35b7cecbdb57eb66eb15b70ce6c9eba36cc73dc7a3c097e9ce4d"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-manual-saved-deferred.png",
+      "sha256": "ac9b6d9d25264ac971e7b8189d74f802da0c5f0350b20a790c0ee777c0b31e28"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-manual-failure.png",
+      "sha256": "d2c71a056e2bfc571c47c86b59fddecc5a6d9380b6b35770440b384946345df5"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-registration-form.png",
+      "sha256": "3f5a5c7b7990ae52c51e0fd45ac3c573dc3cfcf7b9e674ffbb7209b54e922465"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-registration-form-actions.png",
+      "sha256": "a02637fb1475ac0df32423aaad5e365ae9c2fb6b1189e77cdfaa1c7de4517c9e"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-registration-progress.png",
+      "sha256": "425211000c1b7078a7e773345fefab12b96473607308d26310397727ed3118c2"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-registration-progress-log.png",
+      "sha256": "21e570039c4387eb335ac80471a4c8c998192eaadc034a3c8bb146739e9835bf"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-registration-failure.png",
+      "sha256": "023c574209d16167776c73559be841eaa4ea7f68a968e11f1061a843abbcd03a"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-registration-success.png",
+      "sha256": "93522921ccbbaa78eb2ea8b7e995a3aa112e92e8e3ce4180fda4f963417a219e"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-private-manual-form.png",
+      "sha256": "413d920874a8939cc29525cb9611e61dc691ce8a309bb5422a112b644f2b8fec"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-private-manual-saved.png",
+      "sha256": "301bf2e300ed999bc61d271487b87414404448e0c99ca3b8bfda6d908cccf64b"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-private-registration-form.png",
+      "sha256": "9ebeeda984e190d934f7300e25de4094518e3d73c51e824439813bd457ce7273"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-private-registration-progress.png",
+      "sha256": "9a5148a10fed2d89d3248c73eef81ce9fb5e5733b4589f78d97ad57c755e7e28"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-private-registration-failure.png",
+      "sha256": "a780cf2bb69b2d3ce49fb685bcc9db58b000d824d3352606abb4f63a0b2cb774"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-private-registration-success.png",
+      "sha256": "a90e48dfba37da334096eb0397e088170e1e0dcfc6056387d51b0946496b5552"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/1280x720-library-return.png",
+      "sha256": "598b96ce549ea48e4f2dcaa43d52f43da10ff9daa23667db1ce20386f72488f4"
+    },
+    {
+      "image": "native-previews/console-ui-final-dpr2/lifecycle-profile-invalid.png",
+      "sha256": "61a848996ad473e2c5c471f48d8181ded1aa91908212b4e35bbe9ccffc1d2860"
+    }
+  ],
+  "normalBuild": {
+    "sha256": "4b3187ff78789fd3cab16169f587ba55c557198726a2f3a115c3d0ef2d7cacfb",
+    "qaHooksRemoved": true,
+    "visibleLaunchVerifiedBy": "Independent Computer Use by root agent",
+    "windowId": "5704498",
+    "title": "chiaki-ng:PS5-HDMI",
+    "observed": "Library and production manual-entry screen with focused empty address; no submission, authentication, or connection",
+    "usesExistingSettingsAndDiscovery": true
+  },
+  "visualInspection": "All 111 original captures inspected through 21 contact sheets; selected forms, actions, logs, results, and privacy captures also inspected at full size.",
+  "originalCheckoutPreservation": {
+    "recordedFileCount": 18,
+    "changedFileCount": 0
+  }
+}

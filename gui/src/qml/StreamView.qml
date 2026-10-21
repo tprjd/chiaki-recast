@@ -12,8 +12,12 @@ Item {
     id: view
 
     readonly property var hostWindow: view.Window.window
-    property bool sessionError: false
-    property bool sessionLoading: true
+    readonly property bool managedConnection: !!Chiaki.connectionAttempt.presented
+    property bool legacySessionError: false
+    property bool legacySessionLoading: true
+    readonly property bool sessionError: managedConnection ? Chiaki.connectionAttempt.phase === "failure" : legacySessionError
+    readonly property bool sessionLoading: managedConnection ? Chiaki.connectionAttempt.phase !== "ready" && !sessionError : legacySessionLoading
+    property bool connectionInputGrabbed: false
     property list<Item> restoreFocusItems
     readonly property bool useSeparateMenuWindow: Chiaki.window.runtimeRendererBackend === 1
     readonly property int streamMenuHeight: 200
@@ -36,6 +40,7 @@ Item {
     }
 
     function releaseInput() {
+        if (!restoreFocusItems.length) return;
         Chiaki.window.releaseInput();
         let item = restoreFocusItems.pop();
         if (item && item.visible)
@@ -64,10 +69,14 @@ Item {
         separateDialogY = Math.round(hostWindow.y + (hostWindow.height - height) / 2);
     }
 
-    StackView.onActivating: Chiaki.window.keepVideo = true
+    StackView.onActivating: { Chiaki.window.keepVideo = true; connectionView.retiring = false; }
+    StackView.onDeactivating: connectionView.retiring = true
     StackView.onDeactivated: Chiaki.window.keepVideo = false
 
-    Component.onCompleted: updateSeparateMenuGeometry()
+    Component.onCompleted: {
+        updateSeparateMenuGeometry();
+    }
+    Component.onDestruction: if (connectionInputGrabbed) Chiaki.window.releaseInput()
     onWidthChanged: updateSeparateMenuGeometry()
     onHeightChanged: updateSeparateMenuGeometry()
     onUseSeparateMenuWindowChanged: updateSeparateMenuGeometry()
@@ -88,6 +97,8 @@ Item {
 
         property real lastToggleTime: 0
         function toggle() {
+            if (Chiaki.sessionPinRequest.id || view.managedConnection && Chiaki.connectionAttempt.phase !== "ready")
+                return;
             var now = Date.now();
             if (now - lastToggleTime < 200)
                 return;
@@ -116,7 +127,7 @@ Item {
         id: loadingView
         anchors.fill: parent
         color: "black"
-        opacity: sessionError || sessionLoading || (Chiaki.settings.audioVideoDisabled & 0x02) ? 1.0 : 0.0
+        opacity: !view.managedConnection && (sessionError || sessionLoading) || (!sessionLoading && !sessionError && (Chiaki.settings.audioVideoDisabled & 0x02)) ? 1.0 : 0.0
         visible: opacity
 
         Behavior on opacity { NumberAnimation { duration: 250 } }
@@ -209,6 +220,23 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: 20
                 visible: text
+            }
+        }
+    }
+
+    ConnectionView {
+        id: connectionView
+        anchors.fill: parent
+        managesAttempt: view.managedConnection && !Chiaki.connectionAttempt.waitingForWake
+        visible: view.managedConnection && Chiaki.connectionAttempt.phase !== "ready"
+        enabled: visible
+        onVisibleChanged: {
+            if (visible && !view.connectionInputGrabbed) {
+                Chiaki.window.grabInput();
+                view.connectionInputGrabbed = true;
+            } else if (!visible && view.connectionInputGrabbed) {
+                Chiaki.window.releaseInput();
+                view.connectionInputGrabbed = false;
             }
         }
     }
@@ -1079,123 +1107,6 @@ Item {
         }
     }
 
-    Dialog {
-        id: sessionPinDialog
-        parent: Overlay.overlay
-        x: Math.round((root.width - width) / 2)
-        y: Math.round((root.height - height) / 2)
-        title: qsTr("Console Login PIN")
-        modal: true
-        closePolicy: Popup.NoAutoClose
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        onAboutToShow: {
-            standardButton(Dialog.Ok).enabled = Qt.binding(function() {
-                return pinField.acceptableInput;
-            });
-            view.grabInput(pinField);
-        }
-        onClosed: view.releaseInput()
-        onAccepted: Chiaki.enterPin(pinField.text)
-        onRejected: Chiaki.stopSession(false)
-        Material.roundedScale: Material.MediumScale
-
-        TextField {
-            id: pinField
-            echoMode: Chiaki.settings.streamerMode ? TextInput.Password : TextInput.Normal
-            implicitWidth: 200
-            validator: RegularExpressionValidator { regularExpression: /[0-9]{4}/ }
-            Keys.onReturnPressed: {
-                if(sessionPinDialog.standardButton(Dialog.Ok).enabled)
-                    sessionPinDialog.standardButton(Dialog.Ok).clicked()
-            }
-        }
-    }
-
-    Window {
-        id: separateSessionPinWindow
-        readonly property int dialogWidth: 360
-        readonly property int dialogHeight: 220
-        visible: false
-        flags: Qt.Dialog | Qt.FramelessWindowHint
-        color: "transparent"
-        transientParent: view.hostWindow
-        modality: Qt.ApplicationModal
-        x: separateDialogX
-        y: separateDialogY
-        width: dialogWidth
-        height: dialogHeight
-
-        onVisibleChanged: {
-            if (visible) {
-                separatePinField.text = "";
-                view.updateSeparateDialogGeometry(width, height);
-                requestActivate();
-                view.grabInput(separatePinField);
-            } else {
-                view.releaseInput();
-            }
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            radius: 12
-            color: Material.background
-            border.color: "#666666"
-            border.width: 1
-        }
-
-        ColumnLayout {
-            anchors {
-                fill: parent
-                margins: 24
-            }
-
-            Label {
-                Layout.alignment: Qt.AlignCenter
-                text: qsTr("Console Login PIN")
-                font.bold: true
-                font.pixelSize: 24
-            }
-
-            TextField {
-                id: separatePinField
-                Layout.topMargin: 20
-                Layout.fillWidth: true
-                echoMode: Chiaki.settings.streamerMode ? TextInput.Password : TextInput.Normal
-                validator: RegularExpressionValidator { regularExpression: /[0-9]{4}/ }
-                Keys.onReturnPressed: if (acceptableInput) separatePinOkButton.clicked()
-                Keys.onEscapePressed: separateSessionPinWindow.visible = false
-            }
-
-            RowLayout {
-                Layout.topMargin: 20
-                Layout.alignment: Qt.AlignRight
-                spacing: 16
-
-                Button {
-                    text: qsTr("Cancel")
-                    Keys.onReturnPressed: clicked()
-                    onClicked: {
-                        separateSessionPinWindow.visible = false;
-                        Chiaki.stopSession(false);
-                    }
-                }
-
-                Button {
-                    id: separatePinOkButton
-                    text: qsTr("OK")
-                    enabled: separatePinField.acceptableInput
-                    Keys.onReturnPressed: clicked()
-                    onClicked: {
-                        const pin = separatePinField.text;
-                        separateSessionPinWindow.visible = false;
-                        Chiaki.enterPin(pin);
-                    }
-                }
-            }
-        }
-    }
-
     Timer {
         id: closeTimer
         interval: 2000
@@ -1206,6 +1117,16 @@ Item {
         target: Chiaki
 
         function onSessionChanged() {
+            if (view.managedConnection) {
+                if (!Chiaki.sessionPinRequest.id
+                        && (!Chiaki.session || Chiaki.connectionAttempt.route !== "psn")) view.connectionInputGrabbed = false;
+                if (connectionView.visible && !view.connectionInputGrabbed) {
+                    Chiaki.window.grabInput();
+                    view.connectionInputGrabbed = true;
+                }
+                if (!Chiaki.session && Chiaki.connectionAttempt.phase === "ready") root.showMainView();
+                return;
+            }
             if (!Chiaki.session) {
                 if (errorTitleLabel.text)
                     closeTimer.start();
@@ -1215,25 +1136,20 @@ Item {
         }
 
         function onSessionError(title, text) {
-            sessionError = true;
-            sessionLoading = false;
+            if (view.managedConnection) return;
+            legacySessionError = true;
+            legacySessionLoading = false;
             errorTitleLabel.text = title;
             errorTextLabel.text = text;
             closeTimer.start();
         }
 
-        function onSessionPinDialogRequested() {
-            if (sessionPinDialog.opened || separateSessionPinWindow.visible)
-                return;
-            menuController.close();
-            if (useSeparateMenuWindow)
-                separateSessionPinWindow.visible = true;
-            else
-                sessionPinDialog.open();
+        function onSessionPinRequestChanged() {
+            if (Chiaki.sessionPinRequest.id) menuController.close();
         }
 
         function onSessionStopDialogRequested() {
-            if (sessionStopDialog.opened || separateSessionStopWindow.visible)
+            if (Chiaki.sessionPinRequest.id || sessionStopDialog.opened || separateSessionStopWindow.visible)
                 return;
             menuController.close();
             if (useSeparateMenuWindow)
@@ -1247,12 +1163,12 @@ Item {
         target: Chiaki.window
 
         function onHasVideoChanged() {
-            if (Chiaki.window.hasVideo)
-                sessionLoading = false;
+            if (Chiaki.window.hasVideo && !view.managedConnection)
+                legacySessionLoading = false;
         }
 
         function onMenuRequested() {
-            if (sessionPinDialog.opened || sessionStopDialog.opened || separateSessionPinWindow.visible || separateSessionStopWindow.visible)
+            if (Chiaki.sessionPinRequest.id || sessionStopDialog.opened || separateSessionStopWindow.visible)
                 return;
             menuController.toggle();
         }
@@ -1261,8 +1177,8 @@ Item {
         target: Chiaki.session
 
         function onConnectedChanged() {
-            if (Chiaki.settings.audioVideoDisabled & 0x02)
-                sessionLoading = false;
+            if (Chiaki.session && Chiaki.session.connected && !view.managedConnection && (Chiaki.settings.audioVideoDisabled & 0x02))
+                legacySessionLoading = false;
         }
     }
 }

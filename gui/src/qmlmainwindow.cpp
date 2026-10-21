@@ -1730,11 +1730,14 @@ renderer_backend_ready:
 
     backend = new QmlBackend(settings, this);
     connect(backend, &QmlBackend::sessionChanged, this, [this, exit_app_on_stream_exit](StreamSession *s) {
+        const bool preserve_input = !backend->sessionPinRequest().isEmpty()
+            || (s && backend->connectionAttempt().value("route") == "psn");
         session = s;
         stream_session_active.storeRelease(s ? 1 : 0);
-        grab_input = 0;
+        if (!preserve_input)
+            grab_input = 0;
         if (session)
-            session->BlockInput(0);
+            session->BlockInput(grab_input);
         update_timer->stop();
         {
             QMutexLocker locker(&placebo_state_mutex);

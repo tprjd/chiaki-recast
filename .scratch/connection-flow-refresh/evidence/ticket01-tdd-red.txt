@@ -1,0 +1,20 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+QWARN  : console_screen::tst_ConnectionLocal::compile()
+  C:\Users\david\.codex\worktrees\connection-local\chiaki-ng-ui\gui\tests\qml\tst_ConnectionLocal.qml produced 2 error(s):
+    C:\Users\david\.codex\worktrees\connection-local\chiaki-ng-ui\gui\tests\qml\tst_ConnectionLocal.qml:12,39: Type ConnectionHarness unavailable
+    C:\Users\david\.codex\worktrees\connection-local\chiaki-ng-ui\gui\tests\qml\fixtures\ConnectionHarness.qml:27,5: ConnectionView is not a type
+  Working directory: C:\Users\david\.codex\worktrees\connection-local\chiaki-ng-ui
+  Import paths:
+    'C:\Users\david\.codex\worktrees\connection-local\chiaki-ng-ui\gui\tests\imports'
+    'C:\Users\david\.codex\worktrees\connection-local\chiaki-ng-ui\build\connection-screen'
+    'qrc:\qt-project.org\imports'
+    'qrc:\qt\qml'
+    'C:\Users\david\.cache\chiaki-ui-native\msys64\ucrt64\share\qt6\qml'
+  Plugin paths:
+    '.'
+
+FAIL!  : console_screen::tst_ConnectionLocal::compile() Type ConnectionHarness unavailable
+C:\Users\david\.codex\worktrees\connection-local\chiaki-ng-ui\gui\tests\qml\tst_ConnectionLocal.qml(12) : failure location
+Totals: 0 passed, 1 failed, 0 skipped, 0 blacklisted, 1ms
+********* Finished testing of console_screen *********

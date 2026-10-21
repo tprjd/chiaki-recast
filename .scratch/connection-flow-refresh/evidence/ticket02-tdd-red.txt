@@ -1,0 +1,68 @@
+=== red.txt ===
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::ConsolePin::initTestCase()
+QWARN  : console_screen::ConsolePin::test_saveIsConfirmedOnceAndClearsInput() file:///C:/Users/david/.codex/worktrees/connection-saved-pin/chiaki-ng-ui/gui/tests/qml/tst_ConsolePin.qml: Setting initial properties failed: ConsolePinDialog does not have a property called consoleName
+QWARN  : console_screen::ConsolePin::test_saveIsConfirmedOnceAndClearsInput() file:///C:/Users/david/.codex/worktrees/connection-saved-pin/chiaki-ng-ui/gui/tests/qml/tst_ConsolePin.qml: Setting initial properties failed: ConsolePinDialog does not have a property called navigation
+QWARN  : console_screen::ConsolePin::test_saveIsConfirmedOnceAndClearsInput() file:///C:/Users/david/.codex/worktrees/connection-saved-pin/chiaki-ng-ui/gui/tests/qml/tst_ConsolePin.qml: Setting initial properties failed: ConsolePinDialog does not have a property called privateMode
+QDEBUG : console_screen::ConsolePin::test_saveIsConfirmedOnceAndClearsInput() FT_New_Face failed with index 0 : 2
+QWARN  : console_screen::ConsolePin::test_saveIsConfirmedOnceAndClearsInput() file:///C:/Users/david/.codex/worktrees/connection-saved-pin/chiaki-ng-ui/gui/src/qml/ConsolePinDialog.qml:42: TypeError: Cannot read property 'streamerMode' of null
+FAIL!  : console_screen::ConsolePin::test_saveIsConfirmedOnceAndClearsInput() Uncaught exception: Cannot read property 'activeFocus' of null
+qrc:/qt-project.org/imports/QtTest/TestCase.qml(1164) : failure location
+PASS   : console_screen::ConsolePin::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 17ms
+********* Finished testing of console_screen *********
+
+=== outcome-red.txt ===
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::ConsoleManagement::initTestCase()
+QWARN  : console_screen::ConsoleManagement::test_pinSaveOutcomeReachesTheForm() file:///C:/Users/david/.codex/worktrees/connection-saved-pin/chiaki-ng-ui/gui/tests/qml/tst_ConsoleManagement.qml: Setting initial properties failed: ConsoleLibrary does not have a property called savePin
+QDEBUG : console_screen::ConsoleManagement::test_pinSaveOutcomeReachesTheForm() FT_New_Face failed with index 0 : 2
+FAIL!  : console_screen::ConsoleManagement::test_pinSaveOutcomeReachesTheForm() 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\connection-saved-pin\chiaki-ng-ui\gui\tests\qml\tst_ConsoleManagement.qml(139) : failure location
+PASS   : console_screen::ConsoleManagement::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 49ms
+********* Finished testing of console_screen *********
+
+=== removal-red.txt ===
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::ConsolePin::initTestCase()
+QDEBUG : console_screen::ConsolePin::test_removedFormInvalidatesTheManagementCallback() FT_New_Face failed with index 0 : 2
+FAIL!  : console_screen::ConsolePin::test_removedFormInvalidatesTheManagementCallback() Compared values are not the same
+   Actual   (): 0
+   Expected (): 1
+C:\Users\david\.codex\worktrees\connection-saved-pin\chiaki-ng-ui\gui\tests\qml\tst_ConsolePin.qml(109) : failure location
+PASS   : console_screen::ConsolePin::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 16ms
+********* Finished testing of console_screen *********
+
+=== duplicate-close-red.txt ===
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::ConsolePin::initTestCase()
+QDEBUG : console_screen::ConsolePin::test_cancelDiscardsInput(button) FT_New_Face failed with index 0 : 2
+FAIL!  : console_screen::ConsolePin::test_cancelDiscardsInput(button) Compared values are not the same
+   Actual   (): 2
+   Expected (): 1
+C:\Users\david\.codex\worktrees\connection-saved-pin\chiaki-ng-ui\gui\tests\qml\tst_ConsolePin.qml(119) : failure location
+FAIL!  : console_screen::ConsolePin::test_cancelDiscardsInput(escape) Compared values are not the same
+   Actual   (): 2
+   Expected (): 1
+C:\Users\david\.codex\worktrees\connection-saved-pin\chiaki-ng-ui\gui\tests\qml\tst_ConsolePin.qml(119) : failure location
+PASS   : console_screen::ConsolePin::cleanupTestCase()
+Totals: 2 passed, 2 failed, 0 skipped, 0 blacklisted, 19ms
+********* Finished testing of console_screen *********
+
+=== reappeared-target-red.txt ===
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::ConsolePin::initTestCase()
+FAIL!  : console_screen::ConsolePin::test_invalidLibraryTargetNeverShowsSuccess(remove-return) Compared values are not the same
+   Actual   (): 1
+   Expected (): 0
+C:\Users\david\.codex\worktrees\connection-saved-pin\chiaki-ng-ui\gui\tests\qml\tst_ConsolePin.qml(164) : failure location
+PASS   : console_screen::ConsolePin::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 554ms
+********* Finished testing of console_screen *********

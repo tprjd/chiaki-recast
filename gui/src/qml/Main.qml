@@ -39,14 +39,15 @@ Item {
             item.forceActiveFocus(Qt.TabFocusReason);
     }
 
-    function autoRegister(auto, host, ps5) {
+    function autoRegister(auto, host, ps5, context) {
         if(auto)
-            Chiaki.autoRegister()
+            Chiaki.autoRegister(context)
         else
-            showRegistDialog(host, ps5);
+            showRegistDialog(host, ps5, context);
     }
 
     function openDisplaySettings() {
+        if (livePinHost.blocking) return;
         useSeparateStreamSettingsWindows = preferSeparateStreamSettingsWindows;
         const loader = useSeparateStreamSettingsWindows ? separateDisplaySettingsLoader : displaySettingsLoader;
         if(loader.status == Loader.Ready)
@@ -66,6 +67,7 @@ Item {
         }
     }
     function openPlaceboSettings() {
+        if (livePinHost.blocking) return;
         if (!displaySettingsRect.opacity && !placeboSettingsRect.opacity && !colorMappingSettingsRect.opacity)
             useSeparateStreamSettingsWindows = preferSeparateStreamSettingsWindows;
         const loader = useSeparateStreamSettingsWindows ? separatePlaceboSettingsLoader : placeboSettingsLoader;
@@ -141,10 +143,12 @@ Item {
     }
 
     function showStreamView() {
+        if (stack.currentItem instanceof StreamView) return;
         stack.replace(stack.get(0), streamViewComponent);
     }
 
     function showPsnView() {
+        if (stack.currentItem instanceof PsnView || stack.currentItem instanceof StreamView || stack.currentItem instanceof PSNTokenDialog) return;
         stack.replace(stack.get(0), psnViewComponent, {}, StackView.Immediate)
     }
 
@@ -196,11 +200,13 @@ Item {
     }
 
 
-    function showRegistDialog(host, ps5) {
-        stack.push(registDialogComponent, {host: host, ps5: ps5});
+    function showRegistDialog(host, ps5, context) {
+        stack.push(registDialogComponent, {host: host, ps5: ps5,
+            registrationContext: context || Chiaki.createRegistrationContext()});
     }
 
     function showSettingsDialog() {
+        if (livePinHost.blocking) return;
         stack.push(settingsDialogComponent);
     }
 
@@ -215,6 +221,7 @@ Item {
     }
 
     function showPlaceboColorMappingDialog(route) {
+        if (livePinHost.blocking) return;
         if(placeboSettingsRect.opacity)
         {
             root.closeDialog();
@@ -246,8 +253,8 @@ Item {
         else stack.push(profileDialogComponent)
     }
 
-    function showConsolePinDialog(submitPin, cancelPin) {
-        stack.push(consolePinDialogComponent, {submitPin, cancelPin});
+    function showConsolePinDialog(submitPin, cancelPin, consoleName) {
+        stack.push(consolePinDialogComponent, {submitPin, cancelPin, consoleName: Qt.binding(consoleName)});
     }
 
     function showSteamShortcutDialog(fromReminder) {
@@ -264,7 +271,12 @@ Item {
     }
 
     Component.onCompleted: {
-        if (Chiaki.session)
+        if (Chiaki.connectionAttempt.presented && Chiaki.connectionAttempt.waitingForWake)
+            stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
+        else if (Chiaki.connectionAttempt.presented && Chiaki.connectionAttempt.route === "psn"
+                && Chiaki.connectionAttempt.phase !== "video" && Chiaki.connectionAttempt.phase !== "ready")
+            stack.replace(stack.get(0), psnViewComponent, {}, StackView.Immediate);
+        else if (Chiaki.session || Chiaki.connectionAttempt.presented)
             stack.replace(stack.get(0), streamViewComponent, {}, StackView.Immediate);
         else if (Chiaki.autoConnect)
             stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
@@ -277,6 +289,8 @@ Item {
 
     StackView {
         id: stack
+        enabled: !livePinHost.blocking
+        objectName: "mainNavigation"
         anchors.fill: parent
         hoverEnabled: false
         initialItem: mainViewComponent
@@ -299,6 +313,11 @@ Item {
                 duration: 200
             }
         }
+    }
+
+    LiveConsolePinHost {
+        id: livePinHost
+        anchors.fill: parent
     }
 
     Rectangle {
@@ -544,6 +563,19 @@ Item {
     Connections {
         target: Chiaki
 
+        function onConnectionAttemptChanged() {
+            const attempt = Chiaki.connectionAttempt;
+            if (attempt.presented && attempt.waitingForWake) {
+                if (!stack.currentItem || stack.currentItem.objectName !== "autoConnectView")
+                    stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
+                return;
+            }
+            if (!attempt.presented || attempt.waitingForWake || Chiaki.autoConnect) return;
+            if (attempt.route === "psn" && attempt.phase !== "video" && attempt.phase !== "ready")
+                root.showPsnView();
+            else if (attempt.phase !== "ready") root.showStreamView();
+        }
+
         function onSessionChanged() {
             if (Chiaki.session)
                 root.showStreamView();
@@ -562,25 +594,28 @@ Item {
         }
 
         function onError(title, text) {
+            const attempt = Chiaki.connectionAttempt;
+            if (attempt.presented && attempt.errorTitle === title && attempt.errorText === text) return;
             errorTitleLabel.text = title;
             errorTextLabel.text = text;
             errorHideTimer.start();
         }
 
-        function onRegistDialogRequested(host, ps5, duid) {
+        function onRegistDialogRequested(host, ps5, duid, context) {
             if(!duid)
-                showRegistDialog(host, ps5);
+                showRegistDialog(host, ps5, context);
             else
             {
                 if(ps5)
-                    root.showConfirmDialog(qsTr("Registration Type"), qsTr("Would you like to use automatic registration?"), () => root.autoRegister(true, host, ps5), () => root.autoRegister(false, host, ps5))
+                    root.showConfirmDialog(qsTr("Registration Type"), qsTr("Would you like to use automatic registration?"), () => root.autoRegister(true, host, ps5, context), () => root.autoRegister(false, host, ps5, context))
                 else
-                    root.showConfirmDialog(qsTr("Registration Type"), qsTr("Would you like to use automatic registration (must be main PS4 console registered to your PSN)?"), () => root.autoRegister(true, host, ps5), () => root.autoRegister(false, host, ps5))
+                    root.showConfirmDialog(qsTr("Registration Type"), qsTr("Would you like to use automatic registration (must be main PS4 console registered to your PSN)?"), () => root.autoRegister(true, host, ps5, context), () => root.autoRegister(false, host, ps5, context))
             }
         }
 
         function onWakeupStartInitiated() {
-            stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
+            if (!stack.currentItem || stack.currentItem.objectName !== "autoConnectView")
+                stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
         }
     }
 

@@ -1,0 +1,55 @@
+{
+  "executable": "C:\\Users\\david\\.cache\\chiaki-ui-native\\console-setup-bin\\chiaki.exe",
+  "sha256": "090ACD6637C8844FBCCA6BE6F4AB7A010DDD8C0A9F8B02D8AA310027E273B64A",
+  "sourceFiles": [
+    {
+      "path": "gui/CMakeLists.txt",
+      "sha256": "0B06606424DE29C1166518A4AECFD5C232292370C186497E0562797B77D00C2E",
+      "stagedMatches": true
+    },
+    {
+      "path": "gui/include/qmlbackend.h",
+      "sha256": "BA9DAD2286F55E4BBA07315F7BB69DA66B7372CFDDA4D0E3880473D06636816B",
+      "stagedMatches": true
+    },
+    {
+      "path": "gui/include/qmlmainwindow.h",
+      "sha256": "BA7F6ED066EBAB97504E3DE9CCE9AA1DCAEA42E038ABF07A84AD91C875BA9DD8",
+      "stagedMatches": true
+    },
+    {
+      "path": "gui/src/main.cpp",
+      "sha256": "8AB73EDC06B58F874E63B0C9957777F6549C2893F60BE1C7927F8B13129B9A4F",
+      "stagedMatches": true
+    },
+    {
+      "path": "gui/src/qmlbackend.cpp",
+      "sha256": "336AE2C9F8B6B7F1E44169537CC843912B8F8A70A38D1C9F8946E1C3FF27F7CE",
+      "stagedMatches": true
+    },
+    {
+      "path": "gui/src/qmlmainwindow.cpp",
+      "sha256": "00CE94B436B17783B89E610106176F079150367F50F02E27273B79D55BBCDCE2",
+      "stagedMatches": true
+    },
+    {
+      "path": "gui/src/settings.cpp",
+      "sha256": "24E564D18C299C0369A48E53A637D456D52AA561558F11CA20351264D4439ADC",
+      "stagedMatches": true
+    },
+    {
+      "path": "gui/src/qml/Main.qml",
+      "sha256": "48E8D1D05D04845C559C2A18B7DF6B5B298048609A5D76BA1419652CE32E49B4",
+      "stagedMatches": true
+    },
+    {
+      "path": "gui/src/qml/RegistDialog.qml",
+      "sha256": "EE6387F9F68A4635F39F62AB2EB45EC14007C4A28E595E6E5C880DBB38BEA62F",
+      "stagedMatches": true
+    }
+  ],
+  "qaHooksRemoved": true,
+  "normalBuildPassed": true,
+  "normalExecutableLaunched": false,
+  "uiDprAcceptance": "ticket04"
+}

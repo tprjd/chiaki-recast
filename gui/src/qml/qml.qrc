@@ -6,8 +6,10 @@
     <file>ConsoleLibrary.qml</file>
     <file>ConsoleCard.qml</file>
     <file>ConsoleButton.qml</file>
+    <file>SetupButton.qml</file>
     <file>ConsoleDetails.qml</file>
     <file>StreamView.qml</file>
+    <file>ConnectionView.qml</file>
     <file>StreamMenuWindow.qml</file>
     <file>ConfirmDialog.qml</file>
     <file>RemindDialog.qml</file>
@@ -22,6 +24,9 @@
     <file>PlaceboColorMappingDialog.qml</file>
     <file>ProfileDialog.qml</file>
     <file>ConsolePinDialog.qml</file>
+    <file>ConsolePinContent.qml</file>
+    <file>LiveConsolePinContent.qml</file>
+    <file>LiveConsolePinHost.qml</file>
     <file>PSNLoginDialog.qml</file>
     <file>PSNTokenDialog.qml</file>
     <file>ControllerMappingDialog.qml</file>

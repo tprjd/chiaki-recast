@@ -1,0 +1,16 @@
+{
+  "redSourceRevision": "9739e8831a3505c2ba2911be8fceabb8faf2a445",
+  "testedProductionRevision": "2a85439297488e689e3d91783a0f15b604ec32fe",
+  "nativeAssertionCount": 40,
+  "noTestOrPrototypeQmlResources": true,
+  "nativeQaSource": "C:\\Users\\david\\.cache\\chiaki-ui-native\\wake-contract-green-prep\\native-connection.cpp",
+  "qaPatch": "C:\\Users\\david\\.cache\\chiaki-ui-native\\wake-contract-green-prep\\connection-qa.patch",
+  "freshSettingsRoot": "C:\\Users\\david\\.cache\\chiaki-ui-native\\wake-contract-green-run01",
+  "normalBuildLaunched": false,
+  "visibleNativeAcceptance": "Ticket06",
+  "realConsoleTransport": "Unverified",
+  "finalQmlRevision": "7762cd51",
+  "wakeQmlChecks": 13,
+  "sharedExitGuardOrigin": "e13e95df",
+  "sharedGuardNativeBuild": "Ticket05 integrated build"
+}

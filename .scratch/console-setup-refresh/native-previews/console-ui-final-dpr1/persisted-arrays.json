@@ -1,0 +1,30 @@
+{
+  "allPassed": true,
+  "source": "Actual isolated INI arrays read after app exit",
+  "profiles": {
+    "900x600": {
+      "registrations": 4,
+      "manualHosts": 5
+    },
+    "1280x720": {
+      "registrations": 4,
+      "manualHosts": 5
+    },
+    "lifecycle": {
+      "registrations": 1,
+      "manualHosts": 1
+    },
+    "other-profile": {
+      "registrations": 0,
+      "manualHosts": 0
+    },
+    "empty": {
+      "registrations": 0,
+      "manualHosts": 1
+    },
+    "empty-other": {
+      "registrations": 0,
+      "manualHosts": 0
+    }
+  }
+}

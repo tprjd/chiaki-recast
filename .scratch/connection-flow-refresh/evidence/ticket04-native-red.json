@@ -1,0 +1,10 @@
+{
+    "checkCount": 4,
+    "checks": [
+        "Use a fresh isolated directory",
+        "Seed must stay isolated",
+        "Production backend must exist",
+        "Startup must stay hidden and isolated"
+    ],
+    "failedCheck": "Startup auto-connect must own the selected-console wait"
+}

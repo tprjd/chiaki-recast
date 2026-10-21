@@ -90,8 +90,8 @@ backend handlers and dialogs.
 | `steamShortcutRequested()` | Opens the Steam shortcut dialog |
 | `discoveryToggled(enabled)` | Changes local discovery |
 | `quitRequested()` | Opens the quit confirmation |
-| `managementRequested(action, accept, cancel)` | Opens PIN, Delete, or Hide with callbacks for this request |
-| `pinRequested(sourceIndex, pin)` | Stores the accepted four-digit PIN |
+| `managementRequested(action, accept, cancel, consoleName)` | Opens PIN, Delete, or Hide with callbacks for this request; `consoleName()` resolves the current name |
+| `pinRequested(sourceIndex, pin)` | Default test observation when no native `savePin` callback is supplied |
 | `wakeRequested(sourceIndex)` | Sends the explicit manual-host wake request |
 | `deleteRequested(sourceIndex)` | Deletes the resolved manual host |
 | `hideRequested(mac, nickname)` | Hides the resolved eligible discovered host |
@@ -100,6 +100,27 @@ A management dialog calls `accept(pin)` for PIN, `accept()` for Delete or Hide,
 or `cancel()` when dismissed. PIN requires exactly four ASCII digits and keeps
 leading zeroes. Invalid PIN input leaves the request open. Cancellation,
 repeated acceptance, and callbacks from older requests cannot send a command.
+
+`MainView` supplies `savePin(sourceIndex, pin)` with the native boolean save
+outcome. A PIN acceptance returns true only when this callback confirms the
+save. `ConsolePinDialog` then shows the saved result. It uses the production
+`ConsolePinContent` for validation, masked entry, explicit reveal, privacy,
+focus, and the guided workspace. The live PIN route can use this same content.
+`ConsolePinHarness` composes the library and saved PIN dialog with a supplied
+save outcome. `ConsolePin` tests both the form and its guarded library callbacks,
+including target changes and return focus. Test assertions do not print PINs.
+
+`Main.qml` owns one `LiveConsolePinHost` for both PSN and stream routes.
+The backend retains `sessionPinRequest` across the route handoff. Its opaque
+`id` owns `enterPin(id, pin)`, `cancelSessionPin(id)`, and
+`dismissSessionPin(id)`. The request contains no PIN value. Native connection
+progress closes an accepted request. Native cleanup completes cancellation.
+
+`LiveConsolePinHarness` loads this production host with supplied request state.
+`LiveConsolePin` checks validation, leading zeros, masking, privacy, incorrect
+feedback, repeated actions, handoff, replacement, cancellation, return focus,
+and compact-window close. The tests cover 900 by 600 and 1280 by 720 layouts.
+These offscreen checks do not prove visible native focus or display scaling.
 
 `identityOf(host)` returns an opaque profile-scoped identity.
 `resolveTarget(identity)` returns the current `host`, `sourceIndex`, and
@@ -159,3 +180,45 @@ synthetic test inputs, not a copy of the native defaults specification.
 `SettingsGeneral` checks category selection, General setting writes, all four
 shortcut choices, device conditions, privacy, log access, popup Escape handling,
 and focus visibility at 1280 and 900 pixels wide.
+
+## Local connection tests
+
+`ConnectionHarness.qml` loads the production `ConnectionView.qml` with a
+supplied backend and navigation object. `StreamView.qml` uses this same
+component for local connection progress. The renderer is outside this test.
+
+`ConnectionLocal` checks connecting, video waiting, persistent failure,
+cleanup-gated retry, cancellation, disabled actions, privacy, view removal,
+and action focus at 900 by 600 and 1280 by 720 logical pixels. Native events
+control readiness and cleanup. Presentation timers do not complete either task.
+
+The backend exposes `connectionAttempt` and three commands that accept its
+opaque string `id`: `cancelConnection`, `retryConnection`, and
+`dismissConnection`. Each command returns whether it accepted the action.
+The native backend resolves the target again before retry. A changed profile
+invalidates the target even after a switch back to the previous profile.
+
+The native contract checks and source manifests are in
+`.scratch/connection-flow-refresh/evidence/ticket01-*`. These checks use real
+session objects with isolated settings and controlled transport calls.
+They cover event ownership, actual retry and stop dispatch, and direct entry
+that has no library row. A hidden native window cannot verify visible input
+capture, display scaling, or physical controllers. Ticket 06 covers visible
+native acceptance. Real transport checks need a console.
+
+## Auto-connect and console wake-up tests
+
+`ConnectionWake` loads production `AutoConnectView.qml` through
+`ConnectionHarness.qml`. This view uses `ConnectionView.qml` for the selected
+console, actual wait state, persistent timeout, safe retry, and cancellation.
+`context` distinguishes startup auto-connect from a manual wake request.
+`waitingForWake` retains wait-screen ownership until the connection starts.
+The same attempt ID continues through local or PSN handoff.
+
+These tests check repeated input, cleanup before retry, closed views, invalid
+targets, streamer mode, and action focus at 900 by 600 and 1280 by 720.
+The real `StackView` check verifies that an old view cannot dismiss a new
+attempt or take focus during its exit transition.
+The fake backend supplies native results. It does not simulate discovery,
+wake packets, or a session. Isolated native checks cover those handlers with
+transport disabled. Real console wake-up still needs a console.

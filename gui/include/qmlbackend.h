@@ -15,12 +15,14 @@
 #include <QFutureWatcher>
 #include <QFuture>
 #include <QAtomicInteger>
+#include <QPointer>
 #ifdef CHIAKI_HAVE_WEBENGINE
 #include <QQuickWebEngineProfile>
 #include <QWebEngineUrlRequestInterceptor>
 #endif
 
 class SystemdInhibit;
+class PSNToken;
 #ifdef Q_OS_MACOS
     class MacWakeSleep;
 #elif defined(Q_OS_WINDOWS)
@@ -32,7 +34,8 @@ class QmlRegist : public QObject
     Q_OBJECT
 
 public:
-    QmlRegist(const ChiakiRegistInfo &regist_info, uint32_t log_mask, QObject *parent = nullptr);
+    QmlRegist(uint32_t log_mask, QObject *parent = nullptr);
+    ChiakiErrorCode start(const ChiakiRegistInfo &regist_info);
 
 signals:
     void log(ChiakiLogLevel level, const QString &msg);
@@ -52,10 +55,10 @@ class PsnConnectionWorker : public QObject
     Q_OBJECT
 
 public:
-    void ConnectPsnConnection(StreamSession *session, const QString &duid, const bool &ps5);
+    void ConnectPsnConnection(StreamSession *session, const QString &duid, const bool &ps5, quint64 attempt_id);
 
 signals:
-    void resultReady(const ChiakiErrorCode &err);
+    void resultReady(StreamSession *session, quint64 attempt_id, const ChiakiErrorCode &err);
 };
 
 #ifdef CHIAKI_HAVE_WEBENGINE
@@ -81,6 +84,8 @@ class QmlBackend : public QObject
     Q_PROPERTY(QmlMainWindow* window READ qmlWindow CONSTANT)
     Q_PROPERTY(QmlSettings* settings READ qmlSettings CONSTANT)
     Q_PROPERTY(StreamSession* session READ qmlSession NOTIFY sessionChanged)
+    Q_PROPERTY(QVariantMap connectionAttempt READ connectionAttempt NOTIFY connectionAttemptChanged)
+    Q_PROPERTY(QVariantMap sessionPinRequest READ sessionPinRequest NOTIFY sessionPinRequestChanged)
     Q_PROPERTY(QList<QmlController*> controllers READ qmlControllers NOTIFY controllersChanged)
     Q_PROPERTY(bool discoveryEnabled READ discoveryEnabled WRITE setDiscoveryEnabled NOTIFY discoveryEnabledChanged)
     Q_PROPERTY(QVariantList hosts READ hosts NOTIFY hostsChanged)
@@ -155,7 +160,9 @@ public:
 
     void psnConnector();
 
-    void createSession(const StreamSessionConnectInfo &connect_info);
+    void createSession(const StreamSessionConnectInfo &connect_info, const QVariantMap &target = {}, bool continue_attempt = false);
+    QVariantMap connectionAttempt() const;
+    QVariantMap sessionPinRequest() const { return session_pin_request; }
 
     void psnSessionStart();
 
@@ -183,16 +190,22 @@ public:
     Q_INVOKABLE void addManualHost(int index, const QString &address);
     Q_INVOKABLE void hideHost(const QString &mac_string, const QString &host_nickname);
     Q_INVOKABLE void unhideHost(const QString &mac_string);
-    Q_INVOKABLE bool registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QJSValue &callback);
+    Q_INVOKABLE QVariantMap createRegistrationContext() const;
+    Q_INVOKABLE bool registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QJSValue &callback, const QVariantMap &context);
     Q_INVOKABLE void connectToHost(int index, QString nickname = QString());
     Q_INVOKABLE void stopSession(bool sleep);
+    Q_INVOKABLE bool retryConnection(const QString &attempt_id);
+    Q_INVOKABLE bool cancelConnection(const QString &attempt_id);
+    Q_INVOKABLE bool dismissConnection(const QString &attempt_id);
     Q_INVOKABLE void sessionGoHome();
-    Q_INVOKABLE void enterPin(const QString &pin);
+    Q_INVOKABLE bool enterPin(const QString &request_id, const QString &pin);
+    Q_INVOKABLE bool cancelSessionPin(const QString &request_id);
+    Q_INVOKABLE bool dismissSessionPin(const QString &request_id);
     Q_INVOKABLE QUrl psnLoginUrl() const;
     Q_INVOKABLE bool checkPsnRedirectURL(const QUrl &url) const;
     Q_INVOKABLE bool handlePsnLoginRedirect(const QUrl &url);
     Q_INVOKABLE void stopAutoConnect();
-    Q_INVOKABLE void setConsolePin(int index, QString console_pin);
+    Q_INVOKABLE bool setConsolePin(int index, QString console_pin);
     Q_INVOKABLE QString openPsnLink();
     Q_INVOKABLE QString openPlaceboOptionsLink();
     Q_INVOKABLE void initPsnAuth(const QUrl &url, const QJSValue &callback);
@@ -206,7 +219,7 @@ public:
     Q_INVOKABLE void controllerMappingQuit();
     Q_INVOKABLE void controllerMappingButtonQuit();
     Q_INVOKABLE void controllerMappingApply();
-    Q_INVOKABLE void autoRegister();
+    Q_INVOKABLE void autoRegister(const QVariantMap &context);
 #if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
     Q_INVOKABLE void createSteamShortcut(QString shortcutName, QString launchOptions, const QJSValue &callback, QString steamDir);
 #endif
@@ -217,7 +230,9 @@ public:
 
 signals:
     void sessionChanged(StreamSession *session);
-    void psnConnect(StreamSession *session, const QString &duid, const bool &ps5);
+    void connectionAttemptChanged();
+    void sessionPinRequestChanged();
+    void psnConnect(StreamSession *session, const QString &duid, const bool &ps5, quint64 attempt_id);
     void showPsnView();
     void connectStateChanged();
     void controllersChanged();
@@ -241,9 +256,9 @@ signals:
 
     void error(const QString &title, const QString &text);
     void sessionError(const QString &title, const QString &text);
-    void sessionPinDialogRequested();
+    void sessionPinDialogRequested(bool incorrect);
     void sessionStopDialogRequested();
-    void registDialogRequested(const QString &host, bool ps5, const QString &duid);
+    void registDialogRequested(const QString &host, bool ps5, const QString &duid, const QVariantMap &context);
     void psnLoginAccountIdDone(const QString &accountId);
     void psnLoginAccountIdError(const QString &error);
 
@@ -253,12 +268,12 @@ private:
 
         DiscoveryHost discovery_host;
         ManualHost manual_host;
-        bool discovered;
+        bool discovered = false;
 
         PsnHost psn_host;
         QString duid;
         RegisteredHost registered_host;
-        bool registered;
+        bool registered = false;
 
         QString GetHostAddr() const { return discovered ? discovery_host.host_addr : manual_host.GetHost(); }
         bool IsPS5() const { return discovered ? discovery_host.ps5 :
@@ -266,15 +281,28 @@ private:
     };
 
     DisplayServer displayServerAt(int index) const;
+    static QVariantMap connectionTargetKey(const QVariantMap &host);
+    int resolveConnectionTarget() const;
+    bool connectionTargetValid() const;
+    void beginConnection(const StreamSessionConnectInfo &info, const QVariantMap &target, const QString &context = {});
+    void startPsnConnection(const StreamSessionConnectInfo &info, const QVariantMap &target, bool continue_attempt = false);
+    void watchConnectionToken(PSNToken *token);
+    void finishPsnCleanup();
+    void failConnection(const QString &title, const QString &text);
+    void setConnectionPhase(const QString &phase);
+    void beginAutoConnect(const HostMAC &mac);
+    void autoConnectPsn();
+    void clearWakeWait();
     bool sendWakeup(const DisplayServer &server);
     bool sendWakeup(const QString &host, const QByteArray &regist_key, bool ps5);
     void updateControllers();
     void updateControllerMappings();
     void updateDiscoveryHosts();
     void updatePsnHosts();
-    void updatePsnHostsThread();
+    void updatePsnHostsThread(QString token, uint32_t log_mask, QStringList registered_names, int ps4_count, quint64 generation);
     void updateAudioVolume();
     void resumeFromSleep();
+    void reconnectPsn();
     uint32_t getStreamShortcut() const;
     void updateStreamShortcut();
     QString getExecutable();
@@ -294,6 +322,24 @@ private:
     QList<QString> waking_sleeping_nicknames;
     QHash<int, QmlController*> controllers;
     DisplayServer regist_dialog_server;
+    quint64 profile_generation = 0;
+    quint64 connection_generation = 0;
+    quint64 connection_profile_generation = 0;
+    QVariantMap connection_attempt;
+    QVariantMap connection_target;
+    bool connection_cancelled = false;
+    bool connection_dismissed = false;
+    bool connection_direct_credentials = false;
+    QVariantMap session_pin_request;
+    quint64 session_pin_generation = 0;
+    bool session_pin_auto_submitted = false;
+    bool session_pin_accepted = false;
+    bool psn_worker_pending = false;
+    bool psn_session_started = false;
+    QPointer<PSNToken> connection_token;
+    quint64 regist_dialog_generation = 0;
+    quint64 automatic_registration_request = 0;
+    bool registration_active = false;
     StreamSessionConnectInfo session_info = {};
     SystemdInhibit *sleep_inhibit = {};
 #ifdef Q_OS_MACOS
@@ -304,6 +350,7 @@ private:
     bool controller_mapping_default_mapping = false;
     bool controller_mapping_altered = false;
     bool updating_psn_hosts = false;
+    bool psn_hosts_refresh_pending = false;
     QFutureWatcher<void> psn_hosts_watcher;
     QFuture<void> psn_hosts_future;
     bool disable_zero_copy = false;
