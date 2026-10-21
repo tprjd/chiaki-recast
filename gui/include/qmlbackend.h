@@ -15,12 +15,14 @@
 #include <QFutureWatcher>
 #include <QFuture>
 #include <QAtomicInteger>
+#include <QPointer>
 #ifdef CHIAKI_HAVE_WEBENGINE
 #include <QQuickWebEngineProfile>
 #include <QWebEngineUrlRequestInterceptor>
 #endif
 
 class SystemdInhibit;
+class PSNToken;
 #ifdef Q_OS_MACOS
     class MacWakeSleep;
 #elif defined(Q_OS_WINDOWS)
@@ -157,7 +159,7 @@ public:
 
     void psnConnector();
 
-    void createSession(const StreamSessionConnectInfo &connect_info, const QVariantMap &target = {});
+    void createSession(const StreamSessionConnectInfo &connect_info, const QVariantMap &target = {}, bool continue_attempt = false);
     QVariantMap connectionAttempt() const;
 
     void psnSessionStart();
@@ -213,7 +215,7 @@ public:
     Q_INVOKABLE void controllerMappingQuit();
     Q_INVOKABLE void controllerMappingButtonQuit();
     Q_INVOKABLE void controllerMappingApply();
-    Q_INVOKABLE void autoRegister();
+    Q_INVOKABLE void autoRegister(const QVariantMap &context);
 #if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
     Q_INVOKABLE void createSteamShortcut(QString shortcutName, QString launchOptions, const QJSValue &callback, QString steamDir);
 #endif
@@ -278,6 +280,9 @@ private:
     int resolveConnectionTarget() const;
     bool connectionTargetValid() const;
     void beginConnection(const StreamSessionConnectInfo &info, const QVariantMap &target);
+    void startPsnConnection(const StreamSessionConnectInfo &info, const QVariantMap &target, bool continue_attempt = false);
+    void watchConnectionToken(PSNToken *token);
+    void finishPsnCleanup();
     void failConnection(const QString &title, const QString &text);
     void setConnectionPhase(const QString &phase);
     bool sendWakeup(const DisplayServer &server);
@@ -286,7 +291,7 @@ private:
     void updateControllerMappings();
     void updateDiscoveryHosts();
     void updatePsnHosts();
-    void updatePsnHostsThread();
+    void updatePsnHostsThread(QString token, uint32_t log_mask, QStringList registered_names, int ps4_count, quint64 generation);
     void updateAudioVolume();
     void resumeFromSleep();
     uint32_t getStreamShortcut() const;
@@ -315,6 +320,11 @@ private:
     QVariantMap connection_target;
     bool connection_cancelled = false;
     bool connection_dismissed = false;
+    bool psn_worker_pending = false;
+    bool psn_session_started = false;
+    QPointer<PSNToken> connection_token;
+    quint64 regist_dialog_generation = 0;
+    quint64 automatic_registration_request = 0;
     bool registration_active = false;
     StreamSessionConnectInfo session_info = {};
     SystemdInhibit *sleep_inhibit = {};
@@ -326,6 +336,7 @@ private:
     bool controller_mapping_default_mapping = false;
     bool controller_mapping_altered = false;
     bool updating_psn_hosts = false;
+    bool psn_hosts_refresh_pending = false;
     QFutureWatcher<void> psn_hosts_watcher;
     QFuture<void> psn_hosts_future;
     bool disable_zero_copy = false;

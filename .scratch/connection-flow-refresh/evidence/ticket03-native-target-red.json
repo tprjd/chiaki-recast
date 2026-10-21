@@ -1,0 +1,4 @@
+{
+    "failedCheck": "Removed PSN registration cannot retry to a stale target",
+    "stageRestrictionsCancelAndLateEvents": true
+}

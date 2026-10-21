@@ -41,7 +41,7 @@ Item {
 
     function autoRegister(auto, host, ps5, context) {
         if(auto)
-            Chiaki.autoRegister()
+            Chiaki.autoRegister(context)
         else
             showRegistDialog(host, ps5, context);
     }
@@ -146,6 +146,7 @@ Item {
     }
 
     function showPsnView() {
+        if (stack.currentItem instanceof PsnView || stack.currentItem instanceof StreamView) return;
         stack.replace(stack.get(0), psnViewComponent, {}, StackView.Immediate)
     }
 
@@ -266,7 +267,10 @@ Item {
     }
 
     Component.onCompleted: {
-        if (Chiaki.session || (Chiaki.connectionAttempt.presented && Chiaki.connectionAttempt.route === "local"))
+        if (Chiaki.connectionAttempt.presented && Chiaki.connectionAttempt.route === "psn"
+                && Chiaki.connectionAttempt.phase !== "video" && Chiaki.connectionAttempt.phase !== "ready")
+            stack.replace(stack.get(0), psnViewComponent, {}, StackView.Immediate);
+        else if (Chiaki.session || Chiaki.connectionAttempt.presented)
             stack.replace(stack.get(0), streamViewComponent, {}, StackView.Immediate);
         else if (Chiaki.autoConnect)
             stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
@@ -549,8 +553,10 @@ Item {
 
         function onConnectionAttemptChanged() {
             const attempt = Chiaki.connectionAttempt;
-            if (attempt.presented && attempt.route === "local" && attempt.phase !== "ready" && !attempt.waitingForWake && !Chiaki.autoConnect)
-                root.showStreamView();
+            if (!attempt.presented || attempt.waitingForWake || Chiaki.autoConnect) return;
+            if (attempt.route === "psn" && attempt.phase !== "video" && attempt.phase !== "ready")
+                root.showPsnView();
+            else if (attempt.phase !== "ready") root.showStreamView();
         }
 
         function onSessionChanged() {
