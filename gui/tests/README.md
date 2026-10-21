@@ -273,6 +273,25 @@ The native Qt build lacks QtWebEngine, so its browser check proves external
 fallback. The embedded route uses the supplied browser in screen tests.
 Real PSN sign-in and physical controller input remain separate checks.
 
+## Account ID retrieval for registration
+
+`RegistrationAccountHarness.qml` uses production `RegistDialog.qml` and its
+default Account ID route through a real `StackView`. `RegistDialog.accountLookup`
+replaces only the public lookup service. Its callback receives an HTTP status
+and response text. Production keeps the `psn.flipscreen.games` service.
+
+`RegistrationAccount` checks empty input, network and response errors, retry,
+the 30-second timeout, privacy, focus, keyboard/controller keys, and both required
+window sizes with long text. It checks direct return to the original form,
+duplicate and late results, replacement screens, and profile changes.
+Public lookup uses no authentication command or credential save.
+
+The sign-in route loads production `PSNTokenDialog.qml` in registration mode.
+It retains the credential-save and background-completion explanations. A new
+registration screen can show an existing request, but cannot receive its
+Account ID. The screen tests supply authentication outcomes. Native persistence
+is covered by ticket 01; integrated native acceptance is covered by ticket 08.
+
 ## Steam shortcut checks
 
 `SteamShortcut` loads the production `SteamShortcutDialog.qml` with a supplied
