@@ -1,0 +1,140 @@
+{
+    "activeStreamMenuInputCount": 1,
+    "allPassed": true,
+    "captureTrace": [
+    ],
+    "captures": [
+        {
+            "active": true,
+            "attemptId": "1",
+            "captureMethod": "QScreen composed desktop region of active Vulkan QA client",
+            "discoveryEnabled": false,
+            "dpr": 1,
+            "exposed": true,
+            "focus": {
+                "height": 54,
+                "name": "consoleLoginPin",
+                "width": 185,
+                "x": 191,
+                "y": 350
+            },
+            "height": 600,
+            "image": "900-vulkan-inline-form.png",
+            "inputCount": 1,
+            "phase": "connecting",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "pinHeadingBounds": {
+                "height": 30,
+                "truncated": false,
+                "width": 362,
+                "x": 236,
+                "y": 231
+            },
+            "pinPhase": "form",
+            "requestId": "1",
+            "screen": "XG32UCWMG",
+            "screenDpr": 1,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-vulkan02",
+            "transientParentIsHost": false,
+            "visible": true,
+            "width": 900,
+            "x": 30,
+            "y": 40
+        },
+        {
+            "active": true,
+            "attemptId": "1",
+            "captureMethod": "QScreen composed desktop region of active Vulkan QA client",
+            "discoveryEnabled": false,
+            "dpr": 1,
+            "exposed": true,
+            "focus": {
+                "height": 54,
+                "name": "consoleLoginPin",
+                "width": 185,
+                "x": 191,
+                "y": 350
+            },
+            "height": 600,
+            "image": "900-vulkan-inline-incorrect.png",
+            "inputCount": 1,
+            "phase": "connecting",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "pinHeadingBounds": {
+                "height": 30,
+                "truncated": false,
+                "width": 362,
+                "x": 236,
+                "y": 231
+            },
+            "pinPhase": "form",
+            "requestId": "2",
+            "screen": "XG32UCWMG",
+            "screenDpr": 1,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-vulkan02",
+            "transientParentIsHost": false,
+            "visible": true,
+            "width": 900,
+            "x": 30,
+            "y": 40
+        },
+        {
+            "active": true,
+            "attemptId": "1",
+            "captureMethod": "QScreen composed desktop region of active Vulkan QA client",
+            "discoveryEnabled": false,
+            "dpr": 1,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "pinBack",
+                "width": 129,
+                "x": 469,
+                "y": 319
+            },
+            "height": 600,
+            "image": "900-vulkan-inline-cancelled.png",
+            "inputCount": 1,
+            "phase": "cancelled",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "pinHeadingBounds": {
+                "height": 30,
+                "truncated": false,
+                "width": 362,
+                "x": 236,
+                "y": 231
+            },
+            "pinPhase": "cancelled",
+            "requestId": "2",
+            "screen": "XG32UCWMG",
+            "screenDpr": 1,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-vulkan02",
+            "transientParentIsHost": false,
+            "visible": true,
+            "width": 900,
+            "x": 30,
+            "y": 40
+        }
+    ],
+    "checks": 78,
+    "requestedRenderer": "vulkan",
+    "runtimeRendererBackend": 0,
+    "screens": [
+        {
+            "dpr": 1,
+            "height": 2160,
+            "name": "XG32UCWMG",
+            "width": 3840
+        },
+        {
+            "dpr": 1,
+            "height": 1440,
+            "name": "VG270U",
+            "width": 2560
+        }
+    ],
+    "vulkanAvailable": true
+}

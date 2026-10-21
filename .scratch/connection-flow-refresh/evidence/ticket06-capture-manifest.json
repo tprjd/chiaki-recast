@@ -1,0 +1,1476 @@
+{
+  "productionRevision": "125e9284",
+  "captures": [
+    {
+      "active": true,
+      "attemptId": "1",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "connectionCancel",
+        "width": 204,
+        "x": 124,
+        "y": 411
+      },
+      "height": 600,
+      "image": "900-connection-progress.png",
+      "inputCount": 0,
+      "phase": "connecting",
+      "physicalHeight": 600,
+      "physicalWidth": 900,
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 900,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-900-connection-progress.png",
+      "sha256": "34133582ef3eb248c90906a52c6dd009ed8321813b62eb9fbadce718a453f5e4",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "1",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "pinDone",
+        "width": 61,
+        "x": 537,
+        "y": 336
+      },
+      "height": 600,
+      "image": "900-saved-result.png",
+      "inputCount": 0,
+      "phase": "cancelled",
+      "physicalHeight": 600,
+      "physicalWidth": 900,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 362,
+        "x": 236,
+        "y": 231
+      },
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 900,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-900-saved-result.png",
+      "sha256": "eadfaf45a22398d8603d3aee661137a20e8d7656c19d06880ac8de969fbbe19b",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "2",
+      "captureMethod": "QQuickWindow.grabWindow",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 54,
+        "name": "consoleLoginPin",
+        "width": 185,
+        "x": 46,
+        "y": 324
+      },
+      "height": 560,
+      "image": "900-live-form.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 560,
+      "physicalWidth": 720,
+      "pinHeadingBounds": {
+        "height": 60,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "form",
+      "requestId": "1",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": true,
+      "visible": true,
+      "width": 720,
+      "x": 120,
+      "y": 60,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-900-live-form.png",
+      "sha256": "687ae75fce8c571412b877f209dfb71dd09aa2f00954736effa0a559193bb77c",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 720,
+        "height": 560
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "2",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "height": 600,
+      "image": "900-live-host.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 600,
+      "physicalWidth": 900,
+      "pinHeadingBounds": {
+        "height": 60,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "form",
+      "requestId": "1",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 900,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-900-live-host.png",
+      "sha256": "583c9ca2067f4f335e14784d869b9265bd2b62673384c4aaf8187bf503e8f89d",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "2",
+      "captureMethod": "QQuickWindow.grabWindow",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 54,
+        "name": "consoleLoginPin",
+        "width": 185,
+        "x": 46,
+        "y": 324
+      },
+      "height": 560,
+      "image": "900-live-private.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 560,
+      "physicalWidth": 720,
+      "pinHeadingBounds": {
+        "height": 60,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "form",
+      "requestId": "1",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": true,
+      "visible": true,
+      "width": 720,
+      "x": 120,
+      "y": 60,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-900-live-private.png",
+      "sha256": "f553feb0219896a5a2df9e4074f00c7c9a97ae0d1fdb00dae6612519537794f6",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 720,
+        "height": 560
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "2",
+      "captureMethod": "QQuickWindow.grabWindow",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 560,
+        "name": "",
+        "width": 720,
+        "x": 0,
+        "y": 0
+      },
+      "height": 560,
+      "image": "900-live-submitting.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 560,
+      "physicalWidth": 720,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "submitting",
+      "requestId": "1",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": true,
+      "visible": true,
+      "width": 720,
+      "x": 120,
+      "y": 60,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-900-live-submitting.png",
+      "sha256": "817966cdf1ce87ef0537165fd86a6764e733036c5698ad57e6aa34c50cbeb1d4",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 720,
+        "height": 560
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "2",
+      "captureMethod": "QQuickWindow.grabWindow",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 54,
+        "name": "consoleLoginPin",
+        "width": 185,
+        "x": 46,
+        "y": 341
+      },
+      "height": 560,
+      "image": "900-live-incorrect.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 560,
+      "physicalWidth": 720,
+      "pinHeadingBounds": {
+        "height": 60,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "form",
+      "requestId": "2",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": true,
+      "visible": true,
+      "width": 720,
+      "x": 120,
+      "y": 60,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-900-live-incorrect.png",
+      "sha256": "ef5d89f01d7a549d49464c3e5fa0d8cba2b84cad92fd052bc5108485855f978c",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 720,
+        "height": 560
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "2",
+      "captureMethod": "QQuickWindow.grabWindow",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 560,
+        "name": "",
+        "width": 720,
+        "x": 0,
+        "y": 0
+      },
+      "height": 560,
+      "image": "900-live-cancelling.png",
+      "inputCount": 1,
+      "phase": "cancelling",
+      "physicalHeight": 560,
+      "physicalWidth": 720,
+      "pinHeadingBounds": {
+        "height": 60,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "cancelling",
+      "requestId": "2",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": true,
+      "visible": true,
+      "width": 720,
+      "x": 120,
+      "y": 60,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-900-live-cancelling.png",
+      "sha256": "435152082cce5aa6ca6e6bd2a2de071e2e67a5133a5403de7943d546eafdab08",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 720,
+        "height": 560
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "2",
+      "captureMethod": "QQuickWindow.grabWindow",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "pinBack",
+        "width": 194,
+        "x": 233,
+        "y": 280
+      },
+      "height": 560,
+      "image": "900-live-cancelled.png",
+      "inputCount": 1,
+      "phase": "cancelled",
+      "physicalHeight": 560,
+      "physicalWidth": 720,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "cancelled",
+      "requestId": "2",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": true,
+      "visible": true,
+      "width": 720,
+      "x": 120,
+      "y": 60,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-900-live-cancelled.png",
+      "sha256": "c9c86a0b85813d1eccf077fb3d21e4b4634fa80ee5c17d7ab7634a539aafd980",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 720,
+        "height": 560
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "5",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "connectionRetry",
+        "width": 114,
+        "x": 430,
+        "y": 642
+      },
+      "height": 720,
+      "image": "1280-connection-error.png",
+      "inputCount": 0,
+      "phase": "failure",
+      "physicalHeight": 720,
+      "physicalWidth": 1280,
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 1280,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-1280-connection-error.png",
+      "sha256": "76f84ae89f3eb3820318784dc91ce1c8de19be3ea96843f6b28ae42c45ae4773",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "5",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "connectionRetry",
+        "width": 114,
+        "x": 430,
+        "y": 457
+      },
+      "height": 720,
+      "image": "1280-connection-private-error.png",
+      "inputCount": 0,
+      "phase": "failure",
+      "physicalHeight": 720,
+      "physicalWidth": 1280,
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 1280,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-1280-connection-private-error.png",
+      "sha256": "36771a5f3d16f19e3b6c2d166762013acf70cad51b2201977af352d55ea1df34",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "6",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "pinDone",
+        "width": 61,
+        "x": 814,
+        "y": 336
+      },
+      "height": 720,
+      "image": "1280-saved-result.png",
+      "inputCount": 0,
+      "phase": "cancelled",
+      "physicalHeight": 720,
+      "physicalWidth": 1280,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 604,
+        "x": 271,
+        "y": 248
+      },
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 1280,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-1280-saved-result.png",
+      "sha256": "a34ec39da09f0e0a15ed746bb7ffaf33803e8e5401b750547b1c83125282d383",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "7",
+      "captureMethod": "QQuickWindow.grabWindow",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 54,
+        "name": "consoleLoginPin",
+        "width": 185,
+        "x": 46,
+        "y": 324
+      },
+      "height": 560,
+      "image": "1280-live-form.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 560,
+      "physicalWidth": 720,
+      "pinHeadingBounds": {
+        "height": 60,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "form",
+      "requestId": "5",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final1",
+      "transientParentIsHost": true,
+      "visible": true,
+      "width": 720,
+      "x": 310,
+      "y": 120,
+      "sourceRun": "connection-acceptance-visible-final1",
+      "file": "ticket06-captures\\dpr1-1280-live-form.png",
+      "sha256": "f4d84bc56ffaa7d1b208c03463abae00a0602b7116a1eb06eec6e40730c71c12",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 720,
+        "height": 560
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "1",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1.5,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "connectionCancel",
+        "width": 206.9375,
+        "x": 124,
+        "y": 411
+      },
+      "height": 600,
+      "image": "900-connection-progress.png",
+      "inputCount": 0,
+      "phase": "connecting",
+      "physicalHeight": 900,
+      "physicalWidth": 1350,
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1.5,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final15",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 900,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final15",
+      "file": "ticket06-captures\\dpr15-900-connection-progress.png",
+      "sha256": "818a1a309f087542f3bec845813cd74c9e7d6fcbfbb9ccc96ae80df1e77a3d9e",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedDpr": 1.5
+    },
+    {
+      "active": true,
+      "attemptId": "1",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1.5,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "pinDone",
+        "width": 62,
+        "x": 536,
+        "y": 338
+      },
+      "height": 600,
+      "image": "900-saved-result.png",
+      "inputCount": 0,
+      "phase": "cancelled",
+      "physicalHeight": 900,
+      "physicalWidth": 1350,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 362,
+        "x": 236,
+        "y": 231
+      },
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1.5,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final15",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 900,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final15",
+      "file": "ticket06-captures\\dpr15-900-saved-result.png",
+      "sha256": "0a1566d84b3519ed0be2448f4e0d99a22136a01a01f001f9ffbfec26641cd84b",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedDpr": 1.5
+    },
+    {
+      "active": true,
+      "attemptId": "2",
+      "captureMethod": "QQuickWindow.grabWindow",
+      "discoveryEnabled": false,
+      "dpr": 1.5,
+      "exposed": true,
+      "focus": {
+        "height": 54,
+        "name": "consoleLoginPin",
+        "width": 185,
+        "x": 46,
+        "y": 326
+      },
+      "height": 560,
+      "image": "900-live-form.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 840,
+      "physicalWidth": 1080,
+      "pinHeadingBounds": {
+        "height": 60,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "form",
+      "requestId": "1",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1.5,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final15",
+      "transientParentIsHost": true,
+      "visible": true,
+      "width": 720,
+      "x": 120,
+      "y": 60,
+      "sourceRun": "connection-acceptance-visible-final15",
+      "file": "ticket06-captures\\dpr15-900-live-form.png",
+      "sha256": "59e5a8df25ccc87681d9899ae23e5e57191ada4409b4ee4371b01ce39e9bbd37",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 720,
+        "height": 560
+      },
+      "requestedDpr": 1.5
+    },
+    {
+      "active": true,
+      "attemptId": "5",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1.5,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "connectionRetry",
+        "width": 114.8125,
+        "x": 432.234375,
+        "y": 642
+      },
+      "height": 720,
+      "image": "1280-connection-error.png",
+      "inputCount": 0,
+      "phase": "failure",
+      "physicalHeight": 1080,
+      "physicalWidth": 1920,
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1.5,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final15",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 1280,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final15",
+      "file": "ticket06-captures\\dpr15-1280-connection-error.png",
+      "sha256": "68e07ca3f47e52caaf92a943344787d4f9c28f5c2d8afdb5b7b5d7de45ddd56c",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 1.5
+    },
+    {
+      "active": true,
+      "attemptId": "6",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1.5,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "pinDone",
+        "width": 62,
+        "x": 813,
+        "y": 337
+      },
+      "height": 720,
+      "image": "1280-saved-result.png",
+      "inputCount": 0,
+      "phase": "cancelled",
+      "physicalHeight": 1080,
+      "physicalWidth": 1920,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 604,
+        "x": 271,
+        "y": 248
+      },
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1.5,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final15",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 1280,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final15",
+      "file": "ticket06-captures\\dpr15-1280-saved-result.png",
+      "sha256": "7f4c98845991c93dace554ba8dd0a5dc37f3e4948a7d33f9d8e63a295fa7deba",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 1.5
+    },
+    {
+      "active": true,
+      "attemptId": "7",
+      "captureMethod": "QQuickWindow.grabWindow",
+      "discoveryEnabled": false,
+      "dpr": 1.5,
+      "exposed": true,
+      "focus": {
+        "height": 54,
+        "name": "consoleLoginPin",
+        "width": 185,
+        "x": 46,
+        "y": 326
+      },
+      "height": 560,
+      "image": "1280-live-form.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 840,
+      "physicalWidth": 1080,
+      "pinHeadingBounds": {
+        "height": 60,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "form",
+      "requestId": "5",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1.5,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final15",
+      "transientParentIsHost": true,
+      "visible": true,
+      "width": 720,
+      "x": 310,
+      "y": 120,
+      "sourceRun": "connection-acceptance-visible-final15",
+      "file": "ticket06-captures\\dpr15-1280-live-form.png",
+      "sha256": "d81ca84f4cffc19f152b6f9fb5a6b15c77fecc5929509c6fde005b9ee0afca6a",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 720,
+        "height": 560
+      },
+      "requestedDpr": 1.5
+    },
+    {
+      "active": true,
+      "attemptId": "1",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 2,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "connectionCancel",
+        "width": 206.9375,
+        "x": 124,
+        "y": 411
+      },
+      "height": 600,
+      "image": "900-connection-progress.png",
+      "inputCount": 0,
+      "phase": "connecting",
+      "physicalHeight": 1200,
+      "physicalWidth": 1800,
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 2,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final2",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 900,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final2",
+      "file": "ticket06-captures\\dpr2-900-connection-progress.png",
+      "sha256": "986080c03fd9d3d61cde466c750d4bc70436082cde4a31de71523d36a141664e",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedDpr": 2
+    },
+    {
+      "active": true,
+      "attemptId": "1",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 2,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "pinDone",
+        "width": 62,
+        "x": 536,
+        "y": 338
+      },
+      "height": 600,
+      "image": "900-saved-result.png",
+      "inputCount": 0,
+      "phase": "cancelled",
+      "physicalHeight": 1200,
+      "physicalWidth": 1800,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 362,
+        "x": 236,
+        "y": 231
+      },
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 2,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final2",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 900,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final2",
+      "file": "ticket06-captures\\dpr2-900-saved-result.png",
+      "sha256": "814aa7e9a064b1516229a52f6cf239b4dbd7c710b71d709c6890fb9500a43e40",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedDpr": 2
+    },
+    {
+      "active": true,
+      "attemptId": "2",
+      "captureMethod": "QQuickWindow.grabWindow",
+      "discoveryEnabled": false,
+      "dpr": 2,
+      "exposed": true,
+      "focus": {
+        "height": 54,
+        "name": "consoleLoginPin",
+        "width": 185,
+        "x": 46,
+        "y": 326
+      },
+      "height": 560,
+      "image": "900-live-form.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 1120,
+      "physicalWidth": 1440,
+      "pinHeadingBounds": {
+        "height": 60,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "form",
+      "requestId": "1",
+      "screen": "XG32UCWMG",
+      "screenDpr": 2,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final2",
+      "transientParentIsHost": true,
+      "visible": true,
+      "width": 720,
+      "x": 120,
+      "y": 60,
+      "sourceRun": "connection-acceptance-visible-final2",
+      "file": "ticket06-captures\\dpr2-900-live-form.png",
+      "sha256": "f243076aebb23f9ccf2d164493a079156fa101896150c35b9d67db7e56cab4b5",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 720,
+        "height": 560
+      },
+      "requestedDpr": 2
+    },
+    {
+      "active": true,
+      "attemptId": "5",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 2,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "connectionRetry",
+        "width": 114.8125,
+        "x": 432.234375,
+        "y": 642
+      },
+      "height": 720,
+      "image": "1280-connection-error.png",
+      "inputCount": 0,
+      "phase": "failure",
+      "physicalHeight": 1440,
+      "physicalWidth": 2560,
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 2,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final2",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 1280,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final2",
+      "file": "ticket06-captures\\dpr2-1280-connection-error.png",
+      "sha256": "7a74ca07ef509e86e1d1dc8393d48a0503ed5ff5bc87cb12239867f4f42999e1",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 2
+    },
+    {
+      "active": true,
+      "attemptId": "6",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 2,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "pinDone",
+        "width": 62,
+        "x": 813,
+        "y": 337
+      },
+      "height": 720,
+      "image": "1280-saved-result.png",
+      "inputCount": 0,
+      "phase": "cancelled",
+      "physicalHeight": 1440,
+      "physicalWidth": 2560,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 604,
+        "x": 271,
+        "y": 248
+      },
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 2,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final2",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 1280,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-visible-final2",
+      "file": "ticket06-captures\\dpr2-1280-saved-result.png",
+      "sha256": "7be1b31da2c460c99a1c1ed0871b57cf9cc36904ea62cae05b4f68210544a947",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 2
+    },
+    {
+      "active": true,
+      "attemptId": "7",
+      "captureMethod": "QQuickWindow.grabWindow",
+      "discoveryEnabled": false,
+      "dpr": 2,
+      "exposed": true,
+      "focus": {
+        "height": 54,
+        "name": "consoleLoginPin",
+        "width": 185,
+        "x": 46,
+        "y": 326
+      },
+      "height": 560,
+      "image": "1280-live-form.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 1120,
+      "physicalWidth": 1440,
+      "pinHeadingBounds": {
+        "height": 60,
+        "truncated": false,
+        "width": 336,
+        "x": 91,
+        "y": 175
+      },
+      "pinPhase": "form",
+      "requestId": "5",
+      "screen": "XG32UCWMG",
+      "screenDpr": 2,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-visible-final2",
+      "transientParentIsHost": true,
+      "visible": true,
+      "width": 720,
+      "x": 310,
+      "y": 120,
+      "sourceRun": "connection-acceptance-visible-final2",
+      "file": "ticket06-captures\\dpr2-1280-live-form.png",
+      "sha256": "4e6304c939f4d1425c39df5215d4164ba34763bf097bcdcd2a79d9f0ed87c681",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 720,
+        "height": 560
+      },
+      "requestedDpr": 2
+    },
+    {
+      "active": true,
+      "attemptId": "",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "pinBack",
+        "width": 194,
+        "x": 681,
+        "y": 390
+      },
+      "height": 720,
+      "image": "1280-saved-pin-failure.png",
+      "inputCount": 0,
+      "phase": "",
+      "physicalHeight": 720,
+      "physicalWidth": 1280,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 604,
+        "x": 271,
+        "y": 248
+      },
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-results02",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 1280,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-results02",
+      "file": "ticket06-captures\\results-1280-saved-pin-failure.png",
+      "sha256": "465c11aea6cd6d9cf7f76f0e7a4af0849049230dd36e4e1736195433379a82a9",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "1",
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "connectionBack",
+        "width": 194,
+        "x": 224,
+        "y": 414
+      },
+      "height": 720,
+      "image": "1280-registration-result.png",
+      "inputCount": 0,
+      "phase": "registered",
+      "physicalHeight": 720,
+      "physicalWidth": 1280,
+      "pinPhase": "",
+      "requestId": "",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-results02",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 1280,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-results02",
+      "file": "ticket06-captures\\results-1280-registration-result.png",
+      "sha256": "6e0949900a2a1945969832b3a14b7ba90cb8b6e0e94b0096f986cb0dc0a8f051",
+      "requestedHostSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedClientSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "1",
+      "captureMethod": "QScreen composed desktop region of active Vulkan QA client",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 54,
+        "name": "consoleLoginPin",
+        "width": 185,
+        "x": 191,
+        "y": 350
+      },
+      "height": 600,
+      "image": "900-vulkan-inline-form.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 600,
+      "physicalWidth": 900,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 362,
+        "x": 236,
+        "y": 231
+      },
+      "pinPhase": "form",
+      "requestId": "1",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-vulkan02",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 900,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-vulkan02",
+      "file": "ticket06-captures\\vulkan-900-vulkan-inline-form.png",
+      "sha256": "faf5bedeaa36595638d26ad210c70657aa8d8bb02944de512eeb18c09e2e2890",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "1",
+      "captureMethod": "QScreen composed desktop region of active Vulkan QA client",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 54,
+        "name": "consoleLoginPin",
+        "width": 185,
+        "x": 191,
+        "y": 350
+      },
+      "height": 600,
+      "image": "900-vulkan-inline-incorrect.png",
+      "inputCount": 1,
+      "phase": "connecting",
+      "physicalHeight": 600,
+      "physicalWidth": 900,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 362,
+        "x": 236,
+        "y": 231
+      },
+      "pinPhase": "form",
+      "requestId": "2",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-vulkan02",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 900,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-vulkan02",
+      "file": "ticket06-captures\\vulkan-900-vulkan-inline-incorrect.png",
+      "sha256": "f0405d391c7388bc420cfbf7d6770af45fd17692d4e5b69f8fd9655671c58c77",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedDpr": 1
+    },
+    {
+      "active": true,
+      "attemptId": "1",
+      "captureMethod": "QScreen composed desktop region of active Vulkan QA client",
+      "discoveryEnabled": false,
+      "dpr": 1,
+      "exposed": true,
+      "focus": {
+        "height": 42,
+        "name": "pinBack",
+        "width": 129,
+        "x": 469,
+        "y": 319
+      },
+      "height": 600,
+      "image": "900-vulkan-inline-cancelled.png",
+      "inputCount": 1,
+      "phase": "cancelled",
+      "physicalHeight": 600,
+      "physicalWidth": 900,
+      "pinHeadingBounds": {
+        "height": 30,
+        "truncated": false,
+        "width": 362,
+        "x": 236,
+        "y": 231
+      },
+      "pinPhase": "cancelled",
+      "requestId": "2",
+      "screen": "XG32UCWMG",
+      "screenDpr": 1,
+      "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-vulkan02",
+      "transientParentIsHost": false,
+      "visible": true,
+      "width": 900,
+      "x": 30,
+      "y": 40,
+      "sourceRun": "connection-acceptance-vulkan02",
+      "file": "ticket06-captures\\vulkan-900-vulkan-inline-cancelled.png",
+      "sha256": "45d879c27368267de5cc253be6a64fb51b6cb40c4553a9f588f73caba82b5054",
+      "requestedHostSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedClientSize": {
+        "width": 900,
+        "height": 600
+      },
+      "requestedDpr": 1
+    }
+  ],
+  "runs": {
+    "dpr1": {
+      "path": "C:\\Users\\david\\.cache\\chiaki-ui-native\\connection-acceptance-visible-final1",
+      "checks": 623,
+      "runtimeRendererBackend": 1
+    },
+    "dpr15": {
+      "path": "C:\\Users\\david\\.cache\\chiaki-ui-native\\connection-acceptance-visible-final15",
+      "checks": 388,
+      "runtimeRendererBackend": 1
+    },
+    "dpr2": {
+      "path": "C:\\Users\\david\\.cache\\chiaki-ui-native\\connection-acceptance-visible-final2",
+      "checks": 388,
+      "runtimeRendererBackend": 1
+    },
+    "results": {
+      "path": "C:\\Users\\david\\.cache\\chiaki-ui-native\\connection-acceptance-results02",
+      "checks": 90,
+      "runtimeRendererBackend": 1
+    },
+    "vulkan": {
+      "path": "C:\\Users\\david\\.cache\\chiaki-ui-native\\connection-acceptance-vulkan02",
+      "checks": 78,
+      "runtimeRendererBackend": 0
+    }
+  },
+  "excludedVisuals": {
+    "connection-acceptance-visible-final1": [
+      "900-saved-form.png duplicated by sidebar regression proof",
+      "1280-registration-result.png obscured by choice popup, replaced by results02"
+    ]
+  },
+  "inspection": "Retained images inspected; corrected results02 and Vulkan02 accepted by root"
+}

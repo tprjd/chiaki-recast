@@ -1,0 +1,20 @@
+{
+  "allPassed": true,
+  "owner": "Root Computer Use",
+  "scenario": "Fresh isolated OpenGL separate PIN form at900x600, measuredDPR1",
+  "observed": [
+    "OS mouse focuses PIN field and shows caret",
+    "OS keyboard enters four masked synthetic digits, enabling Sign in",
+    "Tab focuses Show; Shift+Tab returns to field",
+    "Show and Hide checked with empty field only",
+    "Escape shows Cancelling until controlled native QUIT",
+    "Native QUIT shows Connection cancelled with Back focus",
+    "OS mouse Back closes PIN and returns Library"
+  ],
+  "nativeFinalAssertions": [
+    "Production Library currentItem",
+    "Input capture count zero"
+  ],
+  "limit": "Background click could be redirected by application modality, so it is not separate OS mouse blocking proof",
+  "pinValuesIncluded": false
+}

@@ -1,0 +1,93 @@
+{
+    "allPassed": true,
+    "captureTrace": [
+    ],
+    "captures": [
+        {
+            "active": true,
+            "attemptId": "",
+            "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+            "discoveryEnabled": false,
+            "dpr": 1,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "pinBack",
+                "width": 194,
+                "x": 681,
+                "y": 390
+            },
+            "height": 720,
+            "image": "1280-saved-pin-failure.png",
+            "inputCount": 0,
+            "phase": "",
+            "physicalHeight": 720,
+            "physicalWidth": 1280,
+            "pinHeadingBounds": {
+                "height": 30,
+                "truncated": false,
+                "width": 604,
+                "x": 271,
+                "y": 248
+            },
+            "pinPhase": "",
+            "requestId": "",
+            "screen": "XG32UCWMG",
+            "screenDpr": 1,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-results02",
+            "transientParentIsHost": false,
+            "visible": true,
+            "width": 1280,
+            "x": 30,
+            "y": 40
+        },
+        {
+            "active": true,
+            "attemptId": "1",
+            "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+            "discoveryEnabled": false,
+            "dpr": 1,
+            "exposed": true,
+            "focus": {
+                "height": 42,
+                "name": "connectionBack",
+                "width": 194,
+                "x": 224,
+                "y": 414
+            },
+            "height": 720,
+            "image": "1280-registration-result.png",
+            "inputCount": 0,
+            "phase": "registered",
+            "physicalHeight": 720,
+            "physicalWidth": 1280,
+            "pinPhase": "",
+            "requestId": "",
+            "screen": "XG32UCWMG",
+            "screenDpr": 1,
+            "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/connection-acceptance-results02",
+            "transientParentIsHost": false,
+            "visible": true,
+            "width": 1280,
+            "x": 30,
+            "y": 40
+        }
+    ],
+    "checks": 90,
+    "requestedRenderer": "opengl",
+    "runtimeRendererBackend": 1,
+    "screens": [
+        {
+            "dpr": 1,
+            "height": 2160,
+            "name": "XG32UCWMG",
+            "width": 3840
+        },
+        {
+            "dpr": 1,
+            "height": 1440,
+            "name": "VG270U",
+            "width": 2560
+        }
+    ]
+}

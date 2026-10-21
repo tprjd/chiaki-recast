@@ -1,0 +1,17 @@
+{
+    "allPassed": true,
+    "cancelButtonEscapeAndWindowClose": true,
+    "cancelReentryScopesNativeStop": true,
+    "captureTrace": [
+    ],
+    "checks": 89,
+    "hiddenHandoffCaptureCount": 2,
+    "hiddenLocalProgressCaptures": 0,
+    "hiddenStreamProgressCaptures": 1,
+    "mode": "separate-visible",
+    "profileInvalidation": true,
+    "psnPromptContinuityAndCaptureBalance": true,
+    "savedPinRejectionCorrectionAndAcceptedHandoff": true,
+    "staleOwnershipAndSubmitReentry": true,
+    "transport": "Controlled native events and transport calls, no hardware"
+}
