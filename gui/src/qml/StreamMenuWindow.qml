@@ -16,6 +16,7 @@ Window {
     readonly property real menuHeight: contentLoader.item ? contentLoader.item.implicitHeight : 80
 
     signal closeRequested()
+    signal menuCloseRequested()
     signal closeAnimationFinished()
 
     onClosing: event => { event.accepted = false; closeRequested(); }
@@ -47,7 +48,7 @@ Window {
         sequence: "Ctrl+O"
         onActivated: {
             if (streamMenuWindow.open)
-                streamMenuWindow.closeRequested();
+                streamMenuWindow.menuCloseRequested();
         }
     }
 

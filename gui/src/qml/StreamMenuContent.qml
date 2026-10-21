@@ -15,6 +15,7 @@ FocusScope {
     required property var menuController
     property bool separate: false
     property Item initialFocusItem: resumeButton
+    readonly property int presetIndex: Math.max(0, presetRepeater.model.findIndex(preset => preset.preset === streamWindow.videoPreset))
     implicitHeight: toolbar.implicitHeight + 24
     focus: true
     anchors.fill: parent
@@ -54,8 +55,9 @@ FocusScope {
             onVisibleChanged: if (visible) requestActivate()
             property Item lastFocusItem: null
             onActiveFocusItemChanged: {
-                if (activeFocusItem) lastFocusItem = activeFocusItem;
-                else if (visible && lastFocusItem) lastFocusItem.forceActiveFocus(Qt.PopupFocusReason);
+                var item = activeFocusItem;
+                while (item && item !== popup.contentItem) item = item.parent;
+                if (item && activeFocusItem !== popup.contentItem) lastFocusItem = activeFocusItem;
             }
         }
         onClosed: Qt.callLater(() => {
@@ -91,6 +93,12 @@ FocusScope {
     component FlyoutButton: ToolButton {
         font.pixelSize: 14
         Layout.fillWidth: true
+        background: Rectangle {
+            radius: 5
+            color: parent.checked ? "#447cadd6" : parent.hovered || parent.down ? "#33ffffff" : "transparent"
+            border.color: parent.activeFocus ? "#a9d9ff" : "transparent"
+            border.width: 2
+        }
         contentItem: Label {
             text: parent.text
             color: "white"
@@ -185,7 +193,7 @@ FocusScope {
             objectName: "streamQuality"
             description: qsTr("Quality preset")
             disclosure: true
-            text: [qsTr("Default"), qsTr("High quality"), qsTr("HQ + Spatial"), qsTr("HQ + Advanced spatial"), qsTr("Custom")][streamWindow.videoPreset - 1] || qsTr("Default")
+            text: presetRepeater.model[content.presetIndex].label
             Layout.preferredWidth: 178
             onClicked: menuController.flyout = menuController.flyout === "quality" ? "" : "quality"
             KeyNavigation.left: pictureButton
@@ -304,7 +312,7 @@ FocusScope {
         objectName: "streamQualityPopup"
         opener: qualityButton
         visible: menuController.open && menuController.flyout === "quality"
-        onOpened: focusItem(presetRepeater.itemAt(Math.max(0, streamWindow.videoPreset - 1)))
+        onOpened: focusItem(presetRepeater.itemAt(content.presetIndex))
         contentItem: ColumnLayout {
             spacing: 4
             Keys.onEscapePressed: menuController.dismiss()

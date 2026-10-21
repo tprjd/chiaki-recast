@@ -13,10 +13,19 @@ Item {
     property bool nativeHost: false
     property alias opener: opener
     property var actions: []
+    property bool streamSettingsOpen: false
+    property alias settingsFocusItem: settingsFocusItem
     property int gameClicks: 0
     function showMainView() { actions = actions.concat(["consoles"]); }
-    function openDisplaySettings() { actions = actions.concat(["display"]); }
-    function openPlaceboSettings() { actions = actions.concat(["renderer"]); }
+    function openStreamSettings() {
+        streamSettingsOpen = true;
+        streamWindow.grabInput();
+        if (nativeHost) streamWindow.requestActivate();
+        settingsFocusItem.forceActiveFocus(Qt.TabFocusReason);
+    }
+    function openDisplaySettings() { actions = actions.concat(["display"]); openStreamSettings(); }
+    function openPlaceboSettings() { actions = actions.concat(["renderer"]); openStreamSettings(); }
+    function closeStreamSettings() { streamSettingsOpen = false; streamWindow.releaseInput(); opener.forceActiveFocus(Qt.TabFocusReason); }
     QtObject {
         id: liveSession
         property bool connected: true
@@ -83,6 +92,7 @@ Item {
     }
     MouseArea { parent: harness.nativeHost ? streamWindow.contentItem : harness; anchors.fill: parent; onClicked: harness.gameClicks++ }
     Button { id: opener; parent: harness.nativeHost ? streamWindow.contentItem : harness; text: "Game"; onClicked: harness.gameClicks++ }
+    Button { id: settingsFocusItem; parent: harness.nativeHost ? streamWindow.contentItem : harness; x: 100; y: 100; z: 1000; visible: harness.streamSettingsOpen; text: "Settings" }
     Loader {
         id: streamLoader
         parent: harness.nativeHost ? streamWindow.contentItem : harness

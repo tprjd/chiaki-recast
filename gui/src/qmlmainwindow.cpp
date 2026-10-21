@@ -40,6 +40,7 @@ extern "C" {
 #include <QtGlobal>
 #include <cstring>
 #include <utility>
+#include <memory>
 #if defined(Q_OS_MACOS)
 #include <objc/message.h>
 #endif
@@ -2837,11 +2838,28 @@ bool QmlMainWindow::event(QEvent *event)
             while (owner && owner != this)
                 owner = owner->transientParent();
             if (owner == this && focused != this && focused != quick_window) {
-                if (!focused->isActive()) {
+                if (focused != QGuiApplication::focusWindow()) {
+                    auto *pending = new QObject(focused);
+                    auto key = std::shared_ptr<QEvent>(event->clone());
+                    connect(qGuiApp, &QGuiApplication::focusWindowChanged, pending,
+                        [this, focused, pending, key](QWindow *active) mutable {
+                            auto copy = std::exchange(key, {});
+                            if (!copy) return;
+                            pending->deleteLater();
+                            if (active == focused && focused->isVisible() && session && grab_input) {
+                                if (auto *item = focused->property("lastFocusItem").value<QQuickItem *>()) {
+                                    if (item->window() == focused && item->isVisible())
+                                        item->forceActiveFocus(Qt::OtherFocusReason);
+                                }
+                                QGuiApplication::sendEvent(focused, copy.get());
+                            }
+                        });
+                    connect(focused, &QWindow::visibleChanged, pending, [pending](bool visible) {
+                        if (!visible) delete pending;
+                    });
+                    connect(backend, &QmlBackend::sessionChanged, pending, [pending] { delete pending; });
                     focused->requestActivate();
-                    // Restore Quick focus before the captured key while native activation completes.
-                    QFocusEvent focus(QEvent::FocusIn, Qt::OtherFocusReason);
-                    QGuiApplication::sendEvent(focused, &focus);
+                    return true;
                 }
                 QGuiApplication::sendEvent(focused, event);
                 return true;

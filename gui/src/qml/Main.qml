@@ -12,6 +12,7 @@ Item {
     property var librarySelection: null
     readonly property bool preferSeparateStreamSettingsWindows: Chiaki.window.runtimeRendererBackend === 1 && Chiaki.session
     property bool useSeparateStreamSettingsWindows: false
+    readonly property bool streamSettingsOpen: displaySettingsRect.opacity > 0 || placeboSettingsRect.opacity > 0 || colorMappingSettingsRect.opacity > 0
     Material.theme: Material.Dark
     Material.accent: "#00a7ff"
 

@@ -6,7 +6,7 @@ import "fixtures"
 TestCase {
     id: tests
     name: "StreamToolbar"
-    width: 1280; height: 720
+    width: 900; height: 600
     visible: true
     when: windowShown
     Component { id: harnessComponent; StreamHarness { anchors.fill: parent } }
@@ -179,6 +179,48 @@ TestCase {
                 for (const background of ["dark", "bright", "detailed"])
                     rows.push({tag: (separate ? "window" : "inline") + "-" + size.width + "-" + background, separate, size, background});
         return rows;
+    }
+    function test_linkedSettingsOwnFocus_data() {
+        const rows = [];
+        for (const separate of [false, true])
+            for (const condition of ["none", "video", "blocked"])
+                rows.push({tag: (separate ? "window-" : "inline-") + condition, separate, condition});
+        return rows;
+    }
+    function test_linkedSettingsOwnFocus(data) {
+        const h = createTemporaryObject(harnessComponent, tests);
+        h.settings.audioVideoDisabled = data.condition === "video" ? 2 : 0;
+        h.backend.session.cantDisplay = data.condition === "blocked";
+        h.window.videoPreset = data.condition === "blocked" ? 5 : 1;
+        const host = openMenu(h, data.separate);
+        mouseClick(findChild(host, data.condition === "blocked" ? "streamQuality" : "streamPicture"));
+        const action = findChild(host, data.condition === "blocked" ? "streamRendererSettings" : "streamDisplaySettings");
+        action.forceActiveFocus(Qt.TabFocusReason);
+        tryCompare(action, "activeFocus", true);
+        keyClick(Qt.Key_Return);
+        tryCompare(h, "streamSettingsOpen", true);
+        wait(350);
+        compare(h.settingsFocusItem.activeFocus, true, "Settings keeps focus after menu closure");
+        compare(h.window.grabs - h.window.releases, 1, "Only settings owns input");
+        compare(findChild(h.screen, data.separate ? "streamActionNoticeWindow" : "streamActionNoticeInline").visible, false);
+        h.closeStreamSettings();
+        if (data.condition !== "none") {
+            const notice = findChild(h.screen, data.separate ? "streamActionNoticeWindow" : "streamActionNoticeInline");
+            tryCompare(notice, "visible", true);
+            tryCompare(findChild(notice, "streamNoticeAction"), "activeFocus", true);
+            compare(h.window.grabs - h.window.releases, 1);
+        } else compare(h.window.grabs, h.window.releases);
+    }
+    function test_shortcutClosesFlyoutAndMenu() {
+        const h = createTemporaryObject(harnessComponent, tests);
+        const host = openMenu(h, true);
+        mouseClick(findChild(host, "streamPicture"));
+        const popup = findChild(host, "streamPicturePopup");
+        tryCompare(popup, "opened", true);
+        tryCompare(findChild(host, "streamFit"), "activeFocus", true);
+        keyClick(Qt.Key_O, Qt.ControlModifier);
+        tryCompare(host, "visible", false);
+        compare(h.window.grabs, h.window.releases);
     }
     function test_layout(data) {
         tests.width = data.size.width; tests.height = data.size.height;

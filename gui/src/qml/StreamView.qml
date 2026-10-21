@@ -16,6 +16,7 @@ Item {
     property var navigation: root
 
     readonly property var hostWindow: view.Window.window
+    readonly property bool settingsOpen: !!view.navigation.streamSettingsOpen
     readonly property bool managedConnection: !!view.backend.connectionAttempt.presented
     property bool legacySessionError: false
     property bool legacySessionLoading: true
@@ -259,7 +260,7 @@ Item {
     }
 
     readonly property bool noticesReady: !!view.backend.session && view.backend.session.connected
-        && !sessionLoading && !sessionError && !view.backend.sessionPinRequest.id
+        && !sessionLoading && !sessionError && !view.backend.sessionPinRequest.id && !settingsOpen
         && !sessionStopDialog.opened && !menuState.disconnectPending
     readonly property bool audioNoticeVisible: noticesReady && view.settings.audioVideoDisabled === 1
     property real networkNoticeOpacity: networkIndicatorTimer.running ? 1 : 0
@@ -497,9 +498,10 @@ Item {
         flyoutOpen: !!menuState.flyout
         closing: useSeparateMenuWindow && menuState.closing
         onCloseRequested: menuState.dismiss()
+        onMenuCloseRequested: menuState.close()
         onCloseAnimationFinished: {
             menuState.closing = false;
-            if (!sessionStopDialog.opened && !view.backend.sessionPinRequest.id && !view.sessionLoading && !menuState.open && !view.actionNoticeVisible) {
+            if (!view.settingsOpen && !sessionStopDialog.opened && !view.backend.sessionPinRequest.id && !view.sessionLoading && !menuState.open && !view.actionNoticeVisible) {
                 if (view.streamWindow) view.streamWindow.requestActivate();
                 if (menuState.returnFocusItem && menuState.returnFocusItem.visible)
                     menuState.returnFocusItem.forceActiveFocus(Qt.TabFocusReason);
