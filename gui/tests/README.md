@@ -327,3 +327,19 @@ patch is applied again.
 
 These controlled checks do not verify physical controllers, native display
 scaling, or shortcut visibility after the user restarts Steam.
+
+## About and renderer information
+
+`InformationDialogs` opens About through production Settings and loads the production
+`RendererFallbackDialog`. The suite checks attribution, license text, a supplied
+application version, the logo, the actual supplied fallback reason, one Close action,
+visible focus, modal input, repeat opening, disabled opener fallback, keyboard
+scrolling, and keyboard/controller dismissal. Layout checks use 900 by 600 and
+1280 by 720 with long translated text and titles. Captures are written under
+`build/information-*.png`.
+
+The screen runner supplies the application name Chiaki and synthetic version
+`0.0.0-screen-test`. These values do not change the normal application metadata.
+The tests do not exercise native input capture, the Main non-Library focus fallback,
+display scaling, a real renderer failure, or a physical controller. Ticket 08 covers
+native acceptance.
