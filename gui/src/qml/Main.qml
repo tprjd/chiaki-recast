@@ -15,6 +15,10 @@ Item {
     Material.theme: Material.Dark
     Material.accent: "#00a7ff"
 
+    // Render control keeps its Quick window hidden, so its overlay needs the viewport size.
+    Binding { target: root.Overlay.overlay; property: "width"; value: root.width }
+    Binding { target: root.Overlay.overlay; property: "height"; value: root.height }
+
     function controllerButton(name) {
         let type = "deck";
         for (let i = 0; i < Chiaki.controllers.length; ++i) {

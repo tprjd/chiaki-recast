@@ -9,6 +9,7 @@
     <file>SetupButton.qml</file>
     <file>ConsoleDetails.qml</file>
     <file>StreamView.qml</file>
+    <file>StreamDisconnectDialog.qml</file>
     <file>ConnectionView.qml</file>
     <file>StreamMenuWindow.qml</file>
     <file>ConfirmDialog.qml</file>
