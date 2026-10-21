@@ -1,0 +1,9 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::RegistrationAccount::initTestCase()
+QDEBUG : console_screen::RegistrationAccount::test_signInReturnsDirectlyWithStorageExplanation() FT_New_Face failed with index 0 : 2
+FAIL!  : console_screen::RegistrationAccount::test_signInReturnsDirectlyWithStorageExplanation() 'function returned false' returned FALSE. ()
+C:\Users\david\.codex\worktrees\psn-registration\chiaki-ng-ui\gui\tests\qml\tst_RegistrationAccount.qml(60) : failure location
+PASS   : console_screen::RegistrationAccount::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 5196ms
+********* Finished testing of console_screen *********

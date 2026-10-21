@@ -23,6 +23,8 @@ FocusScope {
     property bool retiring: false
     property string ownedAttemptId: ""
     property string completedAttemptId: ""
+    property bool registration: false
+    property bool completionAllowed: true
     readonly property var attempt: backend.psnAuthAttempt || ({})
     readonly property bool ownsAttempt: ownedAttemptId.length > 0 && attempt.id === ownedAttemptId
     readonly property string phase: ownsAttempt ? attempt.phase || "form" : "form"
@@ -79,7 +81,7 @@ FocusScope {
         revealed = false;
         detailsExpanded = false;
         const id = backend.startPsnAuth(value);
-        if (id) ownedAttemptId = id;
+        if (id) { ownedAttemptId = id; completionAllowed = true; }
         Qt.callLater(focusAction);
     }
     function close() {
@@ -122,15 +124,18 @@ FocusScope {
     }
     onPrivateModeChanged: if (privateMode) revealed = false
     onAttemptChanged: {
-        if (!ownsAttempt || leaving || retiring) return;
-        if (success && completedAttemptId !== ownedAttemptId) {
+        if (!ownedAttemptId || attempt.id !== ownedAttemptId || leaving || retiring) return;
+        if (attempt.phase === "success" && completedAttemptId !== ownedAttemptId) {
             completedAttemptId = ownedAttemptId;
-            completed(attempt.accountId || "");
+            if (completionAllowed) completed(attempt.accountId || "");
         }
         Qt.callLater(focusAction);
     }
     Component.onCompleted: {
-        if (attempt.phase === "exchanging" || attempt.phase === "account") ownedAttemptId = attempt.id;
+        if (attempt.phase === "exchanging" || attempt.phase === "account") {
+            ownedAttemptId = attempt.id;
+            completionAllowed = !registration;
+        }
         else startBrowser();
         Qt.callLater(focusAction);
     }
@@ -157,9 +162,9 @@ FocusScope {
     ColumnLayout {
         anchors.fill: parent; anchors.margins: dialog.width < 1000 ? 24 : 32
         spacing: 16
-        PsnLabel { text: qsTr("Settings / PSN remote access"); font.pixelSize: 12 }
-        PsnLabel { objectName: "psnHeading"; text: dialog.expired ? qsTr("Renew PSN credentials") : qsTr("Set up PSN remote access"); font.pixelSize: 30; font.bold: true; color: "#ffffff" }
-        PsnLabel { objectName: "psnExplanation"; text: dialog.expired ? qsTr("Your saved PSN credentials expired. Sign in again to use Remote Play away from home.") : qsTr("Sign in to PlayStation Network to use Remote Play away from home.") }
+        PsnLabel { text: dialog.registration ? qsTr("Console setup / Account ID") : qsTr("Settings / PSN remote access"); font.pixelSize: 12 }
+        PsnLabel { objectName: "psnHeading"; text: dialog.registration ? qsTr("Get your PSN Account ID") : dialog.expired ? qsTr("Renew PSN credentials") : qsTr("Set up PSN remote access"); font.pixelSize: 30; font.bold: true; color: "#ffffff" }
+        PsnLabel { objectName: "psnExplanation"; text: dialog.registration ? qsTr("Sign in to PlayStation Network to retrieve your Account ID and continue console registration.") : dialog.expired ? qsTr("Your saved PSN credentials expired. Sign in again to use Remote Play away from home.") : qsTr("Sign in to PlayStation Network to use Remote Play away from home.") }
         Flickable {
             id: scroll
             objectName: "psnScroll"
