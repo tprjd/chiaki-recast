@@ -1,0 +1,26 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::StreamNotices::initTestCase()
+PASS   : console_screen::StreamNotices::test_blockedActionAndClearance(inline)
+PASS   : console_screen::StreamNotices::test_blockedActionAndClearance(window)
+FAIL!  : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(inline-2) property activeFocus
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(129) : failure location
+FAIL!  : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(inline-3) property activeFocus
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(129) : failure location
+FAIL!  : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(window-2) property activeFocus
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(118) : failure location
+FAIL!  : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(window-3) property activeFocus
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(118) : failure location
+PASS   : console_screen::StreamNotices::test_networkThresholdAndAudio(inline)
+PASS   : console_screen::StreamNotices::test_networkThresholdAndAudio(window)
+PASS   : console_screen::StreamNotices::cleanupTestCase()
+Totals: 6 passed, 4 failed, 0 skipped, 0 blacklisted, 24547ms
+********* Finished testing of console_screen *********

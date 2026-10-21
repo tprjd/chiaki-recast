@@ -51,6 +51,17 @@ TestCase {
         wait(30);
         tryCompare(host, "visible", false);
         compare(h.backend.commands.length, 0);
+        h.settings.wifiDroppedNotif = 5;
+        h.backend.session.averagePacketLoss = 0.05;
+        compare(host.visible, false);
+        h.backend.session.averagePacketLoss = 0.051;
+        tryCompare(host, "visible", true);
+        h.backend.session.averagePacketLoss = 0;
+        tryCompare(host, "visible", false);
+        h.backend.session.averagePacketLoss = Infinity;
+        compare(host.visible, false);
+        h.backend.session.averagePacketLoss = NaN;
+        compare(host.visible, false);
     }
     function test_blockedActionAndClearance_data() { return routes(); }
     function test_blockedActionAndClearance(data) {
@@ -296,5 +307,38 @@ TestCase {
         action.clicked();
         compare(h.backend.commands.length, 0);
         compare(h.window.grabs, h.window.releases);
+    }
+    function test_blockedNoticeYieldsToMenu_data() { return routes(); }
+    function test_blockedNoticeYieldsToMenu(data) {
+        const h = createTemporaryObject(harnessComponent, tests);
+        h.nativeHost = true;
+        h.window.runtimeRendererBackend = data.separate ? 1 : 0;
+        wait(20);
+        h.window.requestActivate();
+        wait(20);
+        h.opener.forceActiveFocus(Qt.TabFocusReason);
+        h.backend.session.cantDisplay = true;
+        h.settings.audioVideoDisabled = 1;
+        h.backend.session.averagePacketLoss = 0.05;
+        const host = findChild(h.screen, data.separate ? "streamActionNoticeWindow" : "streamActionNoticeInline");
+        const passive = passiveHost(h, data.separate);
+        tryCompare(host, "visible", true);
+        tryCompare(passive, "visible", true);
+        h.window.menuRequested();
+        tryCompare(host, "visible", false);
+        compare(passive.visible, false);
+        compare(h.window.grabs - h.window.releases, 1);
+        wait(300);
+        keyClick(Qt.Key_Escape);
+        tryCompare(host, "visible", true);
+        compare(passive.visible, true);
+        h.settings.audioVideoDisabled = 2;
+        compare(findChild(host, "streamActionNotice").title, "Video disabled");
+        h.settings.audioVideoDisabled = 0;
+        compare(findChild(host, "streamActionNotice").title, "Content blocked by the console");
+        h.backend.session.cantDisplay = false;
+        tryCompare(h.opener, "activeFocus", true);
+        compare(h.window.grabs, h.window.releases);
+        compare(h.backend.commands.length, 0);
     }
 }
