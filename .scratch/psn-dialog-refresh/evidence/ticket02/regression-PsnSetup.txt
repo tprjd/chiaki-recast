@@ -10,5 +10,5 @@ PASS   : console_screen::PsnSetup::test_rejectedInputStaysEditableAndDetailsHide
 PASS   : console_screen::PsnSetup::test_supportedSizesAndLongText(900x600)
 PASS   : console_screen::PsnSetup::test_supportedSizesAndLongText(1280x720)
 PASS   : console_screen::PsnSetup::cleanupTestCase()
-Totals: 10 passed, 0 failed, 0 skipped, 0 blacklisted, 34ms
+Totals: 10 passed, 0 failed, 0 skipped, 0 blacklisted, 38ms
 ********* Finished testing of console_screen *********

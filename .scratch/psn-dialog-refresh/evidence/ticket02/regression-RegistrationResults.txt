@@ -19,5 +19,5 @@ PASS   : console_screen::RegistrationResults::test_profileChangeInvalidatesFormA
 PASS   : console_screen::RegistrationResults::test_resultsAndDiagnosticsStayReachable(minimum)
 PASS   : console_screen::RegistrationResults::test_resultsAndDiagnosticsStayReachable(normal)
 PASS   : console_screen::RegistrationResults::cleanupTestCase()
-Totals: 19 passed, 0 failed, 0 skipped, 0 blacklisted, 442ms
+Totals: 19 passed, 0 failed, 0 skipped, 0 blacklisted, 512ms
 ********* Finished testing of console_screen *********

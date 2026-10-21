@@ -1,6 +1,7 @@
 # Registration Account ID verification
 
 Base: `d0ea2f19`. Branch: `codex/psn-registration`.
+Integrated `codex/psn-dialog-integration` at `599413ba` without conflicts.
 Standalone Qt 6.9.3 and MSVC 2022 screen target. The shared native cache was not changed.
 
 The tests load production `RegistDialog.qml`, its default `StackView` route,
@@ -9,9 +10,11 @@ service and authentication backend. The production controls and response parser 
 
 ## Results
 
-- [Final Account ID checks](account-final.txt) cover both routes, errors, retry,
+- The five post-merge suites passed 95 checks with no failures.
+- [Final Account ID checks](account-final.txt): 13 passed. These cover both routes, errors, retry,
   a real 30-second timeout, late and repeated results, profile changes, destroyed
   callers, a pending request in a replacement registration, and focus during replacement.
+  These checks include closure after a profile change.
 - [PSN setup](regression-PsnSetup.txt): 10 passed.
 - [Registration form](regression-RegistrationForm.txt): 22 passed.
 - [Registration results](regression-RegistrationResults.txt): 19 passed.
@@ -55,3 +58,5 @@ the fixtures and evidence. These checks use supplied service outcomes. Native
 persistence remains covered by ticket 01. Ticket 08 owns the final native build,
 visible native focus, and display scaling. Real PSN sign-in, live public lookup,
 and physical controllers were not tested.
+
+[SHA-256 record](source-sha256.txt) identifies the changed production screens and test files.

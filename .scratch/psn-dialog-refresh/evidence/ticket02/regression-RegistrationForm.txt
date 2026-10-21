@@ -22,5 +22,5 @@ PASS   : console_screen::RegistrationForm::test_privacyAndLayout(normal)
 PASS   : console_screen::RegistrationForm::test_privacyAndLayout(minimum)
 PASS   : console_screen::RegistrationForm::test_routeDefaultsAndSavedAccount()
 PASS   : console_screen::RegistrationForm::cleanupTestCase()
-Totals: 22 passed, 0 failed, 0 skipped, 0 blacklisted, 2714ms
+Totals: 22 passed, 0 failed, 0 skipped, 0 blacklisted, 2680ms
 ********* Finished testing of console_screen *********
