@@ -362,6 +362,18 @@ pixels, long text, and dark, bright, and detailed backgrounds. Captures under
 inside its visible `StreamTestWindow`. Separate notice windows retain this actual
 native parent. The default remains the screen runner's window for existing tests.
 
+`StreamStatistics` checks the six live values, units, finite-value fallbacks,
+valid zeros, large values, long labels, preference and visibility changes,
+session replacement, teardown, passive input, and both production hosts.
+Set `StreamHarness.nativeHost` to true for the separate route. This places the
+actual `StreamView` and game input control in the visible `StreamTestWindow`.
+
+Pixel checks use the offscreen software renderer at 900 by 600, 1280 by 720,
+and 1920 by 1080. They cover dark, bright, and detailed backgrounds. The
+offscreen platform activates passive native windows, so separate-window focus
+is checked with the Windows platform instead. Native evidence and replay files
+are in `.scratch/stream-interface-implementation/evidence/ticket03/`.
+
 The baseline replay files are in
 `.scratch/stream-interface-implementation/evidence/ticket01/`.
 They include real Vulkan and OpenGL menu-to-disconnect checks with isolated

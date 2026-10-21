@@ -13,6 +13,7 @@ TestCase {
     function routes() { return [{tag: "inline", separate: false}, {tag: "window", separate: true}]; }
     function menuHost(h, separate) { return separate ? findChild(h.screen, "streamMenuWindow") : h.screen; }
     function openMenu(h, separate) {
+        h.nativeHost = separate;
         h.window.runtimeRendererBackend = separate ? 1 : 0;
         h.opener.forceActiveFocus(Qt.TabFocusReason);
         h.window.menuRequested();

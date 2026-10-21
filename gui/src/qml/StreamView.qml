@@ -25,7 +25,7 @@ Item {
     property list<Item> restoreFocusItems
     readonly property bool useSeparateMenuWindow: view.streamWindow.runtimeRendererBackend === 1
     readonly property int streamMenuHeight: 200
-    readonly property bool streamStatsVisible: view.settings.showStreamStats && !(menuState.open || menuState.closing) && !sessionLoading && !sessionError && !(view.settings.audioVideoDisabled & 0x02)
+    readonly property bool streamStatsVisible: !!view.backend.session && view.settings.showStreamStats && !(menuState.open || menuState.closing) && !sessionLoading && !sessionError && !(view.settings.audioVideoDisabled & 0x02)
     property int separateMenuX: 0
     property int separateMenuY: 0
     property int separateMenuWidth: 0
@@ -90,6 +90,16 @@ Item {
         function onWidthChanged() { view.updateSeparateMenuGeometry() }
         function onHeightChanged() { view.updateSeparateMenuGeometry() }
         function onVisibilityChanged() { view.updateSeparateMenuGeometry() }
+    }
+
+    Connections {
+        target: view.streamWindow
+        function onXChanged() { view.updateSeparateMenuGeometry() }
+        function onYChanged() { view.updateSeparateMenuGeometry() }
+        function onWidthChanged() { view.updateSeparateMenuGeometry() }
+        function onHeightChanged() { view.updateSeparateMenuGeometry() }
+        function onVisibilityChanged() { view.updateSeparateMenuGeometry() }
+        function onScreenChanged() { view.updateSeparateMenuGeometry() }
     }
 
     QtObject {
@@ -403,10 +413,10 @@ Item {
     Window {
         id: streamStatsWindow
         objectName: "streamStatsWindow"
-        flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowTransparentForInput
+        flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowTransparentForInput | Qt.WindowDoesNotAcceptFocus
         color: "transparent"
         modality: Qt.NonModal
-        transientParent: view.hostWindow
+        transientParent: view.streamWindow
         visible: streamStatsVisible && useSeparateMenuWindow
         x: separateStatsX
         y: separateStatsY
