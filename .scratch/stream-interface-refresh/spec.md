@@ -1,6 +1,6 @@
 # Stream menu, statistics, and session notices
 
-Status: ready-for-agent
+Status: resolved
 Date: 2026-10-21
 Design: approved A toolbar from revision 3; approved A statistics and notices from revision 2
 Test approach: production QML tests plus native checks, confirmed by the user on 2026-10-21
@@ -175,3 +175,27 @@ The 675 browser assertions recorded with the prototype establish its sample beha
 and layout only. They do not satisfy the native acceptance requirements above.
 Implementation must use production QML and preserve native behavior. Keep the
 throwaway prototype on its reference branch instead of merging it into production.
+
+## Answer
+
+Implemented on `codex/stream-interface-integration`. The five tickets deliver the
+approved descriptive A toolbar, compact statistics, and translucent notices in
+both renderer routes. The final production changes are recorded in `62f9676e`.
+The prototype remains on its reference branch.
+
+Final native acceptance passed 270 OpenGL checks and 251 Vulkan checks at
+900x600 logical pixels and measured DPR 1, as requested in the scope update.
+Earlier passing tests were retained; only affected or failed checks were repeated.
+The normal production build passed and excludes test hooks and prototype resources.
+The original build cache was restored. Standards and specification reviews have
+no remaining findings.
+
+See the [completed ticket map](../stream-interface-implementation/map.md),
+[acceptance record](../stream-interface-implementation/evidence/ticket05/acceptance.md),
+[standards review](../stream-interface-implementation/review/standards-final.md),
+and [specification review](../stream-interface-implementation/review/spec-final.md).
+
+Live media, real network degradation, console power effects, physical controllers,
+multiple displays, and live display-scale changes remain unverified. Final Tool
+flyout resize/fullscreen behavior is not inferred from earlier host results.
+No release package, push, or pull request was created.

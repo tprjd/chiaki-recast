@@ -1,6 +1,6 @@
 # Implement the approved stream interface
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 
 Specification: [Stream menu, statistics, and session notices](../spec.md)
@@ -57,7 +57,7 @@ background opacity while text remains opaque. Top tabs expose all three previews
 The [specification](../spec.md) is the implementation contract. Preserve the existing 900-pixel
 minimum width, keyboard and controller support, and both renderer presentations.
 
-## Checks and limits
+## Prototype checks and limits
 
 The browser self-check passed at 900×600, 1280×720, and 1920×1080, with 675
 assertions and no failures. It checked bounds, sample controls, notice states,
@@ -80,4 +80,23 @@ Do not promote its JavaScript or simplified sample state into production code.
 On 2026-10-21, the user confirmed production QML tests with supplied session state
 plus native checks for both renderer modes, transparency, window placement,
 keyboard/controller key handling, and focus. Live console commands and
-physical-controller testing remain separate. Implementation has not started.
+physical-controller testing remain separate. Implementation had not started when
+the specification was published.
+
+## Answer
+
+Implemented on `codex/stream-interface-integration`. All five
+[implementation tickets](../../stream-interface-implementation/map.md) are resolved.
+The native application uses the approved larger A toolbar and compact A statistics
+and notices. Existing session actions and settings contracts remain in place.
+
+The final native checks passed for OpenGL (270) and Vulkan (251) at 900x600,
+measured DPR 1. The normal production build passed. Both code review axes have no
+remaining findings. Passing tests were retained under the user's reduced test scope.
+
+The [acceptance record](../../stream-interface-implementation/evidence/ticket05/acceptance.md)
+contains source identities, captures, test results, and build restoration evidence.
+Live console/media/network effects, physical controllers, multiple displays, and
+live display-scale changes remain unverified. Final Tool flyout resize/fullscreen
+checks remain unverified; earlier host results are recorded separately.
+No prototype code, release package, push, or pull request is part of this delivery.
