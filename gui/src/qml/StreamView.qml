@@ -69,7 +69,8 @@ Item {
         separateDialogY = Math.round(hostWindow.y + (hostWindow.height - height) / 2);
     }
 
-    StackView.onActivating: Chiaki.window.keepVideo = true
+    StackView.onActivating: { Chiaki.window.keepVideo = true; connectionView.retiring = false; }
+    StackView.onDeactivating: connectionView.retiring = true
     StackView.onDeactivated: Chiaki.window.keepVideo = false
 
     Component.onCompleted: {

@@ -112,6 +112,13 @@ TestCase {
         harness.backend.change({phase: "failure", errorTitle: "Late error"});
         compare(harness.actions.length, 0);
     }
+    function test_exitingViewCannotDismissReplacementAttempt() {
+        const harness = createTemporaryObject(harnessComponent, testCase);
+        harness.screen.retiring = true;
+        harness.backend.change({id: "2", phase: "connecting"});
+        harness.screenActive = false;
+        compare(harness.backend.commands.length, 0);
+    }
     function test_longContentAndActionsRemainReachable_data() {
         return [{tag: "900x600", width: 900, height: 600}, {tag: "1280x720", width: 1280, height: 720}];
     }

@@ -41,3 +41,12 @@ C:\Users\david\.codex\worktrees\connection-live-pin\chiaki-ng-ui\gui\tests\qml\t
 PASS   : console_screen::LiveConsolePin::cleanupTestCase()
 Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 5208ms
 ********* Finished testing of console_screen *********
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::ConnectionLocal::initTestCase()
+FAIL!  : console_screen::ConnectionLocal::test_exitingViewCannotDismissReplacementAttempt() Uncaught exception: Cannot assign to non-existent property "retiring"
+C:\Users\david\.codex\worktrees\connection-live-pin\chiaki-ng-ui\gui\tests\qml\tst_ConnectionLocal.qml(117) : failure location
+PASS   : console_screen::ConnectionLocal::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 33ms
+********* Finished testing of console_screen *********
+

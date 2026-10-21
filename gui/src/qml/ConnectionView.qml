@@ -10,6 +10,8 @@ FocusScope {
     property var backend: Chiaki
     property var navigation: root
     property bool managesAttempt: true
+    property bool retiring: false
+    property string ownedAttemptId: ""
     readonly property var attempt: backend.connectionAttempt || ({})
     readonly property string phase: attempt.phase || "connecting"
     readonly property bool psn: attempt.route === "psn"
@@ -22,8 +24,8 @@ FocusScope {
     property bool commandPending: false
     property bool detailsExpanded: false
     property bool leaving: false
-    readonly property bool canRetry: phase === "failure" && !attempt.cleanupPending && attempt.targetValid && !commandPending
-    readonly property bool canCancel: busy && phase !== "cancelling" && attempt.cancelable !== false && !commandPending
+    readonly property bool canRetry: !retiring && phase === "failure" && !attempt.cleanupPending && attempt.targetValid && !commandPending
+    readonly property bool canCancel: !retiring && busy && phase !== "cancelling" && attempt.cancelable !== false && !commandPending
     readonly property string consoleName: streamerMode ? qsTr("Your console") : attempt.name || qsTr("Console")
 
     component ConnectionLabel: Label {
@@ -48,7 +50,7 @@ FocusScope {
         if (!backend.retryConnection(attempt.id)) commandPending = false;
     }
     function back() {
-        if (!terminal || attempt.cleanupPending || leaving || commandPending) return;
+        if (retiring || !terminal || attempt.cleanupPending || leaving || commandPending) return;
         leaving = true;
         backend.dismissConnection(attempt.id);
         navigation.showMainView();
@@ -72,6 +74,7 @@ FocusScope {
             scroll.contentY = Math.min(Math.max(0, scroll.contentHeight - scroll.height), point.y + item.height - scroll.height + 12);
     }
     onAttemptChanged: {
+        if (!retiring) ownedAttemptId = attempt.id || "";
         if (attempt.id !== commandAttempt) {
             commandAttempt = attempt.id || "";
             commandPending = false;
@@ -81,8 +84,11 @@ FocusScope {
         Qt.callLater(focusAction);
     }
     onVisibleChanged: if (visible) Qt.callLater(focusAction)
-    Component.onCompleted: Qt.callLater(focusAction)
-    Component.onDestruction: if (managesAttempt && !leaving && attempt.id && phase !== "ready") backend.dismissConnection(attempt.id)
+    onRetiringChanged: if (!retiring) ownedAttemptId = attempt.id || ""
+    StackView.onDeactivating: retiring = true
+    StackView.onActivating: retiring = false
+    Component.onCompleted: { ownedAttemptId = attempt.id || ""; Qt.callLater(focusAction); }
+    Component.onDestruction: if (managesAttempt && !leaving && ownedAttemptId && ownedAttemptId === attempt.id && phase !== "ready") backend.dismissConnection(ownedAttemptId)
     Keys.onEscapePressed: terminal ? back() : cancel()
     Shortcut { sequence: "Ctrl+Q"; enabled: view.visible && view.enabled; onActivated: view.terminal ? view.back() : view.cancel() }
     MouseArea { anchors.fill: parent; acceptedButtons: Qt.RightButton; onClicked: view.terminal ? view.back() : view.cancel() }
