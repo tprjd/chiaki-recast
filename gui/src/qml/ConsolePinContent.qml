@@ -86,15 +86,15 @@ FocusScope {
                 }
                 Label { text: "chiaki-ng"; font.pixelSize: content.width < 1000 ? 17 : 20; font.bold: true }
             }
-            ConsoleButton {
+            SetupButton {
                 objectName: "pinConsoles"
                 Layout.fillWidth: true
-                text: qsTr("Consoles"); icon.source: "qrc:/icons/discover-24px.svg"; highlighted: true
+                text: qsTr("Consoles"); highlighted: true
                 onClicked: content.cancelled()
             }
-            ConsoleButton {
+            SetupButton {
                 Layout.fillWidth: true
-                text: qsTr("Settings"); icon.source: "qrc:/icons/options.svg"
+                text: qsTr("Settings")
                 enabled: content.settingsEnabled
                 onClicked: content.settingsRequested()
             }
