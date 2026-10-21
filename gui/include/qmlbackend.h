@@ -286,6 +286,7 @@ private:
     bool connectionTargetValid() const;
     void beginConnection(const StreamSessionConnectInfo &info, const QVariantMap &target);
     void startPsnConnection(const StreamSessionConnectInfo &info, const QVariantMap &target, bool continue_attempt = false);
+    void watchConnectionToken(PSNToken *token);
     void finishPsnCleanup();
     void failConnection(const QString &title, const QString &text);
     void setConnectionPhase(const QString &phase);

@@ -263,7 +263,7 @@ QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
             return;
         }
         PSNToken *psnToken = new PSNToken(this->settings, this);
-        connection_token = psnToken;
+        watchConnectionToken(psnToken);
         connect(psnToken, &PSNToken::PSNTokenError, this, [this, owned](const QString &error) {
             if (!owned()) return;
             qCWarning(chiakiGui) << "Internet is currently down...waiting 5 seconds" << error;
@@ -288,7 +288,6 @@ QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
             session_info.psn_token = this->settings->GetPsnAuthToken();
             createSession(session_info, connection_target, true);
         });
-        connect(psnToken, &PSNToken::Finished, psnToken, &QObject::deleteLater);
         QString refresh_token = this->settings->GetPsnRefreshToken();
         psnToken->RefreshPsnToken(std::move(refresh_token));
     });
@@ -556,7 +555,7 @@ void QmlBackend::profileChanged()
             return;
         }
         PSNToken *psnToken = new PSNToken(this->settings, this);
-        connection_token = psnToken;
+        watchConnectionToken(psnToken);
         connect(psnToken, &PSNToken::PSNTokenError, this, [this, owned](const QString &error) {
             if (!owned()) return;
             qCWarning(chiakiGui) << "Internet is currently down...waiting 5 seconds" << error;
@@ -583,7 +582,6 @@ void QmlBackend::profileChanged()
             session_info.psn_token = this->settings->GetPsnAuthToken();
             createSession(session_info, connection_target, true);
         });
-        connect(psnToken, &PSNToken::Finished, psnToken, &QObject::deleteLater);
         QString refresh_token = this->settings->GetPsnRefreshToken();
         psnToken->RefreshPsnToken(std::move(refresh_token));
     });
@@ -993,9 +991,7 @@ void QmlBackend::startPsnConnection(const StreamSessionConnectInfo &info, const 
         return;
     }
     auto *token = new PSNToken(settings, this);
-    connection_token = token;
-    connection_attempt["cleanupPending"] = true;
-    emit connectionAttemptChanged();
+    watchConnectionToken(token);
     connect(token, &PSNToken::PSNTokenError, this, [this, owned](const QString &error) {
         if (owned()) failConnection(tr("Could not reach PlayStation Network"), error);
     });
@@ -1013,6 +1009,14 @@ void QmlBackend::startPsnConnection(const StreamSessionConnectInfo &info, const 
         refreshed.psn_token = settings->GetPsnAuthToken();
         createSession(refreshed, target, true);
     });
+    token->RefreshPsnToken(refresh);
+}
+
+void QmlBackend::watchConnectionToken(PSNToken *token)
+{
+    connection_token = token;
+    const auto attempt_id = connection_generation;
+    connection_attempt["cleanupPending"] = true;
     connect(token, &PSNToken::Finished, this, [this, token, attempt_id] {
         if (connection_token != token) return;
         connection_token.clear();
@@ -1022,7 +1026,6 @@ void QmlBackend::startPsnConnection(const StreamSessionConnectInfo &info, const 
         }
     });
     connect(token, &PSNToken::Finished, token, &QObject::deleteLater);
-    token->RefreshPsnToken(refresh);
 }
 
 void QmlBackend::failConnection(const QString &title, const QString &text)
