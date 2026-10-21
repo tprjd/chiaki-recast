@@ -6,6 +6,7 @@
 #include <chiaki/session.h>
 
 #include "host.h"
+#include "keyboardmousemapper.h"
 
 #include <QSettings>
 #include <QList>
@@ -425,6 +426,8 @@ class Settings : public QObject
 		void SetKeyboardEnabled(bool enabled);
 		bool GetMouseCameraEnabled() const;
 		void SetMouseCameraEnabled(bool enabled);
+		MouseResponse GetMouseResponse() const;
+		bool SetMouseResponse(const MouseResponse &response);
 
 		bool GetMouseTouchEnabled() const;
 		void SetMouseTouchEnabled(bool enabled);

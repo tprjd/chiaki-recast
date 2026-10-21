@@ -113,6 +113,7 @@ Item {
                     if (settingsTarget === target && !disconnectPending && !sessionStopDialog.opened
                             && view.backend.session && !view.backend.sessionPinRequest.id && !view.sessionLoading && !view.sessionError) {
                         if (target === "display") view.navigation.openDisplaySettings();
+                        else if (target === "keyboard-mouse") view.navigation.openKeyboardMouseSettings();
                         else view.navigation.openPlaceboSettings();
                     }
                     settingsTarget = "";

@@ -834,6 +834,34 @@ void QmlSettings::setMouseCameraEnabled(bool enabled)
     emit mouseCameraEnabledChanged();
 }
 
+void QmlSettings::setMouseHorizontalSensitivity(double value)
+{
+    auto response = settings->GetMouseResponse();
+    response.horizontalSensitivity = value;
+    if (settings->SetMouseResponse(response)) emit mouseResponseChanged();
+}
+
+void QmlSettings::setMouseVerticalSensitivity(double value)
+{
+    auto response = settings->GetMouseResponse();
+    response.verticalSensitivity = value;
+    if (settings->SetMouseResponse(response)) emit mouseResponseChanged();
+}
+
+void QmlSettings::setMouseDeadZoneCompensation(double value)
+{
+    auto response = settings->GetMouseResponse();
+    response.deadZoneCompensation = value;
+    if (settings->SetMouseResponse(response)) emit mouseResponseChanged();
+}
+
+void QmlSettings::setMouseInvertVertical(bool value)
+{
+    auto response = settings->GetMouseResponse();
+    response.invertVertical = value;
+    if (settings->SetMouseResponse(response)) emit mouseResponseChanged();
+}
+
 void QmlSettings::setKeyboardEnabled(bool enabled)
 {
     settings->SetKeyboardEnabled(enabled);
@@ -1837,6 +1865,7 @@ void QmlSettings::setSettings(Settings *new_settings)
 
 void QmlSettings::refreshAllKeys()
 {
+    emit mouseResponseChanged();
     emit mouseCameraEnabledChanged();
     emit remotePlayAskChanged();
     emit addSteamShortcutAskChanged();

@@ -401,6 +401,74 @@ private:
 #endif
     }
 private slots:
+    void keyboardMouseSettingsRoute()
+    {
+        if (QGuiApplication::platformName() == "offscreen") QSKIP("Requires a desktop renderer.");
+        TestSettingsProfile profile;
+        Settings settings(profile.name);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetRenderBackend(qEnvironmentVariable("CHIAKI_INPUT_TEST_RENDERER") == "vulkan" ? RenderBackend::Vulkan : RenderBackend::OpenGL);
+        settings.SetHardwareDecoder({});
+        QmlMainWindow window(&settings);
+        auto *backend = window.getBackend();
+        backend->stopAutoConnect();
+        StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
+            QByteArray(CHIAKI_SESSION_AUTH_SIZE, '\0'), QByteArray(16, '\0'), {}, {}, false, false, false, false);
+        StreamSession session(info);
+        struct SessionBoundary {
+            QmlBackend *backend;
+            ~SessionBoundary() { backend->session = nullptr; backend->sessionChanged(nullptr); }
+        } cleanup{backend};
+        backend->session = &session;
+        backend->sessionChanged(&session);
+        window.resize(900, 600);
+        window.show();
+        window.requestActivate();
+        QTRY_VERIFY(window.isActive());
+        QQuickItem opener(window.quick_window->contentItem());
+        opener.forceActiveFocus(Qt::TabFocusReason);
+        auto *root = window.quick_item;
+        QVERIFY(QMetaObject::invokeMethod(root, "openKeyboardMouseSettings"));
+        QVERIFY(root->property("streamSettingsOpen").toBool());
+        QCOMPARE(root->property("useSeparateStreamSettingsWindows").toBool(), window.runtimeRendererBackend() == 1);
+        QVERIFY(window.streamInput()->blocked());
+        QVERIFY(backend->session == &session);
+        QVERIFY(QMetaObject::invokeMethod(root, "closeDialog"));
+        QVERIFY(!root->property("streamSettingsOpen").toBool());
+        QVERIFY(!window.streamInput()->blocked());
+        QVERIFY(opener.hasFocus());
+        QVERIFY(!window.gameplayCaptured());
+    }
+    void mouseResponseRecapture()
+    {
+        TestSettingsProfile profile;
+        Settings settings(profile.name);
+        settings.SetMouseCameraEnabled(true);
+        settings.SetHardwareDecoder({});
+        StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
+            QByteArray(CHIAKI_SESSION_AUTH_SIZE, '\0'), QByteArray(16, '\0'), {}, {}, false, false, false, false);
+        StreamSession session(info);
+        session.SetMouseResponse(settings.GetMouseResponse());
+        session.SetGameplayCapture(true);
+        session.HandleRelativeMouseMove(1, 0);
+        QMetaObject::invokeMethod(session.gameplay_mouse_timer, "timeout", Qt::DirectConnection);
+        QCOMPARE(outgoing.right_x, 1000);
+        auto response = settings.GetMouseResponse();
+        response.horizontalSensitivity = 2;
+        QVERIFY(settings.SetMouseResponse(response));
+        QCOMPARE(outgoing.right_x, 1000);
+        session.SetGameplayCapture(false);
+        QCOMPARE(outgoing.right_x, 0);
+        session.SetMouseResponse(settings.GetMouseResponse());
+        session.SetGameplayCapture(true);
+        QCOMPARE(outgoing.right_x, 0);
+        session.HandleRelativeMouseMove(1, 0);
+        QMetaObject::invokeMethod(session.gameplay_mouse_timer, "timeout", Qt::DirectConnection);
+        QCOMPARE(outgoing.right_x, 2000);
+        session.SetGameplayCapture(false);
+    }
     void mouseDesktop() { runMouse(false); }
     void spontaneousMouse()
     {

@@ -26,6 +26,7 @@ Item {
     }
     function openDisplaySettings() { actions = actions.concat(["display"]); openStreamSettings(); }
     function openPlaceboSettings() { actions = actions.concat(["renderer"]); openStreamSettings(); }
+    function openKeyboardMouseSettings() { actions = actions.concat(["keyboard-mouse"]); openStreamSettings(); }
     function closeStreamSettings() { streamSettingsOpen = false; streamWindow.streamInput.dismiss(settingsPresentation); streamWindow.streamInput.settled(settingsPresentation); }
     QtObject {
         id: liveSession
@@ -39,6 +40,7 @@ Item {
     }
     QtObject {
         id: settings
+        property bool mouseCameraSupported: true
         property int audioVolume: 64
         property real sZoomFactor: 0
         property int videoPreset: 1

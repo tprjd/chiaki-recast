@@ -6,6 +6,13 @@ QtObject {
     property int changeCount: 0
     property bool mouseCameraSupported: true
     property bool mouseCameraEnabled: false
+    property real mouseHorizontalSensitivity: 1
+    property real mouseVerticalSensitivity: 1
+    property real mouseDeadZoneCompensation: 0
+    property bool mouseInvertVertical: false
+    readonly property real mouseSensitivityMinimum: 0.05
+    readonly property real mouseSensitivityMaximum: 8
+    readonly property real mouseCompensationMaximum: 0.5
     onMouseCameraEnabledChanged: changeCount++
     property var actions: []
     function record(name, args) { actions = actions.concat([{name: name, args: args || []}]); }

@@ -3,6 +3,22 @@
 #include <cmath>
 #include <limits>
 
+bool MouseResponse::valid() const
+{
+    return std::isfinite(horizontalSensitivity) && horizontalSensitivity >= MinimumSensitivity
+        && horizontalSensitivity <= MaximumSensitivity && std::isfinite(verticalSensitivity)
+        && verticalSensitivity >= MinimumSensitivity && verticalSensitivity <= MaximumSensitivity
+        && std::isfinite(deadZoneCompensation) && deadZoneCompensation >= 0
+        && deadZoneCompensation <= MaximumCompensation;
+}
+
+bool KeyboardMouseMapper::setMouseResponse(const MouseResponse &value)
+{
+    if (!value.valid()) return false;
+    response = value;
+    return true;
+}
+
 void KeyboardMouseMapper::reset(const QSet<int> &held)
 {
     pressed.clear();
@@ -35,19 +51,19 @@ void KeyboardMouseMapper::mouseMove(double dx, double dy, qint64 timestampUs)
 
 bool KeyboardMouseMapper::advanceMouse(qint64 timestampUs)
 {
-    // shortcut: provisional 16 ms observation and gain, calibrate with real mice in ticket 03.
-    constexpr qint64 observationUs = 16000;
-    while (!mouse_samples.empty() && timestampUs - mouse_samples.front().time >= observationUs)
+    while (!mouse_samples.empty() && timestampUs - mouse_samples.front().time >= MouseResponse::ObservationUs)
         mouse_samples.pop_front();
     double x = 0, y = 0;
     for (const auto &sample : mouse_samples) {
-        x += sample.x * 1000.0;
-        y += sample.y * 1000.0;
+        x += sample.x * MouseResponse::Gain * response.horizontalSensitivity;
+        y += sample.y * MouseResponse::Gain * response.verticalSensitivity;
     }
+    if (response.invertVertical) y = -y;
     const double magnitude = std::hypot(x, y);
-    if (magnitude > 32767) {
-        x *= 32767 / magnitude;
-        y *= 32767 / magnitude;
+    if (magnitude > 0) {
+        const double output = std::min(32767.0, magnitude + response.deadZoneCompensation * (32767 - magnitude));
+        x = x / magnitude * output;
+        y = y / magnitude * output;
     }
     const auto nextX = int16_t(std::lround(x));
     const auto nextY = int16_t(std::lround(y));

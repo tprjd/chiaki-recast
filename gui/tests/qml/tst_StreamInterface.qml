@@ -177,6 +177,22 @@ TestCase {
         compare(h.window.releases, 1);
     }
     function test_sessionRemoval_data() { return routes(); }
+    function test_keyboardMouseSettings_data() { return routes(); }
+    function test_keyboardMouseSettings(data) {
+        const h = createTemporaryObject(harnessComponent, tests);
+        h.settings.mouseCameraSupported = true;
+        const host = openMenu(h, data.separate);
+        const button = findChild(host, "streamKeyboardMouseSettings");
+        verify(button, "Keyboard and mouse settings are available during the stream");
+        button.forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
+        tryCompare(h, "actions", ["keyboard-mouse"]);
+        verify(h.backend.session);
+        verify(h.streamSettingsOpen);
+        h.closeStreamSettings();
+        tryCompare(h.settingsFocusItem, "activeFocus", false);
+        verify(!h.streamSettingsOpen);
+    }
     function test_sessionRemoval(data) {
         const h = createTemporaryObject(harnessComponent, tests);
         const host = openMenu(h, data.separate);

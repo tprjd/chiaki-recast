@@ -12,7 +12,7 @@ Item {
     property var librarySelection: null
     readonly property bool preferSeparateStreamSettingsWindows: Chiaki.window.runtimeRendererBackend === 1 && Chiaki.session
     property bool useSeparateStreamSettingsWindows: false
-    readonly property bool streamSettingsOpen: displaySettingsRect.opacity > 0 || placeboSettingsRect.opacity > 0 || colorMappingSettingsRect.opacity > 0
+    readonly property bool streamSettingsOpen: displaySettingsRect.opacity > 0 || placeboSettingsRect.opacity > 0 || colorMappingSettingsRect.opacity > 0 || keyboardMouseSettingsRect.opacity > 0
     Material.theme: Material.Dark
     Material.accent: "#00a7ff"
 
@@ -46,7 +46,7 @@ Item {
         const loader = useSeparateStreamSettingsWindows ? separateDisplaySettingsLoader : displaySettingsLoader;
         if(loader.status == Loader.Ready)
         {
-            if(placeboSettingsRect.opacity || displaySettingsRect.opacity || colorMappingSettingsRect.opacity)
+            if(root.streamSettingsOpen)
                 closeDialog();
             displaySettingsRect.opacity = 0.8;
             presentSettings(loader, "display");
@@ -62,12 +62,12 @@ Item {
     }
     function openPlaceboSettings() {
         if (livePinHost.blocking) return;
-        if (!displaySettingsRect.opacity && !placeboSettingsRect.opacity && !colorMappingSettingsRect.opacity)
+        if (!root.streamSettingsOpen)
             useSeparateStreamSettingsWindows = preferSeparateStreamSettingsWindows;
         const loader = useSeparateStreamSettingsWindows ? separatePlaceboSettingsLoader : placeboSettingsLoader;
         if(loader.status == Loader.Ready)
         {
-            if(placeboSettingsRect.opacity || displaySettingsRect.opacity || colorMappingSettingsRect.opacity)
+            if(root.streamSettingsOpen)
                 closeDialog();
             placeboSettingsRect.opacity = 0.8;
             presentSettings(loader, "renderer");
@@ -82,8 +82,28 @@ Item {
         }
     }
 
+    function openKeyboardMouseSettings() {
+        if (livePinHost.blocking || !Chiaki.settings.mouseCameraSupported) return;
+        if (root.streamSettingsOpen) closeDialog();
+        useSeparateStreamSettingsWindows = preferSeparateStreamSettingsWindows;
+        const loader = useSeparateStreamSettingsWindows ? separateKeyboardMouseSettingsLoader : keyboardMouseSettingsLoader;
+        if (loader.status !== Loader.Ready) return;
+        keyboardMouseSettingsRect.opacity = 0.8;
+        presentSettings(loader, "keyboard-mouse");
+        const item = loader.item.restoreFocusItem || loader.item.mainItem.nextItemInFocusChain();
+        if (item) item.forceActiveFocus(Qt.TabFocusReason);
+        loader.item.restoreFocusItem = null;
+    }
+
     function closeDialog() {
-       if(displaySettingsRect.opacity) {
+       if(keyboardMouseSettingsRect.opacity) {
+        const loader = useSeparateStreamSettingsWindows ? separateKeyboardMouseSettingsLoader : keyboardMouseSettingsLoader;
+        loader.item.restoreFocusItem = useSeparateStreamSettingsWindows ? separateKeyboardMouseSettingsWindow.activeFocusItem : Window.window.activeFocusItem;
+        keyboardMouseSettingsRect.opacity = 0.0;
+        dismissSettings();
+        useSeparateStreamSettingsWindows = false;
+       }
+       else if(displaySettingsRect.opacity) {
         displaySettingsRect.opacity = 0.0;
         const loader = useSeparateStreamSettingsWindows ? separateDisplaySettingsLoader : displaySettingsLoader;
         loader.item.restoreFocusItem = Window.window.activeFocusItem;
@@ -109,6 +129,7 @@ Item {
     }
 
     function showMainView() {
+        if (keyboardMouseSettingsRect.opacity) closeDialog();
         if(displaySettingsRect.opacity) {
             displaySettingsRect.opacity = 0.0;
             const loader = useSeparateStreamSettingsWindows ? separateDisplaySettingsLoader : displaySettingsLoader;
@@ -363,6 +384,44 @@ Item {
         }
     }
 
+    Rectangle {
+        id: keyboardMouseSettingsRect
+        opacity: 0.0
+        visible: opacity > 0 && !useSeparateStreamSettingsWindows
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: Math.min(900, root.width)
+        height: Math.min(700, root.height)
+        color: Material.background
+        Loader {
+            id: keyboardMouseSettingsLoader
+            anchors.fill: parent
+            sourceComponent: keyboardMouseSettingsDialogComponent
+        }
+    }
+    Window {
+        id: separateKeyboardMouseSettingsWindow
+        objectName: "keyboardMouseSettingsWindow"
+        visible: useSeparateStreamSettingsWindows && keyboardMouseSettingsRect.opacity > 0
+        transientParent: Chiaki.window
+        flags: Qt.Dialog | Qt.FramelessWindowHint
+        color: Material.background
+        modality: Qt.NonModal
+        x: Math.round(root.mapToGlobal(0, 0).x + (root.width - width) / 2)
+        y: Math.round(root.mapToGlobal(0, 0).y)
+        width: Math.min(900, Math.round(root.width))
+        height: Math.min(700, Math.round(root.height))
+        onVisibleChanged: if (visible) requestActivate()
+        onClosing: event => { event.accepted = false; root.closeDialog(); }
+        Shortcut { sequence: "Ctrl+O"; onActivated: root.closeDialog() }
+        Shortcut { sequences: [StandardKey.Cancel]; onActivated: root.closeDialog() }
+        Loader {
+            id: separateKeyboardMouseSettingsLoader
+            anchors.fill: parent
+            sourceComponent: keyboardMouseSettingsDialogComponent
+        }
+    }
+
     Window {
         id: separateDisplaySettingsWindow
         visible: useSeparateStreamSettingsWindows && displaySettingsRect.opacity > 0.0
@@ -595,6 +654,11 @@ Item {
     Component {
         id: settingsDialogComponent
         SettingsDialog { }
+    }
+
+    Component {
+        id: keyboardMouseSettingsDialogComponent
+        KeyboardMouseSettingsDialog { }
     }
 
     Component {

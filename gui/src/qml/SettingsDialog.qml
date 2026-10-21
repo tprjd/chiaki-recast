@@ -53,6 +53,7 @@ FocusScope {
     function revealSetting(category, name, consoleType, fallback, afterReveal) {
         searchField.clear();
         bar.currentIndex = category;
+        if (category === 5) keyboardMousePage.currentTab = name.indexOf("keyboardMouseBinding") === 0 ? 1 : 0;
         if (consoleType !== undefined) selectedConsole = consoleType;
         Qt.callLater(function() {
             let item = Search.findItem(dialog, name);
@@ -239,7 +240,7 @@ FocusScope {
         case 2: item = consoleSelection; break;
         case 3: item = audioOutDevice; break;
         case 4: item = registerNewButton; break;
-        case 5: item = dialog.backend.settings.mouseCameraSupported ? mouseCameraEnabled : resetAllKeys; break;
+        case 5: item = dialog.backend.settings.mouseCameraSupported ? keyboardMousePage.firstFocusItem : resetAllKeys; break;
         case 6: item = controllerMappingChange; break;
         case 7: item = firstRemoteFocusableItem(); break;
         case 8: item = profile; break;
@@ -1602,21 +1603,11 @@ FocusScope {
                         width: Math.max(0, keysFlick.width - 14)
                         spacing: 16
                         Label { text: qsTr("Keyboard and mouse"); font.pixelSize: 24; font.bold: true }
-                        C.CheckBox {
-                            id: mouseCameraEnabled
-                            objectName: "mouseCameraEnabled"
-                            visible: dialog.backend.settings.mouseCameraSupported
-                            text: qsTr("Enable mouse camera mode")
-                            Accessible.name: text
-                            Accessible.description: qsTr("During a stream, press F8 to capture or release your controls.")
-                            checked: dialog.backend.settings.mouseCameraEnabled
-                            onToggled: dialog.backend.settings.mouseCameraEnabled = checked
-                        }
-                        Label {
-                            visible: dialog.backend.settings.mouseCameraSupported
+                        KeyboardMousePage {
+                            id: keyboardMousePage
                             Layout.fillWidth: true
-                            text: qsTr("During a stream, press F8 to capture or release your controls.")
-                            wrapMode: Text.WordWrap
+                            visible: dialog.backend.settings.mouseCameraSupported
+                            settings: dialog.backend.settings
                         }
                         Frame {
                             Layout.fillWidth: true

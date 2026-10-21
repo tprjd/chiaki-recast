@@ -26,6 +26,9 @@
     <file>RegistDialog.qml</file>
     <file>SteamShortcutDialog.qml</file>
     <file>SettingsDialog.qml</file>
+    <file>KeyboardMousePage.qml</file>
+    <file>KeyboardMouseSettingsDialog.qml</file>
+    <file>MouseResponsePane.qml</file>
     <file>SettingsSearch.js</file>
     <file>DisplaySettingsDialog.qml</file>
     <file>PlaceboSettingsDialog.qml</file>

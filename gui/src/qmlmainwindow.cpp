@@ -2896,6 +2896,7 @@ void QmlMainWindow::startGameplayCapture(ulong timestamp)
     for (const auto &binding : buttons)
         if (GetAsyncKeyState(binding.native) & 0x8000) held.insert(-int(binding.button));
 #endif
+    session->SetMouseResponse(settings->GetMouseResponse());
     session->SetGameplayCapture(true, held);
     gameplay_input_not_before = timestamp;
     gameplay_captured = true;

@@ -7,6 +7,7 @@
 #include <QUrl>
 #include <QKeySequence>
 #include <QCoreApplication>
+#include <cmath>
 
 #include <chiaki/config.h>
 
@@ -912,6 +913,32 @@ void Settings::SetMouseCameraEnabled(bool enabled)
 {
 	settings.setValue("settings/keyboard_mouse/enabled", enabled);
 	emit MouseCameraEnabledChanged();
+}
+
+MouseResponse Settings::GetMouseResponse() const
+{
+	MouseResponse response;
+	const auto number = [this](const char *key, double fallback, double minimum, double maximum) {
+		bool ok;
+		const double value = settings.value(QStringLiteral("settings/keyboard_mouse/") + key, fallback).toDouble(&ok);
+		return ok && std::isfinite(value) && value >= minimum && value <= maximum ? value : fallback;
+	};
+	response.horizontalSensitivity = number("horizontal_sensitivity", 1.0, MouseResponse::MinimumSensitivity, MouseResponse::MaximumSensitivity);
+	response.verticalSensitivity = number("vertical_sensitivity", 1.0, MouseResponse::MinimumSensitivity, MouseResponse::MaximumSensitivity);
+	response.deadZoneCompensation = number("dead_zone_compensation", 0.0, 0, MouseResponse::MaximumCompensation);
+	const auto invert = settings.value("settings/keyboard_mouse/invert_vertical", false).toString();
+	response.invertVertical = invert == "true" || invert == "1";
+	return response;
+}
+
+bool Settings::SetMouseResponse(const MouseResponse &response)
+{
+	if (!response.valid()) return false;
+	settings.setValue("settings/keyboard_mouse/horizontal_sensitivity", response.horizontalSensitivity);
+	settings.setValue("settings/keyboard_mouse/vertical_sensitivity", response.verticalSensitivity);
+	settings.setValue("settings/keyboard_mouse/dead_zone_compensation", response.deadZoneCompensation);
+	settings.setValue("settings/keyboard_mouse/invert_vertical", response.invertVertical);
+	return true;
 }
 void Settings::SetKeyboardEnabled(bool enabled)
 {

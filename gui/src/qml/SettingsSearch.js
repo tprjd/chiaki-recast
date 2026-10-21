@@ -90,6 +90,10 @@ function entries(settings) {
         {category: 4, group: qsTranslate("SettingsSearch", "Registered Consoles"), target: "deleteRegisteredConsole0", title: qsTranslate("SettingsSearch", "Delete registered console"), description: qsTranslate("SettingsSearch", "Focus the first current console delete action. Confirmation is required."), fallback: "registeredConsolesEmpty"},
         {category: 4, group: qsTranslate("SettingsSearch", "Hidden Consoles"), target: "hiddenConsoleInfo0", title: qsTranslate("SettingsSearch", "Hidden console information"), description: qsTranslate("SettingsSearch", "Inspect consoles hidden from the library."), fallback: "hiddenConsolesEmpty"},
         {category: 4, group: qsTranslate("SettingsSearch", "Hidden Consoles"), target: "unhideConsole0", title: qsTranslate("SettingsSearch", "Unhide console"), description: qsTranslate("SettingsSearch", "Focus the first current hidden console. Confirmation is required."), fallback: "hiddenConsolesEmpty"},
+        {category: 5, group: qsTranslate("SettingsSearch", "Mouse response"), target: "mouseHorizontalSensitivity", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Horizontal sensitivity"), description: qsTranslate("SettingsSearch", "Set the horizontal mouse sensitivity multiplier.")},
+        {category: 5, group: qsTranslate("SettingsSearch", "Mouse response"), target: "mouseVerticalSensitivity", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Vertical sensitivity"), description: qsTranslate("SettingsSearch", "Set the vertical mouse sensitivity multiplier.")},
+        {category: 5, group: qsTranslate("SettingsSearch", "Mouse response"), target: "mouseDeadZoneCompensation", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Game dead-zone compensation"), description: qsTranslate("SettingsSearch", "Help small mouse movements cross the game stick dead zone.")},
+        {category: 5, group: qsTranslate("SettingsSearch", "Mouse response"), target: "mouseInvertVertical", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Invert vertical camera movement"), description: qsTranslate("SettingsSearch", "Reverse the vertical camera direction.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Keyboard and mouse"), target: "mouseCameraEnabled", keywords: qsTranslate("SettingsSearch", "F8 gameplay capture keyboard mouse camera controls"), title: qsTranslate("SettingsSearch", "Enable mouse camera mode"), description: qsTranslate("SettingsSearch", "During a stream, press F8 to capture or release your controls.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Keyboard and mouse"), target: "keyboardEnabled", fallback: "mouseCameraEnabled", keywords: qsTranslate("SettingsSearch", "Enable keyboard controller"), title: qsTranslate("SettingsSearch", "Keyboard controller"), description: qsTranslate("SettingsSearch", "Enable keyboard controller input.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Keyboard and mouse"), target: "mouseTouchEnabled", fallback: "mouseCameraEnabled", keywords: qsTranslate("SettingsSearch", "Enable mouse touchpad"), title: qsTranslate("SettingsSearch", "Mouse touchpad"), description: qsTranslate("SettingsSearch", "Use the mouse to control the touchpad.")},
@@ -218,8 +222,9 @@ function entries(settings) {
     ];
     const platform = {steamDeckHaptics: "steamDeckHaptics", verticalDeck: "verticalDeck",
         speechProcessing: "speechProcessing", noiseSuppressLevel: "speechProcessing", echoSuppressLevel: "speechProcessing"};
+    const mouseTargets = ["mouseCameraEnabled", "mouseHorizontalSensitivity", "mouseVerticalSensitivity", "mouseDeadZoneCompensation", "mouseInvertVertical"];
     const supported = result.filter(entry => (!platform[entry.target] || typeof settings[platform[entry.target]] !== "undefined")
-        && (entry.target !== "mouseCameraEnabled" || settings.mouseCameraSupported));
+        && (mouseTargets.indexOf(entry.target) < 0 || settings.mouseCameraSupported));
     for (const mapping of settings.controllerMapping) {
         supported.push({category: 5, group: qsTranslate("SettingsSearch", "Key assignments"),
             title: qsTranslate("SettingsSearch", "Keyboard key for %1").arg(mapping.buttonName),
@@ -238,6 +243,13 @@ function entries(settings) {
                 description: qsTranslate("SettingsSearch", "Select a controller first. Focusing the target does not capture input."),
                 target: "controllerMap" + value + "Slot" + slot, buttonValue: value, slot: slot});
         }
+    }
+    if (settings.mouseCameraSupported) for (const action of settings.keyboardMouseBindings || []) {
+        for (let slot = 0; slot < 2; ++slot) supported.push({category: 5,
+            group: qsTranslate("SettingsSearch", "Bindings"),
+            title: (slot === 0 ? qsTranslate("SettingsSearch", "%1 primary binding") : qsTranslate("SettingsSearch", "%1 alternative binding")).arg(action.name),
+            description: qsTranslate("SettingsSearch", "Change the keyboard or mouse input for this controller action."),
+            target: "keyboardMouseBinding" + action.action + "_" + slot, fallback: "mouseCameraEnabled"});
     }
     return supported;
 }

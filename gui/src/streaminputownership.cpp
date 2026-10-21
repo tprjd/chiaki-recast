@@ -52,7 +52,7 @@ QString StreamInputOwnership::present(QObject *owner, const QString &role, QQuic
     if (!window) {
         if (auto *context = qobject_cast<QQuickItem *>(objectProperty(owner, "context"))) window = context->window();
     }
-    if (!window || (content && (role == "display" || role == "renderer" || role == "color-mapping")))
+    if (!window || (content && (role == "display" || role == "renderer" || role == "color-mapping" || role == "keyboard-mouse")))
         window = content;
     Presentation presentation;
     presentation.owner = owner;

@@ -84,6 +84,13 @@ class QmlSettings : public QObject
     Q_PROPERTY(bool keyboardEnabled READ keyboardEnabled WRITE setKeyboardEnabled NOTIFY keyboardEnabledChanged)
     Q_PROPERTY(bool mouseCameraEnabled READ mouseCameraEnabled WRITE setMouseCameraEnabled NOTIFY mouseCameraEnabledChanged)
     Q_PROPERTY(bool mouseCameraSupported READ mouseCameraSupported CONSTANT)
+    Q_PROPERTY(double mouseHorizontalSensitivity READ mouseHorizontalSensitivity WRITE setMouseHorizontalSensitivity NOTIFY mouseResponseChanged)
+    Q_PROPERTY(double mouseVerticalSensitivity READ mouseVerticalSensitivity WRITE setMouseVerticalSensitivity NOTIFY mouseResponseChanged)
+    Q_PROPERTY(double mouseDeadZoneCompensation READ mouseDeadZoneCompensation WRITE setMouseDeadZoneCompensation NOTIFY mouseResponseChanged)
+    Q_PROPERTY(bool mouseInvertVertical READ mouseInvertVertical WRITE setMouseInvertVertical NOTIFY mouseResponseChanged)
+    Q_PROPERTY(double mouseSensitivityMinimum READ mouseSensitivityMinimum CONSTANT)
+    Q_PROPERTY(double mouseSensitivityMaximum READ mouseSensitivityMaximum CONSTANT)
+    Q_PROPERTY(double mouseCompensationMaximum READ mouseCompensationMaximum CONSTANT)
     Q_PROPERTY(bool dpadTouchEnabled READ dpadTouchEnabled WRITE setDpadTouchEnabled NOTIFY dpadTouchEnabledChanged)
     Q_PROPERTY(bool iDROnFECFailureEnabled READ iDROnFECFailureEnabled WRITE setIDROnFECFailureEnabled NOTIFY iDROnFECFailureEnabledChanged)
     Q_PROPERTY(uint16_t dpadTouchIncrement READ dpadTouchIncrement WRITE setDpadTouchIncrement NOTIFY dpadTouchIncrementChanged)
@@ -535,6 +542,17 @@ public:
     bool mouseCameraEnabled() const;
     void setMouseCameraEnabled(bool enabled);
     bool mouseCameraSupported() const;
+    double mouseHorizontalSensitivity() const { return settings->GetMouseResponse().horizontalSensitivity; }
+    double mouseVerticalSensitivity() const { return settings->GetMouseResponse().verticalSensitivity; }
+    double mouseDeadZoneCompensation() const { return settings->GetMouseResponse().deadZoneCompensation; }
+    bool mouseInvertVertical() const { return settings->GetMouseResponse().invertVertical; }
+    double mouseSensitivityMinimum() const { return MouseResponse::MinimumSensitivity; }
+    double mouseSensitivityMaximum() const { return MouseResponse::MaximumSensitivity; }
+    double mouseCompensationMaximum() const { return MouseResponse::MaximumCompensation; }
+    void setMouseHorizontalSensitivity(double value);
+    void setMouseVerticalSensitivity(double value);
+    void setMouseDeadZoneCompensation(double value);
+    void setMouseInvertVertical(bool value);
 
     bool dpadTouchEnabled() const;
     void setDpadTouchEnabled(bool enabled);
@@ -598,6 +616,7 @@ public:
     Q_INVOKABLE QString stringForStreamMenuShortcut() const;
 
 signals:
+    void mouseResponseChanged();
     void mouseCameraEnabledChanged();
     void resolutionLocalPS4Changed();
     void resolutionRemotePS4Changed();

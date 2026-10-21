@@ -39,6 +39,9 @@ set_tests_properties(chiaki-console-screen PROPERTIES
     ENVIRONMENT "${screen_test_environment}")
 
 if(TARGET chiaki-gui AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_executable(chiaki-mouse-response-tests mouseresponse.cpp)
+    target_link_libraries(chiaki-mouse-response-tests PRIVATE chiaki-gui Qt6::Test)
+    add_test(NAME chiaki-mouse-response COMMAND chiaki-mouse-response-tests)
     add_executable(chiaki-stream-input-native-tests streaminputnative.cpp)
     target_link_libraries(chiaki-stream-input-native-tests PRIVATE chiaki-gui Qt6::Test)
     target_link_options(chiaki-stream-input-native-tests PRIVATE "-Wl,--wrap=chiaki_session_set_controller_state")

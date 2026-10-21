@@ -16,7 +16,7 @@ FocusScope {
     property bool separate: false
     property Item initialFocusItem: resumeButton
     readonly property int presetIndex: Math.max(0, presetRepeater.model.findIndex(preset => preset.preset === streamWindow.videoPreset))
-    implicitHeight: toolbar.implicitHeight + 24
+    implicitHeight: toolbar.implicitHeight + 24 + (keyboardMouseSettingsButton.visible ? 44 : 0)
     focus: true
     anchors.fill: parent
     Keys.onMenuPressed: menuController.close()
@@ -123,8 +123,11 @@ FocusScope {
     }
     RowLayout {
         id: toolbar
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.margins: 12
+        height: implicitHeight
         spacing: 8
         MenuButton {
             id: resumeButton
@@ -218,9 +221,26 @@ FocusScope {
                 else navigation.showMainView();
             }
             KeyNavigation.left: qualityButton
-            KeyNavigation.tab: resumeButton
+            KeyNavigation.tab: keyboardMouseSettingsButton.visible ? keyboardMouseSettingsButton : resumeButton
             KeyNavigation.backtab: qualityButton
         }
+    }
+
+    FlyoutButton {
+        id: keyboardMouseSettingsButton
+        objectName: "streamKeyboardMouseSettings"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: 12
+        height: 36
+        visible: !!settings.mouseCameraSupported
+        text: qsTr("Keyboard and mouse settings")
+        Accessible.name: text
+        onClicked: menuController.openSettings("keyboard-mouse")
+        KeyNavigation.up: disconnectButton
+        KeyNavigation.backtab: disconnectButton
+        KeyNavigation.tab: resumeButton
     }
 
     Flyout {
