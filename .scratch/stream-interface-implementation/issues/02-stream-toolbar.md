@@ -1,6 +1,6 @@
 # 02: Build the approved A toolbar
 
-Status: ready-for-agent
+Status: claimed
 Type: task
 Blocked by: 01
 
@@ -34,3 +34,5 @@ Parent and specification: [implementation map](../map.md).
 
 Ticket 01 is the only blocker. Statistics and notices keep their existing behavior
 until their own tickets land; this menu must not require their redesigned versions.
+
+Claimed after ticket 01 merged into the integration branch in `fe4850b8`.

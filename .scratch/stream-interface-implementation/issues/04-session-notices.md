@@ -1,6 +1,6 @@
 # 04: Build the approved A session notices
 
-Status: ready-for-agent
+Status: claimed
 Type: task
 Blocked by: 01
 
@@ -33,3 +33,5 @@ Parent and specification: [implementation map](../map.md).
 Ticket 01 is the only blocker. Use the existing menu and session action contracts.
 The final combined interaction with the redesigned toolbar and statistics is a
 required part of 05, not a reason to delay this complete notice slice.
+
+Claimed after ticket 01 merged into the integration branch in `fe4850b8`.

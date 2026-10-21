@@ -13,17 +13,17 @@ published in `fff89373`. Keep the prototype out of production integration.
 
 | Ticket | Delivers | Blocked by | Status |
 | --- | --- | --- | --- |
-| [01: Share the existing stream interface](issues/01-share-stream-interface.md) | Shared production menu and one test boundary, with current behavior preserved | None | claimed |
-| [02: Build the approved A toolbar](issues/02-stream-toolbar.md) | Complete descriptive toolbar, pop-ups, settings navigation, audio, Resume, and Disconnect | 01 | ready-for-agent |
-| [03: Build the approved A statistics overlay](issues/03-stream-statistics.md) | Compact six-value readout with real bindings and visibility rules | 01 | ready-for-agent |
-| [04: Build the approved A session notices](issues/04-session-notices.md) | Network, blocked-content, and disabled-media notices with actions and cleanup | 01 | ready-for-agent |
+| [01: Share the existing stream interface](issues/01-share-stream-interface.md) | Shared production menu and one test boundary, with current behavior preserved | None | resolved |
+| [02: Build the approved A toolbar](issues/02-stream-toolbar.md) | Complete descriptive toolbar, pop-ups, settings navigation, audio, Resume, and Disconnect | 01 | claimed |
+| [03: Build the approved A statistics overlay](issues/03-stream-statistics.md) | Compact six-value readout with real bindings and visibility rules | 01 | claimed |
+| [04: Build the approved A session notices](issues/04-session-notices.md) | Network, blocked-content, and disabled-media notices with actions and cleanup | 01 | claimed |
 | [05: Complete native acceptance](issues/05-native-acceptance.md) | Combined native verification, regressions, and normal production build | 02, 03, 04 | ready-for-agent |
 
 ## Work order
 
-Ticket 01 can start immediately. Tickets 02, 03, and 04 become available after 01
-is resolved. They use the same production test boundary but do not require one
-another's completed feature. Ticket 05 checks their combined behavior.
+Ticket 01 is resolved. Tickets 02, 03, and 04 are claimed for implementation.
+They use the same production test boundary but do not require one another's
+completed feature. Ticket 05 remains blocked by 02, 03, and 04.
 
 Shared source edits may need coordination. That is not an extra blocking edge.
 Each feature ticket must pass its own production QML checks before resolution;
@@ -55,5 +55,15 @@ limits explicitly. Browser prototype checks do not establish native acceptance.
 
 Implementation started on `codex/stream-interface-integration` from production
 commit `746218af`. The approved specification and tickets are recorded in
-`401559f7`. The prototype remains on its reference branch. Ticket 01 is claimed.
+`401559f7`. The prototype remains on its reference branch. Ticket 01 was claimed.
 The parent issue remains open.
+
+Ticket [01](issues/01-share-stream-interface.md) is resolved in integration merge
+`fe4850b8`, with implementation `c07c4421`. Both renderer routes use the shared
+production menu. `StreamView` provides one supplied-state boundary for the menu,
+statistics, and notices. The current presentation remains in place.
+See [baseline evidence](evidence/ticket01/README.md) for passing production QML,
+controlled native checks, normal build records, and verification limits.
+
+Tickets 02, 03, and 04 are now claimed. Ticket 05 remains blocked by all three.
+The parent issue and approved specification remain unchanged.

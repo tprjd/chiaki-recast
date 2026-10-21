@@ -1,6 +1,6 @@
 # 03: Build the approved A statistics overlay
 
-Status: ready-for-agent
+Status: claimed
 Type: task
 Blocked by: 01
 
@@ -27,3 +27,5 @@ Parent and specification: [implementation map](../map.md).
 
 Ticket 01 is the only blocker. Use the existing menu visibility contract rather
 than depending on ticket 02's appearance or pop-up implementation.
+
+Claimed after ticket 01 merged into the integration branch in `fe4850b8`.
