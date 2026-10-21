@@ -51,4 +51,3 @@ Item {
     Component { id: registration; RegistDialog { backend: fakeBackend; navigation: harness; accountLookup: harness.lookup } }
     Component { id: replacement; Item { objectName: "replacement" } }
 }
-
