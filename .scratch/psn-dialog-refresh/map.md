@@ -48,3 +48,7 @@ Use the confirmed production-QML, isolated-native, and visible-native test appro
 
 2026-10-21: The user approved the recommended breakdown and requested publication of all eight tickets. All tickets are ready-for-agent and unclaimed. Publication does not start implementation.
 
+2026-10-21: The user invoked implement-spec. Implementation is active on `codex/psn-dialog-integration`, based on `9b138cc43a5d667933284f1c24e8dabb721b01ad`. Tickets 01, 03, and 05 are claimed in separate managed worktrees. Each implementer uses TDD and merges the integration tip before handoff. A merger agent integrates completed branches. Ticket 01 currently owns the shared native build cache.
+
+Final review compares the integration branch with `9b138cc43a5d667933284f1c24e8dabb721b01ad`. The approved specification and published tickets are the review contract. No PR or push is part of this request.
+
