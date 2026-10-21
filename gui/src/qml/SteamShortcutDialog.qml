@@ -52,7 +52,7 @@ FocusScope {
         navigate.closeDialog();
         if (nextReminder) {
             if (!settings.psnRefreshToken || !settings.psnAuthToken || !settings.psnAuthTokenExpiry || !settings.psnAccountId)
-                navigate.showRemindDialog(qsTr("Remote Play via PSN"), qsTr("Sign in to PSN to register automatically and play outside your home network."), true, () => navigate.showPSNTokenDialog(false));
+                navigate.showRemindDialog(qsTr("PSN sign-in"), qsTr("Sign in to PSN to register consoles automatically and use Remote Play outside your home network. Sign-in saves your account credentials in chiaki-ng. You can also set this up later in Settings, under Config."), true, () => navigate.showPSNTokenDialog(false));
             else settings.remotePlayAsk = false;
         }
     }

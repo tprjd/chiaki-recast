@@ -25,14 +25,9 @@ Pane {
         {
             navigation.initialAsk = true;
             if(backend.settings.addSteamShortcutAsk && (typeof backend.createSteamShortcut === "function"))
-                navigation.showRemindDialog(qsTr("Official Steam artwork + controller layout"), qsTr("Would you like to either create a new non-Steam game for chiaki-ng\nor update an existing non-Steam game with the official artwork and controller layout?") + "\n\n" + qsTr("(Note: If you select no now and want to do this later, click the button or press R3 from the main menu.)"), false, () => navigation.showSteamShortcutDialog(true));
-            else if(backend.settings.remotePlayAsk)
-            {
-                if(!backend.settings.psnRefreshToken || !backend.settings.psnAuthToken || !backend.settings.psnAuthTokenExpiry || !backend.settings.psnAccountId)
-                    navigation.showRemindDialog(qsTr("Remote Play via PSN"), qsTr("Would you like to connect to PSN?\nThis enables:\n- Automatic registration\n- Playing outside of your home network without port forwarding?") + "\n\n" + qsTr("(Note: If you select no now and want to do this later, go to the Config section of the settings.)"), true, () => navigation.showPSNTokenDialog(false));
-                else
-                    backend.settings.remotePlayAsk = false;
-            }
+                navigation.showRemindDialog(qsTr("Steam shortcut"), qsTr("Create or update a non-Steam game for chiaki-ng with the official artwork and controller layout. You can also set this up later from the console library."), false, () => navigation.showSteamShortcutDialog(true));
+            else
+                navigation.showPsnReminder();
         }
     }
     function manageConsole(action, accept, cancel, consoleName) {

@@ -5,6 +5,7 @@ import QtQuick.Controls
 Dialog {
     id: dialog
     property alias text: message.text
+    property string cancelText: qsTr("Cancel")
     property string actionText: ""
     property string secondaryActionText: ""
     property var callback: null
@@ -22,6 +23,7 @@ Dialog {
     y: Math.round((parent.height - height) / 2)
     padding: 28
     modal: true
+    Overlay.modal: Rectangle { color: "#99000000" }
     focus: true
     closePolicy: Popup.CloseOnEscape
     background: Rectangle { color: "#181d25"; radius: 18; border.color: "#3b4655" }
@@ -67,6 +69,7 @@ Dialog {
     }
     contentItem: ScrollView {
         id: scroll
+        Keys.onYesPressed: dialog.choose("cancel")
         clip: true
         contentWidth: availableWidth
         implicitHeight: body.implicitHeight
@@ -87,6 +90,7 @@ Dialog {
         }
     }
     footer: Item {
+        Keys.onYesPressed: dialog.choose("cancel")
         implicitHeight: actions.implicitHeight + 28
         ColumnLayout {
             id: actions
@@ -122,7 +126,7 @@ Dialog {
                 id: cancelButton
                 objectName: "confirmationCancel"
                 Layout.fillWidth: true
-                text: qsTr("Cancel")
+                text: dialog.cancelText
                 onClicked: dialog.choose("cancel")
                 KeyNavigation.up: secondaryButton.visible ? secondaryButton : primaryButton
                 KeyNavigation.down: primaryButton

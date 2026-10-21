@@ -185,15 +185,12 @@ Item {
                        qsTr("Vulkan renderer initialization failed and chiaki-ng switched to OpenGL.\n\nReason: %1").arg(reason));
     }
 
+    function showPsnReminder() { remindDialog.offerPsnReminder(); }
+
     function showRemindDialog(title, text, remotePlay, callback) {
+        if (remindDialog.visible) return false;
         rememberMainFocus();
-        remindDialog.title = title;
-        remindDialog.text = text;
-        remindDialog.remotePlay = remotePlay;
-        remindDialog.callback = callback;
-        remindDialog.newDialogOpen = false;
-        remindDialog.restoreFocusItem = Window.window.activeFocusItem;
-        remindDialog.open();
+        return remindDialog.showReminder(title, text, remotePlay, callback, Window.window.activeFocusItem);
     }
 
 
@@ -259,7 +256,7 @@ Item {
     }
 
     function showPSNTokenDialog(psnurl, expired) {
-        stack.push(psnTokenDialogComponent, {psnurl: psnurl, expired: expired});
+        stack.push(psnTokenDialogComponent, {psnurl: psnurl || "", expired: !!expired});
     }
 
     function showControllerMappingDialog(route) {
@@ -561,6 +558,7 @@ Item {
 
     RemindDialog {
         id: remindDialog
+        navigation: root
     }
 
     Connections {
@@ -593,7 +591,7 @@ Item {
             Chiaki.settings.psnAuthToken = ""
             Chiaki.settings.psnAuthTokenExpiry = ""
             Chiaki.settings.psnAccountId = ""
-            root.showPSNTokenDialog(true);
+            root.showPSNTokenDialog("", true);
         }
 
         function onError(title, text) {

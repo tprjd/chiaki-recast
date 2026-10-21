@@ -178,6 +178,21 @@ production `RegistrationMethodDialog.qml`. Both suites check long text at
 900 by 600 and 1280 by 720. Backend commands are controlled test observations.
 Real registration and native input capture require separate acceptance checks.
 
+## Startup reminder tests
+
+`RemindersHarness.qml` loads production `MainView.qml`, `RemindDialog.qml`, and
+the Steam setup screen through a real `StackView`. `Reminders` checks all three
+choices, Escape, the controller triangle/Y dismissal key, initial Later focus,
+focus return, duplicate requests, startup eligibility, and Steam-then-PSN order.
+The long-text checks use 900 by 600 and 1280 by 720 logical pixels.
+
+The navigation contract remains `showRemindDialog(title, text, remotePlay, callback)`.
+Set up now starts that callback after the popup closes. Later leaves the preference
+unchanged. Don't ask again disables the selected reminder. Setup completion uses
+the existing preference and credential-presence contract. The Steam route tests
+use controlled final outcomes and check that success alone disables its reminder.
+These tests do not create Steam files or authenticate a PSN account.
+
 ## Settings screen tests
 
 `SettingsHarness.qml` loads the production Settings screen with synthetic
@@ -236,6 +251,27 @@ attempt or take focus during its exit transition.
 The fake backend supplies native results. It does not simulate discovery,
 wake packets, or a session. Isolated native checks cover those handlers with
 transport disabled. Real console wake-up still needs a console.
+
+## PSN setup tests
+
+`PsnSetupHarness.qml` loads production `PSNTokenDialog.qml`. It supplies the
+backend, navigation, and browser creation boundary. `PsnSetup` checks redirect
+privacy, explicit copy and paste, input rejection, browser fallback and recovery,
+actual progress states, persistent failure, retry, closure, and both supported
+window sizes. The supplied browser does not contact Sony.
+
+The native backend owns `psnAuthAttempt` across screen closure. `startPsnAuth`
+returns its opaque ID and rejects a second active request. Profile changes
+invalidate the request before a result can save in another profile. Credentials
+save only after both the token and Account ID responses pass validation.
+
+The controlled native checks and captures are in
+`.scratch/psn-dialog-refresh/evidence/ticket01-*`. They use isolated INI files
+and controlled network replies. They check actual native persistence and visible
+production screens at 900 by 600 and 1280 by 720, with measured DPR 1.25.
+The native Qt build lacks QtWebEngine, so its browser check proves external
+fallback. The embedded route uses the supplied browser in screen tests.
+Real PSN sign-in and physical controller input remain separate checks.
 
 ## Steam shortcut checks
 

@@ -32,39 +32,23 @@ public:
 
 
     void GetPsnAccountId(QString redirectCode);
+    void Invalidate() { finished = true; settings = nullptr; deleteLater(); }
 
 
 signals:
     void AccountIDResponse(QString accountId);
     void AccountIDError(const QString& url, const QString& error);
     void Finished();
+    void Progress();
 
 private:
     QString basicAuthHeader;
     Settings *settings = {};
-
-    static QByteArray to_bytes_little_endian(long long number, int num_bytes) {
-        QByteArray byte_array;
-        int n = 1;
-        if(*(char *)&n == 1) // little endian
-        {
-            for (int i = 0; i < num_bytes; i++)
-            {
-                char result = number & 0xFF;
-                byte_array.append(result);
-                number >>= 8;
-            }
-        }
-        else // big endian
-        {
-            for (int i = num_bytes - 1; i >= 0; i--)
-            {
-                char result = (number >> (8 * num_bytes)) & 0xFF;
-                byte_array.append(result);
-            }    
-        }
-        return byte_array;
-    }
+    QString access_token;
+    QString refresh_token;
+    QString access_token_expiry;
+    bool finished = false;
+    void fail(const QString &message);
 
 private slots:
     void handleAccessTokenResponse(const QString& url, const QJsonDocument& jsonDocument);
