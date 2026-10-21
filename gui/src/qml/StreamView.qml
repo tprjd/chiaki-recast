@@ -29,8 +29,6 @@ Item {
     property int separateStatsY: 0
     property int separateStatsWidth: 0
     property int separateStatsHeight: 0
-    property int separateDialogX: 0
-    property int separateDialogY: 0
 
     function grabInput(item) {
         Chiaki.window.grabInput();
@@ -60,13 +58,6 @@ Item {
             separateStatsWidth = Math.round(view.width);
             separateStatsHeight = Math.round(view.height);
         }
-    }
-
-    function updateSeparateDialogGeometry(width, height) {
-        if (!useSeparateMenuWindow || !hostWindow)
-            return;
-        separateDialogX = Math.round(hostWindow.x + (hostWindow.width - width) / 2);
-        separateDialogY = Math.round(hostWindow.y + (hostWindow.height - height) / 2);
     }
 
     StackView.onActivating: { Chiaki.window.keepVideo = true; connectionView.retiring = false; }
@@ -933,178 +924,12 @@ Item {
         }
     }
 
-    Popup {
+    StreamDisconnectDialog {
         id: sessionStopDialog
-        property int closeAction: 0
-        parent: Overlay.overlay
-        x: Math.round((root.width - width) / 2)
-        y: Math.round((root.height - height) / 2)
-        modal: true
-        padding: 30
-        onAboutToShow: {
-            closeAction = 0;
-        }
-        onClosed: {
-            view.releaseInput();
-            if (closeAction)
-                Chiaki.stopSession(closeAction == 1);
-        }
-
-        ColumnLayout {
-            Label {
-                Layout.alignment: Qt.AlignCenter
-                text: qsTr("Disconnect Session")
-                font.bold: true
-                font.pixelSize: 24
-            }
-
-            Label {
-                Layout.topMargin: 10
-                Layout.alignment: Qt.AlignCenter
-                text: qsTr("Do you want the Console to go into sleep mode?")
-                font.pixelSize: 20
-            }
-
-            RowLayout {
-                Layout.topMargin: 30
-                Layout.alignment: Qt.AlignCenter
-                spacing: 30
-
-                Button {
-                    id: sleepButton
-                    Layout.preferredWidth: 200
-                    Layout.minimumHeight: 80
-                    Layout.maximumHeight: 80
-                    text: qsTr("Sleep")
-                    font.pixelSize: 24
-                    Material.roundedScale: Material.SmallScale
-                    Material.background: activeFocus ? parent.Material.accent : undefined
-                    KeyNavigation.right: noButton
-                    Keys.onReturnPressed: clicked()
-                    Keys.onEscapePressed: sessionStopDialog.close()
-                    onVisibleChanged: if (visible) view.grabInput(sleepButton)
-                    onClicked: {
-                        sessionStopDialog.closeAction = 1;
-                        sessionStopDialog.close();
-                    }
-                }
-
-                Button {
-                    id: noButton
-                    Layout.preferredWidth: 200
-                    Layout.minimumHeight: 80
-                    Layout.maximumHeight: 80
-                    text: qsTr("No")
-                    font.pixelSize: 24
-                    Material.roundedScale: Material.SmallScale
-                    Material.background: activeFocus ? parent.Material.accent : undefined
-                    KeyNavigation.left: sleepButton
-                    Keys.onReturnPressed: clicked()
-                    Keys.onEscapePressed: sessionStopDialog.close()
-                    onClicked: {
-                        sessionStopDialog.closeAction = 2;
-                        sessionStopDialog.close();
-                    }
-                }
-            }
-        }
-    }
-
-    Window {
-        id: separateSessionStopWindow
-        property int closeAction: 0
-        readonly property int dialogWidth: 700
-        readonly property int dialogHeight: 260
-        visible: false
-        flags: Qt.Dialog | Qt.FramelessWindowHint
-        color: "transparent"
-        transientParent: view.hostWindow
-        modality: Qt.ApplicationModal
-        x: separateDialogX
-        y: separateDialogY
-        width: dialogWidth
-        height: dialogHeight
-
-        onVisibleChanged: {
-            if (visible) {
-                closeAction = 0;
-                view.updateSeparateDialogGeometry(width, height);
-                requestActivate();
-                view.grabInput(separateSleepButton);
-            } else {
-                view.releaseInput();
-                if (closeAction)
-                    Chiaki.stopSession(closeAction === 1);
-            }
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            radius: 12
-            color: Material.background
-            border.color: "#666666"
-            border.width: 1
-        }
-
-        ColumnLayout {
-            anchors.centerIn: parent
-
-            Label {
-                Layout.alignment: Qt.AlignCenter
-                text: qsTr("Disconnect Session")
-                font.bold: true
-                font.pixelSize: 24
-            }
-
-            Label {
-                Layout.topMargin: 10
-                Layout.alignment: Qt.AlignCenter
-                text: qsTr("Do you want the Console to go into sleep mode?")
-                font.pixelSize: 20
-            }
-
-            RowLayout {
-                Layout.topMargin: 30
-                Layout.alignment: Qt.AlignCenter
-                spacing: 30
-
-                Button {
-                    id: separateSleepButton
-                    Layout.preferredWidth: 200
-                    Layout.minimumHeight: 80
-                    Layout.maximumHeight: 80
-                    text: qsTr("Sleep")
-                    font.pixelSize: 24
-                    Material.roundedScale: Material.SmallScale
-                    Material.background: activeFocus ? parent.Material.accent : undefined
-                    KeyNavigation.right: separateNoButton
-                    Keys.onReturnPressed: clicked()
-                    Keys.onEscapePressed: separateSessionStopWindow.visible = false
-                    onClicked: {
-                        separateSessionStopWindow.closeAction = 1;
-                        separateSessionStopWindow.visible = false;
-                    }
-                }
-
-                Button {
-                    id: separateNoButton
-                    Layout.preferredWidth: 200
-                    Layout.minimumHeight: 80
-                    Layout.maximumHeight: 80
-                    text: qsTr("No")
-                    font.pixelSize: 24
-                    Material.roundedScale: Material.SmallScale
-                    Material.background: activeFocus ? parent.Material.accent : undefined
-                    KeyNavigation.left: separateSleepButton
-                    Keys.onReturnPressed: clicked()
-                    Keys.onEscapePressed: separateSessionStopWindow.visible = false
-                    onClicked: {
-                        separateSessionStopWindow.closeAction = 2;
-                        separateSessionStopWindow.visible = false;
-                    }
-                }
-            }
-        }
+        objectName: "streamDisconnectDialog"
+        hostWindow: Chiaki.window
+        onInputRequested: view.grabInput(null)
+        onInputReleased: view.releaseInput()
     }
 
     Timer {
@@ -1149,13 +974,10 @@ Item {
         }
 
         function onSessionStopDialogRequested() {
-            if (Chiaki.sessionPinRequest.id || sessionStopDialog.opened || separateSessionStopWindow.visible)
+            if (Chiaki.sessionPinRequest.id || sessionStopDialog.opened)
                 return;
             menuController.close();
-            if (useSeparateMenuWindow)
-                separateSessionStopWindow.visible = true;
-            else
-                sessionStopDialog.open();
+            sessionStopDialog.open();
         }
     }
 
@@ -1168,7 +990,7 @@ Item {
         }
 
         function onMenuRequested() {
-            if (Chiaki.sessionPinRequest.id || sessionStopDialog.opened || separateSessionStopWindow.visible)
+            if (Chiaki.sessionPinRequest.id || sessionStopDialog.opened)
                 return;
             menuController.toggle();
         }

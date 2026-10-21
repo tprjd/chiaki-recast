@@ -292,6 +292,25 @@ registration screen can show an existing request, but cannot receive its
 Account ID. The screen tests supply authentication outcomes. Native persistence
 is covered by ticket 01; integrated native acceptance is covered by ticket 08.
 
+## Disconnect checks
+
+`DisconnectHarness` loads production `StreamDisconnectDialog` with controlled
+session commands. `Disconnect` checks both window routes, initial Cancel focus,
+all choices, Escape, close, repeated input, disabled actions, keyboard and
+controller key mappings, return focus, and long text at 900 by 600 and
+1280 by 720. Both routes use the production `ConfirmDialog` and `SetupButton`.
+
+`StreamView` retains its native input capture handlers. The separate dialog uses
+the actual native host window for ownership and centering. `Main` binds its
+overlay size to its viewport because the render-control Quick window is hidden.
+
+Controlled native checks and replay files are in
+`.scratch/psn-dialog-refresh/evidence/ticket06/`. They use real `QmlBackend` and
+`StreamSession` objects, isolated settings, and intercepted transport commands.
+OpenGL and Vulkan render-target captures verify the current dialog pixels.
+Desktop compositor capture was unavailable in that session. Real console power
+changes, physical controllers, and broader display scaling need final acceptance.
+
 ## Steam shortcut checks
 
 `SteamShortcut` loads the production `SteamShortcutDialog.qml` with a supplied

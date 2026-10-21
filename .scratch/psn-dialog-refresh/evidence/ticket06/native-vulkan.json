@@ -1,0 +1,107 @@
+{
+    "allPassed": true,
+    "captures": [
+        {
+            "dpr": 1,
+            "file": "900-shared-confirmation.png",
+            "height": 600,
+            "method": "Vulkan Qt Quick target GPU readback",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "separate": false,
+            "width": 900
+        },
+        {
+            "dpr": 1,
+            "file": "900-shared-reminder.png",
+            "height": 600,
+            "method": "Vulkan Qt Quick target GPU readback",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "separate": false,
+            "width": 900
+        },
+        {
+            "dpr": 1,
+            "file": "1280-shared-confirmation.png",
+            "height": 720,
+            "method": "Vulkan Qt Quick target GPU readback",
+            "physicalHeight": 720,
+            "physicalWidth": 1280,
+            "separate": false,
+            "width": 1280
+        },
+        {
+            "dpr": 1,
+            "file": "1280-shared-reminder.png",
+            "height": 720,
+            "method": "Vulkan Qt Quick target GPU readback",
+            "physicalHeight": 720,
+            "physicalWidth": 1280,
+            "separate": false,
+            "width": 1280
+        },
+        {
+            "dpr": 1,
+            "file": "900-cancel-focus.png",
+            "height": 600,
+            "method": "Vulkan Qt Quick target GPU readback",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "separate": false,
+            "width": 900
+        },
+        {
+            "dpr": 1,
+            "file": "1280-cancel-focus.png",
+            "height": 720,
+            "method": "Vulkan Qt Quick target GPU readback",
+            "physicalHeight": 720,
+            "physicalWidth": 1280,
+            "separate": false,
+            "width": 1280
+        }
+    ],
+    "checks": 307,
+    "dialogSizing": {
+        "height": 316,
+        "hostHeight": 720,
+        "hostWidth": 1280,
+        "parentClass": "QQuickOverlay",
+        "parentHeight": 720,
+        "parentWidth": 1280,
+        "sceneHeight": 720,
+        "sceneWidth": 1280,
+        "width": 520
+    },
+    "lastBounds": {
+        "height": 42,
+        "name": "confirmationSecondaryAction",
+        "parentHeight": 146,
+        "parentWidth": 464,
+        "visible": true,
+        "width": 464
+    },
+    "nativeRect": {
+        "bottom": 769,
+        "clientLeft": 40,
+        "clientTop": 40,
+        "left": 31,
+        "qtHeight": 720,
+        "qtWidth": 1280,
+        "qtX": 40,
+        "qtY": 40,
+        "right": 1329,
+        "top": 2
+    },
+    "renderDiagnostics": {
+        "quickPaints": 95,
+        "renderCalls": 107,
+        "swapchain": true,
+        "texture": true
+    },
+    "runtimeRendererBackend": 0,
+    "sleepRequests": 2,
+    "stopRequests": 4,
+    "transport": "Real QmlBackend and StreamSession handlers, controlled native Start, Stop and GoToBed boundaries"
+}
