@@ -1,0 +1,27 @@
+-- The CXX compiler identification is MSVC 19.44.35228.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Found WrapVulkanHeaders: C:/VulkanSDK/1.4.357.0/Include
+-- Configuring done (4.0s)
+-- Generating done (0.2s)
+-- Build files have been written to: C:/Users/david/Projects/chiaki-ng-ui/build/gui-screen-qt67
+[1/7] Automatic MOC for target chiaki-console-screen-tests
+[2/7] Automatic RCC for ../res/resources.qrc
+[3/7] Building CXX object CMakeFiles\chiaki-console-screen-tests.dir\chiaki-console-screen-tests_autogen\mocs_compilation.cpp.obj
+[4/7] Building CXX object CMakeFiles\chiaki-console-screen-tests.dir\chiaki-console-screen-tests_autogen\XOU7KGDNQT\qrc_resources.cpp.obj
+[5/7] Building CXX object CMakeFiles\chiaki-console-screen-tests.dir\C_\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp.obj
+[6/7] Building CXX object CMakeFiles\chiaki-console-screen-tests.dir\main.cpp.obj
+[7/7] Linking CXX executable chiaki-console-screen-tests.exe

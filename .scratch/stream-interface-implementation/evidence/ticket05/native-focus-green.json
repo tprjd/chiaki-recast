@@ -1,0 +1,34 @@
+{
+    "afterOutsideFocus": "none",
+    "allPassed": true,
+    "beforeOutsideFocus": "streamFit",
+    "cachedLeaf": "streamFit",
+    "checks": 26,
+    "dpr": 1,
+    "fitWindow": "98831662",
+    "focusAfter": "",
+    "focusBefore": "",
+    "foregroundDiagnostics": {
+        "enabled": true,
+        "exStyles": "256",
+        "foreground": "29167170",
+        "modal": "none",
+        "qtFocus": "",
+        "styles": "2530148352",
+        "target": "29167170",
+        "targetName": ""
+    },
+    "pointerDiagnostics": {
+        "after": 2,
+        "before": 1,
+        "capture": "0",
+        "foreground": "29167170",
+        "main": "29167170",
+        "picture": false,
+        "quality": false
+    },
+    "routeCached": "",
+    "routeSelected": "streamMenuPopupWindow:98831662",
+    "routeStart": ":29167170:QmlMainWindow",
+    "runtimeRendererBackend": 1
+}

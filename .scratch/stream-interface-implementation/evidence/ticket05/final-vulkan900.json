@@ -1,0 +1,163 @@
+{
+    "allPassed": true,
+    "captures": [
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-passive-target.png",
+            "componentMethod": "Vulkan Qt Quick target GPU readback",
+            "desktop": "900-passive-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "72682500",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-passive"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-menu-target.png",
+            "componentMethod": "Vulkan Qt Quick target GPU readback",
+            "desktop": "900-menu-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "72682500",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-menu"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-zoom-target.png",
+            "componentMethod": "Vulkan Qt Quick target GPU readback",
+            "desktop": "900-zoom-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "72682500",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-zoom"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-custom-target.png",
+            "componentMethod": "Vulkan Qt Quick target GPU readback",
+            "desktop": "900-custom-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "72682500",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-custom"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-blocked-target.png",
+            "componentMethod": "Vulkan Qt Quick target GPU readback",
+            "desktop": "900-blocked-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "72682500",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-blocked"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-long-zoom-target.png",
+            "componentMethod": "Vulkan Qt Quick target GPU readback",
+            "desktop": "900-long-zoom-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "72682500",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-long-zoom"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-long-custom-target.png",
+            "componentMethod": "Vulkan Qt Quick target GPU readback",
+            "desktop": "900-long-custom-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "72682500",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-long-custom"
+        }
+    ],
+    "checks": 251,
+    "dpr": 1,
+    "escapeDiagnostics": {
+        "focusWindow": "",
+        "grabs": 1,
+        "openerFocus": true,
+        "pictureOpen": false
+    },
+    "foregroundDiagnostics": {
+        "enabled": true,
+        "exStyles": "256",
+        "foreground": "72682500",
+        "modal": "none",
+        "qtFocus": "",
+        "styles": "2530148352",
+        "target": "72682500",
+        "targetName": ""
+    },
+    "lastFit": {
+        "height": 31,
+        "menu": true,
+        "name": "streamRendererSettings",
+        "picture": false,
+        "quality": true,
+        "width": 286
+    },
+    "passiveDiagnostics": {
+        "audio": true,
+        "loss": 0.057,
+        "network": true,
+        "phase": "ready",
+        "ready": true,
+        "stats": true
+    },
+    "pointerDiagnostics": {
+        "after": 4,
+        "before": 3,
+        "capture": "0",
+        "foreground": "72682500",
+        "main": "72682500",
+        "picture": true,
+        "quality": false
+    },
+    "runtimeRendererBackend": 0,
+    "transport": "Real Main/QmlBackend/QmlMainWindow/StreamSession; Start,Stop,GoToBed,GoHome,ToggleMute,SetLoginPIN intercepted before I/O",
+    "zoomDiagnostics": {
+        "adjustment": true,
+        "fit": true,
+        "focusWindow": "",
+        "mode": 2,
+        "zoom": true,
+        "zoomFocus": true
+    }
+}

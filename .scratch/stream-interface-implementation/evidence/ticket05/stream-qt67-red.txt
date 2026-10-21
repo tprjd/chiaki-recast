@@ -1,0 +1,22 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.7.3, Qt 6.7.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2019), windows 11
+QWARN  : console_screen::tst_StreamToolbar::compile() 
+  C:\Users\david\Projects\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml produced 4 error(s):
+    C:\Users\david\Projects\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml:12,39: Type StreamHarness unavailable
+    C:\Users\david\Projects\chiaki-ng-ui\gui\tests\qml\fixtures\StreamHarness.qml:92,13: Type StreamView unavailable
+    C:\Users\david\Projects\chiaki-ng-ui\gui\src\qml\StreamView.qml:444,9: Type StreamMenuContent unavailable
+    C:\Users\david\Projects\chiaki-ng-ui\gui\src\qml\StreamMenuContent.qml:30,9: Cannot assign to non-existent property "popupType"
+  Working directory: C:\Users\david\Projects\chiaki-ng-ui
+  Import paths:
+    'C:\Users\david\Projects\chiaki-ng-ui\gui\tests\imports'
+    'C:\Users\david\Projects\chiaki-ng-ui\build\gui-screen-qt67'
+    'qrc:\qt-project.org\imports'
+    'qrc:\qt\qml'
+    'C:\Users\david\.cache\chiaki-native-qt\6.7.3\msvc2019_64\qml'
+  Plugin paths:
+    '.'
+
+FAIL!  : console_screen::tst_StreamToolbar::compile() Type StreamHarness unavailable
+C:\Users\david\Projects\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(12) : failure location
+Totals: 0 passed, 1 failed, 0 skipped, 0 blacklisted, 2ms
+********* Finished testing of console_screen *********

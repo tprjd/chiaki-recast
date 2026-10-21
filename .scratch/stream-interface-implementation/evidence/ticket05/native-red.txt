@@ -1,0 +1,17 @@
+Native PID 31428; evidence C:/Users/david/.cache/chiaki-ui-native/stream-acceptance-red01
+chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+chiaki.gui: [libplacebo] Registering hook pass: aggregation
+qrc:/Main.qml:447:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+qrc:/Main.qml:417:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+qrc:/Main.qml:387:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+chiaki.gui: [libplacebo] Available surface configurations:
+chiaki.gui: [libplacebo]     0: VK_FORMAT_B8G8R8A8_UNORM                 VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+chiaki.gui: [libplacebo]     1: VK_FORMAT_B8G8R8A8_SRGB                  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+chiaki.gui: [libplacebo]     2: VK_FORMAT_R8G8B8A8_UNORM                 VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+chiaki.gui: [libplacebo]     3: VK_FORMAT_R8G8B8A8_SRGB                  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+chiaki.gui: [libplacebo]     4: VK_FORMAT_R16G16B16A16_SFLOAT            VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT
+chiaki.gui: [libplacebo]     5: VK_FORMAT_A2B10G10R10_UNORM_PACK32       VK_COLOR_SPACE_HDR10_ST2084_EXT
+chiaki.gui: [libplacebo]     6: VK_FORMAT_A2B10G10R10_UNORM_PACK32       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+chiaki.gui: [libplacebo] Picked surface configuration 6: VK_FORMAT_A2B10G10R10_UNORM_PACK32 + VK_COLOR_SPACE_SRGB_NONLINEAR_KHR

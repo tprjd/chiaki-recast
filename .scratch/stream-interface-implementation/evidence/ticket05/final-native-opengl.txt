@@ -1,0 +1,164 @@
+Native PID 39732; evidence C:/Users/david/.cache/chiaki-ui-native/stream-acceptance-opengl-final900-01
+{
+    "allPassed": true,
+    "captures": [
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-passive-target.png",
+            "componentMethod": "OpenGL render-control framebuffer",
+            "desktop": "900-passive-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "54725130",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-passive"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-menu-target.png",
+            "componentMethod": "Separate QQuickWindow.grabWindow",
+            "desktop": "900-menu-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "20974308",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-menu"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-zoom-target.png",
+            "componentMethod": "Separate QQuickWindow.grabWindow",
+            "desktop": "900-zoom-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "84541584",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-zoom"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-custom-target.png",
+            "componentMethod": "Separate QQuickWindow.grabWindow",
+            "desktop": "900-custom-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "152242938",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-custom"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-blocked-target.png",
+            "componentMethod": "Separate QQuickWindow.grabWindow",
+            "desktop": "900-blocked-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "107809532",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-blocked"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-long-zoom-target.png",
+            "componentMethod": "Separate QQuickWindow.grabWindow",
+            "desktop": "900-long-zoom-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "84541584",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-long-zoom"
+        },
+        {
+            "clientX": 8,
+            "clientY": 8,
+            "component": "900-long-custom-target.png",
+            "componentMethod": "Separate QQuickWindow.grabWindow",
+            "desktop": "900-long-custom-desktop.png",
+            "dpr": 1,
+            "foregroundOwner": "152242938",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "FFmpeg ddagrab DXGI Desktop Duplication, exact Win32 client crop",
+            "physicalHeight": 600,
+            "physicalWidth": 900,
+            "state": "900-long-custom"
+        }
+    ],
+    "checks": 270,
+    "dpr": 1,
+    "escapeDiagnostics": {
+        "focusWindow": "streamMenuWindow",
+        "grabs": 1,
+        "openerFocus": true,
+        "pictureOpen": false
+    },
+    "foregroundDiagnostics": {
+        "enabled": true,
+        "exStyles": "524416",
+        "foreground": "152242938",
+        "modal": "none",
+        "qtFocus": "streamMenuPopupWindow",
+        "styles": "2516582400",
+        "target": "152242938",
+        "targetName": "streamMenuPopupWindow"
+    },
+    "lastFit": {
+        "height": 31,
+        "menu": true,
+        "name": "streamRendererSettings",
+        "picture": false,
+        "quality": true,
+        "width": 286
+    },
+    "passiveDiagnostics": {
+        "audio": true,
+        "loss": 0.057,
+        "network": true,
+        "phase": "ready",
+        "ready": true,
+        "stats": true
+    },
+    "pointerDiagnostics": {
+        "after": 3,
+        "before": 2,
+        "capture": "0",
+        "foreground": "54725130",
+        "main": "54725130",
+        "picture": true,
+        "quality": false
+    },
+    "runtimeRendererBackend": 1,
+    "transport": "Real Main/QmlBackend/QmlMainWindow/StreamSession; Start,Stop,GoToBed,GoHome,ToggleMute,SetLoginPIN intercepted before I/O",
+    "zoomDiagnostics": {
+        "adjustment": true,
+        "fit": true,
+        "focusWindow": "streamMenuPopupWindow",
+        "mode": 2,
+        "zoom": true,
+        "zoomFocus": true
+    }
+}

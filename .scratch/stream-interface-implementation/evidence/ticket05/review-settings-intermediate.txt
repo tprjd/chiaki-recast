@@ -1,0 +1,19 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::StreamToolbar::initTestCase()
+PASS   : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(inline-none)
+PASS   : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(inline-video)
+PASS   : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(inline-blocked)
+FAIL!  : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(window-none) Settings keeps focus after menu closure
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\stream-acceptance\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(203) : failure location
+PASS   : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(window-video)
+FAIL!  : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(window-blocked) Settings keeps focus after menu closure
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\stream-acceptance\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(203) : failure location
+PASS   : console_screen::StreamToolbar::test_shortcutClosesFlyoutAndMenu()
+PASS   : console_screen::StreamToolbar::cleanupTestCase()
+Totals: 7 passed, 2 failed, 0 skipped, 0 blacklisted, 4769ms
+********* Finished testing of console_screen *********

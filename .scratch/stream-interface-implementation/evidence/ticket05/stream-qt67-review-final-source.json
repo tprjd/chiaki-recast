@@ -1,0 +1,20 @@
+{
+  "revision": "1246ab6d",
+  "before": {
+    "gui/src/qml/StreamMenuContent.qml": "E82915A6FB55AB75C4171779214233757B424F863767BD7ED0B0C3AAD4B5AA6A",
+    "gui/src/qml/StreamView.qml": "2A5A575D322C0CF0C9E3E11AD3E8701235BD5BE3935A1779D4FEDE2D2362C8C8",
+    "gui/src/qml/StreamMenuWindow.qml": "B7C12E999EE3462C63FDB6835E51334CA0D302F5CC49B231B637138E38083324",
+    "gui/tests/qml/tst_StreamToolbar.qml": "FDA27D781ED52D9110C66680B63AFED3674D3280DDDC99CC47FBBCDC4E8355C6"
+  },
+  "after": {
+    "gui/src/qml/StreamMenuContent.qml": "E82915A6FB55AB75C4171779214233757B424F863767BD7ED0B0C3AAD4B5AA6A",
+    "gui/src/qml/StreamView.qml": "2A5A575D322C0CF0C9E3E11AD3E8701235BD5BE3935A1779D4FEDE2D2362C8C8",
+    "gui/src/qml/StreamMenuWindow.qml": "B7C12E999EE3462C63FDB6835E51334CA0D302F5CC49B231B637138E38083324",
+    "gui/tests/qml/tst_StreamToolbar.qml": "FDA27D781ED52D9110C66680B63AFED3674D3280DDDC99CC47FBBCDC4E8355C6"
+  },
+  "testExit": 1,
+  "runtime": "Qt6.7.3 MSVC2019",
+  "size": "900x600",
+  "scale": 1,
+  "method": "production QML offscreen software, affected popup and handoff checks only"
+}

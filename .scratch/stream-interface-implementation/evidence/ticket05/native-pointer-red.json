@@ -1,0 +1,23 @@
+{
+    "checks": 79,
+    "dpr": 1,
+    "failedCheck": "Actual main stream window receives the outside pointer click",
+    "passiveDiagnostics": {
+        "audio": true,
+        "loss": 0.057,
+        "network": true,
+        "phase": "ready",
+        "ready": true,
+        "stats": true
+    },
+    "pointerDiagnostics": {
+        "after": 2,
+        "before": 2,
+        "capture": "3607318",
+        "foreground": "3607318",
+        "main": "43122988",
+        "picture": true,
+        "quality": false
+    },
+    "runtimeRendererBackend": 1
+}

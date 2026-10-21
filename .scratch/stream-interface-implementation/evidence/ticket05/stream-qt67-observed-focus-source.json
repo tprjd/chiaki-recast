@@ -1,0 +1,10 @@
+{
+  "revision": "73b14ded",
+  "before": "76309199DA1220D75A7FCA562C19B314705687901C43A05A22B033C5D2BFCE16",
+  "after": "76309199DA1220D75A7FCA562C19B314705687901C43A05A22B033C5D2BFCE16",
+  "testExit": 0,
+  "runtime": "Qt6.7.3 MSVC2019",
+  "size": "900x600",
+  "scale": 1,
+  "method": "production QML offscreen software, focus observed before input"
+}
