@@ -898,6 +898,30 @@ bool Settings::GetKeyboardEnabled() const
 	return settings.value("settings/keyboard_enabled", true).toBool();
 }
 
+KeyboardMouseBindings Settings::GetKeyboardMouseBindings() const
+{
+	const auto stored = settings.value("settings/keyboard_mouse/bindings").toList();
+	if(stored.size() != 44) return DefaultKeyboardMouseBindings();
+	KeyboardMouseBindings bindings;
+	int i = 0;
+	for(auto &action : bindings) for(auto &input : action) {
+		bool valid = false;
+		input = stored[i].toInt(&valid);
+		if(!valid || stored[i].toString() != QString::number(input)) return DefaultKeyboardMouseBindings();
+		++i;
+	}
+	return ValidKeyboardMouseBindings(bindings) ? bindings : DefaultKeyboardMouseBindings();
+}
+
+bool Settings::SetKeyboardMouseBindings(const KeyboardMouseBindings &bindings)
+{
+	if(!ValidKeyboardMouseBindings(bindings)) return false;
+	QVariantList stored;
+	for(const auto &action : bindings) for(int input : action) stored.append(input);
+	settings.setValue("settings/keyboard_mouse/bindings", stored);
+	return true;
+}
+
 bool Settings::GetMouseCameraEnabled() const
 {
 #ifdef Q_OS_WIN

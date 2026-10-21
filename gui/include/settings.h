@@ -6,6 +6,7 @@
 #include <chiaki/session.h>
 
 #include "host.h"
+#include "keyboardmousebindings.h"
 
 #include <QSettings>
 #include <QList>
@@ -423,6 +424,8 @@ class Settings : public QObject
 
 		bool GetKeyboardEnabled() const;
 		void SetKeyboardEnabled(bool enabled);
+		KeyboardMouseBindings GetKeyboardMouseBindings() const;
+		bool SetKeyboardMouseBindings(const KeyboardMouseBindings &bindings);
 		bool GetMouseCameraEnabled() const;
 		void SetMouseCameraEnabled(bool enabled);
 

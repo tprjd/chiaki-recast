@@ -4,9 +4,12 @@
 #include <algorithm>
 #include <QUuid>
 #include <QQuickItem>
+#include <QQmlComponent>
+#include <QQmlEngine>
 #include <qpa/qwindowsysteminterface.h>
 #include "qmlmainwindow.h"
 #include "qmlbackend.h"
+#include "qmlsettings.h"
 #include "streamsession.h"
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -407,6 +410,248 @@ private slots:
         if (!qEnvironmentVariableIsSet("CHIAKI_INPUT_TEST_MOUSE"))
             QSKIP("Set CHIAKI_INPUT_TEST_MOUSE=1 for foreground Win32 mouse injection.");
         runMouse(true);
+    }
+    void bindingEditor()
+    {
+        if (QGuiApplication::platformName() == "offscreen") QSKIP("Requires the native main-window route.");
+        TestSettingsProfile profile;
+        Settings settings(profile.name);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetHardwareDecoder({});
+        settings.SetRenderBackend(RenderBackend::OpenGL);
+        settings.SetMouseCameraEnabled(true);
+        InputTestWindow window(&settings, true);
+        auto *backend = window.getBackend();
+        backend->stopAutoConnect();
+        StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
+            QByteArray(CHIAKI_SESSION_AUTH_SIZE, '\0'), QByteArray(16, '\0'), {}, {}, false, false, false, false);
+        StreamSession session(info);
+        struct SessionBoundary {
+            QmlBackend *backend;
+            ~SessionBoundary() { backend->session = nullptr; backend->sessionChanged(nullptr); }
+        } cleanup{backend};
+        session.connected = true;
+        backend->session = &session;
+        backend->sessionChanged(&session);
+        window.resize(900, 600);
+        window.show();
+        window.requestActivate();
+        QTRY_VERIFY(window.isActive());
+        QmlSettings bridge(&settings);
+        QQmlComponent component(qmlEngine(window.quick_item), QUrl("qrc:/KeyboardMouseBindingsPane.qml"));
+        QVERIFY2(component.isReady(), qPrintable(component.errorString()));
+        std::unique_ptr<QObject> pane(component.createWithInitialProperties({{"settings", QVariant::fromValue(&bridge)}}));
+        QVERIFY(pane);
+        auto *item = qobject_cast<QQuickItem *>(pane.get());
+        item->setParentItem(window.quick_window->contentItem());
+        item->setWidth(800);
+        window.streamInput()->present(item, "settings", item);
+        QVERIFY(window.streamInput()->blocked());
+        std::function<QQuickItem *(QQuickItem *, const QString &)> visualChild = [&](QQuickItem *parent, const QString &name) -> QQuickItem * {
+            if(parent->objectName() == name) return parent;
+            for(auto *child : parent->childItems()) if(auto *found = visualChild(child, name)) return found;
+            return nullptr;
+        };
+        const auto find = [&](const char *name) {
+            auto *found = pane->findChild<QQuickItem *>(QString::fromLatin1(name));
+            return found ? found : visualChild(window.quick_window->contentItem(), QString::fromLatin1(name));
+        };
+        auto *slot = find("keyboardMouseBinding4_0");
+        QVERIFY(slot);
+        const auto open = [&] {
+            slot = find("keyboardMouseBinding4_0");
+            QVERIFY(slot);
+            QVERIFY(QMetaObject::invokeMethod(slot, "clicked"));
+            QTRY_VERIFY(pane->findChild<QObject *>("keyboardMouseBindingDialog")->property("opened").toBool());
+        };
+        const auto key = [&](int code) {
+            for (auto type : {QEvent::KeyPress, QEvent::KeyRelease})
+                QWindowSystemInterface::handleKeyEvent<QWindowSystemInterface::SynchronousDelivery>(
+                    &window, 100, type, code, Qt::NoModifier);
+            QCoreApplication::processEvents();
+        };
+        open();
+        const auto oldWindowState = window.windowState();
+        for (int code : {Qt::Key_F8, Qt::Key_F11}) {
+            key(code);
+            QVERIFY(find("keyboardMouseBindingError")->property("text").toString().contains(code == Qt::Key_F8 ? "F8" : "F11"));
+            QCOMPARE(window.windowState(), oldWindowState);
+            QVERIFY(!window.property("gameplayCaptured").toBool());
+        }
+        key(Qt::Key_Escape);
+        QTRY_VERIFY(find("keyboardMouseBinding4_0")->hasActiveFocus());
+        QCOMPARE(settings.GetKeyboardMouseBindings()[4][0], int(Qt::Key_Space));
+        open();
+        key(Qt::Key_Q);
+        QVERIFY(find("keyboardMouseBindingConflict")->property("visible").toBool());
+        QVERIFY(find("keyboardMouseBindingConflict")->property("text").toString().contains("L1"));
+        key(Qt::Key_Escape);
+        QCOMPARE(settings.GetKeyboardMouseBindings()[8][0], int(Qt::Key_Q));
+        QCOMPARE(settings.GetKeyboardMouseBindings()[4][0], int(Qt::Key_Space));
+        open();
+        key(Qt::Key_Q);
+        QVERIFY(QMetaObject::invokeMethod(find("keyboardMouseMoveBinding"), "clicked"));
+        QTRY_VERIFY(find("keyboardMouseBinding4_0")->hasActiveFocus());
+        QCOMPARE(settings.GetKeyboardMouseBindings()[8][0], 0);
+        QCOMPARE(settings.GetKeyboardMouseBindings()[4][0], int(Qt::Key_Q));
+        open();
+        key(Qt::Key_Tab);
+        QVERIFY(find("keyboardMouseAssignTab")->hasActiveFocus());
+        key(Qt::Key_Return);
+        QVERIFY(find("keyboardMouseBindingConflict")->property("visible").toBool());
+        QVERIFY(QMetaObject::invokeMethod(find("keyboardMouseMoveBinding"), "clicked"));
+        QTRY_VERIFY(find("keyboardMouseBinding4_0")->hasActiveFocus());
+        QCOMPARE(settings.GetKeyboardMouseBindings()[4][0], int(Qt::Key_Tab));
+        QCOMPARE(settings.GetKeyboardMouseBindings()[20][0], 0);
+        open();
+        QVERIFY(QMetaObject::invokeMethod(find("keyboardMouseClearBinding"), "clicked"));
+        QTRY_VERIFY(find("keyboardMouseBinding4_0")->hasActiveFocus());
+        QCOMPARE(settings.GetKeyboardMouseBindings()[4][0], 0);
+        open();
+        auto *prompt = find("keyboardMouseBindingPrompt");
+        const auto point = prompt->mapToScene(QPointF(prompt->width() / 2, prompt->height() / 2));
+        for(auto type : {QEvent::MouseButtonPress, QEvent::MouseButtonRelease}) {
+            QMouseEvent click(type, point, point, Qt::MiddleButton,
+                type == QEvent::MouseButtonPress ? Qt::MiddleButton : Qt::NoButton, Qt::NoModifier);
+            QCoreApplication::sendEvent(&window, &click);
+        }
+        QTRY_COMPARE(settings.GetKeyboardMouseBindings()[4][0], -int(Qt::MiddleButton));
+        open();
+        key(Qt::Key_R);
+        QVERIFY(find("keyboardMouseBindingConflict")->property("visible").toBool());
+        TestSettingsProfile replacementProfile;
+        Settings replacementSettings(replacementProfile.name);
+        QmlSettings replacementBridge(&replacementSettings);
+        pane->setProperty("settings", QVariant::fromValue(&replacementBridge));
+        QTRY_VERIFY(!pane->findChild<QObject *>("keyboardMouseBindingDialog")->property("opened").toBool());
+        QVERIFY(QMetaObject::invokeMethod(find("keyboardMouseMoveBinding"), "clicked"));
+        QCOMPARE(replacementSettings.GetKeyboardMouseBindings()[4][0], int(Qt::Key_Space));
+        QCOMPARE(replacementSettings.GetKeyboardMouseBindings()[6][0], int(Qt::Key_R));
+        window.hide();
+        pane.reset();
+        QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    }
+    void bindingValidation()
+    {
+        TestSettingsProfile profile;
+        Settings settings(profile.name);
+        const auto defaults = settings.GetKeyboardMouseBindings();
+        QVariantList saved;
+        for(const auto &action : defaults) for(int input : action) saved.append(input);
+        QSettings stored(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile.name);
+        for(const auto value : {QVariant(Qt::Key_F8), QVariant(-int(Qt::ExtraButton3)), QVariant("invalid"), QVariant(65.5), QVariant(Qt::Key_W)}) {
+            auto bad = saved;
+            bad[8] = value;
+            stored.setValue("settings/keyboard_mouse/bindings", bad);
+            QCOMPARE(settings.GetKeyboardMouseBindings(), defaults);
+        }
+        stored.setValue("settings/keyboard_mouse/bindings", QVariantList{Qt::Key_P});
+        QCOMPARE(settings.GetKeyboardMouseBindings(), defaults);
+        auto bad = defaults;
+        bad[4][0] = Qt::Key_F11;
+        QVERIFY(!settings.SetKeyboardMouseBindings(bad));
+        QCOMPARE(settings.GetKeyboardMouseBindings(), defaults);
+    }
+    void editableBindings()
+    {
+        TestSettingsProfile profile;
+        KeyboardMouseBindings saved;
+        {
+            Settings settings(profile.name);
+            QmlSettings bridge(&settings);
+            QCOMPARE(bridge.keyboardMouseBindings().size(), 22);
+            auto result = bridge.changeKeyboardMouseBinding(4, 1, Qt::Key_P, false);
+            QVERIFY(result.value("error").toString().isEmpty());
+            QCOMPARE(result.value("conflict").toInt(), -1);
+            result = bridge.changeKeyboardMouseBinding(5, 0, Qt::Key_P, false);
+            QCOMPARE(result.value("conflict").toInt(), 4);
+            QCOMPARE(settings.GetKeyboardMouseBindings()[4][1], int(Qt::Key_P));
+            QCOMPARE(settings.GetKeyboardMouseBindings()[5][0], int(Qt::Key_Control));
+            result = bridge.changeKeyboardMouseBinding(5, 0, Qt::Key_P, true);
+            QCOMPARE(result.value("conflict").toInt(), -1);
+            QCOMPARE(settings.GetKeyboardMouseBindings()[4][1], 0);
+            QCOMPARE(settings.GetKeyboardMouseBindings()[5][0], int(Qt::Key_P));
+            for (const auto key : {Qt::Key_F8, Qt::Key_F11, Qt::Key_Alt, Qt::Key_Meta})
+                QVERIFY(!bridge.changeKeyboardMouseBinding(4, 0, key, true).value("error").toString().isEmpty());
+            QVERIFY(bridge.changeKeyboardMouseBinding(4, 0, 0, false).value("error").toString().isEmpty());
+            QCOMPARE(settings.GetKeyboardMouseBindings()[4][0], 0);
+            saved = settings.GetKeyboardMouseBindings();
+        }
+        Settings settings(profile.name);
+        QmlSettings bridge(&settings);
+        QCOMPARE(settings.GetKeyboardMouseBindings(), saved);
+        QVERIFY(settings.GetKeyboardEnabled());
+        settings.SetMouseCameraEnabled(true);
+        settings.SetHardwareDecoder({});
+        StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
+            QByteArray(CHIAKI_SESSION_AUTH_SIZE, '\0'), QByteArray(16, '\0'), {}, {}, false, false, false, false);
+        StreamSession session(info);
+        session.SetKeyboardMouseBindings(settings.GetKeyboardMouseBindings());
+        session.SetGameplayCapture(true);
+        QKeyEvent press(QEvent::KeyPress, Qt::Key_P, Qt::NoModifier);
+        QKeyEvent release(QEvent::KeyRelease, Qt::Key_P, Qt::NoModifier);
+        session.HandleKeyboardEvent(&press);
+        QCOMPARE(outgoing.buttons, uint32_t(CHIAKI_CONTROLLER_BUTTON_MOON));
+        bridge.changeKeyboardMouseBinding(5, 0, Qt::Key_B, true);
+        session.HandleKeyboardEvent(&release);
+        session.HandleKeyboardEvent(&press);
+        QCOMPARE(outgoing.buttons, uint32_t(CHIAKI_CONTROLLER_BUTTON_MOON));
+        session.SetGameplayCapture(false);
+        session.SetKeyboardMouseBindings(settings.GetKeyboardMouseBindings());
+        session.SetGameplayCapture(true);
+        session.HandleKeyboardEvent(&press);
+        QCOMPARE(outgoing.buttons, 0u);
+        for (auto button : {Qt::LeftButton, Qt::RightButton, Qt::MiddleButton, Qt::BackButton, Qt::ForwardButton}) {
+            session.SetGameplayCapture(false);
+            bridge.changeKeyboardMouseBinding(4, 0, -int(button), true);
+            bridge.changeKeyboardMouseBinding(4, 1, Qt::Key_Space, true);
+            session.SetKeyboardMouseBindings(settings.GetKeyboardMouseBindings());
+            session.SetGameplayCapture(true);
+            QMouseEvent down(QEvent::MouseButtonPress, QPointF(10, 10), QPointF(10, 10), button, button, Qt::NoModifier);
+            QMouseEvent up(QEvent::MouseButtonRelease, QPointF(10, 10), QPointF(10, 10), button, Qt::NoButton, Qt::NoModifier);
+            QKeyEvent spaceDown(QEvent::KeyPress, Qt::Key_Space, Qt::NoModifier);
+            QKeyEvent spaceUp(QEvent::KeyRelease, Qt::Key_Space, Qt::NoModifier);
+            session.HandleMousePressEvent(&down);
+            QCOMPARE(outgoing.buttons, uint32_t(CHIAKI_CONTROLLER_BUTTON_CROSS));
+            session.HandleKeyboardEvent(&spaceDown);
+            session.HandleMouseReleaseEvent(&up);
+            QCOMPARE(outgoing.buttons, uint32_t(CHIAKI_CONTROLLER_BUTTON_CROSS));
+            session.HandleKeyboardEvent(&spaceUp);
+            QCOMPARE(outgoing.buttons, 0u);
+        }
+        session.SetGameplayCapture(false);
+        bridge.changeKeyboardMouseBinding(4, 0, Qt::Key_F2, true);
+        bridge.changeKeyboardMouseBinding(4, 1, 0, false);
+        session.SetKeyboardMouseBindings(settings.GetKeyboardMouseBindings());
+        session.SetGameplayCapture(true, {Qt::Key_F2});
+        QKeyEvent f2Down(QEvent::KeyPress, Qt::Key_F2, Qt::NoModifier);
+        QKeyEvent f2Up(QEvent::KeyRelease, Qt::Key_F2, Qt::NoModifier);
+        session.HandleKeyboardEvent(&f2Down);
+        QCOMPARE(outgoing.buttons, 0u);
+        session.HandleKeyboardEvent(&f2Up);
+        session.HandleKeyboardEvent(&f2Down);
+        QCOMPARE(outgoing.buttons, uint32_t(CHIAKI_CONTROLLER_BUTTON_CROSS));
+        session.SetGameplayCapture(false);
+        bridge.changeKeyboardMouseBinding(4, 0, Qt::Key_Exclam, true);
+        const int baseKey = settings.GetKeyboardMouseBindings()[4][0];
+        QCOMPARE(bridge.changeKeyboardMouseBinding(5, 0, baseKey, false).value("conflict").toInt(), 4);
+        session.SetKeyboardMouseBindings(settings.GetKeyboardMouseBindings());
+        session.SetGameplayCapture(true);
+        QKeyEvent shiftedDown(QEvent::KeyPress, Qt::Key_Exclam, Qt::ShiftModifier);
+        QKeyEvent baseUp(QEvent::KeyRelease, baseKey, Qt::NoModifier);
+        session.HandleKeyboardEvent(&shiftedDown);
+        QCOMPARE(outgoing.buttons, uint32_t(CHIAKI_CONTROLLER_BUTTON_CROSS));
+        session.HandleKeyboardEvent(&baseUp);
+        QCOMPARE(outgoing.buttons, 0u);
+        QKeyEvent tabDown(QEvent::KeyPress, Qt::Key_Backtab, Qt::ShiftModifier);
+        QKeyEvent tabUp(QEvent::KeyRelease, Qt::Key_Tab, Qt::NoModifier);
+        session.HandleKeyboardEvent(&tabDown);
+        QCOMPARE(outgoing.buttons, uint32_t(CHIAKI_CONTROLLER_BUTTON_TOUCHPAD));
+        session.HandleKeyboardEvent(&tabUp);
+        QCOMPARE(outgoing.buttons, 0u);
+        session.SetGameplayCapture(false);
     }
     void mouseMotion()
     {

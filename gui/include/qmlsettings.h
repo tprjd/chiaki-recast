@@ -83,6 +83,7 @@ class QmlSettings : public QObject
     Q_PROPERTY(bool mouseTouchEnabled READ mouseTouchEnabled WRITE setMouseTouchEnabled NOTIFY mouseTouchEnabledChanged)
     Q_PROPERTY(bool keyboardEnabled READ keyboardEnabled WRITE setKeyboardEnabled NOTIFY keyboardEnabledChanged)
     Q_PROPERTY(bool mouseCameraEnabled READ mouseCameraEnabled WRITE setMouseCameraEnabled NOTIFY mouseCameraEnabledChanged)
+    Q_PROPERTY(QVariantList keyboardMouseBindings READ keyboardMouseBindings NOTIFY keyboardMouseBindingsChanged)
     Q_PROPERTY(bool mouseCameraSupported READ mouseCameraSupported CONSTANT)
     Q_PROPERTY(bool dpadTouchEnabled READ dpadTouchEnabled WRITE setDpadTouchEnabled NOTIFY dpadTouchEnabledChanged)
     Q_PROPERTY(bool iDROnFECFailureEnabled READ iDROnFECFailureEnabled WRITE setIDROnFECFailureEnabled NOTIFY iDROnFECFailureEnabledChanged)
@@ -582,6 +583,9 @@ public:
     QStringList availableAudioInDevices() const;
     QVariantList registeredHosts() const;
     QVariantList controllerMapping() const;
+    QVariantList keyboardMouseBindings() const;
+    Q_INVOKABLE int normalizeKeyboardMouseKey(int input) const { return NormalizeKeyboardMouseKey(input); }
+    Q_INVOKABLE QVariantMap changeKeyboardMouseBinding(int action, int slot, int input, bool move = false);
     QStringList profiles() const;
 
     Q_INVOKABLE void deleteRegisteredHost(int index);
@@ -599,6 +603,7 @@ public:
 
 signals:
     void mouseCameraEnabledChanged();
+    void keyboardMouseBindingsChanged();
     void resolutionLocalPS4Changed();
     void resolutionRemotePS4Changed();
     void resolutionLocalPS5Changed();

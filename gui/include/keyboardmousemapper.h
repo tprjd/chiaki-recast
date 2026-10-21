@@ -1,5 +1,6 @@
 #pragma once
 
+#include "keyboardmousebindings.h"
 #include <QSet>
 #include <Qt>
 #include <deque>
@@ -8,6 +9,7 @@
 class KeyboardMouseMapper
 {
 public:
+    void setBindings(const KeyboardMouseBindings &bindings) { if (ValidKeyboardMouseBindings(bindings)) this->bindings = bindings; }
     void reset(const QSet<int> &held = {});
     void key(int key, bool pressed);
     void mouseButton(Qt::MouseButton button, bool pressed);
@@ -15,6 +17,7 @@ public:
     bool advanceMouse(qint64 timestampUs);
     ChiakiControllerState state() const;
 private:
+    KeyboardMouseBindings bindings = DefaultKeyboardMouseBindings();
     QSet<int> pressed;
     QSet<int> ignored;
     struct MouseSample { double x; double y; qint64 time; };

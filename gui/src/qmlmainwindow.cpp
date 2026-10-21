@@ -2864,6 +2864,7 @@ void QmlMainWindow::releaseGameplayCapture()
 void QmlMainWindow::startGameplayCapture(ulong timestamp)
 {
     if (gameplay_captured || !gameplayCaptureAvailable()) return;
+    const auto bindings = settings->GetKeyboardMouseBindings();
     QSet<int> held;
 #ifdef Q_OS_WIN
     auto mouse = std::make_unique<WindowsMouseCapture>();
@@ -2879,15 +2880,11 @@ void QmlMainWindow::startGameplayCapture(ulong timestamp)
     while (PeekMessage(&pending, reinterpret_cast<HWND>(winId()), WM_INPUT, WM_INPUT, PM_REMOVE))
         DefWindowProc(pending.hwnd, pending.message, pending.wParam, pending.lParam);
     // Include keys held before the window received focus; they need a release first.
-    for (int code = 'A'; code <= 'Z'; ++code)
-        if (GetAsyncKeyState(code) & 0x8000) held.insert(code);
-    const struct { int native; int key; } special[] = {
-        {VK_SPACE, Qt::Key_Space}, {VK_CONTROL, Qt::Key_Control}, {VK_SHIFT, Qt::Key_Shift},
-        {VK_UP, Qt::Key_Up}, {VK_DOWN, Qt::Key_Down}, {VK_LEFT, Qt::Key_Left}, {VK_RIGHT, Qt::Key_Right},
-        {VK_RETURN, Qt::Key_Return}, {VK_BACK, Qt::Key_Backspace}, {VK_TAB, Qt::Key_Tab}, {VK_F1, Qt::Key_F1}
-    };
-    for (const auto &binding : special)
-        if (GetAsyncKeyState(binding.native) & 0x8000) held.insert(binding.key);
+    for (const auto &action : bindings) for (int input : action) {
+        if (input <= 0) continue;
+        const int native = KeyboardMouseNativeKey(input);
+        if (native && (GetAsyncKeyState(native) & 0x8000)) held.insert(input);
+    }
     const struct { int native; Qt::MouseButton button; } buttons[] = {
         {GetSystemMetrics(SM_SWAPBUTTON) ? VK_RBUTTON : VK_LBUTTON, Qt::LeftButton},
         {GetSystemMetrics(SM_SWAPBUTTON) ? VK_LBUTTON : VK_RBUTTON, Qt::RightButton}, {VK_MBUTTON, Qt::MiddleButton},
@@ -2896,6 +2893,7 @@ void QmlMainWindow::startGameplayCapture(ulong timestamp)
     for (const auto &binding : buttons)
         if (GetAsyncKeyState(binding.native) & 0x8000) held.insert(-int(binding.button));
 #endif
+    session->SetKeyboardMouseBindings(bindings);
     session->SetGameplayCapture(true, held);
     gameplay_input_not_before = timestamp;
     gameplay_captured = true;
@@ -2981,9 +2979,18 @@ bool QmlMainWindow::nvidiaCard() const
     return nvidia_card;
 }
 
+static bool keyboardMouseBindingCapture(QQuickWindow *window)
+{
+    for (auto *item = window ? window->activeFocusItem() : nullptr; item; item = item->parentItem())
+        if (item->property("keyboardMouseBindingCapture").toBool()) return true;
+    return false;
+}
+
 bool QmlMainWindow::eventFilter(QObject *object, QEvent *event)
 {
-    if (gameplay_captured && event->type() == QEvent::ShortcutOverride) {
+    if (event->type() == QEvent::ShortcutOverride
+            && (gameplay_captured || keyboardMouseBindingCapture(quick_window)
+                || keyboardMouseBindingCapture(qobject_cast<QQuickWindow *>(QGuiApplication::focusWindow())))) {
         auto *key = static_cast<QKeyEvent *>(event);
         if (!key->modifiers().testFlag(Qt::AltModifier) && !key->modifiers().testFlag(Qt::MetaModifier)) {
             key->accept();
@@ -2995,6 +3002,9 @@ bool QmlMainWindow::eventFilter(QObject *object, QEvent *event)
 
 bool QmlMainWindow::event(QEvent *event)
 {
+    const bool bindingCapture = (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
+        && (keyboardMouseBindingCapture(quick_window)
+            || keyboardMouseBindingCapture(qobject_cast<QQuickWindow *>(QGuiApplication::focusWindow())));
     if (event->type() == QEvent::FocusOut) releaseGameplayCapture();
     if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
         auto *key = static_cast<QKeyEvent *>(event);
@@ -3005,15 +3015,15 @@ bool QmlMainWindow::event(QEvent *event)
             const bool down = event->type() == QEvent::KeyPress;
             const bool obsolete = qint32(key->timestamp() - gameplay_input_not_before) < 0;
             if (key->key() == Qt::Key_F8) {
-                if (obsolete) return true;
+                if (obsolete && !bindingCapture) return true;
                 if (!key->isAutoRepeat()) {
                     if (down && !capture_key_down) {
                         capture_key_down = true;
                         if (gameplay_captured) releaseGameplayCapture();
-                        else startGameplayCapture(key->timestamp());
+                        else if (!bindingCapture) startGameplayCapture(key->timestamp());
                     }
                 }
-                return true;
+                if (!bindingCapture) return true;
             }
             if (gameplay_captured) {
                 if (obsolete) return true;
@@ -3073,7 +3083,7 @@ bool QmlMainWindow::event(QEvent *event)
         }
         break;
     case QEvent::KeyPress:
-        if (handleShortcut(static_cast<QKeyEvent*>(event)))
+        if (!bindingCapture && handleShortcut(static_cast<QKeyEvent*>(event)))
             return true;
     case QEvent::KeyRelease:
         if (session && !stream_input->blocked()) {

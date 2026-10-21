@@ -13,6 +13,7 @@ void KeyboardMouseMapper::reset(const QSet<int> &held)
 
 void KeyboardMouseMapper::key(int key, bool down)
 {
+    key = NormalizeKeyboardMouseKey(key);
     if (!down) {
         pressed.remove(key);
         ignored.remove(key);
@@ -61,24 +62,24 @@ ChiakiControllerState KeyboardMouseMapper::state() const
 {
     ChiakiControllerState result;
     chiaki_controller_state_set_idle(&result);
-    const struct { int key; uint32_t button; } buttons[] = {
-        {Qt::Key_Space, CHIAKI_CONTROLLER_BUTTON_CROSS},
-        {Qt::Key_Control, CHIAKI_CONTROLLER_BUTTON_MOON},
-        {Qt::Key_R, CHIAKI_CONTROLLER_BUTTON_BOX}, {Qt::Key_F, CHIAKI_CONTROLLER_BUTTON_PYRAMID},
-        {Qt::Key_Q, CHIAKI_CONTROLLER_BUTTON_L1}, {Qt::Key_E, CHIAKI_CONTROLLER_BUTTON_R1},
-        {Qt::Key_Shift, CHIAKI_CONTROLLER_BUTTON_L3}, {Qt::Key_C, CHIAKI_CONTROLLER_BUTTON_R3},
-        {Qt::Key_Up, CHIAKI_CONTROLLER_BUTTON_DPAD_UP}, {Qt::Key_Down, CHIAKI_CONTROLLER_BUTTON_DPAD_DOWN},
-        {Qt::Key_Left, CHIAKI_CONTROLLER_BUTTON_DPAD_LEFT}, {Qt::Key_Right, CHIAKI_CONTROLLER_BUTTON_DPAD_RIGHT},
-        {Qt::Key_Return, CHIAKI_CONTROLLER_BUTTON_OPTIONS},
-        {Qt::Key_Backspace, CHIAKI_CONTROLLER_BUTTON_SHARE}, {Qt::Key_Tab, CHIAKI_CONTROLLER_BUTTON_TOUCHPAD},
-        {Qt::Key_F1, CHIAKI_CONTROLLER_BUTTON_PS}
+    const auto active = [this](int action) {
+        return (bindings[action][0] && pressed.contains(bindings[action][0]))
+            || (bindings[action][1] && pressed.contains(bindings[action][1]));
     };
-    for (const auto &binding : buttons)
-        if (pressed.contains(binding.key)) result.buttons |= binding.button;
-    result.l2_state = pressed.contains(Qt::Key_Z) || pressed.contains(-int(Qt::RightButton)) ? 255 : 0;
-    result.r2_state = pressed.contains(Qt::Key_X) || pressed.contains(-int(Qt::LeftButton)) ? 255 : 0;
-    const int x = int(pressed.contains(Qt::Key_D)) - int(pressed.contains(Qt::Key_A));
-    const int y = int(pressed.contains(Qt::Key_S)) - int(pressed.contains(Qt::Key_W));
+    const uint32_t buttons[] = {CHIAKI_CONTROLLER_BUTTON_CROSS, CHIAKI_CONTROLLER_BUTTON_MOON,
+        CHIAKI_CONTROLLER_BUTTON_BOX, CHIAKI_CONTROLLER_BUTTON_PYRAMID,
+        CHIAKI_CONTROLLER_BUTTON_L1, CHIAKI_CONTROLLER_BUTTON_R1, 0, 0,
+        CHIAKI_CONTROLLER_BUTTON_L3, CHIAKI_CONTROLLER_BUTTON_R3,
+        CHIAKI_CONTROLLER_BUTTON_DPAD_UP, CHIAKI_CONTROLLER_BUTTON_DPAD_DOWN,
+        CHIAKI_CONTROLLER_BUTTON_DPAD_LEFT, CHIAKI_CONTROLLER_BUTTON_DPAD_RIGHT,
+        CHIAKI_CONTROLLER_BUTTON_OPTIONS, CHIAKI_CONTROLLER_BUTTON_SHARE,
+        CHIAKI_CONTROLLER_BUTTON_TOUCHPAD, CHIAKI_CONTROLLER_BUTTON_PS};
+    for (int i = 0; i < 18; ++i)
+        if (active(i + 4)) result.buttons |= buttons[i];
+    result.l2_state = active(10) ? 255 : 0;
+    result.r2_state = active(11) ? 255 : 0;
+    const int x = int(active(3)) - int(active(2));
+    const int y = int(active(1)) - int(active(0));
     const int scale = x && y ? 23169 : 32767;
     result.left_x = x * scale;
     result.left_y = y * scale;
