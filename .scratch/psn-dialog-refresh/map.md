@@ -14,7 +14,7 @@ Specification: [PSN sign-in and remaining dialogs](spec.md)
 | [04: Startup reminder choices](issues/04-startup-reminders.md) | resolved | None |
 | [05: Explicit confirmations and registration choice](issues/05-confirmations-and-registration.md) | resolved | None |
 | [06: Disconnect confirmations in both renderer routes](issues/06-disconnect-confirmations.md) | claimed | None |
-| [07: About and renderer notices](issues/07-about-and-renderer-notices.md) | ready-for-agent | None |
+| [07: About and renderer notices](issues/07-about-and-renderer-notices.md) | claimed | None |
 | [08: Integrated native acceptance](issues/08-native-acceptance.md) | ready-for-agent | 02, 03, 04, 05, 06, 07 |
 
 ## Execution order
