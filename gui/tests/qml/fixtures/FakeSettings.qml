@@ -17,6 +17,14 @@ QtObject {
     onMouseCameraEnabledChanged: changeCount++
     property var actions: []
     function record(name, args) { actions = actions.concat([{name: name, args: args || []}]); }
+    function resetKeyboardMouseDefaults() {
+        mouseCameraEnabled = false;
+        mouseHorizontalSensitivity = 1;
+        mouseVerticalSensitivity = 1;
+        mouseDeadZoneCompensation = 0;
+        mouseInvertVertical = false;
+        keyboardMouseBindings = [];
+    }
     property bool remotePlayAsk: false
     onRemotePlayAskChanged: changeCount++
     property bool addSteamShortcutAsk: false

@@ -10,15 +10,43 @@ ColumnLayout {
     property alias firstFocusItem: mode
     signal saved()
     spacing: 14
+    onSettingsChanged: cancelReset()
+    onVisibleChanged: if (!visible) cancelReset()
 
-    C.CheckBox {
-        id: mode
-        objectName: "mouseCameraEnabled"
-        text: qsTr("Enable mouse camera mode")
-        Accessible.name: text
-        Accessible.description: qsTr("During a stream, press F8 to capture or release your controls.")
-        checked: page.settings.mouseCameraEnabled
-        onToggled: { page.settings.mouseCameraEnabled = checked; page.saved(); }
+    function cancelReset() {
+        resetDialog.callback = null;
+        resetDialog.completion = null;
+        resetDialog.close();
+    }
+    Connections {
+        target: page.settings
+        ignoreUnknownSignals: true
+        function onCurrentProfileChanged() { page.cancelReset(); }
+    }
+
+    RowLayout {
+        Layout.fillWidth: true
+        C.CheckBox {
+            id: mode
+            Layout.fillWidth: true
+            objectName: "mouseCameraEnabled"
+            text: qsTr("Enable mouse camera mode")
+            Accessible.name: text
+            Accessible.description: qsTr("During a stream, press F8 to capture or release your controls.")
+            checked: page.settings.mouseCameraEnabled
+            onToggled: { page.settings.mouseCameraEnabled = checked; page.saved(); }
+        }
+        C.Button {
+            id: reset
+            objectName: "keyboardMouseReset"
+            text: qsTr("Reset defaults")
+            Accessible.name: text
+            onClicked: {
+                resetDialog.restoreFocusItem = reset;
+                resetDialog.callback = function() { page.settings.resetKeyboardMouseDefaults(); page.saved(); };
+                resetDialog.open();
+            }
+        }
     }
     Label {
         Layout.fillWidth: true
@@ -55,5 +83,12 @@ ColumnLayout {
         Layout.fillWidth: true
         wrapMode: Text.Wrap
         font.pixelSize: 13
+    }
+    ConfirmDialog {
+        id: resetDialog
+        objectName: "keyboardMouseResetDialog"
+        title: qsTr("Reset keyboard and mouse defaults?")
+        text: qsTr("This restores mouse response and bindings and turns mouse camera mode off. Other settings stay unchanged.")
+        actionText: qsTr("Reset defaults")
     }
 }

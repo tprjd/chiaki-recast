@@ -964,6 +964,15 @@ bool Settings::SetMouseResponse(const MouseResponse &response)
 	settings.setValue("settings/keyboard_mouse/invert_vertical", response.invertVertical);
 	return true;
 }
+
+void Settings::ResetKeyboardMouseDefaults()
+{
+	SetMouseCameraEnabled(false);
+	SetMouseResponse(MouseResponse{});
+	SetKeyboardMouseBindings(DefaultKeyboardMouseBindings());
+	settings.sync();
+}
+
 void Settings::SetKeyboardEnabled(bool enabled)
 {
 	settings.setValue("settings/keyboard_enabled", enabled);

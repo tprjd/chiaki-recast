@@ -604,6 +604,7 @@ public:
     QVariantList keyboardMouseBindings() const;
     Q_INVOKABLE int normalizeKeyboardMouseKey(int input) const { return NormalizeKeyboardMouseKey(input); }
     Q_INVOKABLE QVariantMap changeKeyboardMouseBinding(int action, int slot, int input, bool move = false);
+    Q_INVOKABLE void resetKeyboardMouseDefaults();
     QStringList profiles() const;
 
     Q_INVOKABLE void deleteRegisteredHost(int index);

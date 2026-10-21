@@ -834,6 +834,14 @@ void QmlSettings::setMouseCameraEnabled(bool enabled)
     emit mouseCameraEnabledChanged();
 }
 
+void QmlSettings::resetKeyboardMouseDefaults()
+{
+    settings->ResetKeyboardMouseDefaults();
+    emit mouseCameraEnabledChanged();
+    emit mouseResponseChanged();
+    emit keyboardMouseBindingsChanged();
+}
+
 void QmlSettings::setMouseHorizontalSensitivity(double value)
 {
     auto response = settings->GetMouseResponse();

@@ -431,6 +431,7 @@ class Settings : public QObject
 		void SetMouseCameraEnabled(bool enabled);
 		MouseResponse GetMouseResponse() const;
 		bool SetMouseResponse(const MouseResponse &response);
+		void ResetKeyboardMouseDefaults();
 
 		bool GetMouseTouchEnabled() const;
 		void SetMouseTouchEnabled(bool enabled);

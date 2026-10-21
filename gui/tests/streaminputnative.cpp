@@ -404,6 +404,112 @@ private:
 #endif
     }
 private slots:
+    void resetKeyboardMouseDefaults()
+    {
+        if (QGuiApplication::platformName() == "offscreen") QSKIP("Requires the native main-window renderer.");
+        TestSettingsProfile profile;
+        Settings settings(profile.name);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetRenderBackend(RenderBackend::OpenGL);
+        settings.SetHardwareDecoder({});
+        settings.SetKeyboardEnabled(false);
+        settings.SetMouseTouchEnabled(false);
+        settings.SetControllerButtonMapping(CHIAKI_CONTROLLER_BUTTON_CROSS, Qt::Key_K);
+        settings.SetMouseCameraEnabled(true);
+        MouseResponse response;
+        response.horizontalSensitivity = 2;
+        response.verticalSensitivity = 3;
+        response.deadZoneCompensation = 0.2;
+        response.invertVertical = true;
+        QVERIFY(settings.SetMouseResponse(response));
+        auto bindings = settings.GetKeyboardMouseBindings();
+        bindings[4] = {Qt::Key_J, -int(Qt::MiddleButton)};
+        QVERIFY(settings.SetKeyboardMouseBindings(bindings));
+        QmlMainWindow window(&settings);
+        auto *backend = window.getBackend();
+        backend->stopAutoConnect();
+        StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
+            QByteArray(CHIAKI_SESSION_AUTH_SIZE, '\0'), QByteArray(16, '\0'), {}, {}, false, false, false, false);
+        StreamSession session(info);
+        struct SessionBoundary {
+            QmlBackend *backend;
+            ~SessionBoundary() { backend->session = nullptr; backend->sessionChanged(nullptr); }
+        } cleanup{backend};
+        backend->session = &session;
+        backend->sessionChanged(&session);
+        session.SetMouseResponse(response);
+        session.SetKeyboardMouseBindings(bindings);
+        session.SetGameplayCapture(true);
+        const auto key = [&session](int code, bool down) {
+            QKeyEvent event(down ? QEvent::KeyPress : QEvent::KeyRelease, code, Qt::NoModifier);
+            session.HandleKeyboardEvent(&event);
+        };
+        key(Qt::Key_J, true);
+        key(Qt::Key_W, true);
+        session.HandleRelativeMouseMove(1, 0);
+        QMetaObject::invokeMethod(session.gameplay_mouse_timer, "timeout", Qt::DirectConnection);
+        QCOMPARE(outgoing.buttons, uint32_t(CHIAKI_CONTROLLER_BUTTON_CROSS));
+        QVERIFY(outgoing.left_y != 0);
+        QVERIFY(outgoing.right_x != 0);
+        QSettings persisted(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile.name);
+        const auto unrelated = [&] {
+            persisted.sync();
+            QVariantMap values;
+            for (const auto &key : persisted.allKeys())
+                if (!key.startsWith("settings/keyboard_mouse/")) values[key] = persisted.value(key);
+            return values;
+        };
+        const auto before = unrelated();
+        TestSettingsProfile otherProfile;
+        Settings other(otherProfile.name);
+        QVERIFY(other.SetMouseResponse(response));
+        other.SetMouseCameraEnabled(true);
+        QmlSettings bridge(&settings);
+        QVERIFY(QMetaObject::invokeMethod(&bridge, "resetKeyboardMouseDefaults"));
+        QVERIFY(!settings.GetMouseCameraEnabled());
+        QVERIFY(!window.gameplayCaptured());
+        QCOMPARE(outgoing.buttons, 0u);
+        QCOMPARE(outgoing.left_y, int16_t(0));
+        QCOMPARE(outgoing.right_x, int16_t(0));
+        QMetaObject::invokeMethod(session.gameplay_mouse_timer, "timeout", Qt::DirectConnection);
+        QCOMPARE(outgoing.right_x, int16_t(0));
+        QCOMPARE(unrelated(), before);
+        Settings restarted(profile.name);
+        QVERIFY(!restarted.GetMouseCameraEnabled());
+        QCOMPARE(restarted.GetMouseResponse().horizontalSensitivity, 1.0);
+        QCOMPARE(restarted.GetMouseResponse().verticalSensitivity, 1.0);
+        QCOMPARE(restarted.GetMouseResponse().deadZoneCompensation, 0.0);
+        QVERIFY(!restarted.GetMouseResponse().invertVertical);
+        QCOMPARE(restarted.GetKeyboardMouseBindings(), DefaultKeyboardMouseBindings());
+        Settings otherRestarted(otherProfile.name);
+        QCOMPARE(otherRestarted.GetMouseResponse().horizontalSensitivity, 2.0);
+        QVERIFY(otherRestarted.GetMouseCameraEnabled());
+        bridge.setMouseCameraEnabled(true);
+        QVERIFY(!window.gameplayCaptured());
+        session.SetMouseResponse(restarted.GetMouseResponse());
+        session.SetKeyboardMouseBindings(restarted.GetKeyboardMouseBindings());
+        session.SetGameplayCapture(true, {Qt::Key_W});
+        QCOMPARE(outgoing.buttons, 0u);
+        QCOMPARE(outgoing.left_y, int16_t(0));
+        QCOMPARE(outgoing.right_x, int16_t(0));
+        key(Qt::Key_W, true);
+        QCOMPARE(outgoing.left_y, int16_t(0));
+        key(Qt::Key_W, false);
+        key(Qt::Key_W, true);
+        QCOMPARE(outgoing.left_y, int16_t(-32767));
+        key(Qt::Key_J, true);
+        QCOMPARE(outgoing.buttons, 0u);
+        key(Qt::Key_Space, true);
+        QCOMPARE(outgoing.buttons, uint32_t(CHIAKI_CONTROLLER_BUTTON_CROSS));
+        key(Qt::Key_X, true);
+        QCOMPARE(outgoing.r2_state, uint8_t(255));
+        session.HandleRelativeMouseMove(1, 0);
+        QMetaObject::invokeMethod(session.gameplay_mouse_timer, "timeout", Qt::DirectConnection);
+        QCOMPARE(outgoing.right_x, int16_t(1000));
+        session.SetGameplayCapture(false);
+    }
     void keyboardMouseSettingsRoute()
     {
 #ifndef Q_OS_WIN

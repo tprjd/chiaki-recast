@@ -95,6 +95,7 @@ function entries(settings) {
         {category: 5, group: qsTranslate("SettingsSearch", "Mouse response"), target: "mouseDeadZoneCompensation", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Game dead-zone compensation"), description: qsTranslate("SettingsSearch", "Help small mouse movements cross the game stick dead zone.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Mouse response"), target: "mouseInvertVertical", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Invert vertical camera movement"), description: qsTranslate("SettingsSearch", "Reverse the vertical camera direction.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Keyboard and mouse"), target: "mouseCameraEnabled", keywords: qsTranslate("SettingsSearch", "F8 gameplay capture keyboard mouse camera controls"), title: qsTranslate("SettingsSearch", "Enable mouse camera mode"), description: qsTranslate("SettingsSearch", "During a stream, press F8 to capture or release your controls.")},
+        {category: 5, group: qsTranslate("SettingsSearch", "Keyboard and mouse"), target: "keyboardMouseReset", title: qsTranslate("SettingsSearch", "Reset defaults"), description: qsTranslate("SettingsSearch", "Restore mouse response and bindings and turn mouse camera mode off. Confirmation is required.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Keyboard and mouse"), target: "keyboardEnabled", fallback: "mouseCameraEnabled", keywords: qsTranslate("SettingsSearch", "Enable keyboard controller"), title: qsTranslate("SettingsSearch", "Keyboard controller"), description: qsTranslate("SettingsSearch", "Enable keyboard controller input.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Keyboard and mouse"), target: "mouseTouchEnabled", fallback: "mouseCameraEnabled", keywords: qsTranslate("SettingsSearch", "Enable mouse touchpad"), title: qsTranslate("SettingsSearch", "Mouse touchpad"), description: qsTranslate("SettingsSearch", "Use the mouse to control the touchpad.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Key assignments"), target: "resetAllKeys", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Reset all keys"), description: qsTranslate("SettingsSearch", "Restore all keyboard assignments to their native defaults.")},
@@ -222,7 +223,7 @@ function entries(settings) {
     ];
     const platform = {steamDeckHaptics: "steamDeckHaptics", verticalDeck: "verticalDeck",
         speechProcessing: "speechProcessing", noiseSuppressLevel: "speechProcessing", echoSuppressLevel: "speechProcessing"};
-    const mouseTargets = ["mouseCameraEnabled", "mouseHorizontalSensitivity", "mouseVerticalSensitivity", "mouseDeadZoneCompensation", "mouseInvertVertical"];
+    const mouseTargets = ["mouseCameraEnabled", "keyboardMouseReset", "mouseHorizontalSensitivity", "mouseVerticalSensitivity", "mouseDeadZoneCompensation", "mouseInvertVertical"];
     const supported = result.filter(entry => (!platform[entry.target] || typeof settings[platform[entry.target]] !== "undefined")
         && (mouseTargets.indexOf(entry.target) < 0 || settings.mouseCameraSupported));
     for (const mapping of settings.controllerMapping) {
