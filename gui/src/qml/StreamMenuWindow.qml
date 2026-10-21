@@ -40,11 +40,13 @@ Window {
     }
 
     Shortcut {
+        enabled: streamMenuWindow.open
         sequences: [StandardKey.Cancel]
         onActivated: streamMenuWindow.closeRequested()
     }
 
     Shortcut {
+        enabled: streamMenuWindow.open
         sequence: "Ctrl+O"
         onActivated: {
             if (streamMenuWindow.open)

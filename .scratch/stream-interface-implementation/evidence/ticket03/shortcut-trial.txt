@@ -1,0 +1,14 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamInterface::initTestCase()
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-cancel)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-escape)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-disconnect)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-sleep)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(window-cancel)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(window-escape)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(window-disconnect)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(window-sleep)
+PASS   : console_screen::StreamInterface::cleanupTestCase()
+Totals: 10 passed, 0 failed, 0 skipped, 0 blacklisted, 13573ms
+********* Finished testing of console_screen *********
