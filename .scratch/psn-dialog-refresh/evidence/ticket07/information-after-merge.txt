@@ -1,0 +1,9 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::InformationDialogs::initTestCase()
+PASS   : console_screen::InformationDialogs::test_aboutClosesAndRestoresFocus()
+PASS   : console_screen::InformationDialogs::test_longNoticeCanScrollWithKeyboard()
+PASS   : console_screen::InformationDialogs::test_rendererReportsActualFallback()
+PASS   : console_screen::InformationDialogs::cleanupTestCase()
+Totals: 5 passed, 0 failed, 0 skipped, 0 blacklisted, 1633ms
+********* Finished testing of console_screen *********

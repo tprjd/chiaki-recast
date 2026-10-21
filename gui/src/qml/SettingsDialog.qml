@@ -2084,7 +2084,7 @@ FocusScope {
                                     Accessible.name: text
                                     font.pixelSize: 14
                                     lastInFocusChain: true
-                                    onClicked: aboutDialog.open()
+                                    onClicked: { aboutDialog.restoreFocusItem = aboutButton; aboutDialog.open(); }
                                     Material.roundedScale: Material.SmallScale
                                 }
                             }
@@ -2211,36 +2211,15 @@ FocusScope {
             }
         }
 
-        Dialog {
+        ConfirmDialog {
             id: aboutDialog
             objectName: "aboutDialog"
-            parent: Overlay.overlay
-            x: Math.round((dialog.navigation.width - width) / 2)
-            y: Math.round((dialog.navigation.height - height) / 2)
             title: qsTr("About %1-ng").arg(Qt.application.name)
-            modal: true
-            standardButtons: Dialog.Ok
-            Material.roundedScale: Material.MediumScale
-            onAboutToHide: aboutButton.forceActiveFocus(Qt.TabFocusReason)
-
-            RowLayout {
-                spacing: 50
-                onVisibleChanged: if (visible) forceActiveFocus(Qt.TabFocusReason)
-                Keys.onReturnPressed: aboutDialog.close()
-                Keys.onEscapePressed: aboutDialog.close()
-
-                Image {
-                    Layout.preferredWidth: 200
-                    fillMode: Image.PreserveAspectFit
-                    verticalAlignment: Image.AlignTop
-                    source: "qrc:icons/chiaking-logo.svg"
-                }
-
-                Label {
-                    Layout.preferredWidth: 400
-                    verticalAlignment: Text.AlignTop
-                    wrapMode: Text.Wrap
-                    text: "<h1>chiaki-ng</h1> by Street Pea, version %1
+            cancelText: qsTr("Close")
+            imageSource: "qrc:icons/chiaking-logo.svg"
+            textFormat: Text.RichText
+            navigation: dialog.navigation
+            text: "<h1>chiaki-ng</h1> by Street Pea, version %1
                         <h2>Fork of Chiaki</h2> by Florian Markl at version 2.1.1
 
                         <p>This program is free software: you can redistribute it and/or modify
@@ -2251,8 +2230,6 @@ FocusScope {
                         but WITHOUT ANY WARRANTY; without even the implied warranty of
                         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
                         GNU General Public License for more details.</p>".arg(Qt.application.version)
-                }
-            }
         }
 
         Dialog {

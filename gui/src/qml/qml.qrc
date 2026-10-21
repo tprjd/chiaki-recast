@@ -12,6 +12,7 @@
     <file>ConnectionView.qml</file>
     <file>StreamMenuWindow.qml</file>
     <file>ConfirmDialog.qml</file>
+    <file>RendererFallbackDialog.qml</file>
     <file>RegistrationMethodDialog.qml</file>
     <file>RemindDialog.qml</file>
     <file>DialogView.qml</file>
