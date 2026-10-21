@@ -148,7 +148,7 @@ Item {
     }
 
     function showPsnView() {
-        if (stack.currentItem instanceof PsnView || stack.currentItem instanceof StreamView) return;
+        if (stack.currentItem instanceof PsnView || stack.currentItem instanceof StreamView || stack.currentItem instanceof PSNTokenDialog) return;
         stack.replace(stack.get(0), psnViewComponent, {}, StackView.Immediate)
     }
 
@@ -221,6 +221,7 @@ Item {
     }
 
     function showPlaceboColorMappingDialog(route) {
+        if (livePinHost.blocking) return;
         if(placeboSettingsRect.opacity)
         {
             root.closeDialog();

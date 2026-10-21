@@ -302,6 +302,7 @@ private:
     void updatePsnHostsThread(QString token, uint32_t log_mask, QStringList registered_names, int ps4_count, quint64 generation);
     void updateAudioVolume();
     void resumeFromSleep();
+    void reconnectPsn();
     uint32_t getStreamShortcut() const;
     void updateStreamShortcut();
     QString getExecutable();
@@ -328,6 +329,7 @@ private:
     QVariantMap connection_target;
     bool connection_cancelled = false;
     bool connection_dismissed = false;
+    bool connection_direct_credentials = false;
     QVariantMap session_pin_request;
     quint64 session_pin_generation = 0;
     bool session_pin_auto_submitted = false;

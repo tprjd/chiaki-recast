@@ -1,0 +1,21 @@
+{
+    "captureTrace": [
+    ],
+    "failedCheck": "Explicit CLI connection keeps a valid retry without registration",
+    "requestedRenderer": "opengl",
+    "runtimeRendererBackend": 1,
+    "screens": [
+        {
+            "dpr": 1,
+            "height": 2160,
+            "name": "XG32UCWMG",
+            "width": 3840
+        },
+        {
+            "dpr": 1,
+            "height": 1440,
+            "name": "VG270U",
+            "width": 2560
+        }
+    ]
+}

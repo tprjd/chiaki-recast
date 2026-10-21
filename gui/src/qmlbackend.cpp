@@ -233,55 +233,7 @@ QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
     connect(psn_auto_connect_timer, &QTimer::timeout, this, &QmlBackend::autoConnectPsn);
     if (autoConnect())
         beginAutoConnect(auto_connect_mac);
-    connect(psn_reconnect_timer, &QTimer::timeout, this, [this]{
-        if (session || connection_token || connection_cancelled || connection_dismissed
-                || connection_profile_generation != profile_generation || connection_attempt.value("phase") == "failure")
-            return;
-        const auto attempt_id = connection_generation;
-        const auto generation = profile_generation;
-        const auto owned = [this, attempt_id, generation] {
-            return connection_generation == attempt_id && profile_generation == generation
-                && !connection_cancelled && !connection_dismissed;
-        };
-        QString refresh = this->settings->GetPsnRefreshToken();
-        if(refresh.isEmpty())
-        {
-            qCWarning(chiakiGui) << "No refresh token found, can't refresh PSN token to use PSN remote connection";
-            psn_reconnect_tries = 0;
-            resume_session = false;
-            psn_reconnect_timer->stop();
-            setConnectState(PsnConnectState::ConnectFailed);
-            return;
-        }
-        PSNToken *psnToken = new PSNToken(this->settings, this);
-        watchConnectionToken(psnToken);
-        connect(psnToken, &PSNToken::PSNTokenError, this, [this, owned](const QString &error) {
-            if (!owned()) return;
-            qCWarning(chiakiGui) << "Internet is currently down...waiting 5 seconds" << error;
-            psn_reconnect_tries++;
-            if(psn_reconnect_tries < MAX_PSN_RECONNECT_TRIES)
-                return;
-            else
-            {
-                resume_session = false;
-                psn_reconnect_tries = 0;
-                psn_reconnect_timer->stop();
-                setConnectState(PsnConnectState::ConnectFailed);
-            }
-        });
-        connect(psnToken, &PSNToken::UnauthorizedError, this, [this, owned] { if (owned()) emit psnCredsExpired(); });
-        connect(psnToken, &PSNToken::PSNTokenSuccess, this, [this, owned]() {
-            if (!owned()) return;
-            qCWarning(chiakiGui) << "PSN Remote Connection Tokens Refreshed. Internet is back up";
-            resume_session = false;
-            psn_reconnect_tries = 0;
-            psn_reconnect_timer->stop();
-            session_info.psn_token = this->settings->GetPsnAuthToken();
-            createSession(session_info, connection_target, true);
-        });
-        QString refresh_token = this->settings->GetPsnRefreshToken();
-        psnToken->RefreshPsnToken(std::move(refresh_token));
-    });
+    connect(psn_reconnect_timer, &QTimer::timeout, this, &QmlBackend::reconnectPsn);
     connect(wakeup_start_timer, &QTimer::timeout, this, [this]
     {
         if (!wakeup_start || connection_cancelled || connection_dismissed
@@ -465,6 +417,57 @@ QList<QmlController*> QmlBackend::qmlControllers() const
     return controllers.values();
 }
 
+void QmlBackend::reconnectPsn()
+{
+    if (session || connection_token || connection_cancelled || connection_dismissed
+            || connection_profile_generation != profile_generation || connection_attempt.value("phase") == "failure")
+        return;
+    const auto attempt_id = connection_generation;
+    const auto generation = profile_generation;
+    const auto owned = [this, attempt_id, generation] {
+        return connection_generation == attempt_id && profile_generation == generation
+            && !connection_cancelled && !connection_dismissed;
+    };
+    QString refresh = this->settings->GetPsnRefreshToken();
+    if(refresh.isEmpty())
+    {
+        qCWarning(chiakiGui) << "No refresh token found, can't refresh PSN token to use PSN remote connection";
+        psn_reconnect_tries = 0;
+        resume_session = false;
+        psn_reconnect_timer->stop();
+        setConnectState(PsnConnectState::ConnectFailed);
+        return;
+    }
+    PSNToken *psnToken = new PSNToken(this->settings, this);
+    watchConnectionToken(psnToken);
+    connect(psnToken, &PSNToken::PSNTokenError, this, [this, owned](const QString &error) {
+        if (!owned()) return;
+        qCWarning(chiakiGui) << "Internet is currently down...waiting 5 seconds" << error;
+        psn_reconnect_tries++;
+        if(psn_reconnect_tries < MAX_PSN_RECONNECT_TRIES)
+            return;
+        else
+        {
+            resume_session = false;
+            psn_reconnect_tries = 0;
+            psn_reconnect_timer->stop();
+            setConnectState(PsnConnectState::ConnectFailed);
+        }
+    });
+    connect(psnToken, &PSNToken::UnauthorizedError, this, [this, owned] { if (owned()) emit psnCredsExpired(); });
+    connect(psnToken, &PSNToken::PSNTokenSuccess, this, [this, owned]() {
+        if (!owned()) return;
+        qCWarning(chiakiGui) << "PSN Remote Connection Tokens Refreshed. Internet is back up";
+        resume_session = false;
+        psn_reconnect_tries = 0;
+        psn_reconnect_timer->stop();
+        session_info.psn_token = this->settings->GetPsnAuthToken();
+        createSession(session_info, connection_target, true);
+    });
+    QString refresh_token = this->settings->GetPsnRefreshToken();
+    psnToken->RefreshPsnToken(std::move(refresh_token));
+}
+
 void QmlBackend::profileChanged()
 {
     ++profile_generation;
@@ -514,57 +517,7 @@ void QmlBackend::profileChanged()
     connect(psn_auto_connect_timer, &QTimer::timeout, this, &QmlBackend::autoConnectPsn);
     if (autoConnect())
         beginAutoConnect(auto_connect_mac);
-    connect(psn_reconnect_timer, &QTimer::timeout, this, [this]{
-        if (session || connection_token || connection_cancelled || connection_dismissed
-                || connection_profile_generation != profile_generation || connection_attempt.value("phase") == "failure")
-            return;
-        const auto attempt_id = connection_generation;
-        const auto generation = profile_generation;
-        const auto owned = [this, attempt_id, generation] {
-            return connection_generation == attempt_id && profile_generation == generation
-                && !connection_cancelled && !connection_dismissed;
-        };
-        QString refresh = this->settings->GetPsnRefreshToken();
-        if(refresh.isEmpty())
-        {
-            qCWarning(chiakiGui) << "No refresh token found, can't refresh PSN token to use PSN remote connection";
-            psn_reconnect_tries = 0;
-            resume_session = false;
-            psn_reconnect_timer->stop();
-            setConnectState(PsnConnectState::ConnectFailed);
-            return;
-        }
-        PSNToken *psnToken = new PSNToken(this->settings, this);
-        watchConnectionToken(psnToken);
-        connect(psnToken, &PSNToken::PSNTokenError, this, [this, owned](const QString &error) {
-            if (!owned()) return;
-            qCWarning(chiakiGui) << "Internet is currently down...waiting 5 seconds" << error;
-            psn_reconnect_tries++;
-            if(psn_reconnect_tries < MAX_PSN_RECONNECT_TRIES)
-                return;
-            else
-            {
-                resume_session = false;
-                psn_reconnect_tries = 0;
-                psn_reconnect_timer->stop();
-                setConnectState(PsnConnectState::ConnectFailed);
-            }
-        });
-        connect(psnToken, &PSNToken::UnauthorizedError, this, [this, owned] { if (owned()) emit psnCredsExpired(); });
-        connect(psnToken, &PSNToken::PSNTokenSuccess, this, []() {
-            qCWarning(chiakiGui) << "PSN Remote Connection Tokens Refreshed. Internet is back up";
-        });
-        connect(psnToken, &PSNToken::PSNTokenSuccess, this, [this, owned]() {
-            if (!owned()) return;
-            resume_session = false;
-            psn_reconnect_tries = 0;
-            psn_reconnect_timer->stop();
-            session_info.psn_token = this->settings->GetPsnAuthToken();
-            createSession(session_info, connection_target, true);
-        });
-        QString refresh_token = this->settings->GetPsnRefreshToken();
-        psnToken->RefreshPsnToken(std::move(refresh_token));
-    });
+    connect(psn_reconnect_timer, &QTimer::timeout, this, &QmlBackend::reconnectPsn);
     sleep_inhibit->deleteLater();
     sleep_inhibit = new SystemdInhibit(QGuiApplication::applicationName(), tr("Remote Play session"), "sleep", "delay", this);
     connect(sleep_inhibit, &SystemdInhibit::sleep, this, &QmlBackend::goToSleep);
@@ -894,7 +847,9 @@ bool QmlBackend::connectionTargetValid() const
     }
     if (!connection_target.isEmpty())
         return resolveConnectionTarget() >= 0;
-    // Direct entry keeps its connection data, but must still belong to this profile.
+    // Explicit CLI credentials can be used without a saved console record.
+    if (connection_direct_credentials)
+        return !session_info.host.isEmpty();
     int matches = 0;
     for (const auto &host : settings->GetRegisteredHosts())
         if (host.GetRPRegistKey() == session_info.regist_key && host.GetRPKey() == session_info.morning
@@ -928,6 +883,10 @@ void QmlBackend::beginConnection(const StreamSessionConnectInfo &info, const QVa
     session_pin_accepted = false;
     emit sessionPinRequestChanged();
     connection_target = target;
+    connection_direct_credentials = target.isEmpty();
+    for (const auto &host : settings->GetRegisteredHosts())
+        if (host.GetRPRegistKey() == info.regist_key && host.GetRPKey() == info.morning)
+            connection_direct_credentials = false;
     connection_profile_generation = profile_generation;
     connection_cancelled = false;
     connection_dismissed = false;
