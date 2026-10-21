@@ -1,0 +1,108 @@
+--- a/src/steamtools.cpp
++++ b/src/steamtools.cpp
+@@ -110,7 +110,7 @@
+  * \return bool if we can find steam
+  */
+ bool SteamTools::steamExists() {
+-    return QDir(getSteamBaseDir()).exists();
++    return QDir(steamBaseDir).exists();
+ }
+ 
+ /**
+@@ -198,7 +198,7 @@
+                 VDFStateMachine::ENDING::handleState(value, state, type, endingBuffer);
+             }
+         }
+-    } else {
++    } else if (QFile::exists(shortcutFile)) {
+         errorFunction(QString("Error opening file: %1").arg(shortcutFile));
+     }
+ 
+@@ -213,6 +213,8 @@
+  * \return number of times the subString appears in the body of the file
+  */
+ int countStringOccurrencesInFile(std::function<void(const QString&)> &infoFunction, QString filePath, QString subString) {
++    // A new Steam user can have no non-Steam games yet.
++    if (!QFile::exists(filePath)) return 0;
+     // Read the contents of the file into a QString
+     QFile file(filePath);
+     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+@@ -242,8 +244,10 @@
+                                    .arg(steamBaseDir)
+                                    .arg(mostRecentUser)
+                                    .arg(shortAppId);
+-        it.value()->save(saveLocation);
+-        infoFunction("Saved "+it.key()+" to "+saveLocation);
++        if (it.value()->save(saveLocation))
++            infoFunction("Saved "+it.key()+" to "+saveLocation);
++        else
++            errorFunction("Failed to save "+it.key()+" to "+saveLocation);
+     }
+ }
+ 
+@@ -411,16 +415,18 @@
+     QString directoryPath = fileInfo.absolutePath();
+ 
+     QString backupFile = directoryPath;
+-    QString dateString = QDateTime::currentDateTime().toString("yyyy-MM-dd-HH:mm:ss");
++    QString dateString = QDateTime::currentDateTime().toString("yyyy-MM-dd-HH-mm-ss-zzz");
+     backupFile.append(QString("/shortcuts.vdf.%1.bak").arg(dateString));
+     QFile oldBackup(backupFile);
+     if(oldBackup.exists())
+         oldBackup.remove();
+-    bool success = QFile::copy(shortcutFile, backupFile);
+-    if(success)
++    if (QFile::exists(shortcutFile)) {
++        if (!QFile::copy(shortcutFile, backupFile)) {
++            errorFunction(QString("Error backing up shortcuts.vdf"));
++            return;
++        }
+         infoFunction(QString("shortcuts.vdf backed up at '%1'").arg(backupFile));
+-    else
+-        errorFunction(QString("Error backing up shortcuts.vdf"));
++    }
+ 
+     // Open the file for binary writing
+     std::ofstream outFile(shortcutFile.toStdString(), std::ios::binary);
+@@ -452,6 +458,10 @@
+ 
+         // Close the file
+         outFile.close();
++        if (!outFile) {
++            errorFunction(QString("Error writing file '%1'.").arg(shortcutFile));
++            return;
++        }
+         infoFunction(QString("File '%1' updated successfully.").arg(shortcutFile));
+     } else {
+         errorFunction(QString("Error opening file '%1' for writing.").arg(shortcutFile));
+@@ -526,18 +536,27 @@
+     {
+         QString directoryPath = controllerFileInfo.absolutePath();
+         QString backupFile = directoryPath;
+-        QString dateString = QDateTime::currentDateTime().toString("yyyy-MM-dd-HH:mm:ss");
+-        backupFile.append(QString("/configset_controller_neptune.%2.bak").arg(dateString));
++        QString dateString = QDateTime::currentDateTime().toString("yyyy-MM-dd-HH-mm-ss-zzz");
++        backupFile.append(QString("/configset_controller_neptune.%1.bak").arg(dateString));
+         QFile oldBackup(backupFile);
+         if(oldBackup.exists())
+             oldBackup.remove();
+         bool success = QFile::copy(controllerFile, backupFile);
+         if(success)
+             infoFunction(QString("%1 backed up at %2").arg(controllerFile).arg(backupFile));
+-        else
++        else {
+             errorFunction(QString("Error backing up %1").arg(controllerFile));
++            return;
++        }
+         std::ofstream outFile(controllerFile.toStdString());
++        if (!outFile.is_open()) {
++            errorFunction(QString("Error opening file '%1' for writing.").arg(controllerFile));
++            return;
++        }
+         tyti::vdf::write(outFile, root);
++        outFile.close();
++        if (!outFile)
++            errorFunction(QString("Error writing file '%1'.").arg(controllerFile));
+     }
+ }
+ 

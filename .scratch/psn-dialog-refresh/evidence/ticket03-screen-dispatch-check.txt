@@ -1,0 +1,7 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::SteamShortcut::initTestCase()
+PASS   : console_screen::SteamShortcut::test_dispatchExceptionHasARecoverableResult()
+PASS   : console_screen::SteamShortcut::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 167ms
+********* Finished testing of console_screen *********

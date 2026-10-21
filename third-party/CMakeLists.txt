@@ -90,5 +90,5 @@ if (NOT CHIAKI_IS_SWITCH)
 endif()
 
 if(CHIAKI_ENABLE_STEAM_SHORTCUT)
-	add_subdirectory(cpp-steam-tools)
+	include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/SteamTools.cmake)
 endif()

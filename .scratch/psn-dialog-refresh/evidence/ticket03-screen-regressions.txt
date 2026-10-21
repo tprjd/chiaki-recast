@@ -1,0 +1,14 @@
+INCOMPLETE: The agent stopped its own test PID 49664 after 374.59 seconds. The Windows GUI test process supplied no per-case output. The CTest failure below records that deliberate stop, not a completed regression result. Focused Steam checks passed again after the integration merge.
+
+Internal ctest changing into directory: C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/build/gui-screen
+Test project C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/build/gui-screen
+    Start 1: chiaki-console-screen
+1/1 Test #1: chiaki-console-screen ............***Failed  374.59 sec
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) = 374.59 sec
+
+The following tests FAILED:
+	  1 - chiaki-console-screen (Failed)
