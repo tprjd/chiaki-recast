@@ -125,7 +125,8 @@ Item {
             if (!closing && settingsTarget) {
                 const target = settingsTarget;
                 Qt.callLater(() => {
-                    if (view.backend.session && !view.backend.sessionPinRequest.id && !view.sessionLoading && !view.sessionError) {
+                    if (settingsTarget === target && !disconnectPending && !sessionStopDialog.opened
+                            && view.backend.session && !view.backend.sessionPinRequest.id && !view.sessionLoading && !view.sessionError) {
                         if (target === "display") view.navigation.openDisplaySettings();
                         else view.navigation.openPlaceboSettings();
                     }
@@ -592,6 +593,7 @@ Item {
         function onSessionStopDialogRequested() {
             if (view.backend.sessionPinRequest.id || sessionStopDialog.opened)
                 return;
+            menuState.settingsTarget = "";
             if (menuState.open || menuState.closing) {
                 menuState.disconnectPending = true;
                 menuState.close();

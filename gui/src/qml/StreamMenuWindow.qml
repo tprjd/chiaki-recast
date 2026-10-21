@@ -44,7 +44,7 @@ Window {
     }
 
     Shortcut {
-        enabled: streamMenuWindow.open
+        enabled: streamMenuWindow.open && !streamMenuWindow.flyoutOpen
         sequence: "Ctrl+O"
         onActivated: {
             if (streamMenuWindow.open)

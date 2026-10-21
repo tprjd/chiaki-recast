@@ -53,6 +53,11 @@ FocusScope {
             width: popup.width
             height: popup.height
             onVisibleChanged: if (visible) requestActivate()
+            Shortcut {
+                enabled: nativeWindow.visible && menuController.open
+                sequence: "Ctrl+O"
+                onActivated: menuController.close()
+            }
             property Item lastFocusItem: null
             onActiveFocusItemChanged: {
                 var item = activeFocusItem;

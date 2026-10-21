@@ -211,6 +211,26 @@ TestCase {
             compare(h.window.grabs - h.window.releases, 1);
         } else compare(h.window.grabs, h.window.releases);
     }
+    function test_disconnectCancelsPendingSettings_data() { return routes(); }
+    function test_disconnectCancelsPendingSettings(data) {
+        const h = createTemporaryObject(harnessComponent, tests);
+        const host = openMenu(h, data.separate);
+        mouseClick(findChild(host, "streamPicture"));
+        const action = findChild(host, "streamDisplaySettings");
+        action.forceActiveFocus(Qt.TabFocusReason);
+        tryCompare(action, "activeFocus", true);
+        keyClick(Qt.Key_Return);
+        h.backend.sessionStopDialogRequested();
+        const dialog = findChild(h.screen, "streamDisconnectDialog");
+        tryCompare(dialog, "opened", true);
+        wait(350);
+        compare(h.streamSettingsOpen, false, "Disconnect cancels the pending settings action");
+        compare(h.actions.length, 0);
+        compare(h.window.grabs - h.window.releases, 1);
+        keyClick(Qt.Key_Escape);
+        tryCompare(dialog, "opened", false);
+        compare(h.window.grabs, h.window.releases);
+    }
     function test_shortcutClosesFlyoutAndMenu() {
         const h = createTemporaryObject(harnessComponent, tests);
         const host = openMenu(h, true);

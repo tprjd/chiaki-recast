@@ -17,7 +17,7 @@ metadata={'sourceRevision':subprocess.check_output(['git','rev-parse','HEAD'],cw
           'run':str(run),'runtimeRendererBackend':result['runtimeRendererBackend'],
           'executableSha256':sha(cache/'stream-acceptance-qa-bin/chiaki.exe'),
           'qtCoreSha256':sha(cache/'msys64/ucrt64/bin/Qt6Core.dll'),
-          'nativeHelperSha256':sha(cache/'stream-acceptance-native-prep01/native-disconnect.cpp'),
+          'nativeHelperSha256':sha(cache/sys.argv[3]/'native-disconnect.cpp'),
           'productionSources':{name:sha(repo/name) for name in paths},
           'stagedSources':{name:sha(cache/'source'/name) for name in paths},
           'captureHashes':{p.name:sha(p) for p in dest.glob('*.png')}}
