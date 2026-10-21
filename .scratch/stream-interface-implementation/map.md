@@ -15,15 +15,15 @@ published in `fff89373`. Keep the prototype out of production integration.
 | --- | --- | --- | --- |
 | [01: Share the existing stream interface](issues/01-share-stream-interface.md) | Shared production menu and one test boundary, with current behavior preserved | None | resolved |
 | [02: Build the approved A toolbar](issues/02-stream-toolbar.md) | Complete descriptive toolbar, pop-ups, settings navigation, audio, Resume, and Disconnect | 01 | claimed |
-| [03: Build the approved A statistics overlay](issues/03-stream-statistics.md) | Compact six-value readout with real bindings and visibility rules | 01 | claimed |
+| [03: Build the approved A statistics overlay](issues/03-stream-statistics.md) | Compact six-value readout with real bindings and visibility rules | 01 | resolved |
 | [04: Build the approved A session notices](issues/04-session-notices.md) | Network, blocked-content, and disabled-media notices with actions and cleanup | 01 | claimed |
 | [05: Complete native acceptance](issues/05-native-acceptance.md) | Combined native verification, regressions, and normal production build | 02, 03, 04 | ready-for-agent |
 
 ## Work order
 
-Ticket 01 is resolved. Tickets 02, 03, and 04 are claimed for implementation.
+Tickets 01 and 03 are resolved. Tickets 02 and 04 are claimed for implementation.
 They use the same production test boundary but do not require one another's
-completed feature. Ticket 05 remains blocked by 02, 03, and 04.
+completed feature. Ticket 05 remains blocked by 02 and 04.
 
 Shared source edits may need coordination. That is not an extra blocking edge.
 Each feature ticket must pass its own production QML checks before resolution;
@@ -65,5 +65,16 @@ statistics, and notices. The current presentation remains in place.
 See [baseline evidence](evidence/ticket01/README.md) for passing production QML,
 controlled native checks, normal build records, and verification limits.
 
-Tickets 02, 03, and 04 are now claimed. Ticket 05 remains blocked by all three.
+Tickets 02, 03, and 04 were claimed after ticket 01 was resolved.
 The parent issue and approved specification remain unchanged.
+
+Ticket [03](issues/03-stream-statistics.md) is resolved in integration merge
+`5a8b9404`, with implementation `67c3fa93`. Both renderer routes show the compact
+six-value statistics row. Existing sources supply live values and units, finite
+fallbacks preserve zero, and session changes clear the old window metrics.
+The separate statistics window keeps its native owner and rejects input and focus.
+See [statistics evidence](evidence/ticket03/README.md) for production QML results,
+Windows focus checks, native renderer captures, source hashes, and build limits.
+
+Tickets 02 and 04 remain claimed. Ticket 05 remains blocked by both tickets.
+Its final normal build must include the recorded post-build shortcut changes.
