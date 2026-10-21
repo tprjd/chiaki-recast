@@ -11,16 +11,18 @@
     "cmake/steam-tools.patch": "e2fbd65bd3200196f678e37d9b30260ace08ea195ba79a96d082f4482c6ec006",
     "gui/tests/steam/command.cpp.in": "b67d31b02726066e399b9101ebf1bf4357ee26f9d80d48a053407877cab78bd1",
     "gui/tests/steam/backend.h": "0ddd720eb6b885d96b4db14e43f0d969dbe71505348076ef2238d73c3bc5759b",
-    "gui/tests/qml/tst_SteamShortcut.qml": "42e9272201d633f6db5b68d1c0b441e86393a55404b07eb9f2009d19c2d76fa7",
+    "gui/tests/qml/tst_SteamShortcut.qml": "2040042e74257210463a17ec9a0b57dfe10b6078e38ad7a6d557d96405d23a3c",
     "gui/tests/steam/main.cpp": "4039f99d6fd3f40dc3b45cfaa82be03fff5017c30ed01a8195018e478c92ddb3",
     "cmake/SteamTools.cmake": "6f3d8652621d0311c928289cabdf662504e2890ae6858befc9a31917d9cfb881",
     "third-party/CMakeLists.txt": "b3e0a90715d3d185e0253211d74383ef1281b4a476d472f4fe7b0d70495a8efb",
-    "gui/src/qml/SteamShortcutDialog.qml": "75708e7360990aaf18f3cff95833639646888f804b3ab84dd6296eb37f0f76c9"
+    "gui/src/qml/SteamShortcutDialog.qml": "2d0883a677bfa457f23d501c2fe88e644744aa798a28c70d7babd6f0416c86b3",
+    ".gitattributes": "3e64ebf813a2b0c4957656a0a1fa262d68cf9043d02d9a4a272246c427a0a266"
   },
   "limits": [
     "No real Steam installation writes",
     "No Steam restart or live Steam library check",
     "No physical controller or native display scaling check",
     "Full application build belongs to ticket08"
-  ]
+  ],
+  "integrationMerged": "9afd6e49bfb32fdbf7ffc0b0dd9002a63138bda1"
 }

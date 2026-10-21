@@ -21,5 +21,5 @@ PASS   : console_screen::SteamShortcut::test_returnFocusToLibraryOpener(cancel)
 PASS   : console_screen::SteamShortcut::test_returnFocusToLibraryOpener(done)
 PASS   : console_screen::SteamShortcut::test_streamerModeMasksProfileOptionsFolderAndDetails()
 PASS   : console_screen::SteamShortcut::cleanupTestCase()
-Totals: 21 passed, 0 failed, 0 skipped, 0 blacklisted, 1883ms
+Totals: 21 passed, 0 failed, 0 skipped, 0 blacklisted, 1844ms
 ********* Finished testing of console_screen *********

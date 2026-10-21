@@ -61,3 +61,4 @@ Evidence:
 Limits: No real Steam installation was changed. Steam restart, live library
 visibility, physical controller input, native display scaling, and a full normal
 application build remain for ticket 08 acceptance.
+The broad combined CTest run was stopped after 374.59 seconds without per-case output. Its partial result is retained in evidence/ticket03-screen-regressions.txt and is incomplete. The focused Steam and native checks passed again after the integration merge.
