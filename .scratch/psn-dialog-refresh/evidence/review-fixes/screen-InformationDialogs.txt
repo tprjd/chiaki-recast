@@ -1,0 +1,27 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::InformationDialogs::initTestCase()
+PASS   : console_screen::InformationDialogs::test_aboutClosesAndRestoresFocus()
+PASS   : console_screen::InformationDialogs::test_aboutReopensAndRestoresFocusAgain()
+PASS   : console_screen::InformationDialogs::test_longNoticeCanScrollWithKeyboard()
+PASS   : console_screen::InformationDialogs::test_missingOpenerUsesCurrentViewFocus()
+PASS   : console_screen::InformationDialogs::test_rendererReportsActualFallback()
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(about-900-escape)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(about-900-controller)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(about-900-enter)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(about-900-click)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(about-1280-escape)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(about-1280-controller)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(about-1280-enter)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(about-1280-click)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(renderer-900-escape)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(renderer-900-controller)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(renderer-900-enter)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(renderer-900-click)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(renderer-1280-escape)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(renderer-1280-controller)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(renderer-1280-enter)
+PASS   : console_screen::InformationDialogs::test_supportedLayoutsAndDismissal(renderer-1280-click)
+PASS   : console_screen::InformationDialogs::cleanupTestCase()
+Totals: 23 passed, 0 failed, 0 skipped, 0 blacklisted, 12233ms
+********* Finished testing of console_screen *********

@@ -117,6 +117,7 @@ Dialog {
         }
     }
     footer: Item {
+        Keys.forwardTo: [scroll]
         Keys.onYesPressed: dialog.choose("cancel")
         implicitHeight: actions.implicitHeight + 28
         ColumnLayout {

@@ -70,3 +70,7 @@ targets or the separate QQuickWindow, with native focus and window evidence.
 Earlier GDI and Windows Graphics Capture images were stale and are excluded.
 This resolution covers the attainable controlled checks and states those limits.
 No push or PR is part of this ticket. The parent task owns the final two-axis review.
+
+### Final review follow-up
+
+The [review fix verification](../evidence/review-fixes/README.md) records both final review fixes. Shared dialogs now scroll long text with Page Up and Page Down from the focused actions. Steam completion uses the existing PSN reminder function. The final-source affected suites pass 142 checks. Native runs pass 297 integrated, 337 Vulkan, and 357 OpenGL checks. The normal executable and DLL hashes are refreshed. The shared cache is restored and its original targets rebuilt. The earlier complete 869-check screen run remains prior-source evidence for unchanged paths. The parent task owns the final review resolution and specification status.

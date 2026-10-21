@@ -1,0 +1,10 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::Confirmations::initTestCase()
+PASS   : console_screen::Confirmations::test_longTextScrollsFromFocusedActions(900-confirmation)
+PASS   : console_screen::Confirmations::test_longTextScrollsFromFocusedActions(900-reminder)
+PASS   : console_screen::Confirmations::test_longTextScrollsFromFocusedActions(1280-confirmation)
+PASS   : console_screen::Confirmations::test_longTextScrollsFromFocusedActions(1280-reminder)
+PASS   : console_screen::Confirmations::cleanupTestCase()
+Totals: 6 passed, 0 failed, 0 skipped, 0 blacklisted, 2063ms
+********* Finished testing of console_screen *********

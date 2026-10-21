@@ -1,0 +1,27 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::SteamShortcut::initTestCase()
+PASS   : console_screen::SteamShortcut::test_activeWriteHasNoCancellationOrDuplicateSubmission()
+PASS   : console_screen::SteamShortcut::test_defaultsAndNameValidation()
+PASS   : console_screen::SteamShortcut::test_destroyedFormCannotApplyLateSuccess()
+QDEBUG : console_screen::SteamShortcut::test_dispatchExceptionHasARecoverableResult() qml: [DEBUG-review-retry] before failure 104 0 60 94
+QDEBUG : console_screen::SteamShortcut::test_dispatchExceptionHasARecoverableResult() qml: [DEBUG-review-retry] after progress 0
+PASS   : console_screen::SteamShortcut::test_dispatchExceptionHasARecoverableResult()
+PASS   : console_screen::SteamShortcut::test_editRetainsInputAndPickerCancelRetainsFolder()
+PASS   : console_screen::SteamShortcut::test_existingPsnCredentialsSuppressTheNextReminder()
+PASS   : console_screen::SteamShortcut::test_keyboardAndControllerActions()
+PASS   : console_screen::SteamShortcut::test_layoutActionsRemainReachable(minimum)
+PASS   : console_screen::SteamShortcut::test_layoutActionsRemainReachable(large)
+PASS   : console_screen::SteamShortcut::test_nextReminderIsEligibleAndOnlyAppearsAfterClosing(reminder)
+PASS   : console_screen::SteamShortcut::test_nextReminderIsEligibleAndOnlyAppearsAfterClosing(manual)
+PASS   : console_screen::SteamShortcut::test_nextReminderIsEligibleAndOnlyAppearsAfterClosing(disabled)
+PASS   : console_screen::SteamShortcut::test_optionalInputsAndTerminalSuccess()
+PASS   : console_screen::SteamShortcut::test_partialProgressFailureRetryAndLateCallbacks()
+PASS   : console_screen::SteamShortcut::test_progressAndSuccessLayouts(minimum)
+PASS   : console_screen::SteamShortcut::test_progressAndSuccessLayouts(large)
+PASS   : console_screen::SteamShortcut::test_returnFocusToLibraryOpener(cancel)
+PASS   : console_screen::SteamShortcut::test_returnFocusToLibraryOpener(done)
+PASS   : console_screen::SteamShortcut::test_streamerModeMasksProfileOptionsFolderAndDetails()
+PASS   : console_screen::SteamShortcut::cleanupTestCase()
+Totals: 21 passed, 0 failed, 0 skipped, 0 blacklisted, 1988ms
+********* Finished testing of console_screen *********

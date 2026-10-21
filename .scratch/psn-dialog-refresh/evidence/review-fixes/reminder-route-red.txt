@@ -1,0 +1,14 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::SteamShortcut::initTestCase()
+PASS   : console_screen::SteamShortcut::test_existingPsnCredentialsSuppressTheNextReminder()
+QWARN  : console_screen::SteamShortcut::test_nextReminderIsEligibleAndOnlyAppearsAfterClosing(reminder) file:///C:/Users/david/.codex/worktrees/psn-review-fixes/chiaki-ng-ui/gui/src/qml/SteamShortcutDialog.qml:55: TypeError: Property 'showRemindDialog' of object [object V4ReferenceObject] is not a function
+FAIL!  : console_screen::SteamShortcut::test_nextReminderIsEligibleAndOnlyAppearsAfterClosing(reminder) Compared values are not the same
+   Actual   (): 0
+   Expected (): 1
+C:\Users\david\.codex\worktrees\psn-review-fixes\chiaki-ng-ui\gui\tests\qml\tst_SteamShortcut.qml(260) : failure location
+PASS   : console_screen::SteamShortcut::test_nextReminderIsEligibleAndOnlyAppearsAfterClosing(manual)
+PASS   : console_screen::SteamShortcut::test_nextReminderIsEligibleAndOnlyAppearsAfterClosing(disabled)
+PASS   : console_screen::SteamShortcut::cleanupTestCase()
+Totals: 5 passed, 1 failed, 0 skipped, 0 blacklisted, 289ms
+********* Finished testing of console_screen *********

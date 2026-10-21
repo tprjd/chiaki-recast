@@ -1,0 +1,406 @@
+[1/82] Generating takion.pb
+[2/82] Automatic MOC for target placebo-libav-impl
+[3/81] Generating takion.pb.c, takion.pb.h
+Writing to takion.pb.h and takion.pb.c
+[4/81] Building C object gui/CMakeFiles/placebo-libav-impl.dir/src/libav_impl.c.obj
+[5/81] Automatic MOC for target chiaki-console-screen-tests
+[6/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/sock.c.obj
+[7/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/common.c.obj
+[8/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/base64.c.obj
+[9/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/log.c.obj
+[10/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/thread.c.obj
+[11/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/http.c.obj
+[12/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/session.c.obj
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/session.c: In function 'chiaki_session_fini':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/session.c:288:21: warning: unused variable 'err' [-Wunused-variable]
+  288 |     ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
+      |                     ^~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/session.c: In function 'chiaki_session_stop':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/session.c:316:25: warning: unused variable 'err' [-Wunused-variable]
+  316 |         ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
+      |                         ^~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/session.c: In function 'chiaki_session_set_login_pin':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/session.c:358:25: warning: unused variable 'err' [-Wunused-variable]
+  358 |         ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
+      |                         ^~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/session.c: In function 'chiaki_session_set_stream_connection_switch_received':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/session.c:372:25: warning: unused variable 'err' [-Wunused-variable]
+  372 |         ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
+      |                         ^~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/session.c: In function 'session_thread_request_session':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/session.c:960:33: warning: unused variable 'mutex_err' [-Wunused-variable]
+  960 |                 ChiakiErrorCode mutex_err = chiaki_mutex_lock(&session->state_mutex);
+      |                                 ^~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/session.c:987:25: warning: unused variable 'mutex_err' [-Wunused-variable]
+  987 |         ChiakiErrorCode mutex_err = chiaki_mutex_lock(&session->state_mutex);
+      |                         ^~~~~~~~~
+[13/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/rpcrypt.c.obj
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/rpcrypt.c: In function 'chiaki_rpcrypt_bright_ambassador':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/rpcrypt.c:1553:41: warning: unused variable 'err' [-Wunused-variable]
+ 1553 |                         ChiakiErrorCode err = bright_ambassador(target, bright, ambassador, nonce, morning);
+      |                                         ^~~
+[14/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/ctrl.c.obj
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c: In function 'chiaki_ctrl_stop':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c:183:25: warning: unused variable 'err' [-Wunused-variable]
+  183 |         ChiakiErrorCode err = chiaki_mutex_lock(&ctrl->notif_mutex);
+      |                         ^~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c: In function 'chiaki_ctrl_send_message':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c:233:25: warning: unused variable 'err' [-Wunused-variable]
+  233 |         ChiakiErrorCode err = chiaki_mutex_lock(&ctrl->notif_mutex);
+      |                         ^~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c: In function 'chiaki_ctrl_set_login_pin':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c:255:25: warning: unused variable 'err' [-Wunused-variable]
+  255 |         ChiakiErrorCode err = chiaki_mutex_lock(&ctrl->notif_mutex);
+      |                         ^~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c: In function 'ctrl_failed':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c:311:25: warning: unused variable 'mutex_err' [-Wunused-variable]
+  311 |         ChiakiErrorCode mutex_err = chiaki_mutex_lock(&ctrl->session->state_mutex);
+      |                         ^~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c: In function 'ctrl_message_received_login_pin_req':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c:971:25: warning: unused variable 'err' [-Wunused-variable]
+  971 |         ChiakiErrorCode err = chiaki_mutex_lock(&ctrl->session->state_mutex);
+      |                         ^~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c: In function 'ctrl_message_received_login':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ctrl.c:1035:49: warning: unused variable 'err' [-Wunused-variable]
+ 1035 |                                 ChiakiErrorCode err = chiaki_mutex_lock(&ctrl->session->state_mutex);
+      |                                                 ^~~
+[15/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/senkusha.c.obj
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/senkusha.c: In function 'senkusha_takion_av':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/senkusha.c:725:25: warning: unused variable 'err' [-Wunused-variable]
+  725 |         ChiakiErrorCode err = chiaki_mutex_lock(&senkusha->state_mutex);
+      |                         ^~~
+[16/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/takion.c.obj
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/takion.c: In function 'chiaki_takion_send_raw':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/takion.c:498:36: warning: pointer targets in passing argument 2 of 'send' differ in signedness [-Wpointer-sign]
+  498 |         int r = send(takion->sock, buf, buf_size, 0);
+      |                                    ^~~
+      |                                    |
+      |                                    const uint8_t * {aka const unsigned char *}
+In file included from C:/Users/david/.cache/chiaki-ui-native/source/lib/include/chiaki/sock.h:15,
+                 from C:/Users/david/.cache/chiaki-ui-native/source/lib/include/chiaki/stoppipe.h:6,
+                 from C:/Users/david/.cache/chiaki-ui-native/source/lib/include/chiaki/takion.h:11,
+                 from C:/Users/david/.cache/chiaki-ui-native/source/lib/src/takion.c:4:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/winsock2.h:1033:60: note: expected 'const char *' but argument is of type 'const uint8_t *' {aka 'const unsigned char *'}
+ 1033 |   WINSOCK_API_LINKAGE int WSAAPI send(SOCKET s,const char *buf,int len,int flags);
+      |                                                ~~~~~~~~~~~~^~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/takion.c: In function 'takion_recv':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/takion.c:1205:61: warning: pointer targets in passing argument 2 of 'recv' differ in signedness [-Wpointer-sign]
+ 1205 |         CHIAKI_SSIZET_TYPE received_sz = recv(takion->sock, buf, *buf_size, 0);
+      |                                                             ^~~
+      |                                                             |
+      |                                                             uint8_t * {aka unsigned char *}
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/winsock2.h:1028:54: note: expected 'char *' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+ 1028 |   WINSOCK_API_LINKAGE int WSAAPI recv(SOCKET s,char *buf,int len,int flags);
+      |                                                ~~~~~~^~~
+[17/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/random.c.obj
+[18/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/streamconnection.c.obj
+[19/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/ecdh.c.obj
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c: In function 'chiaki_ecdh_init':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c:61:9: warning: 'EC_KEY_new' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+   61 |         CHECK(ecdh->key_local = EC_KEY_new());
+      |         ^~~~~
+In file included from C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c:12:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/openssl/ec.h:979:31: note: declared here
+  979 | OSSL_DEPRECATEDIN_3_0 EC_KEY *EC_KEY_new(void);
+      |                               ^~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c:62:9: warning: 'EC_KEY_set_group' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+   62 |         CHECK(EC_KEY_set_group(ecdh->key_local, ecdh->group));
+      |         ^~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/openssl/ec.h:1053:27: note: declared here
+ 1053 | OSSL_DEPRECATEDIN_3_0 int EC_KEY_set_group(EC_KEY *key, const EC_GROUP *group);
+      |                           ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c:63:9: warning: 'EC_KEY_generate_key' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+   63 |         CHECK(EC_KEY_generate_key(ecdh->key_local));
+      |         ^~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/openssl/ec.h:1112:27: note: declared here
+ 1112 | OSSL_DEPRECATEDIN_3_0 int EC_KEY_generate_key(EC_KEY *key);
+      |                           ^~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c: In function 'chiaki_ecdh_fini':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c:77:9: warning: 'EC_KEY_free' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+   77 |         EC_KEY_free(ecdh->key_local);
+      |         ^~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/openssl/ec.h:1014:28: note: declared here
+ 1014 | OSSL_DEPRECATEDIN_3_0 void EC_KEY_free(EC_KEY *key);
+      |                            ^~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c: In function 'chiaki_ecdh_set_local_key':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c:126:9: warning: 'EC_KEY_set_private_key' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  126 |         if(!EC_KEY_set_private_key(ecdh->key_local, private_key_bn))
+      |         ^~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/openssl/ec.h:1067:27: note: declared here
+ 1067 | OSSL_DEPRECATEDIN_3_0 int EC_KEY_set_private_key(EC_KEY *key, const BIGNUM *prv);
+      |                           ^~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c:132:9: warning: 'EC_KEY_set_public_key' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  132 |         if(!EC_KEY_set_public_key(ecdh->key_local, public_key_point))
+      |         ^~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/openssl/ec.h:1081:27: note: declared here
+ 1081 | OSSL_DEPRECATEDIN_3_0 int EC_KEY_set_public_key(EC_KEY *key, const EC_POINT *pub);
+      |                           ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c: In function 'chiaki_ecdh_get_local_pub_key':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c:177:9: warning: 'EC_KEY_get0_public_key' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  177 |         const EC_POINT *point = EC_KEY_get0_public_key(ecdh->key_local);
+      |         ^~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/openssl/ec.h:1073:39: note: declared here
+ 1073 | OSSL_DEPRECATEDIN_3_0 const EC_POINT *EC_KEY_get0_public_key(const EC_KEY *key);
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c: In function 'chiaki_ecdh_derive_secret':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/ecdh.c:231:9: warning: 'ECDH_compute_key' is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  231 |         int r = ECDH_compute_key(secret_out, CHIAKI_ECDH_SECRET_SIZE, remote_public_key, ecdh->key_local, NULL);
+      |         ^~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/openssl/ec.h:1307:27: note: declared here
+ 1307 | OSSL_DEPRECATEDIN_3_0 int ECDH_compute_key(void *out, size_t outlen,
+      |                           ^~~~~~~~~~~~~~~~
+[20/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/launchspec.c.obj
+[21/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/audio.c.obj
+[22/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/gkcrypt.c.obj
+[23/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/audiosender.c.obj
+[24/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/audioreceiver.c.obj
+[25/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/videoreceiver.c.obj
+[26/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/frameprocessor.c.obj
+[27/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/packetstats.c.obj
+[28/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/reorderqueue.c.obj
+[29/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/discovery.c.obj
+[30/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/congestioncontrol.c.obj
+[31/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/stoppipe.c.obj
+[32/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/controller.c.obj
+[33/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/feedback.c.obj
+[34/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/discoveryservice.c.obj
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/discoveryservice.c: In function 'discovery_service_host_received':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/discoveryservice.c:309:25: warning: unused variable 'err' [-Wunused-variable]
+  309 |         ChiakiErrorCode err = chiaki_mutex_lock(&service->state_mutex);
+      |                         ^~~
+[35/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/feedbacksender.c.obj
+[36/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/fec.c.obj
+[37/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/takionsendbuffer.c.obj
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/takionsendbuffer.c: In function 'chiaki_takion_send_buffer_fini':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/takionsendbuffer.c:72:25: warning: variable 'err' set but not used [-Wunused-but-set-variable=]
+   72 |         ChiakiErrorCode err = chiaki_cond_signal(&send_buffer->cond);
+      |                         ^~~
+[38/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/time.c.obj
+[39/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/opusdecoder.c.obj
+[40/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/orientation.c.obj
+[41/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/regist.c.obj
+[42/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/opusencoder.c.obj
+[43/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/remote/rudpsendbuffer.c.obj
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/remote/rudpsendbuffer.c: In function 'chiaki_rudp_send_buffer_fini':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/remote/rudpsendbuffer.c:81:25: warning: variable 'err' set but not used [-Wunused-but-set-variable=]
+   81 |         ChiakiErrorCode err = chiaki_cond_signal(&send_buffer->cond);
+      |                         ^~~
+[44/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/remote/rudp.c.obj
+[45/80] Building C object lib/CMakeFiles/chiaki-lib.dir/protobuf/takion.pb.c.obj
+[46/80] Linking CXX static library gui\libplacebo-libav-impl.a
+[47/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/ffmpegdecoder.c.obj
+[48/80] Automatic RCC for ../res/resources.qrc
+[49/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/remote/holepunch.c.obj
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/remote/holepunch.c: In function 'chiaki_holepunch_session_init':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/remote/holepunch.c:775:21: warning: variable 'err' set but not used [-Wunused-but-set-variable=]
+  775 |     ChiakiErrorCode err;
+      |                     ^~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/remote/holepunch.c: In function 'websocket_thread_func':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/remote/holepunch.c:2240:29: warning: unused variable 'mutex_err' [-Wunused-variable]
+ 2240 |             ChiakiErrorCode mutex_err = chiaki_mutex_lock(&session->notif_mutex);
+      |                             ^~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/remote/holepunch.c: In function 'session_message_parse':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/remote/holepunch.c:5369:13: warning: 'strncpy' specified bound 65 equals destination size [-Wstringop-truncation]
+ 5369 |             strncpy(candidate.addr, addr_str, sizeof(candidate.addr));
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/remote/holepunch.c:5378:13: warning: 'strncpy' specified bound 65 equals destination size [-Wstringop-truncation]
+ 5378 |             strncpy(candidate.addr_mapped, mapped_addr_str, sizeof(candidate.addr_mapped));
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/remote/holepunch.c: In function 'chiaki_holepunch_list_devices':
+C:/Users/david/.cache/chiaki-ui-native/source/lib/src/remote/holepunch.c:638:9: warning: 'strncpy' specified bound 32 equals destination size [-Wstringop-truncation]
+  638 |         strncpy(device.device_name, json_object_get_string(device_name), sizeof(device.device_name));
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[50/80] Building CXX object gui/tests/CMakeFiles/chiaki-console-screen-tests.dir/chiaki-console-screen-tests_autogen/OFDLDOFOMB/qrc_resources.cpp.obj
+[51/80] Building C object lib/CMakeFiles/chiaki-lib.dir/src/bitstream.c.obj
+[52/80] Linking C static library lib\libchiaki.a
+[53/80] Building CXX object gui/tests/CMakeFiles/chiaki-console-screen-tests.dir/__/src/qmlsvgprovider.cpp.obj
+[54/80] Building CXX object gui/tests/CMakeFiles/chiaki-console-screen-tests.dir/main.cpp.obj
+[55/80] Linking CXX executable C:\Users\david\.cache\chiaki-ui-native\console-setup-final-bin\chiaki-console-screen-tests.exe
+[56/80] Automatic MOC for target chiaki
+[57/80] Automatic RCC for src/qml/qml.qrc
+[58/80] Automatic RCC for res/resources.qrc
+[59/80] Building RC object gui/CMakeFiles/chiaki.dir/chiaking.rc.obj
+[60/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/main.cpp.obj
+[61/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/discoverymanager.cpp.obj
+[62/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/streamsession.cpp.obj
+[63/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/sessionlog.cpp.obj
+[64/80] Building CXX object gui/CMakeFiles/chiaki.dir/chiaki_autogen/mocs_compilation.cpp.obj
+[65/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/host.cpp.obj
+[66/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/controllermanager.cpp.obj
+[67/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/psnaccountid.cpp.obj
+[68/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/psntoken.cpp.obj
+[69/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/jsonrequester.cpp.obj
+[70/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/qmlcontroller.cpp.obj
+[71/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/settings.cpp.obj
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/settings.cpp: In member function 'void Settings::ExportSettings(QString)':
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/settings.cpp:202:18: warning: ignoring return value of 'virtual bool QFile::open(QIODeviceBase::OpenMode)', declared with attribute 'nodiscard' [-Wunused-result]
+  202 |         file.open(QIODevice::ReadWrite);
+      |         ~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+In file included from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/QFile:1,
+                 from C:/Users/david/.cache/chiaki-ui-native/source/gui/src/settings.cpp:5:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfile.h:264:32: note: declared here
+  264 |     QFILE_MAYBE_NODISCARD bool open(OpenMode flags) override;
+      |                                ^~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/settings.cpp: In member function 'void Settings::ExportPlaceboSettings(QString)':
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/settings.cpp:228:18: warning: ignoring return value of 'virtual bool QFile::open(QIODeviceBase::OpenMode)', declared with attribute 'nodiscard' [-Wunused-result]
+  228 |         file.open(QIODevice::ReadWrite);
+      |         ~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfile.h:264:32: note: declared here
+  264 |     QFILE_MAYBE_NODISCARD bool open(OpenMode flags) override;
+      |                                ^~~~
+[72/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/qmlmainwindow.cpp.obj
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp: In member function 'AVBufferRef* QmlMainWindow::vulkanHwDeviceCtx()':
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1378:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1378 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+In file included from C:/Users/david/.cache/chiaki-ui-native/source/gui/include/qmlmainwindow.h:14,
+                 from C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1378:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1378 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1378:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1378 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1379:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1379 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1379:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1379 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1379:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1379 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1380:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1380 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1380:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1380 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1380:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1380 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1381:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1381 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1381:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1381 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1381:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1381 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1382:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1382 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1382:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1382 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1382:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1382 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1383:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1383 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1383:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1383 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1383:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1383 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1384:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1384 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1384:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1384 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1384:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1384 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1385:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1385 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1385:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1385 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/source/gui/src/qmlmainwindow.cpp:1385:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1385 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+[73/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/qmlsvgprovider.cpp.obj
+[74/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/systemdinhibit.cpp.obj
+[75/80] Building CXX object gui/CMakeFiles/chiaki.dir/chiaki_autogen/PNK5WDWK6L/qrc_resources.cpp.obj
+[76/80] Building CXX object gui/CMakeFiles/chiaki.dir/chiaki_autogen/VLDSMZLXNG/qrc_qml.cpp.obj
+[77/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/qmlsettings.cpp.obj
+[78/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/windowsWakeSleep.cpp.obj
+[79/80] Building CXX object gui/CMakeFiles/chiaki.dir/src/qmlbackend.cpp.obj
+[80/80] Linking CXX executable C:\Users\david\.cache\chiaki-ui-native\console-setup-final-bin\chiaki.exe

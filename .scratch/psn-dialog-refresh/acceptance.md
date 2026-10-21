@@ -3,6 +3,14 @@
 Date: 2026-10-21. Integration base: `d5655228`.
 The tested source includes the focus fixes in ticket 08.
 
+Final review follow-up uses integration base `242c2fa0`.
+The [review fix verification](evidence/review-fixes/README.md) records the final source.
+All six affected screen suites pass 142 checks. Native runs pass 297 integrated,
+337 Vulkan, and 357 OpenGL checks. These runs include long-text scrolling and
+the shared Steam-to-PSN reminder route.
+The [current normal build record](evidence/review-fixes/normal-build.json) supersedes
+the original executable and DLL hashes below.
+
 The normal Windows application builds from all 332 staged build inputs.
 The stage includes root and third-party CMake files, the SteamTools patch,
 GUI sources, headers, resources, and tests. All eight submodule revisions match
@@ -13,12 +21,12 @@ The executable is `C:/Users/david/.cache/chiaki-ui-native/psn-dialog-final-bin/c
 An identical `launch-chiaki.ps1` is beside the executable.
 The final directory takes precedence for the patched SteamTools DLL.
 `chiaki.exe --help` exits with code 0 before Settings construction.
-[The build record](evidence/ticket08/normal-build.json) contains executable and DLL
+[The build record](evidence/review-fixes/normal-build.json) contains executable and DLL
 hashes, the exact 72-resource list, and the submodule revisions.
 All required screens are present. Fixtures and QA resources are absent.
 The normal source matches the worktree, and QA symbols are absent from the executable.
 
-## Results
+## Results before the final review fixes
 
 | Check | Final result |
 | --- | --- |

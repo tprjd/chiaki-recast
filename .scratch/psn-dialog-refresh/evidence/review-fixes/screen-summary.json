@@ -1,0 +1,43 @@
+{
+  "suites": [
+    {
+      "suite": "Confirmations",
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "Disconnect",
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "InformationDialogs",
+      "passed": 23,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "RegistrationMethod",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "Reminders",
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "SteamShortcut",
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "passed": 142,
+  "failed": 0,
+  "skipped": 0
+}

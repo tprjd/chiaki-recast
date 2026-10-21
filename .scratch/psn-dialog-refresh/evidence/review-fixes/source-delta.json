@@ -1,0 +1,26 @@
+{
+  "changedInputs": {
+    "gui/src/qml/ConfirmDialog.qml": {
+      "before": "b0738020bcd266118136dd110bc8d75a9fbf0219f5c05464c0d3d33c6763c7e8",
+      "after": "1f8e48cb5fb5a3ab919fe398fe2d5438eec34966257a186c2c71f802c8bae099"
+    },
+    "gui/src/qml/SteamShortcutDialog.qml": {
+      "before": "9e87353a0fbdd74999b1ff49010420baefd3ab4140c640411fc72062408ce225",
+      "after": "c46221de3e1307e759d2f67492efb3745adc8874b0000ca0ae81d609cbba5560"
+    },
+    "gui/tests/qml/tst_Confirmations.qml": {
+      "before": "477f4ffb68ef9f58912798769f4bbf2116215933c052d5c42cccfc72b9c24767",
+      "after": "2ba83da25f81abe7678cfd9f386c62cb1ec3f6d68437f9113504cab8756b2655"
+    },
+    "gui/tests/qml/tst_Reminders.qml": {
+      "before": "13b8fa118e5f0b2e749d2b6193fb334804c50df55b697e70053de4c4dfaa7a49",
+      "after": "323ca32aec5f0ad68fad6c478f604e0e15bd882092f77d4ead28bea22ca251f4"
+    },
+    "gui/tests/qml/tst_SteamShortcut.qml": {
+      "before": "2040042e74257210463a17ec9a0b57dfe10b6078e38ad7a6d557d96405d23a3c",
+      "after": "ab43a1f1621b5e9a6176d15e8beaf6bf509bd68677c0ee741a6c3d1ca1fb5093"
+    }
+  },
+  "unchangedInputs": 327,
+  "productionCppAndSteamPatchUnchanged": true
+}
