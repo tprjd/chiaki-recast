@@ -1,0 +1,24 @@
+{
+    "checks": 15,
+    "dialogSizing": {
+        "height": -32,
+        "hostHeight": 600,
+        "hostWidth": 900,
+        "parentClass": "QQuickOverlay",
+        "parentHeight": 0,
+        "parentWidth": 0,
+        "sceneHeight": 600,
+        "sceneWidth": 900,
+        "width": -32
+    },
+    "failedCheck": "Native action is visible with positive bounds",
+    "lastBounds": {
+        "height": 42,
+        "name": "confirmationCancel",
+        "parentHeight": 146,
+        "parentWidth": -88,
+        "visible": true,
+        "width": 0
+    },
+    "runtimeRendererBackend": 0
+}

@@ -1,0 +1,32 @@
+{
+  "disconnect-vulkan-readback01": {
+    "unchangedSections": [
+      "registered_hosts",
+      "manual_hosts",
+      "controller_mappings"
+    ],
+    "unchangedPreferences": [
+      "disconnect_action",
+      "auto_connect_mac",
+      "auto_discovery",
+      "remote_play_ask",
+      "add_steam_shortcut_ask"
+    ],
+    "allPassed": true
+  },
+  "disconnect-opengl-final02": {
+    "unchangedSections": [
+      "registered_hosts",
+      "manual_hosts",
+      "controller_mappings"
+    ],
+    "unchangedPreferences": [
+      "disconnect_action",
+      "auto_connect_mac",
+      "auto_discovery",
+      "remote_play_ask",
+      "add_steam_shortcut_ask"
+    ],
+    "allPassed": true
+  }
+}

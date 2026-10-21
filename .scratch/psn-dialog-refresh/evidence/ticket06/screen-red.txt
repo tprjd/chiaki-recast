@@ -1,0 +1,20 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+QWARN  : console_screen::tst_Disconnect::compile()
+  C:\Users\david\.codex\worktrees\psn-disconnect\chiaki-ng-ui\gui\tests\qml\tst_Disconnect.qml produced 2 error(s):
+    C:\Users\david\.codex\worktrees\psn-disconnect\chiaki-ng-ui\gui\tests\qml\tst_Disconnect.qml:12,39: Type DisconnectHarness unavailable
+    C:\Users\david\.codex\worktrees\psn-disconnect\chiaki-ng-ui\gui\tests\qml\fixtures\DisconnectHarness.qml:20,5: StreamDisconnectDialog is not a type
+  Working directory: C:\Users\david\.codex\worktrees\psn-disconnect\chiaki-ng-ui
+  Import paths:
+    'C:\Users\david\.codex\worktrees\psn-disconnect\chiaki-ng-ui\gui\tests\imports'
+    'C:\Users\david\.codex\worktrees\psn-disconnect\chiaki-ng-ui\build\gui-screen'
+    'qrc:\qt-project.org\imports'
+    'qrc:\qt\qml'
+    'C:\Users\david\.cache\chiaki-native-qt\6.9.3\msvc2022_64\qml'
+  Plugin paths:
+    '.'
+
+FAIL!  : console_screen::tst_Disconnect::compile() Type DisconnectHarness unavailable
+C:\Users\david\.codex\worktrees\psn-disconnect\chiaki-ng-ui\gui\tests\qml\tst_Disconnect.qml(12) : failure location
+Totals: 0 passed, 1 failed, 0 skipped, 0 blacklisted, 2ms
+********* Finished testing of console_screen *********

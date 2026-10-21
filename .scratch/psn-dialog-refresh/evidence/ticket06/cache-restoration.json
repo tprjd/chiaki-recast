@@ -1,0 +1,11 @@
+{
+  "restoredPaths": 209,
+  "allOriginalHashesMatch": true,
+  "originalOutputDirectory": "C:\\Users\\david\\.cache\\chiaki-ui-native/console-setup-final-bin",
+  "normalTargetsRebuilt": [
+    "chiaki",
+    "chiaki-console-screen-tests"
+  ],
+  "normalExeSha256": "5a10c793e4154a2501390aa611ef11993454be9559056be1d445c6546d0ee292",
+  "qaHooksRemoved": true
+}
