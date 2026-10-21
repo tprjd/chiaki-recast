@@ -1,6 +1,6 @@
 # PSN sign-in and remaining dialogs
 
-Status: claimed
+Status: resolved
 Date: 2026-10-21
 Design: use the new Library, Settings, console setup, connection, and PIN design
 Test approach: confirmed by the user on 2026-10-21
@@ -186,3 +186,26 @@ The sign-in redirect URL term is recorded in the root glossary. It is distinct f
 Closing submitted PSN sign-in can still result in saved credentials. This behavior is explicitly accepted and must remain visible in the UI wording. Steam failure can occur after some writes; do not describe failure as rollback.
 
 This specification is stored in the project's local Markdown issue tracker. It does not create implementation tickets, authorize a push, or claim implementation or runtime verification. No new architecture decision record is needed for this work because the design keeps the current authentication, storage, and presentation patterns.
+
+## Answer
+
+Implemented all eight tickets on `codex/psn-dialog-integration`.
+The [implementation map](map.md) records the feature changes and merge history.
+PSN sign-in, redirect entry, public Account-ID lookup, Steam results, reminders,
+confirmations, registration choices, information, and both disconnect routes use
+the new design and the approved operation rules.
+
+The [acceptance record](acceptance.md) contains 869 passing checks from the complete
+38-suite screen run. After final review, 142 affected screen checks and native
+runs of 297 integrated, 337 Vulkan, and 357 OpenGL checks passed on the final source.
+The normal Windows build includes the production resources and no QA fixtures.
+The final executable and launch helper are retained outside the temporary worktrees.
+
+The independent [standards and specification review](review.md) found two issues.
+Both are fixed and verified. No review finding remains open.
+The parent verified the final source, binary hashes, result records, and native
+capture. The integration checkout is clean. No push or pull request was requested.
+
+Real services, console effects, physical controllers, native embedded-browser
+operation, and final desktop composition remain unverified. The acceptance record
+keeps these limits separate from controlled service responses and native checks.

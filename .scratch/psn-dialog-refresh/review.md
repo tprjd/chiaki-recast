@@ -50,5 +50,24 @@ Standards: 1 heuristic finding, worst P3 duplication. Spec: 1 finding, worst P2 
 
 ## Resolution
 
-Both findings are assigned to one implementer in `codex/psn-review-fixes`.
-Final verification is pending.
+Both findings are resolved in `d12fe646`, merged into integration at `0c6aebd5`.
+One implementer made both changes with failing and passing production-screen tests.
+
+The standards reviewer confirmed that the shared reminder helper preserves
+credential eligibility, preference updates, and the completion route.
+The specification reviewer independently reran the original scrolling reproduction
+and the complete Confirmations suite. All 3 reproduction checks and 40 suite checks passed.
+
+The [final verification record](evidence/review-fixes/README.md) contains 142 passing
+affected screen checks, with no failures or skips. Native checks pass with 297
+integrated checks, 337 Vulkan checks, and 357 OpenGL checks. A separate test timing
+failure was traced to overlapping buttons before rendering completed. The test
+now waits for rendering. The full Steam suite then passed three times.
+
+The normal build was refreshed and the native cache restored. The parent checked
+both binary hashes, the native result records, the long-text capture, and the
+integrated source against the 332 tested inputs. The only checkout byte differences
+are line endings; there are no content differences.
+
+Final open findings: Standards 0; Spec 0. The recorded external-service, hardware,
+QtWebEngine, and desktop-composition limits remain in the acceptance record.
