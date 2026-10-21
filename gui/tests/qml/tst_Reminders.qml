@@ -168,6 +168,47 @@ TestCase {
         compare(harness.settings.remotePlayAsk, true);
         compare(harness.routes.length, 0);
     }
+    function test_steamSetupReturnsToNextReminder_data() {
+        return ["cancel", "success", "failure"].map(outcome => ({tag: outcome, outcome: outcome}));
+    }
+    function test_steamSetupReturnsToNextReminder(data) {
+        const harness = createTemporaryObject(harnessComponent, tests, {openSteamScreen: true});
+        harness.settings.addSteamShortcutAsk = true;
+        harness.settings.remotePlayAsk = true;
+        harness.started = true;
+        tryCompare(harness.dialog, "opened", true);
+        keyClick(Qt.Key_Down);
+        keyClick(Qt.Key_Return);
+        tryCompare(harness.dialog, "visible", false);
+        tryCompare(harness.pages, "depth", 2);
+        tryVerify(() => harness.pages.currentItem.objectName === "steamShortcutDialog");
+        const steam = harness.pages.currentItem;
+        tryVerify(() => steam.StackView.status === StackView.Active);
+        if (data.outcome === "cancel") {
+            findChild(steam, "steamCancel").forceActiveFocus(Qt.TabFocusReason);
+        } else {
+            findChild(steam, "steamCreate").forceActiveFocus(Qt.TabFocusReason);
+            keyClick(Qt.Key_Return);
+            tryVerify(() => harness.steamResults.length === 1);
+            harness.steamResults[0]("Synthetic progress", true, false);
+            verify(harness.settings.addSteamShortcutAsk);
+            compare(harness.prompts, ["steam"]);
+            harness.steamResults[0]("Synthetic final result", data.outcome === "success", true);
+            tryCompare(findChild(steam, data.outcome === "success" ? "steamDone" : "steamEdit"), "activeFocus", true);
+            findChild(steam, data.outcome === "success" ? "steamDone" : "steamClose").forceActiveFocus(Qt.TabFocusReason);
+        }
+        keyClick(Qt.Key_Return);
+        tryCompare(harness.dialog, "remotePlay", true);
+        tryCompare(harness.dialog, "opened", true);
+        compare(harness.prompts, ["steam", "psn"]);
+        compare(harness.settings.addSteamShortcutAsk, data.outcome !== "success");
+        verify(harness.settings.remotePlayAsk);
+        keyClick(Qt.Key_Escape);
+        tryCompare(harness.dialog, "visible", false);
+        tryCompare(harness.pages, "depth", 1);
+        tryCompare(findChild(harness, "addConsoleButton"), "activeFocus", true);
+        compare(harness.routes.length, 1);
+    }
     function test_longTextAndPrivacy_data() {
         return [{tag: "900", width: 900, height: 600}, {tag: "1280", width: 1280, height: 720}];
     }

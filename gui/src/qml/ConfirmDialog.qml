@@ -23,6 +23,7 @@ Dialog {
     y: Math.round((parent.height - height) / 2)
     padding: 28
     modal: true
+    Overlay.modal: Rectangle { color: "#99000000" }
     focus: true
     closePolicy: Popup.CloseOnEscape
     background: Rectangle { color: "#181d25"; radius: 18; border.color: "#3b4655" }
