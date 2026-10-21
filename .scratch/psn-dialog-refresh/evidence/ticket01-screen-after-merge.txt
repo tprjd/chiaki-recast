@@ -1,0 +1,14 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::PsnSetup::initTestCase()
+PASS   : console_screen::PsnSetup::test_closeBeforeSubmissionAndLateResultsDoNotNavigate()
+PASS   : console_screen::PsnSetup::test_embeddedBrowserRecoveryAndFallback()
+PASS   : console_screen::PsnSetup::test_expiryCopyPasteAndFreshSignIn()
+PASS   : console_screen::PsnSetup::test_onlyFinalResultCompletesAndSubmissionCannotRepeat()
+PASS   : console_screen::PsnSetup::test_redirectIsMaskedAndStreamerModeHidesReveal()
+PASS   : console_screen::PsnSetup::test_rejectedInputStaysEditableAndDetailsHideInStreamerMode()
+PASS   : console_screen::PsnSetup::test_supportedSizesAndLongText(900x600)
+PASS   : console_screen::PsnSetup::test_supportedSizesAndLongText(1280x720)
+PASS   : console_screen::PsnSetup::cleanupTestCase()
+Totals: 10 passed, 0 failed, 0 skipped, 0 blacklisted, 2178ms
+********* Finished testing of console_screen *********

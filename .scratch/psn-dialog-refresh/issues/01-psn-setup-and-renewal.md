@@ -1,6 +1,6 @@
 # 01: PSN setup and credential renewal
 
-Status: claimed
+Status: resolved
 Type: task
 Blocked by: None (can start immediately)
 
@@ -49,7 +49,7 @@ The existing registration sign-in APIs remain available for ticket 02.
 Verification:
 
 - The independent screen build passed 721 tests, with no failures or skips.
-  The final focused PSN screen run passed 10 tests.
+  The final focused PSN screen run passed 10 tests. The focused run also passed after the integration merge.
 - Controlled native run 07 passed 125 checks. It reads actual saved credentials
   through fresh native Settings objects. It covers invalid input, malformed
   responses, duplicate requests and results, profile changes from progress and
@@ -59,7 +59,7 @@ Verification:
   explicit paste and reveal, immediate privacy masking, expiry routing, closure
   during work, re-entry without a second request, and final success.
 - The normal application build passed. Its 83 production source files match
-  this worktree. Its resources and executable exclude test fixtures and QA hooks.
+  source commit `19c81712`. Its resources and executable exclude test fixtures and QA hooks. This build precedes the other integrated tickets.
 - Native output contains no synthetic authorization code or token values.
   The shared cache has all 49 original source hashes and its original output
   configuration restored. The original app and screen targets rebuilt.
@@ -76,3 +76,5 @@ build lacks QtWebEngine. Its real browser check covers fallback; the embedded
 route uses a supplied browser in production-screen tests. The integrated native
 acceptance ticket remains responsible for the final cross-dialog focus and
 scaling matrix.
+
+Merged integration tip `3f998dd3` into this branch as `baadbcc3`. Both README test sections are retained. The final integrated application build remains part of ticket 08.
