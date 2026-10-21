@@ -16,14 +16,13 @@ published in `fff89373`. Keep the prototype out of production integration.
 | [01: Share the existing stream interface](issues/01-share-stream-interface.md) | Shared production menu and one test boundary, with current behavior preserved | None | resolved |
 | [02: Build the approved A toolbar](issues/02-stream-toolbar.md) | Complete descriptive toolbar, pop-ups, settings navigation, audio, Resume, and Disconnect | 01 | claimed |
 | [03: Build the approved A statistics overlay](issues/03-stream-statistics.md) | Compact six-value readout with real bindings and visibility rules | 01 | resolved |
-| [04: Build the approved A session notices](issues/04-session-notices.md) | Network, blocked-content, and disabled-media notices with actions and cleanup | 01 | claimed |
+| [04: Build the approved A session notices](issues/04-session-notices.md) | Network, blocked-content, and disabled-media notices with actions and cleanup | 01 | resolved |
 | [05: Complete native acceptance](issues/05-native-acceptance.md) | Combined native verification, regressions, and normal production build | 02, 03, 04 | ready-for-agent |
 
 ## Work order
 
-Tickets 01 and 03 are resolved. Tickets 02 and 04 are claimed for implementation.
-They use the same production test boundary but do not require one another's
-completed feature. Ticket 05 remains blocked by 02 and 04.
+Tickets 01, 03, and 04 are resolved. Ticket 02 remains claimed for implementation.
+Ticket 05 remains blocked by 02.
 
 Shared source edits may need coordination. That is not an extra blocking edge.
 Each feature ticket must pass its own production QML checks before resolution;
@@ -76,5 +75,17 @@ The separate statistics window keeps its native owner and rejects input and focu
 See [statistics evidence](evidence/ticket03/README.md) for production QML results,
 Windows focus checks, native renderer captures, source hashes, and build limits.
 
-Tickets 02 and 04 remain claimed. Ticket 05 remains blocked by both tickets.
-Its final normal build must include the recorded post-build shortcut changes.
+Tickets 02 and 04 remained claimed after ticket 03 was resolved.
+Ticket 05's final normal build must include the recorded post-build shortcut changes.
+
+Ticket [04](issues/04-session-notices.md) is resolved in integration merge
+`ac69c8c6`, with final ticket commit `45e29e60`. Both renderer host routes use the
+compact audio, network, blocked-content, and disabled-video notices. The existing
+threshold, warning timing, disconnect policy, and guarded session actions remain.
+Shared production content preserves input ownership and higher-priority dialogs.
+See [notice evidence](evidence/ticket04/README.md) for production QML results,
+Windows behavior, component captures, source hashes, and the normal native build.
+
+Ticket 02 remains claimed. Ticket 05 remains blocked by 02. Notice captures do not
+establish actual OpenGL or Vulkan composition, fullscreen, physical controllers,
+live media, or further display scales. These native limits remain for ticket 05.
