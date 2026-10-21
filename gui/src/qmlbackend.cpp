@@ -900,7 +900,8 @@ bool QmlBackend::retryConnection(const QString &attempt_id)
 bool QmlBackend::cancelConnection(const QString &attempt_id)
 {
     const auto phase = connection_attempt.value("phase").toString();
-    if (attempt_id != connection_attempt.value("id").toString() || connection_cancelled
+    if (attempt_id.isEmpty() || connection_attempt.isEmpty()
+            || attempt_id != connection_attempt.value("id").toString() || connection_cancelled
             || phase == "failure" || phase == "ready" || phase == "cancelled")
         return false;
     if (connection_attempt.value("route") == "psn" && (connectState() == PsnConnectState::LinkingConsole
@@ -927,7 +928,8 @@ bool QmlBackend::cancelConnection(const QString &attempt_id)
 
 bool QmlBackend::dismissConnection(const QString &attempt_id)
 {
-    if (attempt_id != connection_attempt.value("id").toString() || connection_dismissed)
+    if (attempt_id.isEmpty() || connection_attempt.isEmpty()
+            || attempt_id != connection_attempt.value("id").toString() || connection_dismissed)
         return false;
     if (connection_attempt.value("cleanupPending").toBool() && connection_attempt.value("phase") != "ready")
         cancelConnection(attempt_id);
@@ -1143,7 +1145,7 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
         }
 
         QMetaObject::invokeMethod(window, [this, owned_session, attempt_id, frame, frames_lost]() mutable {
-            if (session == owned_session && connection_generation == attempt_id && !connection_cancelled
+            if (owned_session && session == owned_session && connection_generation == attempt_id && !connection_cancelled
                     && !connection_dismissed && connection_profile_generation == profile_generation
                     && connection_attempt.value("phase") != "failure")
                 window->presentFrame(frame, frames_lost);
@@ -1181,6 +1183,8 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
             connection_attempt["phase"] = "cancelled";
         else if (connection_attempt.value("phase") == "ready")
             connection_dismissed = true;
+        else if (connection_attempt.value("phase") != "failure")
+            connection_attempt["phase"] = "cancelled";
         emit connectionAttemptChanged();
         emit sessionChanged(session);
 

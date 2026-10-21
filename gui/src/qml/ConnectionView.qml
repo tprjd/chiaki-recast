@@ -95,7 +95,16 @@ FocusScope {
             anchors.fill: parent; anchors.margins: 16; spacing: 28
             RowLayout {
                 Layout.fillWidth: true
-                Image { source: "qrc:/icons/chiaking.svg"; sourceSize: Qt.size(36, 36); Layout.preferredWidth: 36; Layout.preferredHeight: 36 }
+                Rectangle {
+                    Layout.preferredWidth: 32; Layout.preferredHeight: 32
+                    color: "#69b8ff"; radius: 8
+                    Image {
+                        anchors.fill: parent; anchors.margins: 5
+                        source: "qrc:/icons/chiaking-logo-white.svg"
+                        fillMode: Image.PreserveAspectFit
+                        Accessible.ignored: true
+                    }
+                }
                 Label { visible: view.width >= 1000; text: "chiaki-ng"; font.pixelSize: 18; font.bold: true }
             }
             ConsoleButton {
@@ -142,10 +151,11 @@ FocusScope {
                         RowLayout {
                             Layout.fillWidth: true; spacing: 16
                             Image {
-                                Layout.preferredWidth: 40; Layout.preferredHeight: 48
-                                source: view.attempt.ps5 === false ? "qrc:/icons/console-ps4.svg" : "qrc:/icons/console-ps5.svg"
+                                Layout.preferredWidth: 56; Layout.preferredHeight: 48
+                                source: "image://svg/console-ps" + (view.attempt.ps5 === false ? "4" : "5") + "#console"
                                 fillMode: Image.PreserveAspectFit
-                                sourceSize: Qt.size(40, 48)
+                                sourceSize: Qt.size(56, 48)
+                                Accessible.ignored: true
                             }
                             ColumnLayout {
                                 Layout.fillWidth: true
