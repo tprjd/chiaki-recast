@@ -1,0 +1,5 @@
+[1/6] Automatic MOC for target chiaki
+[2/5] Automatic RCC for src/qml/qml.qrc
+[3/5] Building CXX object gui/CMakeFiles/chiaki.dir/chiaki_autogen/VLDSMZLXNG/qrc_qml.cpp.obj
+[4/5] Building CXX object gui/CMakeFiles/chiaki.dir/C_/Users/david/.cache/chiaki-ui-native/stream-statistics-qa-prep01/native-disconnect.cpp.obj
+[5/5] Linking CXX executable C:\Users\david\.cache\chiaki-ui-native\stream-statistics-qa-bin\chiaki.exe

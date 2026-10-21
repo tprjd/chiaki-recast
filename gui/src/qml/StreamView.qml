@@ -26,7 +26,7 @@ Item {
     readonly property bool useSeparateMenuWindow: view.streamWindow.runtimeRendererBackend === 1
     readonly property int streamMenuHeight: useSeparateMenuWindow ? separateMenuWindow.menuHeight : inlineMenuContent.item ? inlineMenuContent.item.implicitHeight : 80
     readonly property real streamMenuWidth: Math.min(820, Math.max(0, view.width - 28))
-    readonly property bool streamStatsVisible: view.settings.showStreamStats && !(menuState.open || menuState.closing) && !sessionLoading && !sessionError && !(view.settings.audioVideoDisabled & 0x02)
+    readonly property bool streamStatsVisible: !!view.backend.session && view.settings.showStreamStats && !(menuState.open || menuState.closing) && !sessionLoading && !sessionError && !(view.settings.audioVideoDisabled & 0x02)
     property int separateMenuX: 0
     property int separateMenuY: 0
     property int separateMenuWidth: 0
@@ -358,10 +358,10 @@ Item {
     Window {
         id: streamStatsWindow
         objectName: "streamStatsWindow"
-        flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowTransparentForInput
+        flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowTransparentForInput | Qt.WindowDoesNotAcceptFocus
         color: "transparent"
         modality: Qt.NonModal
-        transientParent: view.hostWindow
+        transientParent: view.streamWindow
         visible: streamStatsVisible && useSeparateMenuWindow
         x: separateStatsX
         y: separateStatsY

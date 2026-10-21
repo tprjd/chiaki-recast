@@ -1739,11 +1739,17 @@ renderer_backend_ready:
         if (session)
             session->BlockInput(grab_input);
         update_timer->stop();
+        dropped_frames_current.storeRelaxed(0);
+        dropped_frames = 0;
+        emit droppedFramesChanged();
         {
             QMutexLocker locker(&placebo_state_mutex);
             pl_queue_reset(placebo_queue);
             newest_queued_frame_pts = -1.0;
+            queue_depth_average = 0.0;
         }
+        emit queueDepthAverageChanged();
+        updatePendingFrameAge(0.0);
         {
             QMutexLocker locker(&reset_seed_mutex);
             if (reset_seed_frame)
