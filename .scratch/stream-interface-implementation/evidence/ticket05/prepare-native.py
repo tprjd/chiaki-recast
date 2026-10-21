@@ -45,6 +45,7 @@ target = cache / name / 'native-disconnect.cpp'
 text = target.read_text()
 text = text.replace('candidate->objectName()!="streamMenuWindow" || candidate->isVisible()', '!candidate->objectName().startsWith("stream") || candidate->isVisible()')
 text = text.replace('if (item->window()->objectName()=="streamMenuWindow" || item->window()->flags().testFlag(Qt::Popup)) return item->window();', 'if (item->window()->isVisible()) return item->window();')
+text = text.replace('GetCursorPos(&previous); SetCursorPos(point.x,point.y); INPUT', 'GetCursorPos(&previous); check(SetCursorPos(point.x,point.y),"Native pointer movement is available"); INPUT')
 text = text.replace('event(session,CHIAKI_EVENT_CONNECTED);\n', 'event(session,CHIAKI_EVENT_CONNECTED); window->nativeQaVideoReady(); waitUi();\n')
 text = text.replace('#include <QTimer>', '#include <QTimer>\n#include <QProcess>\n#include <QTranslator>\n#include <QQmlEngine>\n#include <qpa/qwindowsysteminterface.h>')
 text = text.replace('void contracts() {', Path(__file__).with_name('native-acceptance.cpp.inc').read_text() + '\nvoid toolbarContracts() {')

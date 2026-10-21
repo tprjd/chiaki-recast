@@ -222,6 +222,23 @@ TestCase {
         tryCompare(host, "visible", false);
         compare(h.window.grabs, h.window.releases);
     }
+    function test_flyoutFocusPixels_data() { return routes(); }
+    function test_flyoutFocusPixels(data) {
+        const h = createTemporaryObject(harnessComponent, tests);
+        const host = openMenu(h, data.separate);
+        mouseClick(findChild(host, "streamPicture"));
+        const popup = findChild(host, "streamPicturePopup");
+        const fit = findChild(host, "streamFit");
+        tryCompare(fit, "activeFocus", true);
+        const target = data.separate ? popup.nativeHost.contentItem : h;
+        const pixels = grabImage(target);
+        const point = fit.mapToItem(target, 0, fit.height / 2);
+        let outline = false;
+        for (let x = Math.ceil(point.x); x < point.x + 10; x++)
+            if (pixels.blue(x, Math.round(point.y)) > pixels.red(x, Math.round(point.y)) + 40) outline = true;
+        verify(outline, "The focused picture choice has a visible blue border");
+        pixels.save("build/flyout-focused-" + data.separate + ".png");
+    }
     function test_layout(data) {
         tests.width = data.size.width; tests.height = data.size.height;
         const h = createTemporaryObject(harnessComponent, tests);

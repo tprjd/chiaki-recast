@@ -123,7 +123,9 @@ void acceptanceContracts() {
   evidence["beforeOutsideFocus"]=ui("streamFit")->window()->activeFocusItem()?ui("streamFit")->window()->activeFocusItem()->objectName():"none";
   emptyHitTest();
   evidence["afterOutsideFocus"]=ui("streamFit")->window()->activeFocusItem()?ui("streamFit")->window()->activeFocusItem()->objectName():"none";
-  key(window,Qt::Key_Right); check(ui("streamZoom")->hasActiveFocus(),"Outside-click controller arrow retains the focused leaf"); key(window,Qt::Key_Return); check(window->videoMode()==QmlMainWindow::VideoMode::Zoom,"Outside-click controller Return activates the focused leaf");
+  auto *cached=ui("streamFit")->window()->property("lastFocusItem").value<QQuickItem *>(); evidence["cachedLeaf"]=cached?cached->objectName():"none";
+  key(window,Qt::Key_Right); evidence["routeStart"]=qApp->property("qaFocusStart").toString(); evidence["routeSelected"]=qApp->property("qaFocusSelected").toString(); evidence["focusBefore"]=qApp->property("qaRouteFocusBefore").toString(); evidence["focusAfter"]=qApp->property("qaRouteFocusAfter").toString(); evidence["routeCached"]=qApp->property("qaRouteCached").toString(); evidence["fitWindow"]=QString::number(ui("streamFit")->window()->winId());
+  check(ui("streamZoom")->hasActiveFocus(),"Outside-click controller arrow retains the focused leaf"); key(window,Qt::Key_Return); check(window->videoMode()==QmlMainWindow::VideoMode::Zoom,"Outside-click controller Return activates the focused leaf");
   key(window,Qt::Key_Escape); waitUi();
   check(!ui("streamFit") && ui("streamPicture")->hasActiveFocus(),"Focus probe Escape closes popup and restores opener after outside native click");
   emptyHitTest(); key(window,Qt::Key_Escape); waitUi(); check(!ui("streamResume") && window->nativeQaGrabCount()==0,"Focus probe menu Escape returns input after outside click");
@@ -205,6 +207,29 @@ void acceptanceContracts() {
  backend->qmlSettings()->setAudioVideoDisabled(2); waitUi(); check(named(ui("streamActionNotice"),"streamNoticeTitle")->property("text")=="Video disabled","Disabled video uses accurate notice");
  backend->qmlSettings()->setAudioVideoDisabled(3); waitUi(); check(named(ui("streamActionNotice"),"streamNoticeTitle")->property("text")=="Audio and video disabled","Disabled audio and video use accurate notice");
  backend->qmlSettings()->setAudioVideoDisabled(1); waitUi();
+ for(bool renderer:{false,true}) {
+  backend->qmlSettings()->setAudioVideoDisabled(renderer?1:2); session->nativeQaBlocked(renderer); waitUi();
+  QMetaObject::invokeMethod(window,"menuRequested"); waitUi();
+  nativePointerClick(ui(renderer?"streamQuality":"streamPicture")); waitUi();
+  if(renderer) nativePointerClick(ui("streamCustom"));
+  nativePointerClick(ui(renderer?"streamRendererSettings":"streamDisplaySettings")); waitUi(600);
+  check(view->property("settingsOpen").toBool(),"Real Main linked settings owns the composed interface");
+  check(!ui("streamResume") && !ui("streamNoticeAction") && window->nativeQaGrabCount()==1,"Settings keeps one native input owner after menu closure");
+  if(separate) {
+   auto *focused=QGuiApplication::focusWindow();
+   check(focused && focused->type()==Qt::Dialog && focused->transientParent()==window,"Real separate settings window retains native keyboard focus");
+   check(GetForegroundWindow()==reinterpret_cast<HWND>(focused->winId()),"Real settings window is the foreground HWND");
+  }
+  auto *navigation=ui("mainNavigation"); check(navigation,"Main navigation remains available");
+  check(QMetaObject::invokeMethod(navigation->parentItem(),"closeDialog"),"Close the existing Main settings route"); waitUi(400);
+  check(!view->property("settingsOpen").toBool() && ui("streamNoticeAction") && window->nativeQaGrabCount()==1,"Settings close restores the correct actionable notice and input owner");
+  backend->qmlSettings()->setAudioVideoDisabled(1); session->nativeQaBlocked(false); waitUi();
+  check(window->nativeQaGrabCount()==0,"Clearing the restored notice returns native session input");
+ }
+ QMetaObject::invokeMethod(window,"menuRequested"); waitUi(); ui("streamDisconnect")->forceActiveFocus(Qt::TabFocusReason); key(window,Qt::Key_Return); waitUi(600);
+ check(ui("confirmationCancel") && ui("confirmationCancel")->hasActiveFocus(),"Real disconnect dialog keeps Cancel-first priority after the toolbar closes");
+ const int stops=count("qaStops"), sleeps=count("qaSleeps"); key(window,Qt::Key_Escape); waitUi();
+ check(!ui("confirmationCancel") && window->nativeQaGrabCount()==0 && count("qaStops")==stops && count("qaSleeps")==sleeps,"Main-window controller Escape cancels the modal dialog without a transport command");
  samples.stop(); backend->nativeQaEndReplacement(); waitUi();
  check(!backend->qmlSession() && !ui("streamResume") && !ui("streamStatsReadout") && !ui("streamNoticeAction"),"Session destruction removes every overlay");
  check(window->nativeQaGrabCount()==0,"Session destruction leaves no native input capture");

@@ -300,7 +300,7 @@ FocusScope {
                 objectName: "streamDisplaySettings"
                 text: qsTr("Display settings")
                 Layout.fillWidth: true
-                onClicked: { menuController.close(); navigation.openDisplaySettings(); }
+                onClicked: menuController.openSettings("display")
                 KeyNavigation.up: zoomFactor.visible ? zoomFactor : fitButton
                 KeyNavigation.down: fitButton
             }
@@ -346,7 +346,7 @@ FocusScope {
                 text: qsTr("Renderer settings")
                 Layout.fillWidth: true
                 visible: streamWindow.videoPreset === ChiakiWindow.VideoPreset.Custom
-                onClicked: { menuController.close(); navigation.openPlaceboSettings(); }
+                onClicked: menuController.openSettings("renderer")
                 KeyNavigation.up: presetRepeater.itemAt(4)
                 KeyNavigation.down: presetRepeater.itemAt(0)
             }

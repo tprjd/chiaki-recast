@@ -113,6 +113,7 @@ Item {
         property string flyout: ""
         property var returnFocusItem: null
         property bool disconnectPending: false
+        property string settingsTarget: ""
         onClosingChanged: {
             if (!closing && disconnectPending) {
                 disconnectPending = false;
@@ -121,11 +122,21 @@ Item {
                     if (!view.backend.sessionPinRequest.id && view.backend.session && !view.sessionLoading && !view.sessionError) sessionStopDialog.open();
                 });
             }
+            if (!closing && settingsTarget) {
+                const target = settingsTarget;
+                Qt.callLater(() => {
+                    if (view.backend.session && !view.backend.sessionPinRequest.id && !view.sessionLoading && !view.sessionError) {
+                        if (target === "display") view.navigation.openDisplaySettings();
+                        else view.navigation.openPlaceboSettings();
+                    }
+                    settingsTarget = "";
+                });
+            }
         }
 
         property real lastToggleTime: 0
         function toggle() {
-            if (closing || disconnectPending || view.backend.sessionPinRequest.id || view.managedConnection && view.backend.connectionAttempt.phase !== "ready")
+            if (closing || disconnectPending || settingsTarget || view.backend.sessionPinRequest.id || view.managedConnection && view.backend.connectionAttempt.phase !== "ready")
                 return;
             var now = Date.now();
             if (now - lastToggleTime < 200)
@@ -151,6 +162,10 @@ Item {
             closing = true;
             open = false;
             releaseInput();
+        }
+        function openSettings(target) {
+            settingsTarget = target;
+            close();
         }
         function dismiss() {
             if (flyout) flyout = "";
@@ -261,7 +276,7 @@ Item {
 
     readonly property bool noticesReady: !!view.backend.session && view.backend.session.connected
         && !sessionLoading && !sessionError && !view.backend.sessionPinRequest.id && !settingsOpen
-        && !sessionStopDialog.opened && !menuState.disconnectPending
+        && !sessionStopDialog.opened && !menuState.disconnectPending && !menuState.settingsTarget
     readonly property bool audioNoticeVisible: noticesReady && view.settings.audioVideoDisabled === 1
     property real networkNoticeOpacity: networkIndicatorTimer.running ? 1 : 0
     property var networkNoticeSession: null
@@ -501,7 +516,7 @@ Item {
         onMenuCloseRequested: menuState.close()
         onCloseAnimationFinished: {
             menuState.closing = false;
-            if (!view.settingsOpen && !sessionStopDialog.opened && !view.backend.sessionPinRequest.id && !view.sessionLoading && !menuState.open && !view.actionNoticeVisible) {
+            if (!view.settingsOpen && !menuState.settingsTarget && !sessionStopDialog.opened && !view.backend.sessionPinRequest.id && !view.sessionLoading && !menuState.open && !view.actionNoticeVisible) {
                 if (view.streamWindow) view.streamWindow.requestActivate();
                 if (menuState.returnFocusItem && menuState.returnFocusItem.visible)
                     menuState.returnFocusItem.forceActiveFocus(Qt.TabFocusReason);

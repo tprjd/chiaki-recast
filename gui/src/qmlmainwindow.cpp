@@ -2839,6 +2839,7 @@ bool QmlMainWindow::event(QEvent *event)
                 owner = owner->transientParent();
             if (owner == this && focused != this && focused != quick_window) {
                 if (focused != QGuiApplication::focusWindow()) {
+                    // Tool windows accept keys after Qt reports their native focus.
                     auto *pending = new QObject(focused);
                     auto key = std::shared_ptr<QEvent>(event->clone());
                     connect(qGuiApp, &QGuiApplication::focusWindowChanged, pending,
