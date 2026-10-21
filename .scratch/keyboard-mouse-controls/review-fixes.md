@@ -35,11 +35,20 @@ Only the affected targets and cases ran. All logs below are in
 | Final `physicalModifiers`, `keyboardCapture`, `editableBindings`, and `bindingValidation` | All five case rows passed | `chiaki-review-session-final.txt` |
 | Final `platformKeyboard` | Added native-only second-modifier and obsolete-message assertions passed. The later existing Space-output assertion failed at line 226. | `chiaki-review-native-modifiers-final.txt` |
 | Final native target build | Passed | `chiaki-review-build-final.txt` |
+| One bounded `platformKeyboard` diagnostic run | Complete case passed with synchronous Space output | `chiaki-review-space-diagnostic.txt` |
 
 The owner check used the offscreen software backend. Session checks used the
 offscreen platform. The notice checks and `platformKeyboard` used Windows.
 The native executable ran through `Start-Process -WindowStyle Hidden -Wait`.
 
-The complete desktop keyboard check remains open. No further suite ran after
-the user requested handoff. Physical mouse calibration, PS5 output, and game
+The bounded follow-up added temporary diagnostics around the existing Space
+press and ran only `platformKeyboard` once. Before the press, capture, active
+window, Qt focus, and Windows foreground were all true. Input ownership was
+unblocked and the button state was zero. Immediately after the synchronous
+press, the same states remained true and the button state was Cross, value 1.
+The complete case passed with exit code zero. The prior failure's cause was
+not established. The temporary diagnostics were removed. No production change
+or retry loop was needed.
+
+No other suite repeated. Physical mouse calibration, PS5 output, and game
 acceptance remain open. These fixes do not establish those results.
