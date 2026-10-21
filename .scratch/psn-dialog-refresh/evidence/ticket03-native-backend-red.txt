@@ -1,0 +1,14 @@
+**********************************************************************
+** Visual Studio 2022 Developer PowerShell v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+-- Configuring done (0.5s)
+-- Generating done (0.2s)
+-- Build files have been written to: C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/build/steam-native
+[1/2] Building CXX object CMakeFiles\chiaki-steam-shortcut-tests.dir\command.cpp.obj
+[2/2] Linking CXX executable chiaki-steam-shortcut-tests.exe
+PASS isolated Steam directory exists
+PASS temporary fixture written
+PASS temporary fixture written
+PASS new shortcut has exactly one terminal result
+FAIL new shortcut terminal result succeeds

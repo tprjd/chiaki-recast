@@ -1,0 +1,7 @@
+#include "backend.h"
+#include <QCoreApplication>
+#include <QImageReader>
+#include <QProcessEnvironment>
+#include "steamtools.h"
+static QString getExecutable() { return QCoreApplication::applicationFilePath(); }
+@command@

@@ -236,3 +236,39 @@ attempt or take focus during its exit transition.
 The fake backend supplies native results. It does not simulate discovery,
 wake packets, or a session. Isolated native checks cover those handlers with
 transport disabled. Real console wake-up still needs a console.
+
+## Steam shortcut checks
+
+`SteamShortcut` loads the production `SteamShortcutDialog.qml` with a supplied
+backend and navigation object. The checks use the production controls. They cover
+profile defaults, name validation, custom options and folders, persistent failure,
+retry, terminal success, privacy, keyboard input, controller key mappings, and
+return focus. Layout checks use 900 by 600 and 1280 by 720 logical pixels.
+`SteamShortcutHarness` composes the production Library and Steam form.
+
+The separate `gui/tests/steam` CMake target builds the exact Steam command from
+`qmlbackend.cpp` with the real pinned SteamTools dependency and artwork. The test
+supplies only the executable path boundary. It creates a temporary Steam directory
+and checks the written shortcut records, matching-entry updates, artwork, and
+controller configuration. Windows file locks test backup and write failures.
+The checks do not access the user's Steam installation.
+
+Build it with the same Qt and compiler environment as the screen target:
+
+```powershell
+& $cmake -S gui/tests/steam -B build/steam-native -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_PREFIX_PATH=$qtPrefix"
+& $cmake --build build/steam-native
+$env:PATH = (Resolve-Path build/steam-native/steam-tools).Path + ';' + $env:PATH
+$env:QT_QPA_PLATFORM = 'offscreen'
+& .\build\steam-native\chiaki-steam-shortcut-tests.exe
+```
+
+`cmake/SteamTools.cmake` applies `cmake/steam-tools.patch` to a build copy of the
+pinned dependency. Both the normal application and the native check use this
+copy. The source submodule stays unchanged. The patch fixes custom folder checks,
+new shortcut files, Windows backup names, artwork error reporting, and failed
+backup or write results. Reconfiguration copies the original source before the
+patch is applied again.
+
+These controlled checks do not verify physical controllers, native display
+scaling, or shortcut visibility after the user restarts Steam.

@@ -10,16 +10,16 @@ Specification: [PSN sign-in and remaining dialogs](spec.md)
 | --- | --- | --- |
 | [01: PSN setup and credential renewal](issues/01-psn-setup-and-renewal.md) | claimed | None |
 | [02: Account-ID retrieval for registration](issues/02-registration-account-id.md) | ready-for-agent | 01 |
-| [03: Steam shortcut creation and results](issues/03-steam-shortcut-results.md) | claimed | None |
+| [03: Steam shortcut creation and results](issues/03-steam-shortcut-results.md) | resolved | None |
 | [04: Startup reminder choices](issues/04-startup-reminders.md) | claimed | None |
 | [05: Explicit confirmations and registration choice](issues/05-confirmations-and-registration.md) | resolved | None |
-| [06: Disconnect confirmations in both renderer routes](issues/06-disconnect-confirmations.md) | ready-for-agent | None |
+| [06: Disconnect confirmations in both renderer routes](issues/06-disconnect-confirmations.md) | claimed | None |
 | [07: About and renderer notices](issues/07-about-and-renderer-notices.md) | ready-for-agent | None |
 | [08: Integrated native acceptance](issues/08-native-acceptance.md) | ready-for-agent | 02, 03, 04, 05, 06, 07 |
 
 ## Execution order
 
-- Tickets 01 and 03 are claimed. Tickets 04, 06, and 07 are open and unblocked. The first eligible ticket is 04.
+- Tickets 01 and 04 are claimed. Tickets 06 and 07 are open and unblocked. The first eligible ticket is 06.
 - Ticket 02 starts after 01 is resolved.
 - Ticket 08 starts after 02, 03, 04, 05, 06, and 07 are resolved. Ticket 01 is included through 02.
 - Every feature ticket includes its own focused tests. Ticket 08 verifies the integrated production build and cross-flow behavior.
@@ -53,4 +53,6 @@ Use the confirmed production-QML, isolated-native, and visible-native test appro
 Final review compares the integration branch with `9b138cc43a5d667933284f1c24e8dabb721b01ad`. The approved specification and published tickets are the review contract. No PR or push is part of this request.
 
 2026-10-21: Resolved [ticket 05](issues/05-confirmations-and-registration.md). Merged `codex/psn-confirmations` at `29d55e6c` without conflicts. Confirmations use explicit action labels and initial Cancel focus. Registration has separate automatic, manual, and cancel choices. The [focused confirmation results](evidence/ticket05/confirm-final.txt) and other evidence linked in the ticket record 111 passing checks and no failures. Visible native and integrated acceptance remain in ticket 08.
+
+2026-10-21: Resolved [ticket 03](issues/03-steam-shortcut-results.md). Merge `39bea6eb` integrates `codex/psn-steam` at `8e764707` without conflicts. Steam creation retains editable input, reports terminal results, and applies dependency fixes to a build copy. The [focused screen results](evidence/ticket03-screen-green.txt) record 21 passing checks. The [native results](evidence/ticket03-native-green.txt) verify actual writes and controlled failures in a temporary Steam directory. The [broad regression run](evidence/ticket03-screen-regressions.txt) was stopped and is incomplete. Normal application, visible native, and real Steam acceptance remain in ticket 08.
 

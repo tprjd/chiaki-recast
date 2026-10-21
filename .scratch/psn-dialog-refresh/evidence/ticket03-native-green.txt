@@ -1,0 +1,41 @@
+**********************************************************************
+** Visual Studio 2022 Developer PowerShell v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+-- Configuring done (0.6s)
+-- Generating done (0.2s)
+-- Build files have been written to: C:/Users/david/.codex/worktrees/psn-steam/chiaki-ng-ui/build/steam-native
+[1/5] Automatic MOC and UIC for target cpp-steam-tools
+[2/4] Building CXX object steam-tools\CMakeFiles\cpp-steam-tools.dir\src\steamtools.cpp.obj
+[3/4] Linking CXX shared library steam-tools\cpp-steam-tools.dll
+PASS isolated Steam directory exists
+PASS temporary fixture written
+PASS temporary fixture written
+PASS new shortcut has exactly one terminal result
+PASS new shortcut terminal result succeeds
+PASS new shortcut does not claim a nonexistent backup
+PASS actual shortcuts.vdf contains the new shortcut
+PASS actual shortcut retains launch options
+PASS all five artwork files are written
+PASS actual controller configuration is updated
+PASS matching executable and launch options update the existing entry
+PASS shortcut backup uses a valid Windows filename
+PASS failure after partial progress cannot report success
+PASS partial write emits progress then exactly one terminal failure
+PASS partial failure reports existing writes without claiming rollback
+PASS native boundary rejects an empty trimmed name
+PASS invalid name does not change Steam files
+PASS temporary artwork directory moved aside
+PASS temporary fixture written
+PASS actual artwork write failure cannot report terminal success
+PASS artwork failure stops shortcut updates
+PASS artwork directory restored after the controlled failure
+PASS temporary shortcut source denies backup reads
+PASS failed backup prevents overwrite of an existing shortcut file
+PASS temporary shortcut source denies write access
+PASS actual shortcut write failure cannot report terminal success
+PASS denied write retains existing shortcut bytes
+PASS temporary fixture written
+PASS temporary controller config denies write access
+PASS actual controller write failure cannot report terminal success
+PASS denied controller write retains existing config bytes
