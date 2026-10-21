@@ -14,406 +14,310 @@ FocusScope {
     required property var navigation
     required property var menuController
     property bool separate: false
+    property Item initialFocusItem: resumeButton
+    implicitHeight: toolbar.implicitHeight + 24
     focus: true
-    Keys.onMenuPressed: menuController.close()
-    Keys.onEscapePressed: menuController.close()
-    property Item initialFocusItem: closeButton
     anchors.fill: parent
+    Keys.onMenuPressed: menuController.close()
+    Keys.onEscapePressed: menuController.dismiss()
 
-    Rectangle { anchors.fill: parent; color: "#2b2b2b"; visible: content.separate }
-
-    Canvas {
-        visible: !content.separate
-        anchors.fill: parent
-        onWidthChanged: requestPaint()
-        onHeightChanged: requestPaint()
-        onPaint: {
-            let ctx = getContext("2d");
-            let gradient = ctx.createLinearGradient(0, 0, 0, height);
-            gradient.addColorStop(0.0, Qt.rgba(0.0, 0.0, 0.0, 0.0));
-            gradient.addColorStop(0.7, Qt.rgba(0.5, 0.5, 0.5, 0.7));
-            gradient.addColorStop(1.0, Qt.rgba(0.5, 0.5, 0.5, 0.9));
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, width, height);
-        }
+    component Flyout: Popup {
+        property Item opener
+        width: Math.min(320, content.width)
+        x: content.width - width
+        y: -height - 9
+        padding: 17
+        popupType: content.separate ? Popup.Window : Popup.Item
+        modal: false
+        dim: false
+        focus: true
+        closePolicy: Popup.NoAutoClose
+        enter: Transition {}
+        exit: Transition {}
+        background: Rectangle { radius: 8; color: "#a6090e15"; border.color: "#24ffffff" }
+        onClosed: Qt.callLater(() => {
+            if (menuController.open && !menuController.flyout) {
+                if (content.separate) content.Window.window.requestActivate();
+                opener.forceActiveFocus(Qt.TabFocusReason);
+            }
+        })
     }
 
+    component MenuButton: ToolButton {
+        property string description
+        property bool disclosure: false
+        font.pixelSize: 14
+        padding: 9
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        Accessible.name: description + ": " + text
+        contentItem: ColumnLayout {
+            spacing: 5
+            Label { text: description; color: "#dbe1e9"; font.pixelSize: 11; wrapMode: Text.Wrap; Layout.fillWidth: true }
+            Label { text: parent.parent.text + (parent.parent.disclosure ? "  ▴" : ""); color: parent.parent.enabled ? "white" : "#aab6c6"; font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true; Accessible.ignored: true }
+        }
+        background: Rectangle {
+            radius: 5
+            color: parent.hovered || parent.down ? "#33ffffff" : "transparent"
+            border.color: parent.visualFocus ? "#a9d9ff" : "transparent"
+            border.width: 2
+        }
+        Keys.onReturnPressed: clicked()
+    }
+
+    component FlyoutButton: ToolButton {
+        font.pixelSize: 14
+        Layout.fillWidth: true
+        contentItem: Label {
+            text: parent.text
+            color: "white"
+            font: parent.font
+            wrapMode: Text.Wrap
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+        Keys.onReturnPressed: clicked()
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        color: "#a6090e15"
+        radius: 8
+        border.color: "#24ffffff"
+    }
     RowLayout {
-        anchors {
-            left: parent.left
-            bottom: parent.bottom
-            leftMargin: 30
-            bottomMargin: 40
-        }
-        spacing: 0
-
-        ToolButton {
-            id: closeButton
-            objectName: "streamDisconnect"
-            Layout.rightMargin: 20
-            text: "×"
-            padding: 10
-            font.pixelSize: 50
-            down: activeFocus
-            onClicked: {
-                menuController.close();
-                if (backend.session)
-                    streamWindow.close();
-                else
-                    navigation.showMainView();
-            }
+        id: toolbar
+        anchors.fill: parent
+        anchors.margins: 12
+        spacing: 8
+        MenuButton {
+            id: resumeButton
+            objectName: "streamResume"
+            description: qsTr("Back to game")
+            text: qsTr("Resume")
+            Layout.preferredWidth: 90
+            Layout.minimumHeight: 54
+            onClicked: menuController.close()
             KeyNavigation.right: volumeSlider
-            Keys.onReturnPressed: clicked()
-            Keys.onEscapePressed: menuController.close()
+            KeyNavigation.tab: volumeSlider
         }
-
-        ToolSeparator {
-            Layout.leftMargin: -10
-            Layout.rightMargin: 10
-        }
-
-        Slider {
-            id: volumeSlider
-            objectName: "streamVolume"
-            Layout.rightMargin: 20
-            orientation: Qt.Vertical
-            from: 0
-            to: 128
-            Layout.preferredHeight: 100
-            padding: 10
-            stepSize: 1
-            value: settings.audioVolume
-            onMoved: settings.audioVolume = value
-            KeyNavigation.left: closeButton
-            KeyNavigation.right: muteButton
-            Keys.onEscapePressed: menuController.close()
-            Label {
-                anchors {
-                    top: parent.bottom
-                    horizontalCenter: parent.horizontalCenter
-                    leftMargin: 10
-                }
-                text: {
-                    ((parent.value / 128.0) * 100).toFixed(0) + qsTr("% Volume")
-                }
+        ColumnLayout {
+            Layout.preferredWidth: 164
+            Layout.fillWidth: true
+            spacing: 1
+            RowLayout {
+                Layout.fillWidth: true
+                Label { objectName: "streamVolumeLabel"; text: qsTr("Volume"); color: "#dbe1e9"; font.pixelSize: 11; wrapMode: Text.Wrap; Layout.fillWidth: true; Layout.minimumWidth: 0 }
+                Label { objectName: "streamVolumePercentage"; text: (volumeSlider.value / 128 * 100).toFixed(0) + "%"; color: "white"; font.pixelSize: 13 }
+            }
+            Slider {
+                id: volumeSlider
+                objectName: "streamVolume"
+                Layout.fillWidth: true
+                implicitHeight: 22
+                from: 0; to: 128; stepSize: 1
+                value: settings.audioVolume
+                onMoved: settings.audioVolume = value
+                Accessible.name: qsTr("Volume")
+                Material.accent: "#d5eaff"
+                Keys.onUpPressed: { increase(); moved(); }
+                Keys.onDownPressed: { decrease(); moved(); }
+                KeyNavigation.priority: KeyNavigation.BeforeItem
+                KeyNavigation.left: resumeButton
+                KeyNavigation.right: muteButton
+                KeyNavigation.tab: muteButton
+                KeyNavigation.backtab: resumeButton
             }
         }
-
-        ToolSeparator {
-            Layout.leftMargin: -10
-            Layout.rightMargin: -10
-        }
-
-        ToolButton {
+        MenuButton {
             id: muteButton
             objectName: "streamMicrophone"
-            Layout.rightMargin: 20
-            text: qsTr("Mic")
-            padding: 10
+            description: qsTr("Microphone")
+            text: checked ? qsTr("On") : qsTr("Muted")
+            Layout.preferredWidth: 106
             checkable: true
-            enabled: backend.session && backend.session.connected
-            checked: backend.session && !backend.session.muted
-            onToggled: { if (backend.session && backend.session.connected) backend.session.muted = !backend.session.muted; }
+            enabled: !!backend.session && backend.session.connected
+            checked: !!backend.session && !backend.session.muted
+            onClicked: { if (backend.session && backend.session.connected) backend.session.muted = !backend.session.muted; }
             KeyNavigation.left: volumeSlider
-            KeyNavigation.right: zoomButton
-            Keys.onReturnPressed: toggled()
-            Keys.onEscapePressed: menuController.close()
+            KeyNavigation.right: pictureButton
+            KeyNavigation.tab: pictureButton
+            KeyNavigation.backtab: volumeSlider
         }
-
-        ToolButton {
-            id: zoomButton
-            objectName: "streamZoom"
-            text: qsTr("Zoom")
-            padding: 10
-            checkable: true
-            checked: streamWindow.videoMode == ChiakiWindow.VideoMode.Zoom
-            onToggled: streamWindow.videoMode = streamWindow.videoMode == ChiakiWindow.VideoMode.Zoom ? ChiakiWindow.VideoMode.Normal : ChiakiWindow.VideoMode.Zoom
+        MenuButton {
+            id: pictureButton
+            objectName: "streamPicture"
+            description: qsTr("Picture mode")
+            disclosure: true
+            text: streamWindow.videoMode === ChiakiWindow.VideoMode.Zoom ? qsTr("Zoom") : streamWindow.videoMode === ChiakiWindow.VideoMode.Stretch ? qsTr("Stretch") : qsTr("Fit")
+            Layout.preferredWidth: 106
+            onClicked: menuController.flyout = menuController.flyout === "picture" ? "" : "picture"
             KeyNavigation.left: muteButton
-            KeyNavigation.right: {
-                if(streamWindow.videoMode == ChiakiWindow.VideoMode.Zoom)
-                    zoomFactor
-                else
-                    stretchButton
+            KeyNavigation.right: qualityButton
+            KeyNavigation.tab: qualityButton
+            KeyNavigation.backtab: muteButton
+        }
+        MenuButton {
+            id: qualityButton
+            objectName: "streamQuality"
+            description: qsTr("Quality preset")
+            disclosure: true
+            text: [qsTr("Default"), qsTr("High quality"), qsTr("HQ + Spatial"), qsTr("HQ + Advanced spatial"), qsTr("Custom")][streamWindow.videoPreset - 1] || qsTr("Default")
+            Layout.preferredWidth: 178
+            onClicked: menuController.flyout = menuController.flyout === "quality" ? "" : "quality"
+            KeyNavigation.left: pictureButton
+            KeyNavigation.right: disconnectButton
+            KeyNavigation.tab: disconnectButton
+            KeyNavigation.backtab: pictureButton
+        }
+        MenuButton {
+            id: disconnectButton
+            objectName: "streamDisconnect"
+            description: qsTr("End session")
+            text: qsTr("Disconnect")
+            Layout.preferredWidth: 112
+            onClicked: {
+                menuController.close();
+                if (backend.session) streamWindow.close();
+                else navigation.showMainView();
             }
-            Keys.onReturnPressed: toggled()
-            Keys.onEscapePressed: menuController.close()
-        }
-
-        Slider {
-            id: zoomFactor
-            objectName: "streamZoomFactor"
-            orientation: Qt.Vertical
-            from: -1
-            to: 4
-            Layout.preferredHeight: 100
-            stepSize: 0.01
-            visible: streamWindow.videoMode == ChiakiWindow.VideoMode.Zoom
-            value: streamWindow.ZoomFactor
-            onMoved: {
-                streamWindow.ZoomFactor = value
-                settings.sZoomFactor = value
-            }
-            Label {
-                anchors {
-                    top: parent.bottom
-                    horizontalCenter: parent.horizontalCenter
-                    leftMargin: 10
-                }
-                text: {
-                    if(parent.value === -1)
-                        qsTr("No Black Bars")
-                    else if(parent.value >= 0)
-                        qsTr((parent.value + 1).toFixed(2)) + qsTr(" x")
-                    else
-                        qsTr(parent.value.toFixed(2)) + qsTr(" x")
-                }
-
-            }
-        }
-
-        ToolSeparator {
-            Layout.leftMargin: -10
-            Layout.rightMargin: -10
-        }
-
-        ToolButton {
-            id: stretchButton
-            objectName: "streamStretch"
-            Layout.rightMargin: 50
-            text: qsTr("Stretch")
-            padding: 10
-            checkable: true
-            checked: streamWindow.videoMode == ChiakiWindow.VideoMode.Stretch
-            onToggled: streamWindow.videoMode = streamWindow.videoMode == ChiakiWindow.VideoMode.Stretch ? ChiakiWindow.VideoMode.Normal : ChiakiWindow.VideoMode.Stretch
-            KeyNavigation.left: {
-                if(streamWindow.videoMode == ChiakiWindow.VideoMode.Zoom)
-                    zoomFactor
-                else
-                    zoomButton
-            }
-            KeyNavigation.right: defaultButton
-            Keys.onReturnPressed: toggled()
-            Keys.onEscapePressed: menuController.close()
-        }
-
-        ToolButton {
-            id: defaultButton
-            objectName: "streamDefault"
-            text: qsTr("Default")
-            padding: 10
-            checkable: true
-            checked: streamWindow.videoPreset == ChiakiWindow.VideoPreset.Default
-            onToggled: {
-                streamWindow.videoPreset = ChiakiWindow.VideoPreset.Default
-                settings.videoPreset = ChiakiWindow.VideoPreset.Default
-            }
-            KeyNavigation.left: stretchButton
-            KeyNavigation.right: highQualityButton
-            Keys.onReturnPressed: toggled()
-            Keys.onEscapePressed: menuController.close()
-        }
-
-        ToolSeparator {
-            Layout.leftMargin: -10
-            Layout.rightMargin: -10
-        }
-
-        ToolButton {
-            id: highQualityButton
-            objectName: "streamHighQuality"
-            text: qsTr("High Quality")
-            padding: 10
-            checkable: true
-            checked: streamWindow.videoPreset == ChiakiWindow.VideoPreset.HighQuality
-            onToggled: {
-                streamWindow.videoPreset = ChiakiWindow.VideoPreset.HighQuality
-                settings.videoPreset = ChiakiWindow.VideoPreset.HighQuality
-            }
-            KeyNavigation.left: defaultButton
-            KeyNavigation.right: highQualitySpatialButton
-            Keys.onReturnPressed: toggled()
-            Keys.onEscapePressed: menuController.close()
-        }
-
-        ToolButton {
-            id: highQualitySpatialButton
-            objectName: "streamSpatial"
-            text: qsTr("HQ + Spatial")
-            padding: 10
-            checkable: true
-            checked: streamWindow.videoPreset == ChiakiWindow.VideoPreset.HighQualitySpatial
-            onToggled: {
-                streamWindow.videoPreset = ChiakiWindow.VideoPreset.HighQualitySpatial
-                settings.videoPreset = ChiakiWindow.VideoPreset.HighQualitySpatial
-            }
-            KeyNavigation.left: highQualityButton
-            KeyNavigation.right: highQualityAdvancedSpatialButton
-            Keys.onReturnPressed: toggled()
-            Keys.onEscapePressed: menuController.close()
-        }
-
-        ToolButton {
-            id: highQualityAdvancedSpatialButton
-            objectName: "streamAdvancedSpatial"
-            text: qsTr("HQ + Adv Spatial")
-            padding: 10
-            checkable: true
-            checked: streamWindow.videoPreset == ChiakiWindow.VideoPreset.HighQualityAdvancedSpatial
-            onToggled: {
-                streamWindow.videoPreset = ChiakiWindow.VideoPreset.HighQualityAdvancedSpatial
-                settings.videoPreset = ChiakiWindow.VideoPreset.HighQualityAdvancedSpatial
-            }
-            KeyNavigation.left: highQualitySpatialButton
-            KeyNavigation.right: customButton
-            Keys.onReturnPressed: toggled()
-            Keys.onEscapePressed: menuController.close()
-        }
-
-        ToolSeparator {
-            Layout.leftMargin: -10
-            Layout.rightMargin: -10
-        }
-
-        ToolButton {
-            id: customButton
-            objectName: "streamCustom"
-            text: qsTr("Custom")
-            Layout.rightMargin: 40
-            padding: 10
-            checkable: true
-            checked: streamWindow.videoPreset == ChiakiWindow.VideoPreset.Custom
-            onToggled: {
-                streamWindow.videoPreset = ChiakiWindow.VideoPreset.Custom
-                settings.videoPreset = ChiakiWindow.VideoPreset.Custom
-            }
-            KeyNavigation.left: highQualityAdvancedSpatialButton
-            KeyNavigation.right: displaySettingsButton
-            Keys.onReturnPressed: toggled()
-            Keys.onEscapePressed: menuController.close()
-        }
-
-        ToolButton {
-            id: displaySettingsButton
-            objectName: "streamDisplaySettings"
-            text: qsTr("Display")
-            padding: 10
-            checkable: false
-            icon.source: "qrc:/icons/settings-20px.svg";
-            onClicked: { menuController.close(); navigation.openDisplaySettings(); }
-            KeyNavigation.left: customButton
-            KeyNavigation.right: {
-                if(streamWindow.videoPreset == ChiakiWindow.VideoPreset.Custom)
-                    placeboSettingsButton;
-                else
-                    displaySettingsButton;
-            }
-            Keys.onReturnPressed: clicked()
-            Keys.onEscapePressed: menuController.close()
-        }
-
-        ToolButton {
-            id: placeboSettingsButton
-            objectName: "streamRendererSettings"
-            text: qsTr("Placebo")
-            icon.source: "qrc:/icons/settings-20px.svg";
-            padding: 10
-            checkable: false
-            onClicked: { menuController.close(); navigation.openPlaceboSettings(); }
-            KeyNavigation.left: displaySettingsButton
-            visible: streamWindow.videoPreset == ChiakiWindow.VideoPreset.Custom
-            Keys.onReturnPressed: clicked()
-            Keys.onEscapePressed: menuController.close()
+            KeyNavigation.left: qualityButton
+            KeyNavigation.tab: resumeButton
+            KeyNavigation.backtab: qualityButton
         }
     }
 
-    Label {
-        anchors {
-            right: consoleNameLabel.right
-            bottom: consoleNameLabel.top
-            bottomMargin: 5
-
-        }
-        text: "Mbps"
-        font.pixelSize: 18
-        visible: backend.session
-
-        Label {
-            anchors {
-                right: parent.left
-                baseline: parent.baseline
-                rightMargin: 5
+    Flyout {
+        id: picturePopup
+        opener: pictureButton
+        objectName: "streamPicturePopup"
+        visible: menuController.open && menuController.flyout === "picture"
+        onOpened: fitButton.forceActiveFocus(Qt.TabFocusReason)
+        contentItem: ColumnLayout {
+            Keys.onEscapePressed: menuController.dismiss()
+            Keys.onMenuPressed: menuController.close()
+            spacing: 9
+            Label { text: qsTr("Picture mode"); color: "white"; font.pixelSize: 14; font.bold: true }
+            RowLayout {
+                Layout.fillWidth: true
+                FlyoutButton {
+                    id: fitButton
+                    objectName: "streamFit"
+                    text: qsTr("Fit")
+                    Layout.fillWidth: true
+                    checkable: true
+                    checked: streamWindow.videoMode === ChiakiWindow.VideoMode.Normal
+                    onClicked: streamWindow.videoMode = ChiakiWindow.VideoMode.Normal
+                    KeyNavigation.right: zoomButton
+                    KeyNavigation.down: zoomFactor.visible ? zoomFactor : displaySettingsButton
+                }
+                FlyoutButton {
+                    id: zoomButton
+                    objectName: "streamZoom"
+                    text: qsTr("Zoom")
+                    Layout.fillWidth: true
+                    checkable: true
+                    checked: streamWindow.videoMode === ChiakiWindow.VideoMode.Zoom
+                    onClicked: streamWindow.videoMode = ChiakiWindow.VideoMode.Zoom
+                    KeyNavigation.left: fitButton
+                    KeyNavigation.right: stretchButton
+                    KeyNavigation.down: zoomFactor.visible ? zoomFactor : displaySettingsButton
+                }
+                FlyoutButton {
+                    id: stretchButton
+                    objectName: "streamStretch"
+                    text: qsTr("Stretch")
+                    Layout.fillWidth: true
+                    checkable: true
+                    checked: streamWindow.videoMode === ChiakiWindow.VideoMode.Stretch
+                    onClicked: streamWindow.videoMode = ChiakiWindow.VideoMode.Stretch
+                    KeyNavigation.left: zoomButton
+                    KeyNavigation.down: displaySettingsButton
+                }
             }
-            text: visible && backend.session ? backend.session.measuredBitrate.toFixed(1) : ""
-            color: Material.accent
-            font.bold: true
-            font.pixelSize: 28
+            Label {
+                text: qsTr("Fit keeps the picture proportions. Zoom fills the window. Stretch can change proportions.")
+                color: "#e0e5ed"; font.pixelSize: 12
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
+            }
+            RowLayout {
+                visible: streamWindow.videoMode === ChiakiWindow.VideoMode.Zoom
+                Layout.fillWidth: true
+                Slider {
+                    id: zoomFactor
+                    objectName: "streamZoomFactor"
+                    Layout.fillWidth: true
+                    from: -1; to: 4; stepSize: 0.01
+                    value: streamWindow.ZoomFactor
+                    onMoved: { streamWindow.ZoomFactor = value; settings.sZoomFactor = value; }
+                    Accessible.name: qsTr("Zoom")
+                    Keys.onUpPressed: { increase(); moved(); }
+                    Keys.onDownPressed: { decrease(); moved(); }
+                    KeyNavigation.priority: KeyNavigation.BeforeItem
+                    KeyNavigation.left: zoomButton
+                    KeyNavigation.right: displaySettingsButton
+                }
+                Label {
+                    objectName: "streamZoomValue"
+                    text: zoomFactor.value === -1 ? qsTr("No black bars") : (zoomFactor.value >= 0 ? (zoomFactor.value + 1).toFixed(2) : zoomFactor.value.toFixed(2)) + qsTr(" x")
+                    color: "white"; font.pixelSize: 12
+                }
+            }
+            FlyoutButton {
+                id: displaySettingsButton
+                objectName: "streamDisplaySettings"
+                text: qsTr("Display settings")
+                Layout.fillWidth: true
+                onClicked: { menuController.close(); navigation.openDisplaySettings(); }
+                KeyNavigation.up: zoomFactor.visible ? zoomFactor : fitButton
+                KeyNavigation.down: fitButton
+            }
         }
     }
 
-    Label {
-        id: consoleNameLabel
-        anchors {
-            right: parent.right
-            verticalCenter: parent.verticalCenter
-            rightMargin: 30
-        }
-        text: {
-            if (!backend.session)
-                return "";
-            if (backend.session.connected)
-                return qsTr("Connected to <b>%1</b>").arg(settings.streamerMode ? "hidden" : backend.session.host);
-            return qsTr("Connecting to <b>%1</b>").arg(settings.streamerMode ? "hidden" : backend.session.host);
-        }
-
-        RowLayout {
-            anchors {
-                right: parent.right
-                top: parent.bottom
-                topMargin: 12
-            }
-
-            Label {
-                text: qsTr("packet loss")
-                font.pixelSize: 15
-                opacity: parent.visible && backend.session ? 1.0 : 0.0
-                visible: opacity
-
-                Behavior on opacity { NumberAnimation { duration: 250 } }
-
-                Label {
-                    anchors {
-                        right: parent.left
-                        baseline: parent.baseline
-                        rightMargin: 5
-                    }
-                    text: visible ? "%1<font size=\"1\">%</font>".arg((((backend.session && isFinite(backend.session.averagePacketLoss)) ? backend.session.averagePacketLoss : 0) * 100).toFixed(1)) : ""
-                    color: "#ef9a9a" // Material.Red
-                    font.bold: true
-                    font.pixelSize: 18
+    Flyout {
+        id: qualityPopup
+        objectName: "streamQualityPopup"
+        opener: qualityButton
+        visible: menuController.open && menuController.flyout === "quality"
+        onOpened: presetRepeater.itemAt(Math.max(0, streamWindow.videoPreset - 1)).forceActiveFocus(Qt.TabFocusReason)
+        contentItem: ColumnLayout {
+            spacing: 4
+            Keys.onEscapePressed: menuController.dismiss()
+            Keys.onMenuPressed: menuController.close()
+            Label { text: qsTr("Quality preset"); color: "white"; font.pixelSize: 14; font.bold: true }
+            Repeater {
+                id: presetRepeater
+                model: [
+                    {name: "streamDefault", label: qsTr("Default"), preset: ChiakiWindow.VideoPreset.Default},
+                    {name: "streamHighQuality", label: qsTr("High quality"), preset: ChiakiWindow.VideoPreset.HighQuality},
+                    {name: "streamSpatial", label: qsTr("HQ + Spatial"), preset: ChiakiWindow.VideoPreset.HighQualitySpatial},
+                    {name: "streamAdvancedSpatial", label: qsTr("HQ + Advanced spatial"), preset: ChiakiWindow.VideoPreset.HighQualityAdvancedSpatial},
+                    {name: "streamCustom", label: qsTr("Custom"), preset: ChiakiWindow.VideoPreset.Custom}
+                ]
+                delegate: FlyoutButton {
+                    required property var modelData
+                    required property int index
+                    objectName: modelData.name
+                    text: modelData.label
+                    Layout.fillWidth: true
+                    checkable: true
+                    checked: streamWindow.videoPreset === modelData.preset
+                    onClicked: { streamWindow.videoPreset = modelData.preset; settings.videoPreset = modelData.preset; }
+                    KeyNavigation.up: index > 0 ? presetRepeater.itemAt(index - 1) : rendererSettingsButton.visible ? rendererSettingsButton : presetRepeater.itemAt(4)
+                    KeyNavigation.down: index < 4 ? presetRepeater.itemAt(index + 1) : rendererSettingsButton.visible ? rendererSettingsButton : presetRepeater.itemAt(0)
                 }
             }
-
-            Label {
-                Layout.leftMargin: droppedFramesLabel.width + 6
-                text: qsTr("dropped frames")
-                font.pixelSize: 15
-                opacity: parent.visible && streamWindow.droppedFrames ? 1.0 : 0.0
-                visible: opacity
-
-                Behavior on opacity { NumberAnimation { duration: 250 } }
-
-                Label {
-                    id: droppedFramesLabel
-                    anchors {
-                        right: parent.left
-                        baseline: parent.baseline
-                        rightMargin: 5
-                    }
-                    text: visible ? streamWindow.droppedFrames : ""
-                    color: "#ef9a9a" // Material.Red
-                    font.bold: true
-                    font.pixelSize: 18
-                }
+            FlyoutButton {
+                id: rendererSettingsButton
+                objectName: "streamRendererSettings"
+                text: qsTr("Renderer settings")
+                Layout.fillWidth: true
+                visible: streamWindow.videoPreset === ChiakiWindow.VideoPreset.Custom
+                onClicked: { menuController.close(); navigation.openPlaceboSettings(); }
+                KeyNavigation.up: presetRepeater.itemAt(4)
+                KeyNavigation.down: presetRepeater.itemAt(0)
             }
         }
     }

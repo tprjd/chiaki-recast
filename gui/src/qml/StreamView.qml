@@ -24,7 +24,8 @@ Item {
     property bool connectionInputGrabbed: false
     property list<Item> restoreFocusItems
     readonly property bool useSeparateMenuWindow: view.streamWindow.runtimeRendererBackend === 1
-    readonly property int streamMenuHeight: 200
+    readonly property int streamMenuHeight: useSeparateMenuWindow ? separateMenuWindow.menuHeight : inlineMenuContent.item ? inlineMenuContent.item.implicitHeight : 80
+    readonly property real streamMenuWidth: Math.min(820, Math.max(0, view.width - 28))
     readonly property bool streamStatsVisible: view.settings.showStreamStats && !(menuState.open || menuState.closing) && !sessionLoading && !sessionError && !(view.settings.audioVideoDisabled & 0x02)
     property int separateMenuX: 0
     property int separateMenuY: 0
@@ -54,9 +55,9 @@ Item {
             return;
         const topLeft = view.mapToGlobal(0, 0);
         if (useSeparateMenuWindow) {
-            separateMenuX = Math.round(topLeft.x);
-            separateMenuY = Math.round(topLeft.y + view.height - streamMenuHeight);
-            separateMenuWidth = Math.round(view.width);
+            separateMenuX = Math.round(topLeft.x + (view.width - streamMenuWidth) / 2);
+            separateMenuY = Math.round(topLeft.y + view.height - streamMenuHeight - 18);
+            separateMenuWidth = Math.round(streamMenuWidth);
             separateStatsX = Math.round(topLeft.x);
             separateStatsY = Math.round(topLeft.y);
             separateStatsWidth = Math.round(view.width);
@@ -76,6 +77,7 @@ Item {
         if (connectionInputGrabbed) view.streamWindow.releaseInput();
     }
     onWidthChanged: updateSeparateMenuGeometry()
+    onStreamMenuHeightChanged: updateSeparateMenuGeometry()
     onHeightChanged: updateSeparateMenuGeometry()
     onUseSeparateMenuWindowChanged: updateSeparateMenuGeometry()
 
@@ -88,11 +90,22 @@ Item {
         function onVisibilityChanged() { view.updateSeparateMenuGeometry() }
     }
 
+    Connections {
+        target: view.streamWindow
+        function onXChanged() { view.updateSeparateMenuGeometry() }
+        function onYChanged() { view.updateSeparateMenuGeometry() }
+        function onWidthChanged() { view.updateSeparateMenuGeometry() }
+        function onHeightChanged() { view.updateSeparateMenuGeometry() }
+        function onVisibilityChanged() { view.updateSeparateMenuGeometry() }
+        function onScreenChanged() { view.updateSeparateMenuGeometry() }
+    }
+
     QtObject {
         id: menuState
         property bool closing: false
         property bool open: false
         property bool inputGrabbed: false
+        property string flyout: ""
         property var returnFocusItem: null
         property bool disconnectPending: false
         onClosingChanged: {
@@ -100,7 +113,7 @@ Item {
                 disconnectPending = false;
                 // Let the native menu hide before the modal dialog takes focus.
                 Qt.callLater(() => {
-                    if (!view.backend.sessionPinRequest.id && view.backend.session) sessionStopDialog.open();
+                    if (!view.backend.sessionPinRequest.id && view.backend.session && !view.sessionLoading && !view.sessionError) sessionStopDialog.open();
                 });
             }
         }
@@ -129,9 +142,14 @@ Item {
         function close() {
             if (!open || closing)
                 return;
+            flyout = "";
             closing = true;
             open = false;
             releaseInput();
+        }
+        function dismiss() {
+            if (flyout) flyout = "";
+            else close();
         }
         function releaseInput() {
             if (!inputGrabbed) return;
@@ -371,13 +389,10 @@ Item {
     Item {
         id: menuView
         objectName: "streamMenuInline"
-        anchors {
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-        }
+        width: streamMenuWidth
+        x: (parent.width - width) / 2
         height: streamMenuHeight
-        y: menuState.open ? parent.height - height : parent.height
+        y: menuState.open ? parent.height - height - 18 : parent.height
         visible: !useSeparateMenuWindow && (menuState.open || menuState.closing)
         enabled: !useSeparateMenuWindow && menuState.open
         onVisibleChanged: {
@@ -408,18 +423,19 @@ Item {
         id: separateMenuWindow
         objectName: "streamMenuWindow"
         menuContent: menuContentComponent
-        transientParent: view.hostWindow
+        transientParent: view.streamWindow
         x: separateMenuX
-        y: menuState.open ? separateMenuY : separateMenuY + streamMenuHeight
+        y: separateMenuY
         width: separateMenuWidth > 0 ? separateMenuWidth : view.width
         height: streamMenuHeight
         open: useSeparateMenuWindow && menuState.open
+        flyoutOpen: !!menuState.flyout
         closing: useSeparateMenuWindow && menuState.closing
-        onCloseRequested: menuState.close()
+        onCloseRequested: menuState.dismiss()
         onCloseAnimationFinished: {
             menuState.closing = false;
             if (!sessionStopDialog.opened && !view.backend.sessionPinRequest.id && !view.sessionLoading && !menuState.open) {
-                if (view.hostWindow) view.hostWindow.requestActivate();
+                if (view.streamWindow) view.streamWindow.requestActivate();
                 if (menuState.returnFocusItem && menuState.returnFocusItem.visible)
                     menuState.returnFocusItem.forceActiveFocus(Qt.TabFocusReason);
             }
@@ -478,6 +494,10 @@ Item {
 
         function onSessionPinRequestChanged() {
             if (view.backend.sessionPinRequest.id) menuState.close();
+        }
+
+        function onConnectionAttemptChanged() {
+            if (view.managedConnection && view.backend.connectionAttempt.phase !== "ready") menuState.close();
         }
 
         function onSessionStopDialogRequested() {

@@ -13,12 +13,13 @@ TestCase {
     function routes() { return [{tag: "inline", separate: false}, {tag: "window", separate: true}]; }
     function menuHost(h, separate) { return separate ? findChild(h.screen, "streamMenuWindow") : h.screen; }
     function openMenu(h, separate) {
+        h.nativeHost = separate;
         h.window.runtimeRendererBackend = separate ? 1 : 0;
         h.opener.forceActiveFocus(Qt.TabFocusReason);
         h.window.menuRequested();
         wait(300);
         const host = menuHost(h, separate);
-        const close = findChild(host, "streamDisconnect");
+        const close = findChild(host, "streamResume");
         verify(close);
         tryCompare(close, "activeFocus", true);
         return host;
@@ -58,7 +59,8 @@ TestCase {
     }
     function test_disconnectEntry(data) {
         const h = createTemporaryObject(harnessComponent, tests);
-        openMenu(h, data.separate);
+        const host = openMenu(h, data.separate);
+        findChild(host, "streamDisconnect").forceActiveFocus(Qt.TabFocusReason);
         keyClick(Qt.Key_Return);
         const prompt = findChild(h.screen, "streamDisconnectDialog");
         const dialog = findChild(prompt, "confirmationDialog");
@@ -109,6 +111,8 @@ TestCase {
         compare(mic.enabled, false);
         h.backend.session.connected = true;
         compare(mic.enabled, true);
+        findChild(host, "streamPicture").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
         const zoom = findChild(host, "streamZoom");
         const factor = findChild(host, "streamZoomFactor");
         const stretch = findChild(host, "streamStretch");
@@ -129,12 +133,16 @@ TestCase {
         keyClick(Qt.Key_Return);
         compare(h.window.videoMode, 1);
         compare(factor.visible, false);
+        findChild(host, "streamFit").forceActiveFocus(Qt.TabFocusReason);
         keyClick(Qt.Key_Return);
         compare(h.window.videoMode, 0);
         compare(stretch.checked, false);
+        keyClick(Qt.Key_Escape);
+        findChild(host, "streamQuality").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
         for (const row of [{name: "streamDefault", value: 1}, {name: "streamHighQuality", value: 2},
                 {name: "streamSpatial", value: 3}, {name: "streamAdvancedSpatial", value: 4}, {name: "streamCustom", value: 5}]) {
-            const button = findChild(host, row.name);
+            const button = findChild(findChild(host, "streamQualityPopup").contentItem, row.name);
             button.forceActiveFocus(Qt.TabFocusReason);
             keyClick(Qt.Key_Return);
             compare(h.window.videoPreset, row.value);
@@ -142,6 +150,7 @@ TestCase {
             compare(button.checked, true);
             compare(findChild(host, "streamRendererSettings").visible, row.value === 5);
         }
+        keyClick(Qt.Key_Escape);
         keyClick(Qt.Key_Escape);
         tryCompare(h.window, "releases", 1);
     }
@@ -155,6 +164,8 @@ TestCase {
         const h = createTemporaryObject(harnessComponent, tests);
         h.window.videoPreset = data.renderer ? 5 : 1;
         const host = openMenu(h, data.separate);
+        findChild(host, data.renderer ? "streamQuality" : "streamPicture").forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Return);
         const button = findChild(host, data.renderer ? "streamRendererSettings" : "streamDisplaySettings");
         button.forceActiveFocus(Qt.TabFocusReason);
         keyClick(Qt.Key_Return);
@@ -252,7 +263,8 @@ TestCase {
     function test_configuredDisconnect(data) {
         const h = createTemporaryObject(harnessComponent, tests);
         h.settings.disconnectAction = data.policy;
-        openMenu(h, data.separate);
+        const host = openMenu(h, data.separate);
+        findChild(host, "streamDisconnect").forceActiveFocus(Qt.TabFocusReason);
         keyClick(Qt.Key_Return);
         compare(h.backend.commands.length, 1);
         compare(h.backend.commands[0].sleep, data.policy === 1);
