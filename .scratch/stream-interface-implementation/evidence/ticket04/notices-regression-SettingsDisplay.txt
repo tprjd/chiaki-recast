@@ -1,0 +1,12 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::SettingsDisplay::initTestCase()
+PASS   : console_screen::SettingsDisplay::test_allModesAndNumericValues()
+PASS   : console_screen::SettingsDisplay::test_backRestoresVideoOpener()
+PASS   : console_screen::SettingsDisplay::test_displayModes()
+PASS   : console_screen::SettingsDisplay::test_noWritesOnConstructionAndProfileUpdates()
+PASS   : console_screen::SettingsDisplay::test_responsiveDisplay(desktop)
+PASS   : console_screen::SettingsDisplay::test_responsiveDisplay(minimum)
+PASS   : console_screen::SettingsDisplay::cleanupTestCase()
+Totals: 8 passed, 0 failed, 0 skipped, 0 blacklisted, 11834ms
+********* Finished testing of console_screen *********

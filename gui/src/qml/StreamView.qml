@@ -315,6 +315,8 @@ Item {
         if (!actionNoticeVisible) return;
         const item = useSeparateMenuWindow ? actionWindowContent.item : actionNoticeInline.item;
         if (useSeparateMenuWindow) actionNoticeWindow.requestActivate();
+        else if (view.hostWindow && view.hostWindow.visible) view.hostWindow.requestActivate();
+        else view.streamWindow.requestActivate();
         if (item) item.initialFocusItem.forceActiveFocus(Qt.TabFocusReason);
     }
     function releaseNoticeInput(restoreFocus) {

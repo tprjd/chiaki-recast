@@ -341,4 +341,47 @@ TestCase {
         compare(h.window.grabs, h.window.releases);
         compare(h.backend.commands.length, 0);
     }
+    function test_rendererHandoff_data() { return routes(); }
+    function test_rendererHandoff(data) {
+        const h = createTemporaryObject(harnessComponent, tests);
+        h.nativeHost = true;
+        h.window.runtimeRendererBackend = data.separate ? 1 : 0;
+        h.settings.showStreamStats = false;
+        wait(20);
+        h.window.requestActivate();
+        wait(20);
+        h.opener.forceActiveFocus(Qt.TabFocusReason);
+        h.backend.session.cantDisplay = true;
+        const firstHost = findChild(h.screen, data.separate ? "streamActionNoticeWindow" : "streamActionNoticeInline");
+        tryCompare(firstHost, "visible", true);
+        h.window.runtimeRendererBackend = data.separate ? 0 : 1;
+        const host = findChild(h.screen, data.separate ? "streamActionNoticeInline" : "streamActionNoticeWindow");
+        tryCompare(firstHost, "visible", false);
+        tryCompare(host, "visible", true);
+        const button = findChild(host, "streamNoticeAction");
+        tryCompare(button, "activeFocus", true);
+        wait(30);
+        keyClick(Qt.Key_Return);
+        compare(h.backend.commands.length, 1);
+        compare(h.window.grabs, 1);
+        h.backend.session.cantDisplay = false;
+        tryCompare(h.opener, "activeFocus", true);
+        compare(h.window.releases, 1);
+    }
+    function test_initialDisabledMedia_data() { return routes(); }
+    function test_initialDisabledMedia(data) {
+        const h = createTemporaryObject(harnessComponent, tests);
+        h.screenActive = false;
+        h.nativeHost = data.separate;
+        h.window.runtimeRendererBackend = data.separate ? 1 : 0;
+        h.settings.audioVideoDisabled = 3;
+        h.screenActive = true;
+        const host = findChild(h.screen, data.separate ? "streamActionNoticeWindow" : "streamActionNoticeInline");
+        tryCompare(host, "visible", true);
+        tryCompare(findChild(host, "streamNoticeAction"), "activeFocus", true);
+        compare(findChild(host, "streamActionNotice").title, "Audio and video disabled");
+        compare(h.window.grabs, 1);
+        h.screenActive = false;
+        compare(h.window.releases, 1);
+    }
 }
