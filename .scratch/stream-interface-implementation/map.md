@@ -4,7 +4,7 @@ Breakdown approved and published: 2026-10-21.
 
 Specification: [Stream menu, statistics, and session notices](../stream-interface-refresh/spec.md).
 Parent: [Implement the approved stream interface](../stream-interface-refresh/issues/01-stream-interface.md).
-Both source records remain unchanged.
+The specification includes the user's later acceptance-scope update.
 
 The approved design is A: the descriptive third-revision toolbar and the
 second-revision statistics and notices. The design reference is branch
