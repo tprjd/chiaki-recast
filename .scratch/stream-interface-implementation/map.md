@@ -21,8 +21,9 @@ published in `fff89373`. Keep the prototype out of production integration.
 
 ## Work order
 
-Tickets 01 through 05 are resolved. Combined native acceptance and the final
-normal production build are complete within the user-reduced testing scope.
+Tickets 01 through 05 are resolved and merged into the integration branch.
+Combined native acceptance and the final normal production build are complete
+within the user-reduced testing scope.
 
 Shared source edits may need coordination. That is not an extra blocking edge.
 Each feature ticket must pass its own production QML checks before resolution;
@@ -98,8 +99,9 @@ the owned native menu or popup. The native toolbar window retains compact bounds
 See [toolbar evidence](evidence/ticket02/README.md) for native input checks,
 component captures, long-label checks, source hashes, and post-merge QML results.
 
-Ticket [05](issues/05-native-acceptance.md) is resolved. Final native acceptance
-passes at 900×600 and measured DPR 1 on both renderers: OpenGL 270 checks and
+Ticket [05](issues/05-native-acceptance.md) is resolved in integration merge
+`d5fea0b3`, with final acceptance commit `c6904274`. Final native acceptance
+passes at 900x600 and measured DPR 1 on both renderers: OpenGL 270 checks and
 Vulkan 251 checks. Native input/focus, settings and modal handoffs, session
 replacement, desktop composition and the Qt 6.7 compatibility regression pass.
 The final normal build excludes QA/test/prototype resources; the original native
@@ -107,3 +109,8 @@ cache is restored and rebuilt. Both code review axes are clear. See
 [acceptance and replay](evidence/ticket05/acceptance.md) for source identities,
 captures, earlier-source coverage and remaining limits. The specification records
 the user's later restriction on repeated resolution and scale testing.
+
+The merged production source matches reviewed candidate `62f9676e`.
+The [standards review](review/standards-final.md) and
+[specification review](review/spec-final.md) have no remaining findings.
+The parent issue and specification were resolved separately in `75982954`.
