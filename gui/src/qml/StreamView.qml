@@ -324,13 +324,13 @@ Item {
         if (!noticeInputGrabbed) return;
         noticeInputGrabbed = false;
         view.streamWindow.releaseInput();
-        if (restoreFocus && noticeReturnFocusItem && noticeReturnFocusItem.visible) {
+        if (restoreFocus) {
             const item = noticeReturnFocusItem;
             Qt.callLater(() => {
-                if (!view.noticesReady || view.actionNoticeVisible || menuState.open || menuState.closing || !item || !item.visible) return;
+                if (!view.noticesReady || view.actionNoticeVisible || menuState.open || menuState.closing) return;
                 if (view.hostWindow && view.hostWindow.visible) view.hostWindow.requestActivate();
                 else view.streamWindow.requestActivate();
-                item.forceActiveFocus(Qt.TabFocusReason);
+                if (item && item.visible) item.forceActiveFocus(Qt.TabFocusReason);
             });
         }
         if (restoreFocus || !view.backend.session || !(blockedContent || videoDisabled))
@@ -386,7 +386,7 @@ Item {
         height: actionWindowContent.item ? actionWindowContent.item.implicitHeight : 0
         onVisibleChanged: if (visible) { requestActivate(); noticeFocusTimer.restart(); }
         onActiveChanged: if (active && visible) noticeFocusTimer.restart()
-        onClosing: event => { event.accepted = false; }
+        onClosing: event => { event.accepted = false; view.streamWindow.close(); }
         Shortcut { sequence: "Ctrl+O"; enabled: actionNoticeWindow.visible; onActivated: menuState.toggle() }
         Loader {
             id: actionWindowContent

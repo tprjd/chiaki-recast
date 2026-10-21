@@ -87,8 +87,9 @@ TestCase {
         const area = data.separate ? host.contentItem : h.screen;
         const focused = grabImage(area);
         const edge = button.mapToItem(area, 1, Math.floor(button.height / 2));
-        verify(focused.red(Math.round(edge.x), Math.round(edge.y)) > 200
-            && focused.green(Math.round(edge.x), Math.round(edge.y)) > 200, "Visible focus outline");
+        const scale = focused.width / area.width;
+        verify(focused.red(Math.round(edge.x * scale), Math.round(edge.y * scale)) > 200
+            && focused.green(Math.round(edge.x * scale), Math.round(edge.y * scale)) > 200, "Visible focus outline");
         keyClick(Qt.Key_Return);
         compare(h.backend.commands.length, 1);
         compare(h.backend.commands[0].name, "home");
@@ -219,6 +220,8 @@ TestCase {
         tryCompare(passive, "visible", true);
         wait(380);
         const image = grabImage(data.separate ? host.contentItem : h.screen);
+        console.log("notice capture", data.tag, "logical", data.width, data.height,
+            "pixels", image.width, image.height, "DPR", image.width / (data.separate ? host.width : h.screen.width));
         image.save("build/notice-" + data.tag + ".png");
         findChild(notice, "streamNoticeTitle").text = "Content blocked by the console. ".repeat(4);
         findChild(notice, "streamNoticeMessage").text = "This screen cannot be shown through Remote Play. ".repeat(6);
@@ -383,5 +386,50 @@ TestCase {
         compare(h.window.grabs, 1);
         h.screenActive = false;
         compare(h.window.releases, 1);
+    }
+    function test_passiveInput_data() { return routes(); }
+    function test_passiveInput(data) {
+        if (data.separate && Qt.platform.pluginName === "offscreen")
+            skip("The offscreen platform activates passive windows. Run this case with the Windows platform.");
+        const h = createTemporaryObject(harnessComponent, tests);
+        h.nativeHost = data.separate;
+        h.window.runtimeRendererBackend = data.separate ? 1 : 0;
+        h.settings.showStreamStats = false;
+        wait(20);
+        (data.separate ? h.window : tests.Window.window).requestActivate();
+        wait(20);
+        h.opener.forceActiveFocus(Qt.TabFocusReason);
+        h.settings.audioVideoDisabled = 1;
+        h.backend.session.averagePacketLoss = 0.032;
+        tryCompare(passiveHost(h, data.separate), "visible", true);
+        wait(30);
+        compare(h.opener.activeFocus, true);
+        keyClick(Qt.Key_Space);
+        compare(h.gameClicks, 1, "Notices leave keyboard input with the game");
+        if (!data.separate) {
+            const notice = findChild(passiveHost(h, false), "streamNetworkNotice");
+            const point = notice.mapToItem(h, notice.width / 2, notice.height / 2);
+            mouseClick(h, point.x, point.y);
+            compare(h.gameClicks, 2, "A click on a notice reaches the game");
+        }
+        compare(h.window.grabs, 0);
+        compare(h.window.releases, 0);
+    }
+    function test_nativeNoticeCloseUsesDisconnectPolicy() {
+        const h = createTemporaryObject(harnessComponent, tests);
+        h.nativeHost = true;
+        h.window.runtimeRendererBackend = 1;
+        h.backend.session.cantDisplay = true;
+        const host = findChild(h.screen, "streamActionNoticeWindow");
+        tryCompare(host, "visible", true);
+        host.close();
+        const prompt = findChild(h.screen, "streamDisconnectDialog");
+        tryCompare(prompt, "opened", true);
+        compare(host.visible, false);
+        compare(h.backend.commands.length, 0);
+        findChild(prompt, "confirmationDialog").choose("cancel");
+        tryCompare(host, "visible", true);
+        h.backend.session = null;
+        compare(h.window.grabs, h.window.releases);
     }
 }

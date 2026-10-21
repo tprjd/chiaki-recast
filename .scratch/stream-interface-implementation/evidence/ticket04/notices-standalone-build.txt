@@ -1,0 +1,7 @@
+[1/7] Automatic MOC for target chiaki-console-screen-tests
+[2/7] Automatic RCC for ../res/resources.qrc
+[3/7] Building CXX object CMakeFiles\chiaki-console-screen-tests.dir\chiaki-console-screen-tests_autogen\mocs_compilation.cpp.obj
+[4/7] Building CXX object CMakeFiles\chiaki-console-screen-tests.dir\chiaki-console-screen-tests_autogen\JNLRFP7NXS\qrc_resources.cpp.obj
+[5/7] Building CXX object CMakeFiles\chiaki-console-screen-tests.dir\C_\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp.obj
+[6/7] Building CXX object CMakeFiles\chiaki-console-screen-tests.dir\main.cpp.obj
+[7/7] Linking CXX executable chiaki-console-screen-tests.exe
