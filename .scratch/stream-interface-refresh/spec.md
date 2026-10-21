@@ -116,6 +116,13 @@ presentations. Keep the 900-logical-pixel minimum application width.
 
 ## Testing Decisions
 
+Acceptance scope update, 2026-10-21: the user limited the remaining checks to
+900×600 logical pixels at 100% scale and requested that passing checks not be
+repeated. Keep the results already collected. Re-run only checks affected by a
+fix or needed to confirm a failure. This update overrides the resolution and
+scale matrix below for the remaining acceptance work. Both renderer routes,
+the normal production build, and final review remain required.
+
 - The user confirmed production QML tests with supplied session state plus native checks for both renderer modes, transparency, window placement, keyboard/controller key handling, and focus. Live console commands and physical-controller tests remain separate.
 - Prefer one test boundary at the composed production stream interface. Supply backend, settings, window, and navigation state at that boundary and observe resulting UI and commands. Where the stream view currently binds directly to the singleton, add the smallest top-level injection point needed, with the native backend as its production default. Do not add independent test APIs to every control.
 - Load actual production menu, statistics, and notice components, including their real inline and separate-window wrappers. A fixture may provide state and record commands; it must not copy the production layout or implement a second menu state machine. Use the existing Qt Quick screen runner.
