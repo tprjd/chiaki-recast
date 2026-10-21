@@ -59,7 +59,7 @@ FocusScope {
         background: Rectangle {
             radius: 5
             color: parent.hovered || parent.down ? "#33ffffff" : "transparent"
-            border.color: parent.visualFocus ? "#a9d9ff" : "transparent"
+            border.color: parent.activeFocus ? "#a9d9ff" : "transparent"
             border.width: 2
         }
         Keys.onReturnPressed: clicked()

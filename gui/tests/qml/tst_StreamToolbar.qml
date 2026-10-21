@@ -26,6 +26,15 @@ TestCase {
         const resume = findChild(host, "streamResume");
         verify(resume, "The toolbar names Resume as its first action");
         tryCompare(resume, "activeFocus", true);
+        const captureRoot = data.separate ? host.contentItem : h.screen;
+        const focused = grabImage(captureRoot);
+        const position = resume.mapToItem(captureRoot, 0, 0);
+        focused.save("build/resume-focused-" + data.separate + ".png");
+        let outline = false;
+        const y = Math.round(position.y + resume.height / 2);
+        for (let x = Math.ceil(position.x); x < position.x + 20; x++)
+            if (focused.blue(x, y) > focused.red(x, y) + 40) outline = true;
+        verify(outline, "Initial Resume focus has a visible blue outline");
         compare(resume.text, "Resume");
         compare(findChild(host, "streamVolumePercentage").text, "50%");
         compare(findChild(host, "streamMicrophone").text, "Muted");
