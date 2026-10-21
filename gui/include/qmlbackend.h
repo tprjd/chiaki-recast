@@ -219,7 +219,7 @@ public:
     Q_INVOKABLE void controllerMappingQuit();
     Q_INVOKABLE void controllerMappingButtonQuit();
     Q_INVOKABLE void controllerMappingApply();
-    Q_INVOKABLE void autoRegister();
+    Q_INVOKABLE void autoRegister(const QVariantMap &context);
 #if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
     Q_INVOKABLE void createSteamShortcut(QString shortcutName, QString launchOptions, const QJSValue &callback, QString steamDir);
 #endif
@@ -332,6 +332,7 @@ private:
     bool psn_session_started = false;
     QPointer<PSNToken> connection_token;
     quint64 regist_dialog_generation = 0;
+    quint64 automatic_registration_request = 0;
     bool registration_active = false;
     StreamSessionConnectInfo session_info = {};
     SystemdInhibit *sleep_inhibit = {};

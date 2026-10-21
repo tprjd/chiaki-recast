@@ -41,7 +41,7 @@ Item {
 
     function autoRegister(auto, host, ps5, context) {
         if(auto)
-            Chiaki.autoRegister()
+            Chiaki.autoRegister(context)
         else
             showRegistDialog(host, ps5, context);
     }
