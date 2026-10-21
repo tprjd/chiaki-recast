@@ -210,13 +210,18 @@ TestCase {
         mouseClick(findChild(host, "streamPicture"));
         const picture = findChild(host, "streamPicturePopup");
         tryCompare(picture, "opened", true);
+        tryCompare(findChild(host, "streamFit"), "activeFocus", true);
         findChild(host, "streamZoom").forceActiveFocus(Qt.TabFocusReason);
+        tryCompare(findChild(host, "streamZoom"), "activeFocus", true);
         keyClick(Qt.Key_Return);
+        compare(h.window.videoMode, 2);
+        compare(picture.opened, true);
+        if (data.separate) compare(picture.nativeHost.visible, true);
         compare(picture.width, 320);
         wait(50);
         verify(picture.contentItem.mapToGlobal(0, picture.contentItem.height + picture.bottomPadding).y <= findChild(host, "streamResume").mapToGlobal(0, 0).y);
         verify(picture.height + toolbar.height + 27 < tests.height);
-        grabImage(data.separate ? picture.contentItem.Window.window.contentItem : h).save(prefix + "-picture.png");
+        grabImage(data.separate ? picture.nativeHost.contentItem : h).save(prefix + "-picture.png");
         mouseClick(findChild(host, "streamQuality"));
         const quality = findChild(host, "streamQualityPopup");
         tryCompare(quality, "opened", true);
@@ -225,7 +230,7 @@ TestCase {
         wait(50);
         verify(quality.contentItem.mapToGlobal(0, quality.contentItem.height + quality.bottomPadding).y <= findChild(host, "streamResume").mapToGlobal(0, 0).y);
         verify(quality.height + toolbar.height + 27 < tests.height);
-        grabImage(data.separate ? quality.contentItem.Window.window.contentItem : h).save(prefix + "-quality.png");
+        grabImage(data.separate ? quality.nativeHost.contentItem : h).save(prefix + "-quality.png");
         keyClick(Qt.Key_Escape);
         keyClick(Qt.Key_Escape);
         wait(300);

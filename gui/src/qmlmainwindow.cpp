@@ -527,13 +527,6 @@ bool QmlMainWindow::directStream() const
     return direct_stream;
 }
 
-void QmlMainWindow::releaseMenuPointerGrab(QWindow *menuWindow)
-{
-    // Qt's popup owner otherwise captures clicks outside the stream controls.
-    if (menuWindow && menuWindow->transientParent() == this)
-        menuWindow->setMouseGrabEnabled(false);
-}
-
 QmlMainWindow::VideoMode QmlMainWindow::videoMode() const
 {
     return video_mode;
@@ -2829,7 +2822,9 @@ bool QmlMainWindow::event(QEvent *event)
         if (session && grab_input) {
             auto *focused = QGuiApplication::focusWindow();
             for (auto *popup : QGuiApplication::topLevelWindows()) {
-                if (!popup->isVisible() || popup->type() != Qt::Popup)
+                if (!popup->isVisible() || (popup->type() != Qt::Popup && popup->type() != Qt::Tool)
+                        || popup->flags().testFlag(Qt::WindowTransparentForInput)
+                        || popup->flags().testFlag(Qt::WindowDoesNotAcceptFocus))
                     continue;
                 for (auto *parent = popup->transientParent(); parent; parent = parent->transientParent()) {
                     if (parent == focused) {
@@ -2842,6 +2837,12 @@ bool QmlMainWindow::event(QEvent *event)
             while (owner && owner != this)
                 owner = owner->transientParent();
             if (owner == this && focused != this && focused != quick_window) {
+                if (!focused->isActive()) {
+                    focused->requestActivate();
+                    // Restore Quick focus before the captured key while native activation completes.
+                    QFocusEvent focus(QEvent::FocusIn, Qt::OtherFocusReason);
+                    QGuiApplication::sendEvent(focused, &focus);
+                }
                 QGuiApplication::sendEvent(focused, event);
                 return true;
             }

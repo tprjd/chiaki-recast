@@ -22,12 +22,13 @@ FocusScope {
     Keys.onEscapePressed: menuController.dismiss()
 
     component Flyout: Popup {
+        id: popup
         property Item opener
         width: Math.min(320, content.width)
-        x: content.width - width
-        y: -height - 9
+        parent: content.separate ? nativeWindow.contentItem : content
+        x: content.separate ? 0 : content.width - width
+        y: content.separate ? 0 : -height - 9
         padding: 17
-        popupType: content.separate ? Popup.Window : Popup.Item
         modal: false
         dim: false
         focus: true
@@ -36,8 +37,26 @@ FocusScope {
         exit: Transition {}
         background: Rectangle { radius: 8; color: "#a6090e15"; border.color: "#24ffffff" }
         function focusItem(item) {
-            if (content.separate) streamWindow.releaseMenuPointerGrab(content.Window.window);
+            if (content.separate) nativeWindow.requestActivate();
             item.forceActiveFocus(Qt.TabFocusReason);
+        }
+        property Window nativeHost: Window {
+            id: nativeWindow
+            objectName: "streamMenuPopupWindow"
+            transientParent: content.Window.window
+            flags: Qt.Tool | Qt.FramelessWindowHint
+            color: "transparent"
+            visible: content.separate && popup.visible
+            x: content.Window.window ? content.Window.window.x + content.width - width : 0
+            y: content.Window.window ? content.Window.window.y - height - 9 : 0
+            width: popup.width
+            height: popup.height
+            onVisibleChanged: if (visible) requestActivate()
+            property Item lastFocusItem: null
+            onActiveFocusItemChanged: {
+                if (activeFocusItem) lastFocusItem = activeFocusItem;
+                else if (visible && lastFocusItem) lastFocusItem.forceActiveFocus(Qt.PopupFocusReason);
+            }
         }
         onClosed: Qt.callLater(() => {
             if (menuController.open && !menuController.flyout) {

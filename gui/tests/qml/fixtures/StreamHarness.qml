@@ -59,7 +59,6 @@ Item {
         signal menuRequested()
         function grabInput() { grabs++; }
         function releaseInput() { releases++; }
-        function releaseMenuPointerGrab(menuWindow) {}
         function close() {
             if (settings.disconnectAction === 2) fakeBackend.sessionStopDialogRequested();
             else fakeBackend.stopSession(settings.disconnectAction === 1);
