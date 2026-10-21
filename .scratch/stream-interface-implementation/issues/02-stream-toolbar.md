@@ -66,3 +66,7 @@ checks; ticket 05 includes it in the final integrated native build.
 Evidence and replay: [ticket 02 record](../evidence/ticket02/README.md).
 The record separates component captures and controlled input results from
 remaining combined desktop, fullscreen, scale, and live-console acceptance in 05.
+
+Latest integration `a946da38` is merged in `107a7aae`. The merge retains notice
+input owners and the action-notice focus guard. The merged toolbar, interface,
+statistics, and notice suites pass, with the two documented offscreen skips.

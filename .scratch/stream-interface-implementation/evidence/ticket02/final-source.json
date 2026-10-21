@@ -1,12 +1,16 @@
 {
-  "revision": "6ab85a7d06ab7fb400b22c1cbbc730a5125f7e5e",
+  "revision": "107a7aae84b2384acabd45123dd0f31115e98c99",
   "sourceSha256": {
+    "gui/src/qml/StreamActionNotice.qml": "7c4208e143c3063373d9b24d23aaf417184f38ef255c9472fdac6249bfc5a4cf",
     "gui/src/qml/StreamMenuContent.qml": "7923419c8faa665e961d57949fd50e33232cde7754dd1559b752f1fa2597dd30",
     "gui/src/qml/StreamMenuWindow.qml": "668d86b1a82f19eb6b483c6caf9d8e94dfb32718dfa5a9c66a9e8d090522a414",
-    "gui/src/qml/StreamView.qml": "829e7aca528b65c5b1c8e8c876fb276a07db19e006b327260a2e43a063abf073",
+    "gui/src/qml/StreamNotice.qml": "e39f97fabd429abc4a2de835b7f82f3509b70e8707eb8e1c8e2b450f63f96eb7",
+    "gui/src/qml/StreamPassiveNotices.qml": "4d16030e81c3473d9818d316b0730d01dfb40f8b0d5f980b25a6389e8a45c5c6",
+    "gui/src/qml/StreamStatsContent.qml": "e5052f476fd3edb6843fcd7b2d82ff6c42aff8ef8516551712c26725b2e04b8e",
+    "gui/src/qml/StreamView.qml": "8e0b3b0cc79e5f9c31b7e72308b8ba8191ff8996fec3971d35a198439a145578",
     "gui/src/qmlmainwindow.cpp": "c2ea519b4ea238b6505d2f3547b1710bffc620e7815dbe850dc255c91563ce04",
     "gui/tests/CMakeLists.txt": "15ae7c8cc0ae6f90fc9bfadf1ecf93211ed9ef5c7dfb0e0e00e2178f1397e423",
-    "gui/tests/README.md": "d31c48b03e9ac32cf7f8a1a24e8e7970dc35b01cfc331e7b04341b79e1f40d5f",
+    "gui/tests/README.md": "dcf5f7f320fafdafe56519ae95832f27e89a737335a0fc2b50ce7da6b927cf5b",
     "gui/tests/imports/org/streetpea/chiaking/Chiaki.qml": "13180574c12a5330dcc3edfde4f2d4abef4c66d357cfee1baeb3b25f786189e0",
     "gui/tests/imports/org/streetpea/chiaking/ChiakiWindow.qml": "0f10f8a14a06edbfe0110370b8635472d281a728637291d9a1e9ef60b7519442",
     "gui/tests/imports/org/streetpea/chiaking/qmldir": "cd379984041d388d2b62ad85142d53b5875b71612958144b19c49da0c886ca88",
@@ -65,6 +69,7 @@
     "gui/tests/qml/tst_SettingsVideo.qml": "25aa2c9f58b4f57e9f8448bdea70da7b92475b0d1f77f30c10552e137ec61204",
     "gui/tests/qml/tst_SteamShortcut.qml": "ab43a1f1621b5e9a6176d15e8beaf6bf509bd68677c0ee741a6c3d1ca1fb5093",
     "gui/tests/qml/tst_StreamInterface.qml": "e99804856468c030b122b0850639c0d09426fd1efb7b2360248821e882f98126",
+    "gui/tests/qml/tst_StreamNotices.qml": "6c1c595bc79acd660ca38ad4e4fa04910438304798cb5dd9a780e4e499cc6612",
     "gui/tests/qml/tst_StreamStatistics.qml": "8b78babf99bd742e4a457ff0da93ede8e169bbd2d6b3420adb1ad77704ecd665",
     "gui/tests/qml/tst_StreamToolbar.qml": "4a23a9d2baddd0606060904538ec8c249e1dac2ca014df21c8d4cb1bd435e307",
     "gui/tests/steam/CMakeLists.txt": "6666ea6e3aa327258c9a3b360942613bee7dfe1b13ce6ca00cf1114359cc9d72",
@@ -72,5 +77,5 @@
     "gui/tests/steam/command.cpp.in": "832627531421b8cfc597e5b46f01924d8047daf9f27b7c795b76c7e040d8f322",
     "gui/tests/steam/main.cpp": "4039f99d6fd3f40dc3b45cfaa82be03fff5017c30ed01a8195018e478c92ddb3"
   },
-  "normalBuildDelta": "StreamMenuContent MenuButton border uses activeFocus instead of visualFocus; covered by native QML pixel checks and the final integrated native build in ticket 05"
+  "normalBuildDelta": "The toolbar-owned delta is MenuButton border activeFocus instead of visualFocus; the later notices integration is also included. Native QML pixel checks cover the outline. Ticket 05 builds the final integrated source."
 }

@@ -46,6 +46,10 @@ render-control window. Closed popups cannot receive this route.
   controller mappings, disconnect policy, discovery, and reminder preferences
   stay unchanged. Test preset writes remain in isolated settings.
 
+After merging integration `a946da38`, `merged-*.txt` records 36 passing toolbar
+checks, 37 interface checks, 23 statistics checks, and 46 notice checks. The
+statistics and notice suites each retain their documented offscreen-only skip.
+
 ## TDD record
 
 `red-resume.txt`, `red-picture.txt`, `red-quality.txt`, and `red-priority.txt`
@@ -62,7 +66,8 @@ inactive while the disconnect dialog is open.
 `red-initial-focus.txt` fails an actual blue-outline pixel check with the former
 visualFocus binding. `initial-focus.txt` and the final toolbar suite pass after
 the border uses activeFocus. The two `resume-focus-*.png` captures show this
-initial focus. This is the only production change after the normal build below.
+initial focus. This is the only toolbar-owned production change after the normal
+build below.
 The native input checks establish focus ownership, not this final outline.
 
 ## Build and source records
@@ -78,8 +83,9 @@ The normal production target was built after integration merge `4dd8813c`.
 worktree, executable and Qt DLL hashes, and the absence of QA symbols, fixtures,
 and prototype resources. `normal-help.txt` records a successful `--help` run.
 `final-source.json` records the final source, including the focus-outline fix
-at `6ab85a7d`. Ticket 05 owns the final integrated native build of that style
-change.
+at `6ab85a7d`, and the notices integration at `107a7aae`. The latter preserves
+notice input ownership and visibility guards. Ticket 05 owns the final integrated
+native build of all three features, including that style change.
 
 `cache-restoration.json` verifies all 338 original source hashes. The original
 CMake options and runtime output were restored. `restored-build.txt` records

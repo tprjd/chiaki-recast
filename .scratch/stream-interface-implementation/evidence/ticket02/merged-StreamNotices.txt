@@ -1,0 +1,88 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamNotices::initTestCase()
+PASS   : console_screen::StreamNotices::test_blockedActionAndClearance(inline)
+PASS   : console_screen::StreamNotices::test_blockedActionAndClearance(window)
+PASS   : console_screen::StreamNotices::test_blockedNoticeYieldsToMenu(inline)
+PASS   : console_screen::StreamNotices::test_blockedNoticeYieldsToMenu(window)
+PASS   : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(inline-2)
+PASS   : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(inline-3)
+PASS   : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(window-2)
+PASS   : console_screen::StreamNotices::test_disabledVideoMenuAndPriority(window-3)
+PASS   : console_screen::StreamNotices::test_higherPriorityAndDestruction(inline-connecting)
+PASS   : console_screen::StreamNotices::test_higherPriorityAndDestruction(inline-failure)
+PASS   : console_screen::StreamNotices::test_higherPriorityAndDestruction(inline-disconnect)
+PASS   : console_screen::StreamNotices::test_higherPriorityAndDestruction(inline-destroy)
+PASS   : console_screen::StreamNotices::test_higherPriorityAndDestruction(window-connecting)
+PASS   : console_screen::StreamNotices::test_higherPriorityAndDestruction(window-failure)
+PASS   : console_screen::StreamNotices::test_higherPriorityAndDestruction(window-disconnect)
+PASS   : console_screen::StreamNotices::test_higherPriorityAndDestruction(window-destroy)
+PASS   : console_screen::StreamNotices::test_initialDisabledMedia(inline)
+PASS   : console_screen::StreamNotices::test_initialDisabledMedia(window)
+QDEBUG : console_screen::StreamNotices::test_layout(inline-900-dark) qml: notice layout inline-900-dark logical 900 600 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(inline-900-dark) qml: component pixels 900 600
+PASS   : console_screen::StreamNotices::test_layout(inline-900-dark)
+QDEBUG : console_screen::StreamNotices::test_layout(inline-900-bright) qml: notice layout inline-900-bright logical 900 600 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(inline-900-bright) qml: component pixels 900 600
+PASS   : console_screen::StreamNotices::test_layout(inline-900-bright)
+QDEBUG : console_screen::StreamNotices::test_layout(inline-900-detail) qml: notice layout inline-900-detail logical 900 600 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(inline-900-detail) qml: component pixels 900 600
+PASS   : console_screen::StreamNotices::test_layout(inline-900-detail)
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1280-dark) qml: notice layout inline-1280-dark logical 1280 720 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1280-dark) qml: component pixels 1280 720
+PASS   : console_screen::StreamNotices::test_layout(inline-1280-dark)
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1280-bright) qml: notice layout inline-1280-bright logical 1280 720 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1280-bright) qml: component pixels 1280 720
+PASS   : console_screen::StreamNotices::test_layout(inline-1280-bright)
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1280-detail) qml: notice layout inline-1280-detail logical 1280 720 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1280-detail) qml: component pixels 1280 720
+PASS   : console_screen::StreamNotices::test_layout(inline-1280-detail)
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1920-dark) qml: notice layout inline-1920-dark logical 1920 1080 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1920-dark) qml: component pixels 1920 1080
+PASS   : console_screen::StreamNotices::test_layout(inline-1920-dark)
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1920-bright) qml: notice layout inline-1920-bright logical 1920 1080 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1920-bright) qml: component pixels 1920 1080
+PASS   : console_screen::StreamNotices::test_layout(inline-1920-bright)
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1920-detail) qml: notice layout inline-1920-detail logical 1920 1080 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(inline-1920-detail) qml: component pixels 1920 1080
+PASS   : console_screen::StreamNotices::test_layout(inline-1920-detail)
+QDEBUG : console_screen::StreamNotices::test_layout(window-900-dark) qml: notice layout window-900-dark logical 900 600 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(window-900-dark) qml: component pixels 360 109
+PASS   : console_screen::StreamNotices::test_layout(window-900-dark)
+QDEBUG : console_screen::StreamNotices::test_layout(window-900-bright) qml: notice layout window-900-bright logical 900 600 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(window-900-bright) qml: component pixels 360 109
+PASS   : console_screen::StreamNotices::test_layout(window-900-bright)
+QDEBUG : console_screen::StreamNotices::test_layout(window-900-detail) qml: notice layout window-900-detail logical 900 600 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(window-900-detail) qml: component pixels 360 109
+PASS   : console_screen::StreamNotices::test_layout(window-900-detail)
+QDEBUG : console_screen::StreamNotices::test_layout(window-1280-dark) qml: notice layout window-1280-dark logical 1280 720 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(window-1280-dark) qml: component pixels 360 109
+PASS   : console_screen::StreamNotices::test_layout(window-1280-dark)
+QDEBUG : console_screen::StreamNotices::test_layout(window-1280-bright) qml: notice layout window-1280-bright logical 1280 720 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(window-1280-bright) qml: component pixels 360 109
+PASS   : console_screen::StreamNotices::test_layout(window-1280-bright)
+QDEBUG : console_screen::StreamNotices::test_layout(window-1280-detail) qml: notice layout window-1280-detail logical 1280 720 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(window-1280-detail) qml: component pixels 360 109
+PASS   : console_screen::StreamNotices::test_layout(window-1280-detail)
+QDEBUG : console_screen::StreamNotices::test_layout(window-1920-dark) qml: notice layout window-1920-dark logical 1920 1080 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(window-1920-dark) qml: component pixels 360 109
+PASS   : console_screen::StreamNotices::test_layout(window-1920-dark)
+QDEBUG : console_screen::StreamNotices::test_layout(window-1920-bright) qml: notice layout window-1920-bright logical 1920 1080 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(window-1920-bright) qml: component pixels 360 109
+PASS   : console_screen::StreamNotices::test_layout(window-1920-bright)
+QDEBUG : console_screen::StreamNotices::test_layout(window-1920-detail) qml: notice layout window-1920-detail logical 1920 1080 windowDpr 1
+QDEBUG : console_screen::StreamNotices::test_layout(window-1920-detail) qml: component pixels 360 109
+PASS   : console_screen::StreamNotices::test_layout(window-1920-detail)
+PASS   : console_screen::StreamNotices::test_nativeNoticeCloseUsesDisconnectPolicy()
+PASS   : console_screen::StreamNotices::test_networkThresholdAndAudio(inline)
+PASS   : console_screen::StreamNotices::test_networkThresholdAndAudio(window)
+PASS   : console_screen::StreamNotices::test_passiveInput(inline)
+SKIP   : console_screen::StreamNotices::test_passiveInput(window) The offscreen platform activates passive windows. Run this case with the Windows platform.
+C:\Users\david\.codex\worktrees\stream-toolbar\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(398) : failure location
+PASS   : console_screen::StreamNotices::test_rendererHandoff(inline)
+PASS   : console_screen::StreamNotices::test_rendererHandoff(window)
+PASS   : console_screen::StreamNotices::test_warningTimingAndSessionReplacement(inline)
+PASS   : console_screen::StreamNotices::test_warningTimingAndSessionReplacement(window)
+PASS   : console_screen::StreamNotices::cleanupTestCase()
+Totals: 46 passed, 0 failed, 1 skipped, 0 blacklisted, 21713ms
+********* Finished testing of console_screen *********
