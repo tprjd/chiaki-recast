@@ -1,0 +1,24 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamToolbar::initTestCase()
+PASS   : console_screen::StreamToolbar::test_priorityClosesFlyout(inline-pin)
+FAIL!  : console_screen::StreamToolbar::test_priorityClosesFlyout(inline-connecting) property opened
+   Actual   (): true
+   Expected (): false
+C:\Users\david\.codex\worktrees\stream-toolbar\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(160) : failure location
+FAIL!  : console_screen::StreamToolbar::test_priorityClosesFlyout(inline-failure) property opened
+   Actual   (): true
+   Expected (): false
+C:\Users\david\.codex\worktrees\stream-toolbar\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(160) : failure location
+PASS   : console_screen::StreamToolbar::test_priorityClosesFlyout(window-pin)
+FAIL!  : console_screen::StreamToolbar::test_priorityClosesFlyout(window-connecting) property opened
+   Actual   (): true
+   Expected (): false
+C:\Users\david\.codex\worktrees\stream-toolbar\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(160) : failure location
+FAIL!  : console_screen::StreamToolbar::test_priorityClosesFlyout(window-failure) property opened
+   Actual   (): true
+   Expected (): false
+C:\Users\david\.codex\worktrees\stream-toolbar\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(160) : failure location
+PASS   : console_screen::StreamToolbar::cleanupTestCase()
+Totals: 4 passed, 4 failed, 0 skipped, 0 blacklisted, 22867ms
+********* Finished testing of console_screen *********

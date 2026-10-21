@@ -1,0 +1,12 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamInterface::initTestCase()
+PASS   : console_screen::StreamInterface::test_settingsActions(inline-false)
+PASS   : console_screen::StreamInterface::test_settingsActions(inline-true)
+PASS   : console_screen::StreamInterface::test_settingsActions(window-false)
+PASS   : console_screen::StreamInterface::test_settingsActions(window-true)
+PASS   : console_screen::StreamInterface::test_shortcutDuringClosure(inline)
+PASS   : console_screen::StreamInterface::test_shortcutDuringClosure(window)
+PASS   : console_screen::StreamInterface::cleanupTestCase()
+Totals: 8 passed, 0 failed, 0 skipped, 0 blacklisted, 3810ms
+********* Finished testing of console_screen *********

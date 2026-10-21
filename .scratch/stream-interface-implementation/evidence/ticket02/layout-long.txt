@@ -1,0 +1,24 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamToolbar::initTestCase()
+PASS   : console_screen::StreamToolbar::test_layout(inline-900-dark)
+PASS   : console_screen::StreamToolbar::test_layout(inline-900-bright)
+PASS   : console_screen::StreamToolbar::test_layout(inline-900-detailed)
+PASS   : console_screen::StreamToolbar::test_layout(inline-1280-dark)
+PASS   : console_screen::StreamToolbar::test_layout(inline-1280-bright)
+PASS   : console_screen::StreamToolbar::test_layout(inline-1280-detailed)
+PASS   : console_screen::StreamToolbar::test_layout(inline-1920-dark)
+PASS   : console_screen::StreamToolbar::test_layout(inline-1920-bright)
+PASS   : console_screen::StreamToolbar::test_layout(inline-1920-detailed)
+PASS   : console_screen::StreamToolbar::test_layout(window-900-dark)
+PASS   : console_screen::StreamToolbar::test_layout(window-900-bright)
+PASS   : console_screen::StreamToolbar::test_layout(window-900-detailed)
+PASS   : console_screen::StreamToolbar::test_layout(window-1280-dark)
+PASS   : console_screen::StreamToolbar::test_layout(window-1280-bright)
+PASS   : console_screen::StreamToolbar::test_layout(window-1280-detailed)
+PASS   : console_screen::StreamToolbar::test_layout(window-1920-dark)
+PASS   : console_screen::StreamToolbar::test_layout(window-1920-bright)
+PASS   : console_screen::StreamToolbar::test_layout(window-1920-detailed)
+PASS   : console_screen::StreamToolbar::cleanupTestCase()
+Totals: 20 passed, 0 failed, 0 skipped, 0 blacklisted, 13869ms
+********* Finished testing of console_screen *********

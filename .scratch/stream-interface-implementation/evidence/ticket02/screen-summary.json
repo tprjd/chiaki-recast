@@ -1,0 +1,52 @@
+{
+  "screen-ConnectionLocal": {
+    "passed": 12,
+    "failed": 0,
+    "skipped": 0
+  },
+  "screen-ConnectionPsn": {
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0
+  },
+  "screen-ConnectionWake": {
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0
+  },
+  "screen-Disconnect": {
+    "passed": 19,
+    "failed": 0,
+    "skipped": 0
+  },
+  "screen-LiveConsolePin": {
+    "passed": 23,
+    "failed": 0,
+    "skipped": 0
+  },
+  "screen-SettingsDisplay": {
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0
+  },
+  "screen-SettingsRenderer": {
+    "passed": 48,
+    "failed": 0,
+    "skipped": 0
+  },
+  "screen-StreamInterface": {
+    "passed": 37,
+    "failed": 0,
+    "skipped": 0
+  },
+  "screen-StreamStatistics": {
+    "passed": 23,
+    "failed": 0,
+    "skipped": 1
+  },
+  "screen-StreamToolbar": {
+    "passed": 36,
+    "failed": 0,
+    "skipped": 0
+  }
+}

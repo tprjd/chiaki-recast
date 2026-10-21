@@ -1,0 +1,31 @@
+{
+    "checks": 57,
+    "failedCheck": "Controller-mapped main-window key reaches the active toolbar",
+    "lastBounds": {
+        "height": 42,
+        "name": "confirmationCancel",
+        "parentHeight": 146,
+        "parentWidth": 464,
+        "visible": true,
+        "width": 464
+    },
+    "nativeRect": {
+        "bottom": 959,
+        "clientLeft": 50,
+        "clientTop": 50,
+        "left": 41,
+        "qtHeight": 720,
+        "qtWidth": 1280,
+        "qtX": 40,
+        "qtY": 40,
+        "right": 1659,
+        "top": 12
+    },
+    "renderDiagnostics": {
+        "quickPaints": 149,
+        "renderCalls": 155,
+        "swapchain": true,
+        "texture": true
+    },
+    "runtimeRendererBackend": 1
+}
