@@ -40,6 +40,7 @@ extern "C" {
 #include <QtGlobal>
 #include <cstring>
 #include <utility>
+#include <memory>
 #if defined(Q_OS_MACOS)
 #include <objc/message.h>
 #endif
@@ -1731,7 +1732,7 @@ renderer_backend_ready:
     backend = new QmlBackend(settings, this);
     connect(backend, &QmlBackend::sessionChanged, this, [this, exit_app_on_stream_exit](StreamSession *s) {
         const bool preserve_input = !backend->sessionPinRequest().isEmpty()
-            || (s && backend->connectionAttempt().value("route") == "psn");
+            || (s && (session || backend->connectionAttempt().value("route") == "psn"));
         session = s;
         stream_session_active.storeRelease(s ? 1 : 0);
         if (!preserve_input)
@@ -2822,7 +2823,9 @@ bool QmlMainWindow::event(QEvent *event)
         if (session && grab_input) {
             auto *focused = QGuiApplication::focusWindow();
             for (auto *popup : QGuiApplication::topLevelWindows()) {
-                if (!popup->isVisible() || popup->type() != Qt::Popup)
+                if (!popup->isVisible() || (popup->type() != Qt::Popup && popup->type() != Qt::Tool)
+                        || popup->flags().testFlag(Qt::WindowTransparentForInput)
+                        || popup->flags().testFlag(Qt::WindowDoesNotAcceptFocus))
                     continue;
                 for (auto *parent = popup->transientParent(); parent; parent = parent->transientParent()) {
                     if (parent == focused) {
@@ -2835,6 +2838,30 @@ bool QmlMainWindow::event(QEvent *event)
             while (owner && owner != this)
                 owner = owner->transientParent();
             if (owner == this && focused != this && focused != quick_window) {
+                if (focused != QGuiApplication::focusWindow()) {
+                    // Tool windows accept keys after Qt reports their native focus.
+                    auto *pending = new QObject(focused);
+                    auto key = std::shared_ptr<QEvent>(event->clone());
+                    connect(qGuiApp, &QGuiApplication::focusWindowChanged, pending,
+                        [this, focused, pending, key](QWindow *active) mutable {
+                            auto copy = std::exchange(key, {});
+                            if (!copy) return;
+                            pending->deleteLater();
+                            if (active == focused && focused->isVisible() && session && grab_input) {
+                                if (auto *item = focused->property("lastFocusItem").value<QQuickItem *>()) {
+                                    if (item->window() == focused && item->isVisible())
+                                        item->forceActiveFocus(Qt::OtherFocusReason);
+                                }
+                                QGuiApplication::sendEvent(focused, copy.get());
+                            }
+                        });
+                    connect(focused, &QWindow::visibleChanged, pending, [pending](bool visible) {
+                        if (!visible) delete pending;
+                    });
+                    connect(backend, &QmlBackend::sessionChanged, pending, [pending] { delete pending; });
+                    focused->requestActivate();
+                    return true;
+                }
                 QGuiApplication::sendEvent(focused, event);
                 return true;
             }

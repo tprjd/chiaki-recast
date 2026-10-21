@@ -1,0 +1,6 @@
+{
+    "checks": 18,
+    "dpr": 1,
+    "failedCheck": "Open-menu replacement preserves native capture",
+    "runtimeRendererBackend": 0
+}

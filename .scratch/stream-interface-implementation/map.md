@@ -17,12 +17,12 @@ published in `fff89373`. Keep the prototype out of production integration.
 | [02: Build the approved A toolbar](issues/02-stream-toolbar.md) | Complete descriptive toolbar, pop-ups, settings navigation, audio, Resume, and Disconnect | 01 | resolved |
 | [03: Build the approved A statistics overlay](issues/03-stream-statistics.md) | Compact six-value readout with real bindings and visibility rules | 01 | resolved |
 | [04: Build the approved A session notices](issues/04-session-notices.md) | Network, blocked-content, and disabled-media notices with actions and cleanup | 01 | resolved |
-| [05: Complete native acceptance](issues/05-native-acceptance.md) | Combined native verification, regressions, and normal production build | 02, 03, 04 | claimed |
+| [05: Complete native acceptance](issues/05-native-acceptance.md) | Combined native verification, regressions, and normal production build | 02, 03, 04 | resolved |
 
 ## Work order
 
-Tickets 01 through 04 are resolved. Ticket 05 is claimed for combined native
-acceptance and the final normal production build.
+Tickets 01 through 05 are resolved. Combined native acceptance and the final
+normal production build are complete within the user-reduced testing scope.
 
 Shared source edits may need coordination. That is not an extra blocking edge.
 Each feature ticket must pass its own production QML checks before resolution;
@@ -98,7 +98,12 @@ the owned native menu or popup. The native toolbar window retains compact bounds
 See [toolbar evidence](evidence/ticket02/README.md) for native input checks,
 component captures, long-label checks, source hashes, and post-merge QML results.
 
-Ticket [05](issues/05-native-acceptance.md) is claimed with all blockers resolved.
-It must build and verify the final combined source, including the focus-outline
-fix and notice integration that followed ticket 02's normal production build.
-The parent issue and approved specification remain unchanged.
+Ticket [05](issues/05-native-acceptance.md) is resolved. Final native acceptance
+passes at 900×600 and measured DPR 1 on both renderers: OpenGL 270 checks and
+Vulkan 251 checks. Native input/focus, settings and modal handoffs, session
+replacement, desktop composition and the Qt 6.7 compatibility regression pass.
+The final normal build excludes QA/test/prototype resources; the original native
+cache is restored and rebuilt. Both code review axes are clear. See
+[acceptance and replay](evidence/ticket05/acceptance.md) for source identities,
+captures, earlier-source coverage and remaining limits. The specification records
+the user's later restriction on repeated resolution and scale testing.

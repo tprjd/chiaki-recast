@@ -6,7 +6,7 @@ import "fixtures"
 TestCase {
     id: tests
     name: "StreamInterface"
-    width: 1280; height: 720
+    width: 900; height: 600
     visible: true
     when: windowShown
     Component { id: harnessComponent; StreamHarness { anchors.fill: parent } }
@@ -169,7 +169,7 @@ TestCase {
         const button = findChild(host, data.renderer ? "streamRendererSettings" : "streamDisplaySettings");
         button.forceActiveFocus(Qt.TabFocusReason);
         keyClick(Qt.Key_Return);
-        compare(h.actions.length, 1);
+        tryCompare(h, "actions", [data.renderer ? "renderer" : "display"]);
         compare(h.actions[0], data.renderer ? "renderer" : "display");
         compare(h.window.releases, 1);
         wait(300);

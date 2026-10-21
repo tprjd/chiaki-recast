@@ -1,0 +1,14 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::StreamToolbar::initTestCase()
+FAIL!  : console_screen::StreamToolbar::test_disconnectCancelsPendingSettings(inline) Disconnect cancels the pending settings action
+   Actual   (): true
+   Expected (): false
+C:\Users\david\.codex\worktrees\stream-acceptance\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(227) : failure location
+FAIL!  : console_screen::StreamToolbar::test_disconnectCancelsPendingSettings(window) Disconnect cancels the pending settings action
+   Actual   (): true
+   Expected (): false
+C:\Users\david\.codex\worktrees\stream-acceptance\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(227) : failure location
+PASS   : console_screen::StreamToolbar::cleanupTestCase()
+Totals: 2 passed, 2 failed, 0 skipped, 0 blacklisted, 2007ms
+********* Finished testing of console_screen *********

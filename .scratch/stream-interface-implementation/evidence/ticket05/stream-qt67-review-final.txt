@@ -1,0 +1,19 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.7.3, Qt 6.7.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2019), windows 11
+PASS   : console_screen::StreamToolbar::initTestCase()
+PASS   : console_screen::StreamToolbar::test_flyoutFocusPixels(inline)
+PASS   : console_screen::StreamToolbar::test_flyoutFocusPixels(window)
+PASS   : console_screen::StreamToolbar::test_layout(window-900-dark)
+PASS   : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(inline-none)
+PASS   : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(inline-video)
+PASS   : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(inline-blocked)
+PASS   : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(window-none)
+PASS   : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(window-video)
+PASS   : console_screen::StreamToolbar::test_linkedSettingsOwnFocus(window-blocked)
+FAIL!  : console_screen::StreamToolbar::test_shortcutClosesFlyoutAndMenu() property visible
+   Actual   (): true
+   Expected (): false
+C:\Users\david\.codex\worktrees\stream-acceptance\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(222) : failure location
+PASS   : console_screen::StreamToolbar::cleanupTestCase()
+Totals: 11 passed, 1 failed, 0 skipped, 0 blacklisted, 12817ms
+********* Finished testing of console_screen *********

@@ -15,6 +15,7 @@ FocusScope {
     required property var menuController
     property bool separate: false
     property Item initialFocusItem: resumeButton
+    readonly property int presetIndex: Math.max(0, presetRepeater.model.findIndex(preset => preset.preset === streamWindow.videoPreset))
     implicitHeight: toolbar.implicitHeight + 24
     focus: true
     anchors.fill: parent
@@ -22,12 +23,13 @@ FocusScope {
     Keys.onEscapePressed: menuController.dismiss()
 
     component Flyout: Popup {
+        id: popup
         property Item opener
         width: Math.min(320, content.width)
-        x: content.width - width
-        y: -height - 9
+        parent: content.separate ? nativeWindow.contentItem : content
+        x: content.separate ? 0 : content.width - width
+        y: content.separate ? 0 : -height - 9
         padding: 17
-        popupType: content.separate ? Popup.Window : Popup.Item
         modal: false
         dim: false
         focus: true
@@ -35,6 +37,34 @@ FocusScope {
         enter: Transition {}
         exit: Transition {}
         background: Rectangle { radius: 8; color: "#a6090e15"; border.color: "#24ffffff" }
+        function focusItem(item) {
+            if (content.separate) nativeWindow.requestActivate();
+            item.forceActiveFocus(Qt.TabFocusReason);
+        }
+        property Window nativeHost: Window {
+            id: nativeWindow
+            objectName: "streamMenuPopupWindow"
+            transientParent: content.Window.window
+            flags: Qt.Tool | Qt.FramelessWindowHint
+            color: "transparent"
+            visible: content.separate && popup.visible
+            x: content.Window.window ? content.Window.window.x + content.width - width : 0
+            y: content.Window.window ? content.Window.window.y - height - 9 : 0
+            width: popup.width
+            height: popup.height
+            onVisibleChanged: if (visible) requestActivate()
+            Shortcut {
+                enabled: nativeWindow.visible && menuController.open
+                sequence: "Ctrl+O"
+                onActivated: menuController.close()
+            }
+            property Item lastFocusItem: null
+            onActiveFocusItemChanged: {
+                var item = activeFocusItem;
+                while (item && item !== popup.contentItem) item = item.parent;
+                if (item && activeFocusItem !== popup.contentItem) lastFocusItem = activeFocusItem;
+            }
+        }
         onClosed: Qt.callLater(() => {
             if (menuController.open && !menuController.flyout) {
                 if (content.separate) content.Window.window.requestActivate();
@@ -68,6 +98,12 @@ FocusScope {
     component FlyoutButton: ToolButton {
         font.pixelSize: 14
         Layout.fillWidth: true
+        background: Rectangle {
+            radius: 5
+            color: parent.checked ? "#447cadd6" : parent.hovered || parent.down ? "#33ffffff" : "transparent"
+            border.color: parent.activeFocus ? "#a9d9ff" : "transparent"
+            border.width: 2
+        }
         contentItem: Label {
             text: parent.text
             color: "white"
@@ -162,7 +198,7 @@ FocusScope {
             objectName: "streamQuality"
             description: qsTr("Quality preset")
             disclosure: true
-            text: [qsTr("Default"), qsTr("High quality"), qsTr("HQ + Spatial"), qsTr("HQ + Advanced spatial"), qsTr("Custom")][streamWindow.videoPreset - 1] || qsTr("Default")
+            text: presetRepeater.model[content.presetIndex].label
             Layout.preferredWidth: 178
             onClicked: menuController.flyout = menuController.flyout === "quality" ? "" : "quality"
             KeyNavigation.left: pictureButton
@@ -192,7 +228,7 @@ FocusScope {
         opener: pictureButton
         objectName: "streamPicturePopup"
         visible: menuController.open && menuController.flyout === "picture"
-        onOpened: fitButton.forceActiveFocus(Qt.TabFocusReason)
+        onOpened: focusItem(fitButton)
         contentItem: ColumnLayout {
             Keys.onEscapePressed: menuController.dismiss()
             Keys.onMenuPressed: menuController.close()
@@ -269,7 +305,7 @@ FocusScope {
                 objectName: "streamDisplaySettings"
                 text: qsTr("Display settings")
                 Layout.fillWidth: true
-                onClicked: { menuController.close(); navigation.openDisplaySettings(); }
+                onClicked: menuController.openSettings("display")
                 KeyNavigation.up: zoomFactor.visible ? zoomFactor : fitButton
                 KeyNavigation.down: fitButton
             }
@@ -281,7 +317,7 @@ FocusScope {
         objectName: "streamQualityPopup"
         opener: qualityButton
         visible: menuController.open && menuController.flyout === "quality"
-        onOpened: presetRepeater.itemAt(Math.max(0, streamWindow.videoPreset - 1)).forceActiveFocus(Qt.TabFocusReason)
+        onOpened: focusItem(presetRepeater.itemAt(content.presetIndex))
         contentItem: ColumnLayout {
             spacing: 4
             Keys.onEscapePressed: menuController.dismiss()
@@ -315,7 +351,7 @@ FocusScope {
                 text: qsTr("Renderer settings")
                 Layout.fillWidth: true
                 visible: streamWindow.videoPreset === ChiakiWindow.VideoPreset.Custom
-                onClicked: { menuController.close(); navigation.openPlaceboSettings(); }
+                onClicked: menuController.openSettings("renderer")
                 KeyNavigation.up: presetRepeater.itemAt(4)
                 KeyNavigation.down: presetRepeater.itemAt(0)
             }

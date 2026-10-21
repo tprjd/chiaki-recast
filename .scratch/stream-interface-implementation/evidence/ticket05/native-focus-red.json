@@ -1,0 +1,34 @@
+{
+    "afterOutsideFocus": "none",
+    "beforeOutsideFocus": "streamFit",
+    "cachedLeaf": "streamFit",
+    "checks": 18,
+    "dpr": 1,
+    "failedCheck": "Outside-click controller arrow retains the focused leaf",
+    "fitWindow": "30936638",
+    "focusAfter": "none",
+    "focusBefore": "1:none",
+    "foregroundDiagnostics": {
+        "enabled": true,
+        "exStyles": "256",
+        "foreground": "84872818",
+        "modal": "none",
+        "qtFocus": "",
+        "styles": "2530148352",
+        "target": "84872818",
+        "targetName": ""
+    },
+    "pointerDiagnostics": {
+        "after": 1,
+        "before": 0,
+        "capture": "0",
+        "foreground": "84872818",
+        "main": "84872818",
+        "picture": true,
+        "quality": false
+    },
+    "routeCached": "streamFit:30936638:1",
+    "routeSelected": "streamMenuPopupWindow:30936638",
+    "routeStart": ":84872818:QmlMainWindow",
+    "runtimeRendererBackend": 1
+}

@@ -1,0 +1,20 @@
+{
+  "revision": "62f9676e",
+  "before": {
+    "gui/tests/qml/tst_StreamToolbar.qml": "EDD2743224744F5157543526992248864063FA266D3A3CCBFE1C47A109CE2F8B",
+    "gui/src/qml/StreamMenuContent.qml": "BD544869688ACC033898F0834AE6E5D45C39E8FE6272D81266229112C55319AF",
+    "gui/src/qml/StreamView.qml": "771C35756A6433E19197B36F26C1937CA1E6CB1DCFFCF73D045B177DA91A1E3D",
+    "gui/src/qml/StreamMenuWindow.qml": "B31AAAF643AAAE42589F7D5D8E69F2E3FFE76B5580EBDF16DA32DFE4E7FAE114"
+  },
+  "after": {
+    "gui/tests/qml/tst_StreamToolbar.qml": "EDD2743224744F5157543526992248864063FA266D3A3CCBFE1C47A109CE2F8B",
+    "gui/src/qml/StreamMenuContent.qml": "BD544869688ACC033898F0834AE6E5D45C39E8FE6272D81266229112C55319AF",
+    "gui/src/qml/StreamView.qml": "771C35756A6433E19197B36F26C1937CA1E6CB1DCFFCF73D045B177DA91A1E3D",
+    "gui/src/qml/StreamMenuWindow.qml": "B31AAAF643AAAE42589F7D5D8E69F2E3FFE76B5580EBDF16DA32DFE4E7FAE114"
+  },
+  "testExit": 0,
+  "runtime": "Qt6.7.3 MSVC2019",
+  "size": "900x600",
+  "scale": 1,
+  "method": "only previously failed shortcut and new disconnect priority regression"
+}
