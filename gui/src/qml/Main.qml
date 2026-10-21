@@ -262,7 +262,7 @@ Item {
     }
 
     function showPSNTokenDialog(psnurl, expired) {
-        stack.push(psnTokenDialogComponent, {psnurl: psnurl, expired: expired});
+        stack.push(psnTokenDialogComponent, {psnurl: psnurl || "", expired: !!expired});
     }
 
     function showControllerMappingDialog(route) {
@@ -590,7 +590,7 @@ Item {
             Chiaki.settings.psnAuthToken = ""
             Chiaki.settings.psnAuthTokenExpiry = ""
             Chiaki.settings.psnAccountId = ""
-            root.showPSNTokenDialog(true);
+            root.showPSNTokenDialog("", true);
         }
 
         function onError(title, text) {

@@ -86,6 +86,7 @@ class QmlBackend : public QObject
     Q_PROPERTY(StreamSession* session READ qmlSession NOTIFY sessionChanged)
     Q_PROPERTY(QVariantMap connectionAttempt READ connectionAttempt NOTIFY connectionAttemptChanged)
     Q_PROPERTY(QVariantMap sessionPinRequest READ sessionPinRequest NOTIFY sessionPinRequestChanged)
+    Q_PROPERTY(QVariantMap psnAuthAttempt READ psnAuthAttempt NOTIFY psnAuthAttemptChanged)
     Q_PROPERTY(QList<QmlController*> controllers READ qmlControllers NOTIFY controllersChanged)
     Q_PROPERTY(bool discoveryEnabled READ discoveryEnabled WRITE setDiscoveryEnabled NOTIFY discoveryEnabledChanged)
     Q_PROPERTY(QVariantList hosts READ hosts NOTIFY hostsChanged)
@@ -204,6 +205,8 @@ public:
     Q_INVOKABLE QUrl psnLoginUrl() const;
     Q_INVOKABLE bool checkPsnRedirectURL(const QUrl &url) const;
     Q_INVOKABLE bool handlePsnLoginRedirect(const QUrl &url);
+    QVariantMap psnAuthAttempt() const { return psn_auth_attempt; }
+    Q_INVOKABLE QString startPsnAuth(const QUrl &url);
     Q_INVOKABLE void stopAutoConnect();
     Q_INVOKABLE bool setConsolePin(int index, QString console_pin);
     Q_INVOKABLE QString openPsnLink();
@@ -248,6 +251,7 @@ signals:
     void hostsChanged();
     void hiddenHostsChanged();
     void psnTokenChanged();
+    void psnAuthAttemptChanged();
     void psnCredsExpired();
     void autoConnectChanged();
     void wakeupStartInitiated();
@@ -323,6 +327,9 @@ private:
     QHash<int, QmlController*> controllers;
     DisplayServer regist_dialog_server;
     quint64 profile_generation = 0;
+    quint64 psn_auth_generation = 0;
+    QVariantMap psn_auth_attempt;
+    bool psn_auth_pending = false;
     quint64 connection_generation = 0;
     quint64 connection_profile_generation = 0;
     QVariantMap connection_attempt;
