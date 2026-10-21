@@ -1,6 +1,6 @@
 # PSN sign-in and remaining dialogs
 
-Status: ready-for-agent
+Status: claimed
 Date: 2026-10-21
 Design: use the new Library, Settings, console setup, connection, and PIN design
 Test approach: confirmed by the user on 2026-10-21

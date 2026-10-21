@@ -43,4 +43,3 @@ results, focused regressions, and six inspected captures at both required sizes.
 Native persistence is covered by ticket 01. The final native build, visible native
 focus, and display scaling remain in ticket 08. Real PSN sign-in, public-service
 availability, and physical controllers were not tested.
-

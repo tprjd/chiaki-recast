@@ -1,6 +1,6 @@
 # 08: Integrated native acceptance
 
-Status: ready-for-agent
+Status: claimed
 Type: task
 Blocked by: 02, 03, 04, 05, 06, 07
 
@@ -26,4 +26,3 @@ Ticket 01 is a transitive blocker through 02. No redundant direct edge is needed
 ## Comments
 
 Published on 2026-10-21 after the user approved the eight-ticket breakdown. No implementation work has started.
-
