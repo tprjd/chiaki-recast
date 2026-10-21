@@ -10,6 +10,7 @@ Item {
     property alias window: streamWindow
     readonly property var screen: streamLoader.item
     property bool screenActive: true
+    property bool nativeHost: false
     property alias opener: opener
     property var actions: []
     function showMainView() { actions = actions.concat(["consoles"]); }
@@ -41,6 +42,7 @@ Item {
     }
     StreamTestWindow {
         id: streamWindow
+        visible: harness.nativeHost
         width: harness.width
         height: harness.height
         property int runtimeRendererBackend: 0
@@ -78,9 +80,10 @@ Item {
         function stopSession(sleep) { commands = commands.concat([{name: "stop", sleep: sleep}]); }
         function sessionGoHome() { commands = commands.concat([{name: "home"}]); }
     }
-    Button { id: opener; text: "Game" }
+    Button { id: opener; parent: harness.nativeHost ? streamWindow.contentItem : harness; text: "Game" }
     Loader {
         id: streamLoader
+        parent: harness.nativeHost ? streamWindow.contentItem : harness
         anchors.fill: parent
         active: harness.screenActive
         sourceComponent: Component {
