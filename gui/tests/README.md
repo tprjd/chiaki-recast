@@ -205,3 +205,18 @@ They cover event ownership, actual retry and stop dispatch, and direct entry
 that has no library row. A hidden native window cannot verify visible input
 capture, display scaling, or physical controllers. Ticket 06 covers visible
 native acceptance. Real transport checks need a console.
+
+## Auto-connect and console wake-up tests
+
+`ConnectionWake` loads production `AutoConnectView.qml` through
+`ConnectionHarness.qml`. This view uses `ConnectionView.qml` for the selected
+console, actual wait state, persistent timeout, safe retry, and cancellation.
+`context` distinguishes startup auto-connect from a manual wake request.
+`waitingForWake` retains wait-screen ownership until the connection starts.
+The same attempt ID continues through local or PSN handoff.
+
+These tests check repeated input, cleanup before retry, closed views, invalid
+targets, streamer mode, and action focus at 900 by 600 and 1280 by 720.
+The fake backend supplies native results. It does not simulate discovery,
+wake packets, or a session. Isolated native checks cover those handlers with
+transport disabled. Real console wake-up still needs a console.

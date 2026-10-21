@@ -270,7 +270,9 @@ Item {
     }
 
     Component.onCompleted: {
-        if (Chiaki.connectionAttempt.presented && Chiaki.connectionAttempt.route === "psn"
+        if (Chiaki.connectionAttempt.presented && Chiaki.connectionAttempt.waitingForWake)
+            stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
+        else if (Chiaki.connectionAttempt.presented && Chiaki.connectionAttempt.route === "psn"
                 && Chiaki.connectionAttempt.phase !== "video" && Chiaki.connectionAttempt.phase !== "ready")
             stack.replace(stack.get(0), psnViewComponent, {}, StackView.Immediate);
         else if (Chiaki.session || Chiaki.connectionAttempt.presented)
@@ -562,6 +564,11 @@ Item {
 
         function onConnectionAttemptChanged() {
             const attempt = Chiaki.connectionAttempt;
+            if (attempt.presented && attempt.waitingForWake) {
+                if (!stack.currentItem || stack.currentItem.objectName !== "autoConnectView")
+                    stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
+                return;
+            }
             if (!attempt.presented || attempt.waitingForWake || Chiaki.autoConnect) return;
             if (attempt.route === "psn" && attempt.phase !== "video" && attempt.phase !== "ready")
                 root.showPsnView();
@@ -606,7 +613,8 @@ Item {
         }
 
         function onWakeupStartInitiated() {
-            stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
+            if (!stack.currentItem || stack.currentItem.objectName !== "autoConnectView")
+                stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
         }
     }
 

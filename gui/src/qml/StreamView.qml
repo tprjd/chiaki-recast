@@ -227,7 +227,7 @@ Item {
     ConnectionView {
         id: connectionView
         anchors.fill: parent
-        managesAttempt: view.managedConnection
+        managesAttempt: view.managedConnection && !Chiaki.connectionAttempt.waitingForWake
         visible: view.managedConnection && Chiaki.connectionAttempt.phase !== "ready"
         enabled: visible
         onVisibleChanged: {
