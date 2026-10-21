@@ -1,0 +1,15 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::SettingsControllerMapping::initTestCase()
+PASS   : console_screen::SettingsControllerMapping::test_allMappingTargetsAreReachable()
+PASS   : console_screen::SettingsControllerMapping::test_analogApplyAndCancel()
+PASS   : console_screen::SettingsControllerMapping::test_captureCancelAndLateInput()
+PASS   : console_screen::SettingsControllerMapping::test_directionalNavigationKeepsInputSlot()
+PASS   : console_screen::SettingsControllerMapping::test_dispatchEveryPrimaryAndAlternateInput()
+PASS   : console_screen::SettingsControllerMapping::test_layoutAndOpeningDoNotWrite(desktop)
+PASS   : console_screen::SettingsControllerMapping::test_layoutAndOpeningDoNotWrite(minimum)
+PASS   : console_screen::SettingsControllerMapping::test_removedControllerAndProfileCloseCapture()
+PASS   : console_screen::SettingsControllerMapping::test_returnRestoresMappingOpener()
+PASS   : console_screen::SettingsControllerMapping::cleanupTestCase()
+Totals: 11 passed, 0 failed, 0 skipped, 0 blacklisted, 26444ms
+********* Finished testing of console_screen *********

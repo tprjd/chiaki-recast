@@ -14,12 +14,12 @@ Specification: [PSN sign-in and remaining dialogs](spec.md)
 | [04: Startup reminder choices](issues/04-startup-reminders.md) | resolved | None |
 | [05: Explicit confirmations and registration choice](issues/05-confirmations-and-registration.md) | resolved | None |
 | [06: Disconnect confirmations in both renderer routes](issues/06-disconnect-confirmations.md) | claimed | None |
-| [07: About and renderer notices](issues/07-about-and-renderer-notices.md) | claimed | None |
+| [07: About and renderer notices](issues/07-about-and-renderer-notices.md) | resolved | None |
 | [08: Integrated native acceptance](issues/08-native-acceptance.md) | ready-for-agent | 02, 03, 04, 05, 06, 07 |
 
 ## Execution order
 
-- Tickets 06 and 07 are claimed. Ticket 02 is open and unblocked. The first eligible ticket is 02.
+- Tickets 02 and 06 are claimed. No other ticket is open and unblocked. Ticket 08 waits for 02 and 06.
 - Ticket 08 starts after 02, 03, 04, 05, 06, and 07 are resolved. Ticket 01 is included through 02.
 - Every feature ticket includes its own focused tests. Ticket 08 verifies the integrated production build and cross-flow behavior.
 - Shared-file overlap requires coordination, not extra blocking edges. Allow only one writer to the shared native build cache.
@@ -59,3 +59,11 @@ Final review compares the integration branch with `9b138cc43a5d667933284f1c24e8d
 
 2026-10-21: Resolved [ticket 01](issues/01-psn-setup-and-renewal.md). Merge `d22b035b` integrates `codex/psn-setup` at `c4fff081` without conflicts. PSN setup uses guarded native requests, masked redirect input, persistent results, and explicit closure wording. The [full screen results](evidence/ticket01-screen-full.txt) record 721 passing checks, and the [post-merge PSN results](evidence/ticket01-screen-after-merge.txt) record 10 passing checks. The [controlled native evidence](evidence/ticket01-native-contracts.json) records 125 checks, actual isolated persistence, and visible native input at both required sizes. The normal build matches source `19c81712` before integration and does not prove the final integrated build. Real PSN sign-in, physical controller input, and final integrated acceptance remain in ticket 08. Ticket 02 can now start.
 
+
+2026-10-21: Resolved [ticket 07](issues/07-about-and-renderer-notices.md). Merge `9b249964` integrates `codex/psn-information` at `52b241f4` without conflicts. About and
+renderer notices reuse the refreshed compact dialog, retain all required content,
+and provide one Close action with scrolling and focus restoration. The
+[evidence](evidence/ticket07/README.md) records 23 passing focused checks, 141 passing
+regression checks, five passing post-merge checks, and eight inspected captures.
+Native focus/input/scaling and the Main non-Library fallback remain in ticket 08.
+Integration also removes one extra blank line at the end of the information test file so the diff check passes.

@@ -158,7 +158,19 @@ Item {
     }
 
     function restoreMainFocus() {
-        if (stack.currentItem instanceof MainView) stack.currentItem.restoreFocus();
+        const view = stack.currentItem;
+        if (view instanceof MainView) { view.restoreFocus(); return; }
+        if (!view) return;
+        let item = view.nextItemInFocusChain();
+        for (let count = 0; item && item !== view && count < 256; ++count) {
+            let owner = item;
+            while (owner && owner !== view) owner = owner.parent;
+            if (owner && item.visible && item.enabled && item.activeFocusOnTab) {
+                item.forceActiveFocus(Qt.TabFocusReason);
+                return;
+            }
+            item = item.nextItemInFocusChain();
+        }
     }
 
     function showConfirmDialog(title, text, actionText, callback, rejectCallback = null) {
@@ -172,17 +184,11 @@ Item {
         confirmDialog.open();
     }
 
-    function showInfoDialog(title, text) {
+    function showRendererFallbackDialog(reason) {
         rememberMainFocus();
-        infoDialog.title = title;
-        infoDialog.text = text;
+        infoDialog.reason = reason;
         infoDialog.restoreFocusItem = Window.window.activeFocusItem;
         infoDialog.open();
-    }
-
-    function showRendererFallbackDialog(reason) {
-        showInfoDialog(qsTr("Renderer Fallback"),
-                       qsTr("Vulkan renderer initialization failed and chiaki-ng switched to OpenGL.\n\nReason: %1").arg(reason));
     }
 
     function showPsnReminder() { remindDialog.offerPsnReminder(); }
@@ -488,62 +494,9 @@ Item {
         }
     }
 
-    Dialog {
+    RendererFallbackDialog {
         id: infoDialog
-        property alias text: infoDialogLabel.text
-        property Item restoreFocusItem
-        parent: Overlay.overlay
-        x: Math.round((root.width - width) / 2)
-        y: Math.round((root.height - height) / 2)
-        modal: true
-        Material.roundedScale: Material.MediumScale
-        onOpened: infoDialogLabel.forceActiveFocus(Qt.TabFocusReason)
-        onClosed: {
-            if (restoreFocusItem && restoreFocusItem.visible && restoreFocusItem.enabled)
-                restoreFocusItem.forceActiveFocus(Qt.TabFocusReason);
-            else root.restoreMainFocus();
-            infoDialogLabel.focus = false;
-        }
-
-        Component.onCompleted: {
-            header.horizontalAlignment = Text.AlignHCenter;
-            header.background = null;
-        }
-
-        ColumnLayout {
-            spacing: 20
-
-            Label {
-                id: infoDialogLabel
-                Keys.onEscapePressed: infoDialog.close()
-                Keys.onReturnPressed: infoDialog.close()
-            }
-
-            RowLayout {
-                Layout.alignment: Qt.AlignCenter
-
-                Button {
-                    text: qsTr("OK")
-                    Material.background: Material.accent
-                    flat: true
-                    leftPadding: 50
-                    onClicked: infoDialog.close()
-                    Material.roundedScale: Material.SmallScale
-
-                    Image {
-                        anchors {
-                            left: parent.left
-                            verticalCenter: parent.verticalCenter
-                            leftMargin: 12
-                        }
-                        width: 28
-                        height: 28
-                        sourceSize: Qt.size(width, height)
-                        source: root.controllerButton("cross")
-                    }
-                }
-            }
-        }
+        navigation: root
     }
 
     ConfirmDialog {

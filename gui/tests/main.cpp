@@ -12,6 +12,8 @@ class ConsoleScreenSetup : public QObject
 public slots:
     void qmlEngineAvailable(QQmlEngine *engine)
     {
+        QGuiApplication::setApplicationName(QStringLiteral("Chiaki"));
+        QGuiApplication::setApplicationVersion(QStringLiteral("0.0.0-screen-test"));
 #ifdef Q_OS_WIN
         QGuiApplication::setFont(QFont("Segoe UI"));
 #endif
