@@ -12,14 +12,14 @@ Specification: [PSN sign-in and remaining dialogs](spec.md)
 | [02: Account-ID retrieval for registration](issues/02-registration-account-id.md) | ready-for-agent | 01 |
 | [03: Steam shortcut creation and results](issues/03-steam-shortcut-results.md) | claimed | None |
 | [04: Startup reminder choices](issues/04-startup-reminders.md) | ready-for-agent | None |
-| [05: Explicit confirmations and registration choice](issues/05-confirmations-and-registration.md) | claimed | None |
+| [05: Explicit confirmations and registration choice](issues/05-confirmations-and-registration.md) | resolved | None |
 | [06: Disconnect confirmations in both renderer routes](issues/06-disconnect-confirmations.md) | ready-for-agent | None |
 | [07: About and renderer notices](issues/07-about-and-renderer-notices.md) | ready-for-agent | None |
 | [08: Integrated native acceptance](issues/08-native-acceptance.md) | ready-for-agent | 02, 03, 04, 05, 06, 07 |
 
 ## Execution order
 
-- Tickets 01, 03, 04, 05, 06, and 07 can start immediately. The first eligible ticket is 01.
+- Tickets 01 and 03 are claimed. Tickets 04, 06, and 07 are open and unblocked. The first eligible ticket is 04.
 - Ticket 02 starts after 01 is resolved.
 - Ticket 08 starts after 02, 03, 04, 05, 06, and 07 are resolved. Ticket 01 is included through 02.
 - Every feature ticket includes its own focused tests. Ticket 08 verifies the integrated production build and cross-flow behavior.
@@ -51,4 +51,6 @@ Use the confirmed production-QML, isolated-native, and visible-native test appro
 2026-10-21: The user invoked implement-spec. Implementation is active on `codex/psn-dialog-integration`, based on `9b138cc43a5d667933284f1c24e8dabb721b01ad`. Tickets 01, 03, and 05 are claimed in separate managed worktrees. Each implementer uses TDD and merges the integration tip before handoff. A merger agent integrates completed branches. Ticket 01 currently owns the shared native build cache.
 
 Final review compares the integration branch with `9b138cc43a5d667933284f1c24e8dabb721b01ad`. The approved specification and published tickets are the review contract. No PR or push is part of this request.
+
+2026-10-21: Resolved [ticket 05](issues/05-confirmations-and-registration.md). Merged `codex/psn-confirmations` at `29d55e6c` without conflicts. Confirmations use explicit action labels and initial Cancel focus. Registration has separate automatic, manual, and cancel choices. The [focused confirmation results](evidence/ticket05/confirm-final.txt) and other evidence linked in the ticket record 111 passing checks and no failures. Visible native and integrated acceptance remain in ticket 08.
 
