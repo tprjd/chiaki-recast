@@ -1,0 +1,87 @@
+Start testing: Oct 21 20:53 Central Europe Summer Time
+----------------------------------------------------------
+3/7 Testing: chiaki-stream-input-desktop
+3/7 Test: chiaki-stream-input-desktop
+Command: "C:/Users/david/.codex/worktrees/kbm-capture/chiaki-ng-ui/build/keyboard-mouse-native/gui/tests/chiaki-stream-input-native-tests.exe" "sessionAndFeedback"
+Directory: C:/Users/david/.codex/worktrees/kbm-capture/chiaki-ng-ui/build/keyboard-mouse-native/gui/tests
+"chiaki-stream-input-desktop" start time: Oct 21 20:53 Central Europe Summer Time
+Output:
+----------------------------------------------------------
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki input tests/Chiaki input tests/log/chiaki_session_2026-10-21_20-53-04-666666.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki input tests/Chiaki input tests/log/chiaki_session_2026-10-21_20-53-04-666666.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+<end of output>
+Test time =   0.98 sec
+----------------------------------------------------------
+Test Passed.
+"chiaki-stream-input-desktop" end time: Oct 21 20:53 Central Europe Summer Time
+"chiaki-stream-input-desktop" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/7 Testing: chiaki-stream-input-vulkan
+4/7 Test: chiaki-stream-input-vulkan
+Command: "C:/Users/david/.codex/worktrees/kbm-capture/chiaki-ng-ui/build/keyboard-mouse-native/gui/tests/chiaki-stream-input-native-tests.exe" "sessionAndFeedback"
+Directory: C:/Users/david/.codex/worktrees/kbm-capture/chiaki-ng-ui/build/keyboard-mouse-native/gui/tests
+"chiaki-stream-input-vulkan" start time: Oct 21 20:53 Central Europe Summer Time
+Output:
+----------------------------------------------------------
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki input tests/Chiaki input tests/log/chiaki_session_2026-10-21_20-53-05-867867.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki input tests/Chiaki input tests/log/chiaki_session_2026-10-21_20-53-05-867867.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+<end of output>
+Test time =   1.52 sec
+----------------------------------------------------------
+Test Passed.
+"chiaki-stream-input-vulkan" end time: Oct 21 20:53 Central Europe Summer Time
+"chiaki-stream-input-vulkan" time elapsed: 00:00:01
+----------------------------------------------------------
+
+5/7 Testing: chiaki-gameplay-keyboard-output
+5/7 Test: chiaki-gameplay-keyboard-output
+Command: "C:/Users/david/.codex/worktrees/kbm-capture/chiaki-ng-ui/build/keyboard-mouse-native/gui/tests/chiaki-stream-input-native-tests.exe" "keyboardCapture"
+Directory: C:/Users/david/.codex/worktrees/kbm-capture/chiaki-ng-ui/build/keyboard-mouse-native/gui/tests
+"chiaki-gameplay-keyboard-output" start time: Oct 21 20:53 Central Europe Summer Time
+Output:
+----------------------------------------------------------
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki input tests/Chiaki input tests/log/chiaki_session_2026-10-21_20-53-06-704704.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+<end of output>
+Test time =   0.22 sec
+----------------------------------------------------------
+Test Passed.
+"chiaki-gameplay-keyboard-output" end time: Oct 21 20:53 Central Europe Summer Time
+"chiaki-gameplay-keyboard-output" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/7 Testing: chiaki-gameplay-keyboard-desktop
+6/7 Test: chiaki-gameplay-keyboard-desktop
+Command: "C:/Users/david/.codex/worktrees/kbm-capture/chiaki-ng-ui/build/keyboard-mouse-native/gui/tests/chiaki-stream-input-native-tests.exe" "platformKeyboard"
+Directory: C:/Users/david/.codex/worktrees/kbm-capture/chiaki-ng-ui/build/keyboard-mouse-native/gui/tests
+"chiaki-gameplay-keyboard-desktop" start time: Oct 21 20:53 Central Europe Summer Time
+Output:
+----------------------------------------------------------
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki input tests/Chiaki input tests/log/chiaki_session_2026-10-21_20-53-07-352352.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki input tests/Chiaki input tests/log/chiaki_session_2026-10-21_20-53-07-352352.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+<end of output>
+Test time =   0.97 sec
+----------------------------------------------------------
+Test Passed.
+"chiaki-gameplay-keyboard-desktop" end time: Oct 21 20:53 Central Europe Summer Time
+"chiaki-gameplay-keyboard-desktop" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 21 20:53 Central Europe Summer Time
+
+desktop =   3.47 sec*proc
+

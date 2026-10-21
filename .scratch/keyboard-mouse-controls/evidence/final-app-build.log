@@ -1,0 +1,181 @@
+[1/18] Automatic MOC for target chiaki-gui
+[2/18] Automatic RCC for src/qml/qml.qrc
+[3/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/keyboardmousemapper.cpp.obj
+[4/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/keyboardmousebindings.cpp.obj
+[5/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/streaminputownership.cpp.obj
+[6/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/discoverymanager.cpp.obj
+[7/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/streamsession.cpp.obj
+[8/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/chiaki-gui_autogen/mocs_compilation.cpp.obj
+[9/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/psnaccountid.cpp.obj
+[10/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/psntoken.cpp.obj
+[11/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlmainwindow.cpp.obj
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp: In member function 'AVBufferRef* QmlMainWindow::vulkanHwDeviceCtx()':
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1447:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1447 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+In file included from C:/Users/david/Projects/chiaki-ng-ui/gui/include/qmlmainwindow.h:16,
+                 from C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1447:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1447 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1447:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1447 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1448:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1448 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1448:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1448 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1448:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1448 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1449:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1449 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1449:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1449 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1449:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1449 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1450:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1450 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1450:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1450 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1450:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1450 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1451:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1451 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1451:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1451 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1451:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1451 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1452:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1452 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1452:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1452 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1452:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1452 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1453:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1453 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1453:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1453 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1453:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1453 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1454:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1454 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1454:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1454 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1454:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1454 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+[12/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/settings.cpp.obj
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/settings.cpp: In member function 'void Settings::ExportSettings(QString)':
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/settings.cpp:203:18: warning: ignoring return value of 'virtual bool QFile::open(QIODeviceBase::OpenMode)', declared with attribute 'nodiscard' [-Wunused-result]
+  203 |         file.open(QIODevice::ReadWrite);
+      |         ~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+In file included from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/QFile:1,
+                 from C:/Users/david/Projects/chiaki-ng-ui/gui/src/settings.cpp:5:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfile.h:264:32: note: declared here
+  264 |     QFILE_MAYBE_NODISCARD bool open(OpenMode flags) override;
+      |                                ^~~~
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/settings.cpp: In member function 'void Settings::ExportPlaceboSettings(QString)':
+C:/Users/david/Projects/chiaki-ng-ui/gui/src/settings.cpp:229:18: warning: ignoring return value of 'virtual bool QFile::open(QIODeviceBase::OpenMode)', declared with attribute 'nodiscard' [-Wunused-result]
+  229 |         file.open(QIODevice::ReadWrite);
+      |         ~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfile.h:264:32: note: declared here
+  264 |     QFILE_MAYBE_NODISCARD bool open(OpenMode flags) override;
+      |                                ^~~~
+[13/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/chiaki-gui_autogen/VLDSMZLXNG/qrc_qml.cpp.obj
+[14/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlsettings.cpp.obj
+[15/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/windowsWakeSleep.cpp.obj
+[16/18] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlbackend.cpp.obj
+[17/18] Building CXX object gui/CMakeFiles/chiaki.dir/src/main.cpp.obj
+[18/18] Linking CXX executable gui\chiaki.exe

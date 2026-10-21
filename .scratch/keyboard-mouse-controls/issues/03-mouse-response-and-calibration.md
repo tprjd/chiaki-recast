@@ -16,10 +16,10 @@ This ticket implements Stage 2. It can proceed independently of ticket 04 using 
 - [x] Validate entered and stored values. Reject non-finite and out-of-range values. Preserve the last valid value or use a validated default when stored data is invalid.
 - [x] Apply dead-zone compensation to nonzero movement while retaining an exactly centred idle stick. Keep output bounded and preserve direct response without added acceleration or optional smoothing controls.
 - [ ] Measure and record base gain, default values, sensitivity ranges, compensation limits, idle-return timing, and comparison tolerances. Do not adopt mockup numbers as tested defaults.
-- [ ] Replay equivalent timed movement with different event batching and rendering schedules. Check response against the recorded tolerance, including inversion, small movement, saturation, idle return, and reset.
+- [x] Replay equivalent timed movement with different event batching and rendering schedules. Check response against the recorded tolerance, including inversion, small movement, saturation, idle return, and reset.
 - [ ] Test fine corrections, tracking, fast turns, aiming while moving, and firing while moving in The First Descendant. Record game controller settings, mouse DPI, and report rate where available.
 - [ ] Distinguish conversion faults from the game's response curve and maximum turn speed through repeatable comparisons. Record setting changes between trials.
-- [ ] Verify persistence across restart and recapture, invalid stored data, settings search, keyboard navigation, and the existing minimum settings window size.
+- [x] Verify persistence across restart and recapture, invalid stored data, settings search, keyboard navigation, and the existing minimum settings window size.
 - [ ] Publish calibration evidence tied to the tested source revision and build. Unusable aiming or missing calibration evidence prevents completion.
 
 ## Implementation evidence
@@ -27,4 +27,12 @@ This ticket implements Stage 2. It can proceed independently of ticket 04 using 
 The shared page is available in main Settings and through the live-stream menu, with inline and native settings windows.
 [The evidence record](../mouse-response-evidence.md) identifies the provisional numeric values, synthetic comparisons, and open real mouse and game trials.
 Ticket 03 remains claimed because required game calibration is not available in this environment.
+
+The combined-page checks pass after ticket 04 integration. Preserved logs cover
+the response and binding snapshots, malformed stored values, numeric validation,
+and all 12 synthetic timing comparisons. These comparisons use the recorded
+unsaturated tolerance. They do not establish a tolerance for game aiming.
+The actual Main settings route passes in OpenGL and Vulkan. The final reset
+layout passes at 900 by 600, and its saved image was inspected without a rerun.
+See the [integrated acceptance record](../acceptance.md) for preserved evidence.
 

@@ -1,8 +1,13 @@
 # Built-in keyboard and mouse controls
 
-Status: ready-for-agent
+Status: claimed
 Created: 2026-10-21
 Design approval: The user accepted the settings layout, recommendations, and four implementation stages on 2026-10-21.
+
+Implementation status: Software implementation and selected automated checks are
+available on `codex/keyboard-mouse-integration`. Physical input, mouse calibration,
+and PS5 gameplay acceptance remain open. The [acceptance record](acceptance.md)
+separates completed checks from these release gates.
 
 ## Problem Statement
 

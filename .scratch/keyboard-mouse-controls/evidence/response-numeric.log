@@ -1,0 +1,21 @@
+********* Start testing of MouseResponseTest *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : MouseResponseTest::initTestCase()
+QINFO  : MouseResponseTest::timedTraces() batch=1000 us render=8000 us integral=512000 stick*ms peak=16000 idle=0
+QINFO  : MouseResponseTest::timedTraces() batch=1000 us render=16000 us integral=512000 stick*ms peak=16000 idle=0
+QINFO  : MouseResponseTest::timedTraces() batch=1000 us render=33000 us integral=512000 stick*ms peak=16000 idle=0
+QINFO  : MouseResponseTest::timedTraces() batch=2000 us render=8000 us integral=512000 stick*ms peak=16000 idle=0
+QINFO  : MouseResponseTest::timedTraces() batch=2000 us render=16000 us integral=512000 stick*ms peak=16000 idle=0
+QINFO  : MouseResponseTest::timedTraces() batch=2000 us render=33000 us integral=512000 stick*ms peak=16000 idle=0
+QINFO  : MouseResponseTest::timedTraces() batch=4000 us render=8000 us integral=512000 stick*ms peak=16000 idle=0
+QINFO  : MouseResponseTest::timedTraces() batch=4000 us render=16000 us integral=512000 stick*ms peak=16000 idle=0
+QINFO  : MouseResponseTest::timedTraces() batch=4000 us render=33000 us integral=512000 stick*ms peak=16000 idle=0
+QINFO  : MouseResponseTest::timedTraces() batch=8000 us render=8000 us integral=512000 stick*ms peak=16000 idle=0
+QINFO  : MouseResponseTest::timedTraces() batch=8000 us render=16000 us integral=512000 stick*ms peak=16000 idle=0
+QINFO  : MouseResponseTest::timedTraces() batch=8000 us render=33000 us integral=512000 stick*ms peak=16000 idle=0
+PASS   : MouseResponseTest::timedTraces()
+PASS   : MouseResponseTest::persistenceAndInvalidValues()
+PASS   : MouseResponseTest::responseAndValidation()
+PASS   : MouseResponseTest::cleanupTestCase()
+Totals: 5 passed, 0 failed, 0 skipped, 0 blacklisted, 6ms
+********* Finished testing of MouseResponseTest *********

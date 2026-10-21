@@ -1,0 +1,48 @@
+Start testing: Oct 21 20:31 Central Europe Summer Time
+----------------------------------------------------------
+3/5 Testing: chiaki-stream-input-desktop
+3/5 Test: chiaki-stream-input-desktop
+Command: "C:/Users/david/.codex/worktrees/input-ownership/chiaki-ng-ui/build/input-native/gui/tests/chiaki-stream-input-native-tests.exe"
+Directory: C:/Users/david/.codex/worktrees/input-ownership/chiaki-ng-ui/build/input-native/gui/tests
+"chiaki-stream-input-desktop" start time: Oct 21 20:31 Central Europe Summer Time
+Output:
+----------------------------------------------------------
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki input tests/Chiaki input tests/log/chiaki_session_2026-10-21_20-31-05-858858.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki input tests/Chiaki input tests/log/chiaki_session_2026-10-21_20-31-05-858858.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+<end of output>
+Test time =   1.28 sec
+----------------------------------------------------------
+Test Passed.
+"chiaki-stream-input-desktop" end time: Oct 21 20:31 Central Europe Summer Time
+"chiaki-stream-input-desktop" time elapsed: 00:00:01
+----------------------------------------------------------
+
+4/5 Testing: chiaki-stream-input-vulkan
+4/5 Test: chiaki-stream-input-vulkan
+Command: "C:/Users/david/.codex/worktrees/input-ownership/chiaki-ng-ui/build/input-native/gui/tests/chiaki-stream-input-native-tests.exe"
+Directory: C:/Users/david/.codex/worktrees/input-ownership/chiaki-ng-ui/build/input-native/gui/tests
+"chiaki-stream-input-vulkan" start time: Oct 21 20:31 Central Europe Summer Time
+Output:
+----------------------------------------------------------
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki input tests/Chiaki input tests/log/chiaki_session_2026-10-21_20-31-07-611611.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki input tests/Chiaki input tests/log/chiaki_session_2026-10-21_20-31-07-611611.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+<end of output>
+Test time =   2.01 sec
+----------------------------------------------------------
+Test Passed.
+"chiaki-stream-input-vulkan" end time: Oct 21 20:31 Central Europe Summer Time
+"chiaki-stream-input-vulkan" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 21 20:31 Central Europe Summer Time
+
+desktop =   3.30 sec*proc
+
