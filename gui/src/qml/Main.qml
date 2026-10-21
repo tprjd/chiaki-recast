@@ -39,13 +39,6 @@ Item {
             item.forceActiveFocus(Qt.TabFocusReason);
     }
 
-    function autoRegister(auto, host, ps5, context) {
-        if(auto)
-            Chiaki.autoRegister(context)
-        else
-            showRegistDialog(host, ps5, context);
-    }
-
     function openDisplaySettings() {
         if (livePinHost.blocking) return;
         useSeparateStreamSettingsWindows = preferSeparateStreamSettingsWindows;
@@ -164,13 +157,13 @@ Item {
         if (stack.currentItem instanceof MainView) stack.currentItem.restoreFocus();
     }
 
-    function showConfirmDialog(title, text, callback, rejectCallback = null) {
+    function showConfirmDialog(title, text, actionText, callback, rejectCallback = null) {
         rememberMainFocus();
         confirmDialog.title = title;
         confirmDialog.text = text;
+        confirmDialog.actionText = actionText;
         confirmDialog.callback = callback;
         confirmDialog.rejectCallback = rejectCallback;
-        confirmDialog.newDialogOpen = false;
         confirmDialog.restoreFocusItem = Window.window.activeFocusItem;
         confirmDialog.open();
     }
@@ -188,15 +181,12 @@ Item {
                        qsTr("Vulkan renderer initialization failed and chiaki-ng switched to OpenGL.\n\nReason: %1").arg(reason));
     }
 
+    function showPsnReminder() { remindDialog.offerPsnReminder(); }
+
     function showRemindDialog(title, text, remotePlay, callback) {
+        if (remindDialog.visible) return false;
         rememberMainFocus();
-        remindDialog.title = title;
-        remindDialog.text = text;
-        remindDialog.remotePlay = remotePlay;
-        remindDialog.callback = callback;
-        remindDialog.newDialogOpen = false;
-        remindDialog.restoreFocusItem = Window.window.activeFocusItem;
-        remindDialog.open();
+        return remindDialog.showReminder(title, text, remotePlay, callback, Window.window.activeFocusItem);
     }
 
 
@@ -554,10 +544,17 @@ Item {
 
     ConfirmDialog {
         id: confirmDialog
+        navigation: root
+    }
+
+    RegistrationMethodDialog {
+        id: registrationMethodDialog
+        navigation: root
     }
 
     RemindDialog {
         id: remindDialog
+        navigation: root
     }
 
     Connections {
@@ -604,12 +601,9 @@ Item {
         function onRegistDialogRequested(host, ps5, duid, context) {
             if(!duid)
                 showRegistDialog(host, ps5, context);
-            else
-            {
-                if(ps5)
-                    root.showConfirmDialog(qsTr("Registration Type"), qsTr("Would you like to use automatic registration?"), () => root.autoRegister(true, host, ps5, context), () => root.autoRegister(false, host, ps5, context))
-                else
-                    root.showConfirmDialog(qsTr("Registration Type"), qsTr("Would you like to use automatic registration (must be main PS4 console registered to your PSN)?"), () => root.autoRegister(true, host, ps5, context), () => root.autoRegister(false, host, ps5, context))
+            else {
+                rememberMainFocus();
+                registrationMethodDialog.chooseRegistration(host, ps5, context, Window.window.activeFocusItem);
             }
         }
 

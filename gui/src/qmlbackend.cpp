@@ -2817,6 +2817,13 @@ QString QmlBackend::getExecutable() {
 void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions, const QJSValue &callback, QString steamDir)
 {
     QJSValue cb = callback;
+    shortcutName = shortcutName.trimmed();
+    if (shortcutName.isEmpty())
+    {
+        if (cb.isCallable()) cb.call({QString("Enter a name for the Steam game."), false, true});
+        return;
+    }
+    QString failure;
     QString controller_layout_workshop_id = "3049833406";
     QMap<QString, const QPixmap*> artwork;
     auto landscape = QPixmap(":/icons/steam_landscape.png");
@@ -2839,17 +2846,18 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
             icb.call({infoMessage, true, false});
     };
 
-    auto errorLambda = [callback](const QString &errorMessage) {
+    auto errorLambda = [callback, &failure](const QString &errorMessage) {
+        failure += errorMessage + "\n";
         QJSValue icb = callback;
         if (icb.isCallable())
-            icb.call({errorMessage, false, true});
+            icb.call({errorMessage, false, false});
     };
     SteamTools* steam_tools = new SteamTools(infoLambda, errorLambda, steamDir);
     bool steamExists = steam_tools->steamExists();
-    if(!steamExists)
+    if(!steamExists || !failure.isEmpty())
     {
         if (cb.isCallable())
-            cb.call({QString("[E] Steam does not exist, cannot create Steam Shortcut"), false, true});
+            cb.call({failure.isEmpty() ? QString("[E] Steam does not exist, cannot create Steam Shortcut") : failure, false, true});
         delete steam_tools;
         return;
     }
@@ -2864,6 +2872,12 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
     SteamShortcutEntry newShortcut = steam_tools->buildShortcutEntry(std::move(shortcutName), std::move(executable), std::move(launchOptions), std::move(artwork));
 
     QVector<SteamShortcutEntry> shortcuts = steam_tools->parseShortcuts();
+    if (!failure.isEmpty())
+    {
+        if (cb.isCallable()) cb.call({failure, false, true});
+        delete steam_tools;
+        return;
+    }
     bool found = false;
     for (auto& map : shortcuts) {
         if (map.getExe() == newShortcut.getExe() && map.getLaunchOptions() == newShortcut.getLaunchOptions()) {
@@ -2880,12 +2894,17 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
    //If we didn't find it to update, let's add it to the end
     if (!found) {
         if (cb.isCallable())
-            cb.call({QString("[I] Adding Steam entry ") + QString(newShortcut.getAppName().toStdString().c_str()), false, true});
+            cb.call({QString("[I] Adding Steam entry ") + QString(newShortcut.getAppName().toStdString().c_str()), true, false});
         shortcuts.append(newShortcut);
     }
     steam_tools->updateShortcuts(std::move(shortcuts));
-    steam_tools->updateControllerConfig(newShortcut.getAppName(), std::move(controller_layout_workshop_id));
-    if (!found)
+    if (failure.isEmpty())
+        steam_tools->updateControllerConfig(newShortcut.getAppName(), std::move(controller_layout_workshop_id));
+    if (!failure.isEmpty())
+    {
+        if (cb.isCallable()) cb.call({failure, false, true});
+    }
+    else if (!found)
     {
         if (cb.isCallable())
             cb.call({QString("[I] Added Steam entry: ") + QString(newShortcut.getAppName().toStdString().c_str()), true, true});

@@ -142,7 +142,8 @@ FocusScope {
             restoreFocus();
         };
         navigation.showConfirmDialog(action === "delete" ? qsTr("Delete Console") : qsTr("Unhide Console"),
-            action === "delete" ? qsTr("Are you sure you want to delete this console?") : qsTr("Are you sure you want to unhide this console?"), accept, cancel);
+            action === "delete" ? qsTr("Are you sure you want to delete this console?") : qsTr("Are you sure you want to unhide this console?"),
+            action === "delete" ? qsTr("Delete console") : qsTr("Unhide console"), accept, cancel);
     }
     function close() { navigation.closeDialog(); }
     Keys.onEscapePressed: {
