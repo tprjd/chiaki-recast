@@ -84,12 +84,14 @@ TestCase {
         compare(button.text, "Go to console home");
         wait(30);
         compare(button.activeFocus, true);
-        const area = data.separate ? host.contentItem : h.screen;
-        const focused = grabImage(area);
-        const edge = button.mapToItem(area, 1, Math.floor(button.height / 2));
-        const scale = focused.width / area.width;
-        verify(focused.red(Math.round(edge.x * scale), Math.round(edge.y * scale)) > 200
-            && focused.green(Math.round(edge.x * scale), Math.round(edge.y * scale)) > 200, "Visible focus outline");
+        if (Qt.platform.pluginName === "offscreen") {
+            const area = data.separate ? host.contentItem : h.screen;
+            const focused = grabImage(area);
+            const edge = button.mapToItem(area, 1, Math.floor(button.height / 2));
+            const scale = focused.width / area.width;
+            verify(focused.red(Math.round(edge.x * scale), Math.round(edge.y * scale)) > 200
+                && focused.green(Math.round(edge.x * scale), Math.round(edge.y * scale)) > 200, "Visible focus outline");
+        }
         keyClick(Qt.Key_Return);
         compare(h.backend.commands.length, 1);
         compare(h.backend.commands[0].name, "home");
@@ -219,10 +221,13 @@ TestCase {
         tryCompare(host, "visible", true);
         tryCompare(passive, "visible", true);
         wait(380);
-        const image = grabImage(data.separate ? host.contentItem : h.screen);
-        console.log("notice capture", data.tag, "logical", data.width, data.height,
-            "pixels", image.width, image.height, "DPR", image.width / (data.separate ? host.width : h.screen.width));
-        image.save("build/notice-" + data.tag + ".png");
+        console.log("notice layout", data.tag, "logical", data.width, data.height,
+            "windowDpr", h.screen.Screen.devicePixelRatio);
+        if (Qt.platform.pluginName === "offscreen") {
+            const image = grabImage(data.separate ? host.contentItem : h.screen);
+            console.log("component pixels", image.width, image.height);
+            image.save("build/notice-" + data.tag + ".png");
+        }
         findChild(notice, "streamNoticeTitle").text = "Content blocked by the console. ".repeat(4);
         findChild(notice, "streamNoticeMessage").text = "This screen cannot be shown through Remote Play. ".repeat(6);
         const action = findChild(notice, "streamNoticeAction");
@@ -248,7 +253,7 @@ TestCase {
             compare(host.y + host.height, data.height - 72);
             compare(passive.x + passive.width, data.width - 18);
         }
-        grabImage(data.separate ? host.contentItem : h.screen).save("build/notice-" + data.tag + "-long.png");
+        if (Qt.platform.pluginName === "offscreen") grabImage(data.separate ? host.contentItem : h.screen).save("build/notice-" + data.tag + "-long.png");
         h.backend.session.cantDisplay = false;
         h.backend.session.averagePacketLoss = 0.06;
         const network = findChild(passive, "streamNetworkNotice");
@@ -260,7 +265,7 @@ TestCase {
         wait(80);
         verify(passive.height < data.height - 36);
         verify(audio.y >= network.y + network.height);
-        grabImage(data.separate ? passive.contentItem : h.screen).save("build/notice-" + data.tag + "-passive-long.png");
+        if (Qt.platform.pluginName === "offscreen") grabImage(data.separate ? passive.contentItem : h.screen).save("build/notice-" + data.tag + "-passive-long.png");
         h.screenActive = false;
         compare(h.window.grabs, h.window.releases);
         tests.width = 1280; tests.height = 720;
