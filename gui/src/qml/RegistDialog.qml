@@ -11,8 +11,10 @@ FocusScope {
     objectName: "registrationDialog"
     property var backend: Chiaki
     property var navigation: root
+    property var accountLookup: null
     property var openAccount: function(login, callback) {
-        stack.push(psnLoginDialogComponent, {login: login, callback: callback});
+        dialog.StackView.view.push(psnLoginDialogComponent, {login: login, callback: callback,
+            backend: dialog.backend, navigation: dialog.navigation, lookup: dialog.accountLookup});
     }
     property bool ps5: true
     property alias host: hostField.text
@@ -31,7 +33,7 @@ FocusScope {
     property string resultMessage: ""
     property bool logExpanded: false
     property bool profileInvalid: false
-    property var callbackScope: ({owner: dialog, attempt: 0, terminal: false})
+    property var callbackScope: ({owner: dialog, attempt: 0, accountAttempt: 0, terminal: false})
 
     component SetupField: C.TextField {
         id: input
@@ -74,9 +76,12 @@ FocusScope {
         returningFromAccount = true;
         restoreFocusItem = accountId;
         const scope = callbackScope;
+        const attempt = ++scope.accountAttempt;
         openAccount(login, function(id) {
-            if (!scope.owner || scope.owner.profileInvalid) return;
+            if (!scope.owner || scope.owner.profileInvalid || scope.accountAttempt !== attempt) return false;
+            scope.accountAttempt++;
             scope.owner.applyAccountId(id);
+            return true;
         });
     }
     function applyAccountId(id) {

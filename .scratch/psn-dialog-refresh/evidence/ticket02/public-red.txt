@@ -1,0 +1,17 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::RegistrationAccount::initTestCase()
+QWARN  : console_screen::RegistrationAccount::test_publicLookupExplainsItsService() file:///C:/Users/david/.codex/worktrees/psn-registration/chiaki-ng-ui/gui/src/qml/PSNLoginDialog.qml:428:9: QML Connections: Detected function "onPsnLoginAccountIdDone" in Connections element. This is probably intended to be a signal handler but no signal of the target matches the name.
+QWARN  : console_screen::RegistrationAccount::test_publicLookupExplainsItsService() file:///C:/Users/david/.codex/worktrees/psn-registration/chiaki-ng-ui/gui/src/qml/PSNLoginDialog.qml:428:9: QML Connections: Detected function "onPsnLoginAccountIdError" in Connections element. This is probably intended to be a signal handler but no signal of the target matches the name.
+QCRITICAL: console_screen::RegistrationAccount::test_publicLookupExplainsItsService() qml: Create webengine view failed with error:Error: Qt.createQmlObject(): failed to create object:
+    file:///C:/Users/david/.codex/worktrees/psn-registration/chiaki-ng-ui/gui/src/qml/webView:2:25: module "QtWebEngine" is not installed
+QWARN  : console_screen::RegistrationAccount::test_publicLookupExplainsItsService() file:///C:/Users/david/.codex/worktrees/psn-registration/chiaki-ng-ui/gui/src/qml/PSNLoginDialog.qml:144: TypeError: Property 'openPsnLink' of object Chiaki_QMLTYPE_678(0x1ced2ebca50) is not a function
+QWARN  : console_screen::RegistrationAccount::test_publicLookupExplainsItsService() file:///C:/Users/david/.codex/worktrees/psn-registration/chiaki-ng-ui/gui/src/qml/PSNLoginDialog.qml:115: TypeError: Cannot read property 'loadProgress' of null
+QWARN  : console_screen::RegistrationAccount::test_publicLookupExplainsItsService() file:///C:/Users/david/.codex/worktrees/psn-registration/chiaki-ng-ui/gui/src/qml/PSNLoginDialog.qml:307: TypeError: Cannot read property 'streamerMode' of null
+QWARN  : console_screen::RegistrationAccount::test_publicLookupExplainsItsService() file:///C:/Users/david/.codex/worktrees/psn-registration/chiaki-ng-ui/gui/src/qml/PSNLoginDialog.qml:332: TypeError: Cannot read property 'streamerMode' of null
+QWARN  : console_screen::RegistrationAccount::test_publicLookupExplainsItsService() file:///C:/Users/david/.codex/worktrees/psn-registration/chiaki-ng-ui/gui/src/qml/PSNLoginDialog.qml:389: TypeError: Cannot read property 'streamerMode' of null
+FAIL!  : console_screen::RegistrationAccount::test_publicLookupExplainsItsService() 'function returned false' returned FALSE. ()
+C:\Users\david\.codex\worktrees\psn-registration\chiaki-ng-ui\gui\tests\qml\tst_RegistrationAccount.qml(17) : failure location
+PASS   : console_screen::RegistrationAccount::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 7012ms
+********* Finished testing of console_screen *********

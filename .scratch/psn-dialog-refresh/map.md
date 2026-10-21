@@ -9,7 +9,7 @@ Specification: [PSN sign-in and remaining dialogs](spec.md)
 | Ticket | Status | Blocked by |
 | --- | --- | --- |
 | [01: PSN setup and credential renewal](issues/01-psn-setup-and-renewal.md) | resolved | None |
-| [02: Account-ID retrieval for registration](issues/02-registration-account-id.md) | claimed | 01 |
+| [02: Account-ID retrieval for registration](issues/02-registration-account-id.md) | resolved | 01 |
 | [03: Steam shortcut creation and results](issues/03-steam-shortcut-results.md) | resolved | None |
 | [04: Startup reminder choices](issues/04-startup-reminders.md) | resolved | None |
 | [05: Explicit confirmations and registration choice](issues/05-confirmations-and-registration.md) | resolved | None |
@@ -19,7 +19,7 @@ Specification: [PSN sign-in and remaining dialogs](spec.md)
 
 ## Execution order
 
-- Tickets 02 and 06 are claimed. No other ticket is open and unblocked. Ticket 08 waits for 02 and 06.
+- Ticket 06 is claimed. No other ticket is open and unblocked. Ticket 08 waits for 06.
 - Ticket 08 starts after 02, 03, 04, 05, 06, and 07 are resolved. Ticket 01 is included through 02.
 - Every feature ticket includes its own focused tests. Ticket 08 verifies the integrated production build and cross-flow behavior.
 - Shared-file overlap requires coordination, not extra blocking edges. Allow only one writer to the shared native build cache.
@@ -67,3 +67,7 @@ and provide one Close action with scrolling and focus restoration. The
 regression checks, five passing post-merge checks, and eight inspected captures.
 Native focus/input/scaling and the Main non-Library fallback remain in ticket 08.
 Integration also removes one extra blank line at the end of the information test file so the diff check passes.
+
+2026-10-21: Resolved [ticket 02](issues/02-registration-account-id.md). Registration reuses the PSN sign-in screen and has a separate public lookup form. Public lookup validates responses, recovers after a 30-second timeout, and saves no credentials. Both routes return only to the original valid registration form. The [verification record](evidence/ticket02/verification.md) contains production-screen red/green checks, focused regressions, and inspected captures at both required sizes. The implementation merged integration tip `599413ba` before final verification. Native build and visible native acceptance remain in ticket 08.
+
+2026-10-21: Merge `e71a49c2` integrates ticket 02 from `codex/psn-registration` at `70f6891e` without conflicts. Reviewed evidence records 95 passing post-merge checks. Removed trailing whitespace from one saved red log and an extra blank line from the registration test fixture. The diff check passes. Ticket 06 is the only unresolved dependency of ticket 08.
