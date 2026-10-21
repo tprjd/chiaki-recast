@@ -1,0 +1,10 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::ConnectionWake::initTestCase()
+FAIL!  : console_screen::ConnectionWake::test_oldExitCannotDismissANewWait() 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\connection-wake\chiaki-ng-ui\gui\tests\qml\tst_ConnectionWake.qml(108) : failure location
+QWARN  : console_screen::ConnectionWake::test_oldExitCannotDismissANewWait() file:///C:/Users/david/.codex/worktrees/connection-wake/chiaki-ng-ui/gui/src/qml/ConnectionView.qml:15: TypeError: Cannot read property 'connectionAttempt' of null
+QWARN  : console_screen::ConnectionWake::test_oldExitCannotDismissANewWait() file:///C:/Users/david/.codex/worktrees/connection-wake/chiaki-ng-ui/gui/src/qml/ConnectionView.qml:20: TypeError: Cannot read property 'settings' of null
+PASS   : console_screen::ConnectionWake::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 70ms
+********* Finished testing of console_screen *********

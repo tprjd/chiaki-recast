@@ -23,7 +23,13 @@ TestCase {
             replaceExit: Transition { NumberAnimation { property: "opacity"; to: 0; duration: 200 } }
         }
     }
-    Component { id: blankComponent; Item {} }
+    Component {
+        id: blankComponent
+        FocusScope {
+            property alias action: action
+            Button { id: action; text: "Next action"; focus: true }
+        }
+    }
     function control(harness, name) { return findChild(harness.screen, "connection" + name); }
     function activate(item) { item.forceActiveFocus(Qt.TabFocusReason); keyClick(Qt.Key_Return); }
     function test_startupWaitIdentifiesSelectedConsole() {
@@ -96,7 +102,10 @@ TestCase {
         const stack = createTemporaryObject(stackComponent, testCase, {backend: harness.backend, navigation: harness});
         harness.backend.change({phase: "connecting", waitingForWake: false});
         stack.replace(blankComponent);
+        stack.currentItem.action.forceActiveFocus(Qt.TabFocusReason);
         harness.backend.change({id: "2", phase: "waiting", context: "startup", waitingForWake: true});
+        wait(30);
+        verify(stack.currentItem.action.activeFocus);
         wait(300);
         compare(harness.backend.commands.length, 0);
     }

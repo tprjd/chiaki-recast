@@ -1,0 +1,23 @@
+{
+  "gui/CMakeLists.txt": "d23abde37a9aec4a413a213360e5cff9eda41afb5f9959e8e14690d77946704d",
+  "gui/src/main.cpp": "1d4797cc51583d3d1e15831eb5fa8e1556049e25e8bc7ed19869482ab82b1a57",
+  "gui/src/settings.cpp": "c5d37cf2ba289c7b9f6dd366437c22b5130749303229a382bcda0890e3f05c71",
+  "gui/src/sessionlog.cpp": "978a417804cf77454833bee24e5410b7bd3843bdc750ab192fe52e5203bdc963",
+  "gui/include/streamsession.h": "416c4ddeb204028fd76aad060832734b55117c655d6c9ac4519e6d883b5c4830",
+  "gui/src/streamsession.cpp": "099b9865c1d614f04a38b0f65d2a452496f14affe2a967903abcba0eff9ec87b",
+  "gui/include/qmlmainwindow.h": "cf061c9d91fa7760b4aefbffb1b94e1c5db8448d11ba599b917d705337c98e20",
+  "gui/src/qmlmainwindow.cpp": "3d68a203661b5d66ed2ba1917ba47a9c9ebb8e14136efbf4ad820bf02ea2f3fd",
+  "gui/include/qmlbackend.h": "711eac583c0327a4f3f9bdad50885db0dfef65b8c2094a2096caacfd2c1ba5d8",
+  "gui/src/qmlbackend.cpp": "25607a44639ab916ecf191b92a274af13aa2117cb8920ccefa0252d7e28c417b",
+  "gui/src/qml/Main.qml": "fba3a01d720e15b1c9855a429aac8546729485f6fd2603d007448f88389d4fc1",
+  "gui/src/qml/StreamView.qml": "3ede5ec7a47b1809b55ffd58cbe0577336cfbc89cd9b1361560426e39dc8a237",
+  "gui/src/qml/ConnectionView.qml": "4a8f1c52730df10f720c1365bffe069b932678137bce3ff773eb979a818822cc",
+  "gui/src/qml/qml.qrc": "e30e6bba7350c4f6d68aae5d62dd354b0f3e000ea67afc5fae99a90b4d15259c",
+  "gui/src/qml/ConsoleLibrary.qml": "8dd460ddbbc4e601fedac7bc1426b6a33a01d13b238925442648250419ba3c8a",
+  "gui/src/qml/ConsolePinContent.qml": "87c2575ebae45a74ac97422b30be0513864710fa17f2f90c09d61e92b494c5d5",
+  "gui/src/qml/ConsolePinDialog.qml": "3888834b57436e76de54e19363fc08d862fdae8ef151bbb318b44579ba0860b2",
+  "gui/src/qml/MainView.qml": "c437a633b59ab45a258207aa6a170788565fee2f2f9f9ec3f1c24aebfe37a531",
+  "gui/src/qml/PsnView.qml": "98b45a4c145d0dc2ba23929e949ddff49ac0e87781a2806512e8df8b5d33ab55",
+  "gui/src/psntoken.cpp": "3457e5c9b3b32900a38cb5cc9e05a04e1f9f1c5f684c5694f108ec95eee65c27",
+  "gui/src/qml/AutoConnectView.qml": "318bbe1c97a901ec303bba500dc320916e6ec0c4152dc16c2d62dfbc768e79dc"
+}

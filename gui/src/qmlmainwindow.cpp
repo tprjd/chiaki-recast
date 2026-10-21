@@ -1730,7 +1730,7 @@ renderer_backend_ready:
 
     backend = new QmlBackend(settings, this);
     connect(backend, &QmlBackend::sessionChanged, this, [this, exit_app_on_stream_exit](StreamSession *s) {
-        const bool preserve_input = session == s || !backend->sessionPinRequest().isEmpty()
+        const bool preserve_input = !backend->sessionPinRequest().isEmpty()
             || (s && backend->connectionAttempt().value("route") == "psn");
         session = s;
         stream_session_active.storeRelease(s ? 1 : 0);
