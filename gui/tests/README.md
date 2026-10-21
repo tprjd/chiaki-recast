@@ -110,6 +110,18 @@ focus, and the guided workspace. The live PIN route can use this same content.
 save outcome. `ConsolePin` tests both the form and its guarded library callbacks,
 including target changes and return focus. Test assertions do not print PINs.
 
+`Main.qml` owns one `LiveConsolePinHost` for both PSN and stream routes.
+The backend retains `sessionPinRequest` across the route handoff. Its opaque
+`id` owns `enterPin(id, pin)`, `cancelSessionPin(id)`, and
+`dismissSessionPin(id)`. The request contains no PIN value. Native connection
+progress closes an accepted request. Native cleanup completes cancellation.
+
+`LiveConsolePinHarness` loads this production host with supplied request state.
+`LiveConsolePin` checks validation, leading zeros, masking, privacy, incorrect
+feedback, repeated actions, handoff, replacement, cancellation, return focus,
+and compact-window close. The tests cover 900 by 600 and 1280 by 720 layouts.
+These offscreen checks do not prove visible native focus or display scaling.
+
 `identityOf(host)` returns an opaque profile-scoped identity.
 `resolveTarget(identity)` returns the current `host`, `sourceIndex`, and
 `nickname`, or `null` for a missing, hidden, or ambiguous target.

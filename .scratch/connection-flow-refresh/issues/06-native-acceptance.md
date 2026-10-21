@@ -4,7 +4,7 @@
 
 **Blocked by:** 03: PSN connection progress and recovery; 04: Auto-connect and console wake-up; 05: Live console login PIN across connection routes.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 Parent: Connection progress and console login PIN: guided workspace. Specification commit: `cb1f76e9`.
 Selected design: A on prototype branch `codex/prototype-connection-flows`, implementation commit `7a0111b6`.

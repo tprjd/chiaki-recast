@@ -85,6 +85,7 @@ class QmlBackend : public QObject
     Q_PROPERTY(QmlSettings* settings READ qmlSettings CONSTANT)
     Q_PROPERTY(StreamSession* session READ qmlSession NOTIFY sessionChanged)
     Q_PROPERTY(QVariantMap connectionAttempt READ connectionAttempt NOTIFY connectionAttemptChanged)
+    Q_PROPERTY(QVariantMap sessionPinRequest READ sessionPinRequest NOTIFY sessionPinRequestChanged)
     Q_PROPERTY(QList<QmlController*> controllers READ qmlControllers NOTIFY controllersChanged)
     Q_PROPERTY(bool discoveryEnabled READ discoveryEnabled WRITE setDiscoveryEnabled NOTIFY discoveryEnabledChanged)
     Q_PROPERTY(QVariantList hosts READ hosts NOTIFY hostsChanged)
@@ -161,6 +162,7 @@ public:
 
     void createSession(const StreamSessionConnectInfo &connect_info, const QVariantMap &target = {}, bool continue_attempt = false);
     QVariantMap connectionAttempt() const;
+    QVariantMap sessionPinRequest() const { return session_pin_request; }
 
     void psnSessionStart();
 
@@ -196,7 +198,9 @@ public:
     Q_INVOKABLE bool cancelConnection(const QString &attempt_id);
     Q_INVOKABLE bool dismissConnection(const QString &attempt_id);
     Q_INVOKABLE void sessionGoHome();
-    Q_INVOKABLE void enterPin(const QString &pin);
+    Q_INVOKABLE bool enterPin(const QString &request_id, const QString &pin);
+    Q_INVOKABLE bool cancelSessionPin(const QString &request_id);
+    Q_INVOKABLE bool dismissSessionPin(const QString &request_id);
     Q_INVOKABLE QUrl psnLoginUrl() const;
     Q_INVOKABLE bool checkPsnRedirectURL(const QUrl &url) const;
     Q_INVOKABLE bool handlePsnLoginRedirect(const QUrl &url);
@@ -227,6 +231,7 @@ public:
 signals:
     void sessionChanged(StreamSession *session);
     void connectionAttemptChanged();
+    void sessionPinRequestChanged();
     void psnConnect(StreamSession *session, const QString &duid, const bool &ps5, quint64 attempt_id);
     void showPsnView();
     void connectStateChanged();
@@ -323,6 +328,10 @@ private:
     QVariantMap connection_target;
     bool connection_cancelled = false;
     bool connection_dismissed = false;
+    QVariantMap session_pin_request;
+    quint64 session_pin_generation = 0;
+    bool session_pin_auto_submitted = false;
+    bool session_pin_accepted = false;
     bool psn_worker_pending = false;
     bool psn_session_started = false;
     QPointer<PSNToken> connection_token;

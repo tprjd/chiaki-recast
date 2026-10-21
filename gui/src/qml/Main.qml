@@ -47,6 +47,7 @@ Item {
     }
 
     function openDisplaySettings() {
+        if (livePinHost.blocking) return;
         useSeparateStreamSettingsWindows = preferSeparateStreamSettingsWindows;
         const loader = useSeparateStreamSettingsWindows ? separateDisplaySettingsLoader : displaySettingsLoader;
         if(loader.status == Loader.Ready)
@@ -66,6 +67,7 @@ Item {
         }
     }
     function openPlaceboSettings() {
+        if (livePinHost.blocking) return;
         if (!displaySettingsRect.opacity && !placeboSettingsRect.opacity && !colorMappingSettingsRect.opacity)
             useSeparateStreamSettingsWindows = preferSeparateStreamSettingsWindows;
         const loader = useSeparateStreamSettingsWindows ? separatePlaceboSettingsLoader : placeboSettingsLoader;
@@ -204,6 +206,7 @@ Item {
     }
 
     function showSettingsDialog() {
+        if (livePinHost.blocking) return;
         stack.push(settingsDialogComponent);
     }
 
@@ -285,6 +288,7 @@ Item {
 
     StackView {
         id: stack
+        enabled: !livePinHost.blocking
         objectName: "mainNavigation"
         anchors.fill: parent
         hoverEnabled: false
@@ -308,6 +312,11 @@ Item {
                 duration: 200
             }
         }
+    }
+
+    LiveConsolePinHost {
+        id: livePinHost
+        anchors.fill: parent
     }
 
     Rectangle {

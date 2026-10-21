@@ -25,6 +25,8 @@
     <file>ProfileDialog.qml</file>
     <file>ConsolePinDialog.qml</file>
     <file>ConsolePinContent.qml</file>
+    <file>LiveConsolePinContent.qml</file>
+    <file>LiveConsolePinHost.qml</file>
     <file>PSNLoginDialog.qml</file>
     <file>PSNTokenDialog.qml</file>
     <file>ControllerMappingDialog.qml</file>

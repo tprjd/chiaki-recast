@@ -4,7 +4,7 @@
 
 **Blocked by:** 01: Local connection progress, cancellation, and retry.
 
-**Status:** claimed
+**Status:** resolved
 
 Parent: Connection progress and console login PIN: guided workspace. Specification commit: `cb1f76e9`.
 Selected design: A on prototype branch `codex/prototype-connection-flows`, implementation commit `7a0111b6`.
@@ -16,7 +16,7 @@ Selected design: A on prototype branch `codex/prototype-connection-flows`, imple
 - [x] Cancel uses the existing PSN stop behavior once and respects genuine non-cancellable stages. Explain disabled cancellation. Keyboard, controller, right-click, and Ctrl+Q inputs follow the same decision.
 - [x] Cancelling remains visible until cleanup completes. Show cancelled with Back to consoles. Late PSN success, failure, registration, or PIN events cannot reopen the old route or affect another attempt.
 - [x] Data connection completion hands off to the existing session/video waiting condition. It must not show video ready before a frame, except for the existing video-disabled mode. Success never adds an extra confirmation step.
-- [ ] PIN requests still reach the current live-PIN presentation while 05 is pending. The PSN-to-stream transition must not lose a pending PIN request or open duplicate prompts.
+- [x] PIN requests still reach the current live-PIN presentation while 05 is pending. The PSN-to-stream transition must not lose a pending PIN request or open duplicate prompts.
 - [x] Private console data and diagnostics follow streamer mode. Text wraps, keyboard/controller focus stays visible, and return focus is valid at both target sizes.
 - [x] Production-QML tests drive all native PSN states and transitions, conditional registration, disabled cancellation, cleanup, persistent errors, retry, route handoff, video-disabled mode, stale events, and profile/target changes.
 - [x] Focused isolated native contract checks verify PSN event ownership, cancel dispatch, registration-only retry intent, and the PSN-to-stream handoff. The normal build and affected routing regressions pass.
@@ -49,10 +49,8 @@ profile snapshots and apply their results only to that profile generation.
 
 The stream view retains ownership after PSN handoff. A later error, cancellation,
 or retry therefore cannot destroy the active attempt by replacing its host.
-The earlier PIN signal and prompt remain functional in this branch. The pending
-PIN criterion stays unchecked until ticket 05 proves its Main-owned prompt through
-the integrated PSN-to-stream transition. Status remains claimed for that check.
-The parent agent will resolve this ticket after that proof.
+The earlier PIN signal and prompt remained functional before ticket 05. The
+integrated PIN continuity proof below completes that criterion.
 
 Verification completed:
 
@@ -98,3 +96,12 @@ No real PSN account, console, network connection, hardware PIN acceptance, video
 transport, visible native input, physical controller, or native DPR check is
 claimed. Ticket 05 owns pending PIN presentation continuity. Ticket 06 owns full
 visible acceptance and hardware limits. No map or specification file changed.
+
+### Integrated PIN continuity
+
+Ticket 05 is integrated at `f54346ae`. Its Main-owned prompt keeps the same
+request and field through the PSN-to-StreamView transition. Both [inline native
+checks](../evidence/ticket05-native-inline.json) and [separate hidden-window
+checks](../evidence/ticket05-native-separate.json) passed 99 assertions, including
+prompt continuity and balanced input capture. This resolves the remaining PIN
+criterion. Visible native focus, input delivery, and DPR checks remain with 06.

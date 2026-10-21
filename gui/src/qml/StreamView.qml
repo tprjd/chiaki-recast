@@ -40,6 +40,7 @@ Item {
     }
 
     function releaseInput() {
+        if (!restoreFocusItems.length) return;
         Chiaki.window.releaseInput();
         let item = restoreFocusItems.pop();
         if (item && item.visible)
@@ -68,10 +69,13 @@ Item {
         separateDialogY = Math.round(hostWindow.y + (hostWindow.height - height) / 2);
     }
 
-    StackView.onActivating: Chiaki.window.keepVideo = true
+    StackView.onActivating: { Chiaki.window.keepVideo = true; connectionView.retiring = false; }
+    StackView.onDeactivating: connectionView.retiring = true
     StackView.onDeactivated: Chiaki.window.keepVideo = false
 
-    Component.onCompleted: updateSeparateMenuGeometry()
+    Component.onCompleted: {
+        updateSeparateMenuGeometry();
+    }
     Component.onDestruction: if (connectionInputGrabbed) Chiaki.window.releaseInput()
     onWidthChanged: updateSeparateMenuGeometry()
     onHeightChanged: updateSeparateMenuGeometry()
@@ -93,7 +97,7 @@ Item {
 
         property real lastToggleTime: 0
         function toggle() {
-            if (view.managedConnection && Chiaki.connectionAttempt.phase !== "ready")
+            if (Chiaki.sessionPinRequest.id || view.managedConnection && Chiaki.connectionAttempt.phase !== "ready")
                 return;
             var now = Date.now();
             if (now - lastToggleTime < 200)
@@ -1103,123 +1107,6 @@ Item {
         }
     }
 
-    Dialog {
-        id: sessionPinDialog
-        parent: Overlay.overlay
-        x: Math.round((root.width - width) / 2)
-        y: Math.round((root.height - height) / 2)
-        title: qsTr("Console Login PIN")
-        modal: true
-        closePolicy: Popup.NoAutoClose
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        onAboutToShow: {
-            standardButton(Dialog.Ok).enabled = Qt.binding(function() {
-                return pinField.acceptableInput;
-            });
-            view.grabInput(pinField);
-        }
-        onClosed: view.releaseInput()
-        onAccepted: Chiaki.enterPin(pinField.text)
-        onRejected: Chiaki.stopSession(false)
-        Material.roundedScale: Material.MediumScale
-
-        TextField {
-            id: pinField
-            echoMode: Chiaki.settings.streamerMode ? TextInput.Password : TextInput.Normal
-            implicitWidth: 200
-            validator: RegularExpressionValidator { regularExpression: /[0-9]{4}/ }
-            Keys.onReturnPressed: {
-                if(sessionPinDialog.standardButton(Dialog.Ok).enabled)
-                    sessionPinDialog.standardButton(Dialog.Ok).clicked()
-            }
-        }
-    }
-
-    Window {
-        id: separateSessionPinWindow
-        readonly property int dialogWidth: 360
-        readonly property int dialogHeight: 220
-        visible: false
-        flags: Qt.Dialog | Qt.FramelessWindowHint
-        color: "transparent"
-        transientParent: view.hostWindow
-        modality: Qt.ApplicationModal
-        x: separateDialogX
-        y: separateDialogY
-        width: dialogWidth
-        height: dialogHeight
-
-        onVisibleChanged: {
-            if (visible) {
-                separatePinField.text = "";
-                view.updateSeparateDialogGeometry(width, height);
-                requestActivate();
-                view.grabInput(separatePinField);
-            } else {
-                view.releaseInput();
-            }
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            radius: 12
-            color: Material.background
-            border.color: "#666666"
-            border.width: 1
-        }
-
-        ColumnLayout {
-            anchors {
-                fill: parent
-                margins: 24
-            }
-
-            Label {
-                Layout.alignment: Qt.AlignCenter
-                text: qsTr("Console Login PIN")
-                font.bold: true
-                font.pixelSize: 24
-            }
-
-            TextField {
-                id: separatePinField
-                Layout.topMargin: 20
-                Layout.fillWidth: true
-                echoMode: Chiaki.settings.streamerMode ? TextInput.Password : TextInput.Normal
-                validator: RegularExpressionValidator { regularExpression: /[0-9]{4}/ }
-                Keys.onReturnPressed: if (acceptableInput) separatePinOkButton.clicked()
-                Keys.onEscapePressed: separateSessionPinWindow.visible = false
-            }
-
-            RowLayout {
-                Layout.topMargin: 20
-                Layout.alignment: Qt.AlignRight
-                spacing: 16
-
-                Button {
-                    text: qsTr("Cancel")
-                    Keys.onReturnPressed: clicked()
-                    onClicked: {
-                        separateSessionPinWindow.visible = false;
-                        Chiaki.stopSession(false);
-                    }
-                }
-
-                Button {
-                    id: separatePinOkButton
-                    text: qsTr("OK")
-                    enabled: separatePinField.acceptableInput
-                    Keys.onReturnPressed: clicked()
-                    onClicked: {
-                        const pin = separatePinField.text;
-                        separateSessionPinWindow.visible = false;
-                        Chiaki.enterPin(pin);
-                    }
-                }
-            }
-        }
-    }
-
     Timer {
         id: closeTimer
         interval: 2000
@@ -1231,8 +1118,9 @@ Item {
 
         function onSessionChanged() {
             if (view.managedConnection) {
-                view.connectionInputGrabbed = false;
-                if (connectionView.visible) {
+                if (!Chiaki.sessionPinRequest.id
+                        && (!Chiaki.session || Chiaki.connectionAttempt.route !== "psn")) view.connectionInputGrabbed = false;
+                if (connectionView.visible && !view.connectionInputGrabbed) {
                     Chiaki.window.grabInput();
                     view.connectionInputGrabbed = true;
                 }
@@ -1256,18 +1144,12 @@ Item {
             closeTimer.start();
         }
 
-        function onSessionPinDialogRequested() {
-            if (sessionPinDialog.opened || separateSessionPinWindow.visible)
-                return;
-            menuController.close();
-            if (useSeparateMenuWindow)
-                separateSessionPinWindow.visible = true;
-            else
-                sessionPinDialog.open();
+        function onSessionPinRequestChanged() {
+            if (Chiaki.sessionPinRequest.id) menuController.close();
         }
 
         function onSessionStopDialogRequested() {
-            if (sessionStopDialog.opened || separateSessionStopWindow.visible)
+            if (Chiaki.sessionPinRequest.id || sessionStopDialog.opened || separateSessionStopWindow.visible)
                 return;
             menuController.close();
             if (useSeparateMenuWindow)
@@ -1286,7 +1168,7 @@ Item {
         }
 
         function onMenuRequested() {
-            if (sessionPinDialog.opened || sessionStopDialog.opened || separateSessionPinWindow.visible || separateSessionStopWindow.visible)
+            if (Chiaki.sessionPinRequest.id || sessionStopDialog.opened || separateSessionStopWindow.visible)
                 return;
             menuController.toggle();
         }

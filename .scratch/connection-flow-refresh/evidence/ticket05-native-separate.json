@@ -1,0 +1,17 @@
+{
+  "allPassed": true,
+  "cancelButtonEscapeAndWindowClose": true,
+  "cancelReentryScopesNativeStop": true,
+  "checks": 99,
+  "hiddenHandoffCaptureCount": 2,
+  "hiddenLocalProgressCaptures": 0,
+  "hiddenStreamProgressCaptures": 1,
+  "mode": "separate-hidden",
+  "profileInvalidation": true,
+  "psnPromptContinuityAndCaptureBalance": true,
+  "savedPinRejectionCorrectionAndAcceptedHandoff": true,
+  "staleOwnershipAndSubmitReentry": true,
+  "transport": "Controlled native events and transport calls, no hardware",
+  "limitations": "Hidden native windows; visible focus, native input delivery, DPR and hardware remain ticket06 checks",
+  "helperRoot": "C:\\Users\\david\\.cache\\chiaki-ui-native\\live-pin-contract-prep01"
+}

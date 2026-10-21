@@ -56,7 +56,7 @@ FocusScope {
         navigation.showMainView();
     }
     function focusAction() {
-        if (!visible || leaving || commandPending || retiring) return;
+        if (!visible || retiring || leaving || commandPending) return;
         if (canRetry) retryButton.forceActiveFocus(Qt.TabFocusReason);
         else if (terminal && !attempt.cleanupPending) backButton.forceActiveFocus(Qt.TabFocusReason);
         else if (canCancel) cancelButton.forceActiveFocus(Qt.TabFocusReason);
@@ -90,7 +90,7 @@ FocusScope {
     Component.onCompleted: { ownedAttemptId = attempt.id || ""; Qt.callLater(focusAction); }
     Component.onDestruction: if (managesAttempt && !leaving && ownedAttemptId && ownedAttemptId === attempt.id && phase !== "ready") backend.dismissConnection(ownedAttemptId)
     Keys.onEscapePressed: terminal ? back() : cancel()
-    Shortcut { sequence: "Ctrl+Q"; enabled: view.visible; onActivated: view.terminal ? view.back() : view.cancel() }
+    Shortcut { sequence: "Ctrl+Q"; enabled: view.visible && view.enabled; onActivated: view.terminal ? view.back() : view.cancel() }
     MouseArea { anchors.fill: parent; acceptedButtons: Qt.RightButton; onClicked: view.terminal ? view.back() : view.cancel() }
     Connections { target: view.Window.window; function onActiveFocusItemChanged() { Qt.callLater(view.ensureFocusVisible); } }
 
