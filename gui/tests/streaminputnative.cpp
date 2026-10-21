@@ -406,6 +406,9 @@ private:
 private slots:
     void resetKeyboardMouseDefaults()
     {
+#ifndef Q_OS_WIN
+        QSKIP("Mouse camera mode is available on Windows.");
+#endif
         if (QGuiApplication::platformName() == "offscreen") QSKIP("Requires the native main-window renderer.");
         TestSettingsProfile profile;
         Settings settings(profile.name);
