@@ -403,6 +403,9 @@ private:
 private slots:
     void keyboardMouseSettingsRoute()
     {
+#ifndef Q_OS_WIN
+        QSKIP("Mouse camera mode is available on Windows.");
+#endif
         if (QGuiApplication::platformName() == "offscreen") QSKIP("Requires a desktop renderer.");
         TestSettingsProfile profile;
         Settings settings(profile.name);
@@ -443,6 +446,9 @@ private slots:
     }
     void mouseResponseRecapture()
     {
+#ifndef Q_OS_WIN
+        QSKIP("Mouse camera mode is available on Windows.");
+#endif
         TestSettingsProfile profile;
         Settings settings(profile.name);
         settings.SetMouseCameraEnabled(true);

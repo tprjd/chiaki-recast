@@ -6,6 +6,7 @@ Ticket 03 remains incomplete until real mouse and The First Descendant trials es
 ## Source and build
 
 The implementation starts at integration revision `70ecfdd26c1e2053a9297081dd46c1ef6c8cff66`.
+Tested standalone response implementation: `9d8fd01d4bd4c9c8fea3eb7793d0060c6fe82438`.
 The response implementation commit contains this record and the maintained checks below.
 Build directory: `build/keyboard-mouse-native` in the response worktree.
 Configuration: Release, GCC 16.2.0 UCRT64, Qt 6.11.2, SDL controller support, Steam shortcuts, and tests enabled.
