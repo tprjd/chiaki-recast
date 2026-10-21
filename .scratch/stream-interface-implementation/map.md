@@ -13,7 +13,7 @@ published in `fff89373`. Keep the prototype out of production integration.
 
 | Ticket | Delivers | Blocked by | Status |
 | --- | --- | --- | --- |
-| [01: Share the existing stream interface](issues/01-share-stream-interface.md) | Shared production menu and one test boundary, with current behavior preserved | None | ready-for-agent |
+| [01: Share the existing stream interface](issues/01-share-stream-interface.md) | Shared production menu and one test boundary, with current behavior preserved | None | claimed |
 | [02: Build the approved A toolbar](issues/02-stream-toolbar.md) | Complete descriptive toolbar, pop-ups, settings navigation, audio, Resume, and Disconnect | 01 | ready-for-agent |
 | [03: Build the approved A statistics overlay](issues/03-stream-statistics.md) | Compact six-value readout with real bindings and visibility rules | 01 | ready-for-agent |
 | [04: Build the approved A session notices](issues/04-session-notices.md) | Network, blocked-content, and disabled-media notices with actions and cleanup | 01 | ready-for-agent |
@@ -53,4 +53,7 @@ limits explicitly. Browser prototype checks do not establish native acceptance.
 
 ## Comments
 
-No implementation has started. No parent issue has been closed or modified.
+Implementation started on `codex/stream-interface-integration` from production
+commit `746218af`. The approved specification and tickets are recorded in
+`401559f7`. The prototype remains on its reference branch. Ticket 01 is claimed.
+The parent issue remains open.
