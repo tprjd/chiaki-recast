@@ -1,0 +1,21 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::ConsoleDetails::initTestCase()
+PASS   : console_screen::ConsoleDetails::test_detailsOmitUnavailableFields()
+PASS   : console_screen::ConsoleDetails::test_detailsShowAvailableFieldsWithoutConnecting()
+PASS   : console_screen::ConsoleDetails::test_hostMarkupRemainsLiteralText()
+PASS   : console_screen::ConsoleDetails::test_keyboardOpenAndCloseRestoresFocusWithoutConnecting()
+PASS   : console_screen::ConsoleDetails::test_liveDetailsFollowIdentityAndCloseWhenTargetIsLost(removed)
+PASS   : console_screen::ConsoleDetails::test_liveDetailsFollowIdentityAndCloseWhenTargetIsLost(ambiguous)
+PASS   : console_screen::ConsoleDetails::test_liveDetailsFollowIdentityAndCloseWhenTargetIsLost(hidden)
+PASS   : console_screen::ConsoleDetails::test_liveDetailsFollowIdentityAndCloseWhenTargetIsLost(profile)
+PASS   : console_screen::ConsoleDetails::test_longDetailsRemainInsideNarrowWindow()
+PASS   : console_screen::ConsoleDetails::test_removalRestoresFocusToRemainingControl(remaining-card)
+PASS   : console_screen::ConsoleDetails::test_removalRestoresFocusToRemainingControl(empty-library)
+PASS   : console_screen::ConsoleDetails::test_streamerModeMasksEveryPrivateIdentifier(local)
+PASS   : console_screen::ConsoleDetails::test_streamerModeMasksEveryPrivateIdentifier(manual-address-name)
+PASS   : console_screen::ConsoleDetails::test_streamerModeMasksEveryPrivateIdentifier(missing-name)
+PASS   : console_screen::ConsoleDetails::test_streamerModeMasksEveryPrivateIdentifier(psn)
+PASS   : console_screen::ConsoleDetails::cleanupTestCase()
+Totals: 17 passed, 0 failed, 0 skipped, 0 blacklisted, 21473ms
+********* Finished testing of console_screen *********

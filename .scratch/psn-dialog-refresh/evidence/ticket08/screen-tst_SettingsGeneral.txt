@@ -1,0 +1,20 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::SettingsGeneral::initTestCase()
+PASS   : console_screen::SettingsGeneral::test_constructionDoesNotChangeSettings()
+PASS   : console_screen::SettingsGeneral::test_generalActions()
+PASS   : console_screen::SettingsGeneral::test_generalChoices(disconnect)
+PASS   : console_screen::SettingsGeneral::test_generalChoices(suspend)
+PASS   : console_screen::SettingsGeneral::test_generalChoices(media)
+PASS   : console_screen::SettingsGeneral::test_generalChoices(shortcut1)
+PASS   : console_screen::SettingsGeneral::test_generalChoices(shortcut2)
+PASS   : console_screen::SettingsGeneral::test_generalChoices(shortcut3)
+PASS   : console_screen::SettingsGeneral::test_generalChoices(shortcut4)
+PASS   : console_screen::SettingsGeneral::test_generalConditionsAndPrivacy()
+PASS   : console_screen::SettingsGeneral::test_popupEscapeDoesNotCloseSettings()
+PASS   : console_screen::SettingsGeneral::test_responsiveGeneral(desktop)
+PASS   : console_screen::SettingsGeneral::test_responsiveGeneral(minimum)
+PASS   : console_screen::SettingsGeneral::test_sidebarAndGeneralOpenWithoutWrites()
+PASS   : console_screen::SettingsGeneral::cleanupTestCase()
+Totals: 16 passed, 0 failed, 0 skipped, 0 blacklisted, 2733ms
+********* Finished testing of console_screen *********

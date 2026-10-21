@@ -1,0 +1,28 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::ConsolePin::initTestCase()
+PASS   : console_screen::ConsolePin::test_cancelDiscardsInput(button)
+PASS   : console_screen::ConsolePin::test_cancelDiscardsInput(escape)
+PASS   : console_screen::ConsolePin::test_expandedTextRemainsReachable(900)
+PASS   : console_screen::ConsolePin::test_expandedTextRemainsReachable(1280)
+PASS   : console_screen::ConsolePin::test_invalidInputCannotSubmit(0)
+PASS   : console_screen::ConsolePin::test_invalidInputCannotSubmit(1)
+PASS   : console_screen::ConsolePin::test_invalidInputCannotSubmit(2)
+PASS   : console_screen::ConsolePin::test_invalidInputCannotSubmit(3)
+PASS   : console_screen::ConsolePin::test_invalidLibraryTargetNeverShowsSuccess(removed)
+PASS   : console_screen::ConsolePin::test_invalidLibraryTargetNeverShowsSuccess(remove-return)
+PASS   : console_screen::ConsolePin::test_invalidLibraryTargetNeverShowsSuccess(hidden)
+PASS   : console_screen::ConsolePin::test_invalidLibraryTargetNeverShowsSuccess(ambiguous)
+PASS   : console_screen::ConsolePin::test_invalidLibraryTargetNeverShowsSuccess(profile)
+PASS   : console_screen::ConsolePin::test_invalidLibraryTargetNeverShowsSuccess(profile-return)
+PASS   : console_screen::ConsolePin::test_invalidLibraryTargetNeverShowsSuccess(obsolete)
+PASS   : console_screen::ConsolePin::test_invalidLibraryTargetNeverShowsSuccess(rejected)
+PASS   : console_screen::ConsolePin::test_librarySaveFollowsTargetAfterReorderAndRestoresOpener()
+PASS   : console_screen::ConsolePin::test_rejectedSaveCannotShowSuccessOrSaveTwice()
+PASS   : console_screen::ConsolePin::test_removedFormInvalidatesTheManagementCallback()
+PASS   : console_screen::ConsolePin::test_revealAndPrivacyAlwaysHidePrivateValues()
+PASS   : console_screen::ConsolePin::test_saveIsConfirmedOnceAndClearsInput()
+PASS   : console_screen::ConsolePin::test_sidebarActionExpandsForLongLabels()
+PASS   : console_screen::ConsolePin::cleanupTestCase()
+Totals: 24 passed, 0 failed, 0 skipped, 0 blacklisted, 9829ms
+********* Finished testing of console_screen *********

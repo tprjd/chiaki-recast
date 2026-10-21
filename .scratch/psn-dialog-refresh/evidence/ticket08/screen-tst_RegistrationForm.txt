@@ -1,0 +1,26 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::RegistrationForm::initTestCase()
+PASS   : console_screen::RegistrationForm::test_accountRoutesKeepDetails(sign-in)
+PASS   : console_screen::RegistrationForm::test_accountRoutesKeepDetails(public-lookup)
+PASS   : console_screen::RegistrationForm::test_consoleTargets(ps5)
+PASS   : console_screen::RegistrationForm::test_consoleTargets(ps4-before7)
+PASS   : console_screen::RegistrationForm::test_consoleTargets(ps4-before8)
+PASS   : console_screen::RegistrationForm::test_consoleTargets(ps4-current)
+PASS   : console_screen::RegistrationForm::test_hostnameAndOptionalPin()
+PASS   : console_screen::RegistrationForm::test_invalidDetails(address)
+PASS   : console_screen::RegistrationForm::test_invalidDetails(identity)
+PASS   : console_screen::RegistrationForm::test_invalidDetails(online-identity)
+PASS   : console_screen::RegistrationForm::test_invalidDetails(short-pin)
+PASS   : console_screen::RegistrationForm::test_invalidDetails(short-console-pin)
+PASS   : console_screen::RegistrationForm::test_nativeRejectionLeavesFormEditable()
+PASS   : console_screen::RegistrationForm::test_navigationDoesNotSubmit(back)
+PASS   : console_screen::RegistrationForm::test_navigationDoesNotSubmit(cancel)
+PASS   : console_screen::RegistrationForm::test_navigationDoesNotSubmit(escape)
+PASS   : console_screen::RegistrationForm::test_popupEscapeAndTextEditing()
+PASS   : console_screen::RegistrationForm::test_privacyAndLayout(normal)
+PASS   : console_screen::RegistrationForm::test_privacyAndLayout(minimum)
+PASS   : console_screen::RegistrationForm::test_routeDefaultsAndSavedAccount()
+PASS   : console_screen::RegistrationForm::cleanupTestCase()
+Totals: 22 passed, 0 failed, 0 skipped, 0 blacklisted, 2690ms
+********* Finished testing of console_screen *********

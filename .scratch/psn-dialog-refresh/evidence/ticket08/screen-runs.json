@@ -1,0 +1,192 @@
+[
+  {
+    "Suite": "tst_Confirmations",
+    "ExitCode": 0,
+    "Seconds": 29.69
+  },
+  {
+    "Suite": "tst_ConnectionLocal",
+    "ExitCode": 0,
+    "Seconds": 4.44
+  },
+  {
+    "Suite": "tst_ConnectionPsn",
+    "ExitCode": 0,
+    "Seconds": 13.05
+  },
+  {
+    "Suite": "tst_ConnectionWake",
+    "ExitCode": 0,
+    "Seconds": 4.23
+  },
+  {
+    "Suite": "tst_ConsoleAppearance",
+    "ExitCode": 0,
+    "Seconds": 6.3
+  },
+  {
+    "Suite": "tst_ConsoleDetails",
+    "ExitCode": 0,
+    "Seconds": 21.57
+  },
+  {
+    "Suite": "tst_ConsoleLibrary",
+    "ExitCode": 0,
+    "Seconds": 0.32
+  },
+  {
+    "Suite": "tst_ConsoleManagement",
+    "ExitCode": 0,
+    "Seconds": 20.44
+  },
+  {
+    "Suite": "tst_ConsoleNavigation",
+    "ExitCode": 0,
+    "Seconds": 30.5
+  },
+  {
+    "Suite": "tst_ConsolePin",
+    "ExitCode": 0,
+    "Seconds": 9.94
+  },
+  {
+    "Suite": "tst_ConsoleSearch",
+    "ExitCode": 0,
+    "Seconds": 0.45
+  },
+  {
+    "Suite": "tst_Disconnect",
+    "ExitCode": 0,
+    "Seconds": 23.99
+  },
+  {
+    "Suite": "tst_InformationDialogs",
+    "ExitCode": 0,
+    "Seconds": 17.6
+  },
+  {
+    "Suite": "tst_LiveConsolePin",
+    "ExitCode": 0,
+    "Seconds": 0.47
+  },
+  {
+    "Suite": "tst_ManualHost",
+    "ExitCode": 0,
+    "Seconds": 12.44
+  },
+  {
+    "Suite": "tst_PsnSetup",
+    "ExitCode": 0,
+    "Seconds": 0.12
+  },
+  {
+    "Suite": "tst_RegistrationAccount",
+    "ExitCode": 0,
+    "Seconds": 32.99
+  },
+  {
+    "Suite": "tst_RegistrationForm",
+    "ExitCode": 0,
+    "Seconds": 2.79
+  },
+  {
+    "Suite": "tst_RegistrationMethod",
+    "ExitCode": 0,
+    "Seconds": 3.19
+  },
+  {
+    "Suite": "tst_RegistrationResults",
+    "ExitCode": 0,
+    "Seconds": 0.58
+  },
+  {
+    "Suite": "tst_Reminders",
+    "ExitCode": 0,
+    "Seconds": 15.82
+  },
+  {
+    "Suite": "tst_SettingsAudio",
+    "ExitCode": 0,
+    "Seconds": 2.99
+  },
+  {
+    "Suite": "tst_SettingsColorMapping",
+    "ExitCode": 0,
+    "Seconds": 16.93
+  },
+  {
+    "Suite": "tst_SettingsConfig",
+    "ExitCode": 0,
+    "Seconds": 1.41
+  },
+  {
+    "Suite": "tst_SettingsConsoles",
+    "ExitCode": 0,
+    "Seconds": 1.06
+  },
+  {
+    "Suite": "tst_SettingsControllerMapping",
+    "ExitCode": 0,
+    "Seconds": 26.48
+  },
+  {
+    "Suite": "tst_SettingsControllers",
+    "ExitCode": 0,
+    "Seconds": 5.87
+  },
+  {
+    "Suite": "tst_SettingsDisplay",
+    "ExitCode": 0,
+    "Seconds": 11.85
+  },
+  {
+    "Suite": "tst_SettingsGeneral",
+    "ExitCode": 0,
+    "Seconds": 2.84
+  },
+  {
+    "Suite": "tst_SettingsKeys",
+    "ExitCode": 0,
+    "Seconds": 19.97
+  },
+  {
+    "Suite": "tst_SettingsProfiles",
+    "ExitCode": 0,
+    "Seconds": 13.47
+  },
+  {
+    "Suite": "tst_SettingsRemote",
+    "ExitCode": 0,
+    "Seconds": 2.71
+  },
+  {
+    "Suite": "tst_SettingsRenderer",
+    "ExitCode": 0,
+    "Seconds": 22.17
+  },
+  {
+    "Suite": "tst_SettingsSearch",
+    "ExitCode": 0,
+    "Seconds": 174.77
+  },
+  {
+    "Suite": "tst_SettingsSidebar",
+    "ExitCode": 0,
+    "Seconds": 1.49
+  },
+  {
+    "Suite": "tst_SettingsStream",
+    "ExitCode": 0,
+    "Seconds": 16.25
+  },
+  {
+    "Suite": "tst_SettingsVideo",
+    "ExitCode": 0,
+    "Seconds": 5.68
+  },
+  {
+    "Suite": "tst_SteamShortcut",
+    "ExitCode": 0,
+    "Seconds": 1.93
+  }
+]

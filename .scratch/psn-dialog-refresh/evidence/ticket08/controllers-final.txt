@@ -1,0 +1,13 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::SettingsControllers::initTestCase()
+PASS   : console_screen::SettingsControllers::test_allControllerSettings()
+PASS   : console_screen::SettingsControllers::test_cancelSelectionStopsDelayedOpen()
+PASS   : console_screen::SettingsControllers::test_controllerValues()
+PASS   : console_screen::SettingsControllers::test_layoutAndNoWrites(desktop)
+PASS   : console_screen::SettingsControllers::test_layoutAndNoWrites(minimum)
+PASS   : console_screen::SettingsControllers::test_selectAndResetController()
+PASS   : console_screen::SettingsControllers::test_steamControllerAndProfileCancellation()
+PASS   : console_screen::SettingsControllers::cleanupTestCase()
+Totals: 9 passed, 0 failed, 0 skipped, 0 blacklisted, 5608ms
+********* Finished testing of console_screen *********

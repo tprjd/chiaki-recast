@@ -1,0 +1,12 @@
+{
+  "suites": 38,
+  "passed": 869,
+  "failed": 0,
+  "skipped": 0,
+  "blacklisted": 0,
+  "seconds": 578.79,
+  "screenExecutableSha256": "d658e5e02f8dcc63cd5b8479a285db19a94462fd33b721a0a2d78d63b158ac2a",
+  "qtVersion": "6.11.2",
+  "compiler": "GCC 16.2.0 UCRT",
+  "productionQmlWithSuppliedState": true
+}

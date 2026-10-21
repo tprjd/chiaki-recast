@@ -1,0 +1,92 @@
+{
+  "actualNativePersistence": true,
+  "allPassed": true,
+  "captures": [
+    {
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "dpr": 1.25,
+      "file": "integration/form-900x600.png",
+      "logicalHeight": 600,
+      "logicalWidth": 900,
+      "physicalHeight": 750,
+      "physicalWidth": 1125,
+      "sha256": "08bef02f064cde35bc9bf64c479343b31fb6da289fb4a3617d7849d3f777e363"
+    },
+    {
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "dpr": 1.25,
+      "file": "integration/success-900x600.png",
+      "logicalHeight": 600,
+      "logicalWidth": 900,
+      "physicalHeight": 750,
+      "physicalWidth": 1125,
+      "sha256": "2c020093364f963e7f1af22da6fa651743dfff6cb5aad85d5affa92e14fa339c"
+    },
+    {
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "dpr": 1.25,
+      "file": "integration/form-1280x720.png",
+      "logicalHeight": 720,
+      "logicalWidth": 1280,
+      "physicalHeight": 900,
+      "physicalWidth": 1600,
+      "sha256": "431ae1f53c3ebe573e9995dcdbbbae04107657c5d65c2192d5d614db0d5e48c3"
+    },
+    {
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "dpr": 1.25,
+      "file": "integration/success-1280x720.png",
+      "logicalHeight": 720,
+      "logicalWidth": 1280,
+      "physicalHeight": 900,
+      "physicalWidth": 1600,
+      "sha256": "0f712488245c0072695588e13d275675e5a27e83b4145350b4599c7dad4c6922"
+    },
+    {
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "dpr": 1.25,
+      "file": "integration/about-900.png",
+      "logicalHeight": 600,
+      "logicalWidth": 900,
+      "physicalHeight": 750,
+      "physicalWidth": 1125,
+      "sha256": "94b594473941b6620cdd7581e6054208ab027753f658dd5725b7eb0cf199a532"
+    },
+    {
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "dpr": 1.25,
+      "file": "integration/renderer-900.png",
+      "logicalHeight": 600,
+      "logicalWidth": 900,
+      "physicalHeight": 750,
+      "physicalWidth": 1125,
+      "sha256": "6b82def593ea6320f115799eb9b5f9809ab77b06e525bcb67d1033de27d805be"
+    },
+    {
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "dpr": 1.25,
+      "file": "integration/about-1280.png",
+      "logicalHeight": 720,
+      "logicalWidth": 1280,
+      "physicalHeight": 900,
+      "physicalWidth": 1600,
+      "sha256": "34c86cc6b1e84e8f356ea5cc7e52aba37fb7b0da92b9ab3a0df8e70c6127719a"
+    },
+    {
+      "captureMethod": "OpenGL QQuickRenderControl framebuffer",
+      "dpr": 1.25,
+      "file": "integration/renderer-1280.png",
+      "logicalHeight": 720,
+      "logicalWidth": 1280,
+      "physicalHeight": 900,
+      "physicalWidth": 1600,
+      "sha256": "422fdc7140bf328972837d1e66b7b8055f3041d428dfc5212122f0f6134d4a81"
+    }
+  ],
+  "checks": 297,
+  "controlledResponses": true,
+  "realPsnRequests": 0,
+  "visibleNativeChecks": true,
+  "distinctFormAndSuccessPixels": true,
+  "nativeRunDirectory": "C:\\Users\\david\\.cache\\chiaki-ui-native\\psn-integration-complete125"
+}

@@ -1,0 +1,23 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::Disconnect::initTestCase()
+PASS   : console_screen::Disconnect::test_choices(inline-sleep)
+PASS   : console_screen::Disconnect::test_choices(inline-disconnect)
+PASS   : console_screen::Disconnect::test_choices(inline-cancel)
+PASS   : console_screen::Disconnect::test_choices(inline-escape)
+PASS   : console_screen::Disconnect::test_choices(inline-close)
+PASS   : console_screen::Disconnect::test_choices(window-sleep)
+PASS   : console_screen::Disconnect::test_choices(window-disconnect)
+PASS   : console_screen::Disconnect::test_choices(window-cancel)
+PASS   : console_screen::Disconnect::test_choices(window-escape)
+PASS   : console_screen::Disconnect::test_choices(window-close)
+PASS   : console_screen::Disconnect::test_enterInitiallyCancels()
+PASS   : console_screen::Disconnect::test_longTextAtSupportedSizes(inline-900)
+PASS   : console_screen::Disconnect::test_longTextAtSupportedSizes(inline-1280)
+PASS   : console_screen::Disconnect::test_longTextAtSupportedSizes(window-900)
+PASS   : console_screen::Disconnect::test_longTextAtSupportedSizes(window-1280)
+PASS   : console_screen::Disconnect::test_tabNavigationAndDisabledAction(inline)
+PASS   : console_screen::Disconnect::test_tabNavigationAndDisabledAction(window)
+PASS   : console_screen::Disconnect::cleanupTestCase()
+Totals: 19 passed, 0 failed, 0 skipped, 0 blacklisted, 23862ms
+********* Finished testing of console_screen *********

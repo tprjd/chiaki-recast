@@ -1,0 +1,11 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::SettingsConfig::initTestCase()
+PASS   : console_screen::SettingsConfig::test_actionsAndPrivacy()
+PASS   : console_screen::SettingsConfig::test_backRestoresConfigOpener()
+PASS   : console_screen::SettingsConfig::test_bounds(desktop)
+PASS   : console_screen::SettingsConfig::test_bounds(minimum)
+PASS   : console_screen::SettingsConfig::test_loggingRefreshAndAboutCancel()
+PASS   : console_screen::SettingsConfig::cleanupTestCase()
+Totals: 7 passed, 0 failed, 0 skipped, 0 blacklisted, 1300ms
+********* Finished testing of console_screen *********

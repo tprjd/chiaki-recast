@@ -120,6 +120,7 @@ TestCase {
         keyClick(Qt.Key_Escape);
         tryCompare(steam, "visible", false);
         compare(harness.actions.filter(action => action.name === "mapping").length, 0);
+        tryCompare(findChild(harness, "controllerMappingChange"), "visualFocus", true);
         findChild(harness, "controllerMappingChange").forceActiveFocus(Qt.TabFocusReason); keyClick(Qt.Key_Return);
         tryCompare(capture, "opened", true);
         harness.settings.currentProfile = "Other";

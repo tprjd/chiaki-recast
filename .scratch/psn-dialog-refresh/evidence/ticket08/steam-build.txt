@@ -1,0 +1,37 @@
+[1/11] Automatic MOC and UIC for target cpp-steam-tools
+[2/11] Building CXX object steam-tools/CMakeFiles/cpp-steam-tools.dir/cpp-steam-tools_autogen/mocs_compilation.cpp.obj
+[3/11] Building CXX object steam-tools/CMakeFiles/cpp-steam-tools.dir/src/vdfstatemachine.cpp.obj
+[4/11] Building CXX object steam-tools/CMakeFiles/cpp-steam-tools.dir/src/steamshortcutentry.cpp.obj
+[5/11] Building CXX object steam-tools/CMakeFiles/cpp-steam-tools.dir/src/steamtools.cpp.obj
+In file included from C:/Users/david/.codex/worktrees/psn-acceptance/chiaki-ng-ui/build/steam-native-from-cache/cpp-steam-tools-patched/src/steamtools.cpp:10:
+C:/Users/david/.codex/worktrees/psn-acceptance/chiaki-ng-ui/build/steam-native-from-cache/cpp-steam-tools-patched/include/vdf_parser.hpp: In function 'std::string tyti::vdf::detail::string_converter(const std::wstring&)':
+C:/Users/david/.codex/worktrees/psn-acceptance/chiaki-ng-ui/build/steam-native-from-cache/cpp-steam-tools-patched/include/vdf_parser.hpp:127:10: warning: 'template<class _Codecvt, class _Elem, class _Wide_alloc, class _Byte_alloc> class std::__cxx11::wstring_convert' is deprecated [-Wdeprecated-declarations]
+  127 |     std::wstring_convert<
+      |          ^~~~~~~~~~~~~~~
+In file included from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/locale:47,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/bits/fs_path.h:36,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/filesystem:55,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfiledevice.h:12,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfile.h:9,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfileinfo.h:9,
+                 from C:/Users/david/.codex/worktrees/psn-acceptance/chiaki-ng-ui/build/steam-native-from-cache/cpp-steam-tools-patched/src/steamtools.cpp:4:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/bits/locale_conv.h:265:33: note: declared here
+  265 |     class _GLIBCXX17_DEPRECATED wstring_convert
+      |                                 ^~~~~~~~~~~~~~~
+[6/11] Linking CXX shared library steam-tools\libcpp-steam-tools.dll
+[7/11] Automatic RCC for ../../res/resources.qrc
+[8/11] Building CXX object CMakeFiles/chiaki-steam-shortcut-tests.dir/chiaki-steam-shortcut-tests_autogen/L3HTQS74W7/qrc_resources.cpp.obj
+[9/11] Building CXX object CMakeFiles/chiaki-steam-shortcut-tests.dir/command.cpp.obj
+[10/11] Building CXX object CMakeFiles/chiaki-steam-shortcut-tests.dir/main.cpp.obj
+C:/Users/david/.cache/chiaki-ui-native/source/gui/tests/steam/main.cpp: In function 'QByteArray read(const QString&)':
+C:/Users/david/.cache/chiaki-ui-native/source/gui/tests/steam/main.cpp:22:68: warning: ignoring return value of 'virtual bool QFile::open(QIODeviceBase::OpenMode)', declared with attribute 'nodiscard' [-Wunused-result]
+   22 | static QByteArray read(const QString &path) { QFile f(path); f.open(QIODevice::ReadOnly); return f.readAll(); }
+      |                                                              ~~~~~~^~~~~~~~~~~~~~~~~~~~~
+In file included from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qdir.h:11,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qtemporarydir.h:9,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/QTemporaryDir:1,
+                 from C:/Users/david/.cache/chiaki-ui-native/source/gui/tests/steam/main.cpp:5:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfile.h:264:32: note: declared here
+  264 |     QFILE_MAYBE_NODISCARD bool open(OpenMode flags) override;
+      |                                ^~~~
+[11/11] Linking CXX executable chiaki-steam-shortcut-tests.exe

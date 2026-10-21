@@ -1,0 +1,10 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::SettingsControllers::initTestCase()
+FAIL!  : console_screen::SettingsControllers::test_steamControllerAndProfileCancellation() property visualFocus
+   Actual   (): false
+   Expected (): true
+C:\Users\david\.codex\worktrees\psn-acceptance\chiaki-ng-ui\gui\tests\qml\tst_SettingsControllers.qml(123) : failure location
+PASS   : console_screen::SettingsControllers::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 5936ms
+********* Finished testing of console_screen *********
