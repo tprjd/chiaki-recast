@@ -18,6 +18,7 @@ Item {
     readonly property bool sessionError: managedConnection ? Chiaki.connectionAttempt.phase === "failure" : legacySessionError
     readonly property bool sessionLoading: managedConnection ? Chiaki.connectionAttempt.phase !== "ready" && !sessionError : legacySessionLoading
     property bool connectionInputGrabbed: false
+    property var connectionInputSession: null
     property list<Item> restoreFocusItems
     readonly property bool useSeparateMenuWindow: Chiaki.window.runtimeRendererBackend === 1
     readonly property int streamMenuHeight: 200
@@ -71,7 +72,10 @@ Item {
     StackView.onActivating: Chiaki.window.keepVideo = true
     StackView.onDeactivated: Chiaki.window.keepVideo = false
 
-    Component.onCompleted: updateSeparateMenuGeometry()
+    Component.onCompleted: {
+        connectionInputSession = Chiaki.session;
+        updateSeparateMenuGeometry();
+    }
     Component.onDestruction: if (connectionInputGrabbed) Chiaki.window.releaseInput()
     onWidthChanged: updateSeparateMenuGeometry()
     onHeightChanged: updateSeparateMenuGeometry()
@@ -1114,7 +1118,9 @@ Item {
 
         function onSessionChanged() {
             if (view.managedConnection) {
-                if (!Chiaki.sessionPinRequest.id) view.connectionInputGrabbed = false;
+                if (view.connectionInputSession !== Chiaki.session && !Chiaki.sessionPinRequest.id
+                        && (!Chiaki.session || Chiaki.connectionAttempt.route !== "psn")) view.connectionInputGrabbed = false;
+                view.connectionInputSession = Chiaki.session;
                 if (connectionView.visible && !view.connectionInputGrabbed) {
                     Chiaki.window.grabInput();
                     view.connectionInputGrabbed = true;

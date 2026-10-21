@@ -7,6 +7,7 @@ PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(submit
 PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(escape-while-submitting)
 PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(ctrl-q)
 PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(right-click)
+PASS   : console_screen::LiveConsolePin::test_compactGeometryTracksHostMoveAndResize()
 PASS   : console_screen::LiveConsolePin::test_compactWindowCloseUsesTheSameCancelAndWaits()
 PASS   : console_screen::LiveConsolePin::test_contentAndActionsRemainReachable(900)
 PASS   : console_screen::LiveConsolePin::test_contentAndActionsRemainReachable(1280)
@@ -22,5 +23,5 @@ PASS   : console_screen::LiveConsolePin::test_privacyHidesRevealedPinAndConsoleI
 PASS   : console_screen::LiveConsolePin::test_replacementAndRemovalClearInputWithoutSendingToNewRequest()
 PASS   : console_screen::LiveConsolePin::test_routeHandoffRetainsOnePromptAndReleasesAfterNativeAcceptance()
 PASS   : console_screen::LiveConsolePin::cleanupTestCase()
-Totals: 22 passed, 0 failed, 0 skipped, 0 blacklisted, 369ms
+Totals: 23 passed, 0 failed, 0 skipped, 0 blacklisted, 385ms
 ********* Finished testing of console_screen *********

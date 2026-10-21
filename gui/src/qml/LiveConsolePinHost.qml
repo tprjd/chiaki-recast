@@ -29,15 +29,24 @@ FocusScope {
     }
     function updateInput() {
         if (request.id && !inputGrabbed) {
+            restoreFocusTimer.stop();
             restoreFocusItem = host.Window.window ? host.Window.window.activeFocusItem : null;
             backend.window.grabInput();
             inputGrabbed = true;
         } else if (!request.id && inputGrabbed) {
             backend.window.releaseInput();
             inputGrabbed = false;
-            if (restoreFocusItem && restoreFocusItem.visible && restoreFocusItem.enabled)
-                restoreFocusItem.forceActiveFocus(Qt.TabFocusReason);
-            restoreFocusItem = null;
+            restoreFocusTimer.restart();
+        }
+    }
+    Timer {
+        id: restoreFocusTimer
+        interval: 0
+        onTriggered: {
+            if (host.restoreFocusItem && host.restoreFocusItem.visible && host.restoreFocusItem.enabled)
+                host.restoreFocusItem.forceActiveFocus(Qt.TabFocusReason);
+            else if (host.navigation.restoreMainFocus) host.navigation.restoreMainFocus();
+            host.restoreFocusItem = null;
         }
     }
     function cancel() {

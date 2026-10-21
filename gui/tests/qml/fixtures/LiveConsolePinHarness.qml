@@ -11,7 +11,7 @@ Item {
     property bool screenActive: true
     property var actions: []
     function showMainView() { actions = actions.concat(["consoles"]); }
-    Button { id: opener; objectName: "livePinOpener"; text: "Connect" }
+    Button { id: opener; objectName: "livePinOpener"; text: "Connect"; enabled: !prompt.blocking }
     QtObject { id: settings; property bool streamerMode: false }
     QtObject {
         id: window

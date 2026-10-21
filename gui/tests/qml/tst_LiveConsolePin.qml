@@ -172,6 +172,29 @@ TestCase {
         compare(harness.backend.window.releases, 1);
         compare(harness.actions.length, 1);
     }
+    function test_compactGeometryTracksHostMoveAndResize() {
+        const harness = createTemporaryObject(harnessComponent, tests);
+        harness.backend.window.runtimeRendererBackend = 1;
+        harness.backend.request();
+        const window = findChild(harness.prompt, "liveConsolePinWindow");
+        const host = harness.prompt.hostWindow;
+        const original = {x: host.x, y: host.y, width: host.width, height: host.height};
+        try {
+            host.x = 200; host.y = 100; host.width = 900; host.height = 600;
+            tryCompare(window, "width", 720);
+            tryCompare(window, "height", 560);
+            tryCompare(window, "x", 290);
+            tryCompare(window, "y", 120);
+            host.width = 500; host.height = 400;
+            tryCompare(window, "width", 500);
+            tryCompare(window, "height", 400);
+            tryCompare(window, "x", 200);
+            tryCompare(window, "y", 100);
+            compare(harness.backend.window.grabs, 1);
+        } finally {
+            host.x = original.x; host.y = original.y; host.width = original.width; host.height = original.height;
+        }
+    }
     function test_contentAndActionsRemainReachable_data() {
         return [{tag: "900", width: 900, height: 600}, {tag: "1280", width: 1280, height: 720},
             {tag: "compact", width: 620, height: 480, separate: true}];
