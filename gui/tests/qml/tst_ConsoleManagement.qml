@@ -111,7 +111,7 @@ TestCase {
         tryCompare(dialogSpy, "count", 1);
         compare(dialogSpy.signalArguments[0][0], "pin");
         const submit = dialogSpy.signalArguments[0][1];
-        for (const invalid of ["", "123", "12345", "abcd", " 1234 ", 1234]) {
+        for (const invalid of ["", "123", "12345", "abcd", " 1234 ", "0123\n", "١٢٣٤", 1234]) {
             verify(!submit(invalid));
             compare(actionSpy.count, 0);
         }
@@ -119,7 +119,7 @@ TestCase {
         verify(submit("0123"));
         compare(actionSpy.count, 1);
         compare(actionSpy.signalArguments[0][0], 1);
-        compare(actionSpy.signalArguments[0][1], "0123");
+        verify(actionSpy.signalArguments[0][1] === "0123", "Save preserves the complete PIN text");
         verify(!submit("4567"));
         compare(actionSpy.count, 1);
         compare(connectSpy.count, 0);
@@ -128,6 +128,16 @@ TestCase {
     function hostForAction(action) {
         return host(action === "hide" ? { discovered: true, manual: false, registered: false }
             : action === "delete" ? { discovered: true } : {});
+    }
+
+    function test_pinSaveOutcomeReachesTheForm() {
+        const screen = createTemporaryObject(screenComponent, testCase, {
+            hosts: [host()], savePin: () => false
+        });
+        dialogSpy.target = screen;
+        verify(screen.requestManagement("pin", screen.selectedIdentity));
+        verify(!dialogSpy.signalArguments[0][1]("0123"));
+        verify(!dialogSpy.signalArguments[0][1]("0123"));
     }
 
     function test_cancelConsumesPendingAction_data() {

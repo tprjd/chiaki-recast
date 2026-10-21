@@ -1,0 +1,31 @@
+{
+  "nativeContracts": {
+    "exactLeadingZeroText": true,
+    "invalidIndicesRejected": true,
+    "invalidInputsRejected": true,
+    "noSessionOrDiscovery": true,
+    "noVisibleWindow": true,
+    "peerUnchanged": true,
+    "productionSaveAccepted": true,
+    "settingsRoot": "C:/Users/david/.cache/chiaki-ui-native/saved-pin-contract-run02",
+    "settingsSynced": true
+  },
+  "afterProcessExit": {
+    "postExitTargetExact": true,
+    "postExitPeerUnchanged": true,
+    "registeredCount": 2,
+    "manualCount": 2,
+    "pinValuesAbsentFromLogs": true,
+    "isolatedSettingsFile": "C:\\Users\\david\\.cache\\chiaki-ui-native\\saved-pin-contract-run02\\Chiaki\\Chiaki.ini"
+  },
+  "restoration": {
+    "allSourceHashesRestored": true,
+    "normalBuildPassed": true,
+    "normalExecutableExcludesSavedPinQa": true,
+    "runtimeOutputRestored": "console-setup-final-bin"
+  },
+  "helperDirectory": "C:\\Users\\david\\.cache\\chiaki-ui-native\\saved-pin-contract-prep",
+  "qaExecutable": "C:\\Users\\david\\.cache\\chiaki-ui-native\\saved-pin-contract-bin\\chiaki.exe",
+  "processExitCode": 0,
+  "limits": "Controlled native save and actual isolated persistence only. Native visual acceptance, measured DPR, and hardware checks belong to ticket 06."
+}

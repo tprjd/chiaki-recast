@@ -248,8 +248,8 @@ Item {
         else stack.push(profileDialogComponent)
     }
 
-    function showConsolePinDialog(submitPin, cancelPin) {
-        stack.push(consolePinDialogComponent, {submitPin, cancelPin});
+    function showConsolePinDialog(submitPin, cancelPin, consoleName) {
+        stack.push(consolePinDialogComponent, {submitPin, cancelPin, consoleName: Qt.binding(consoleName)});
     }
 
     function showSteamShortcutDialog(fromReminder) {

@@ -18,6 +18,7 @@ FocusScope {
     property bool playStationController: false
     property string selectedIdentity: ""
     property var pendingManagement: null
+    property var savePin: (sourceIndex, pin) => { pinRequested(sourceIndex, pin); return true; }
     property Item returnFocusItem: null
     property string returnFocusIdentity: ""
     property bool returnToDetails: false
@@ -33,7 +34,7 @@ FocusScope {
     signal steamShortcutRequested()
     signal discoveryToggled(bool enabled)
     signal quitRequested()
-    signal managementRequested(string action, var accept, var cancel)
+    signal managementRequested(string action, var accept, var cancel, var consoleName)
     signal wakeRequested(int sourceIndex)
     signal deleteRequested(int sourceIndex)
     signal hideRequested(string mac, string nickname)
@@ -41,6 +42,11 @@ FocusScope {
     implicitWidth: 1280
     implicitHeight: 720
     onDisplayedHostsChanged: updateSelection()
+    onHostsChanged: {
+        if (!pendingManagement) return;
+        const target = resolveTarget(pendingManagement.identity);
+        if (!target || !eligible(pendingManagement.action, target.host)) pendingManagement = null;
+    }
     onProfileKeyChanged: {
         targetEpoch++;
         selectedIdentity = "";
@@ -147,20 +153,27 @@ FocusScope {
             const pending = { action, identity };
             pendingManagement = pending;
             managementRequested(action, value => finishManagement(pending, true, value),
-                () => finishManagement(pending, false));
+                () => finishManagement(pending, false), () => {
+                    const current = resolveTarget(identity);
+                    return current ? current.host.name || current.host.address || qsTr("Console") : qsTr("Console unavailable");
+                });
         }
         return true;
     }
     function finishManagement(pending, accepted, value) {
         if (pendingManagement !== pending) return false;
         if (accepted && pending.action === "pin"
-            && (typeof value !== "string" || !/^[0-9]{4}$/.test(value))) return false;
+            && (typeof value !== "string" || value.length !== 4 || !/^[0-9]{4}$/.test(value))) return false;
         pendingManagement = null;
         const target = resolveTarget(pending.identity);
         if (accepted && target && eligible(pending.action, target.host)) {
             if (pending.action === "delete") deleteRequested(target.sourceIndex);
             else if (pending.action === "hide") hideRequested(target.host.mac, target.host.name || "");
-            else if (pending.action === "pin") pinRequested(target.sourceIndex, value);
+            else if (pending.action === "pin") {
+                const saved = savePin(target.sourceIndex, value) === true;
+                restoreFocus();
+                return saved;
+            }
             restoreFocus();
             return true;
         }
