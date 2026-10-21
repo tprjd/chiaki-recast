@@ -444,7 +444,7 @@ TestCase {
         const confirmation = h.actions.filter(action => action.name === "confirm")[0];
         verify(confirmation);
         h.settings.registeredHosts = [{mac: "A", name: "First"}, {mac: "B", name: "Second"}];
-        confirmation.args[2]();
+        confirmation.args[3]();
         compare(h.settings.actions[h.settings.actions.length - 1].args[0], 1);
     }
     function test_conditionChangeKeepsUsableSearchFocus() {

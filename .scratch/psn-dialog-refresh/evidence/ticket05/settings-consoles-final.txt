@@ -1,0 +1,24 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::SettingsConsoles::initTestCase()
+PASS   : console_screen::SettingsConsoles::test_autoConnectIsExclusiveAndFollowsIdentity()
+PASS   : console_screen::SettingsConsoles::test_cancelAfterProfileChangeRestoresValidFocus()
+PASS   : console_screen::SettingsConsoles::test_confirmationInvalidation(delete-removed)
+PASS   : console_screen::SettingsConsoles::test_confirmationInvalidation(unhide-removed)
+PASS   : console_screen::SettingsConsoles::test_confirmationInvalidation(delete-duplicate)
+PASS   : console_screen::SettingsConsoles::test_confirmationInvalidation(unhide-duplicate)
+PASS   : console_screen::SettingsConsoles::test_confirmationInvalidation(delete-profile)
+PASS   : console_screen::SettingsConsoles::test_confirmationInvalidation(unhide-profile)
+PASS   : console_screen::SettingsConsoles::test_confirmationInvalidation(delete-cancel)
+PASS   : console_screen::SettingsConsoles::test_confirmationInvalidation(unhide-cancel)
+PASS   : console_screen::SettingsConsoles::test_confirmationInvalidation(delete-superseded)
+PASS   : console_screen::SettingsConsoles::test_confirmationInvalidation(unhide-superseded)
+PASS   : console_screen::SettingsConsoles::test_deleteResolvesOriginalIdentityAfterReorder()
+PASS   : console_screen::SettingsConsoles::test_directionalNavigationAndLongActionLabels()
+PASS   : console_screen::SettingsConsoles::test_narrowControlsAndPrivacy()
+PASS   : console_screen::SettingsConsoles::test_openingAndListUpdatesDoNotWriteSettings()
+PASS   : console_screen::SettingsConsoles::test_registrationAndEmptyListsDoNotWriteSettings()
+PASS   : console_screen::SettingsConsoles::test_unhideUsesOriginalIdentityOnceAndRestoresFallbackFocus()
+PASS   : console_screen::SettingsConsoles::cleanupTestCase()
+Totals: 20 passed, 0 failed, 0 skipped, 0 blacklisted, 968ms
+********* Finished testing of console_screen *********
