@@ -12,6 +12,8 @@ Window {
     property Component menuContent
     property bool open: false
     property bool closing: false
+    property bool flyoutOpen: false
+    readonly property real menuHeight: contentLoader.item ? contentLoader.item.implicitHeight : 80
 
     signal closeRequested()
     signal closeAnimationFinished()
@@ -34,13 +36,8 @@ Window {
             focusTimer.restart();
     }
 
-    onActiveChanged: {
-        if (active && open)
-            focusTimer.restart();
-    }
-
     Shortcut {
-        enabled: streamMenuWindow.open
+        enabled: streamMenuWindow.open && !streamMenuWindow.flyoutOpen
         sequences: [StandardKey.Cancel]
         onActivated: streamMenuWindow.closeRequested()
     }
@@ -54,15 +51,14 @@ Window {
         }
     }
 
-    Behavior on y {
-        NumberAnimation {
-            id: menuAnimation
-            duration: 250
-            onRunningChanged: {
-                if (!running && !streamMenuWindow.open)
-                    streamMenuWindow.closeAnimationFinished();
-            }
-        }
+    onOpenChanged: {
+        if (!open) closeTimer.restart();
+    }
+
+    Timer {
+        id: closeTimer
+        interval: 250
+        onTriggered: streamMenuWindow.closeAnimationFinished()
     }
 
     Timer {

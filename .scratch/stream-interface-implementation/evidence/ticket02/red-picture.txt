@@ -1,0 +1,12 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamToolbar::initTestCase()
+FAIL!  : console_screen::StreamToolbar::test_pictureFlyout(inline) 'Picture controls open above the toolbar' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-toolbar\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(47) : failure location
+FAIL!  : console_screen::StreamToolbar::test_pictureFlyout(window) 'Picture controls open above the toolbar' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-toolbar\chiaki-ng-ui\gui\tests\qml\tst_StreamToolbar.qml(47) : failure location
+PASS   : console_screen::StreamToolbar::test_resume(inline)
+PASS   : console_screen::StreamToolbar::test_resume(window)
+PASS   : console_screen::StreamToolbar::cleanupTestCase()
+Totals: 4 passed, 2 failed, 0 skipped, 0 blacklisted, 1928ms
+********* Finished testing of console_screen *********

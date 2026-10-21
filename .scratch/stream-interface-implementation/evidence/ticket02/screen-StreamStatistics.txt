@@ -1,0 +1,29 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamStatistics::initTestCase()
+PASS   : console_screen::StreamStatistics::test_backgroundContrast(inline-dark)
+PASS   : console_screen::StreamStatistics::test_backgroundContrast(inline-bright)
+PASS   : console_screen::StreamStatistics::test_backgroundContrast(inline-detailed)
+PASS   : console_screen::StreamStatistics::test_backgroundContrast(window-dark)
+PASS   : console_screen::StreamStatistics::test_backgroundContrast(window-bright)
+PASS   : console_screen::StreamStatistics::test_backgroundContrast(window-detailed)
+PASS   : console_screen::StreamStatistics::test_layout(inline-900)
+PASS   : console_screen::StreamStatistics::test_layout(inline-1280)
+PASS   : console_screen::StreamStatistics::test_layout(inline-1920)
+PASS   : console_screen::StreamStatistics::test_layout(window-900)
+PASS   : console_screen::StreamStatistics::test_layout(window-1280)
+PASS   : console_screen::StreamStatistics::test_layout(window-1920)
+PASS   : console_screen::StreamStatistics::test_liveValues(inline)
+PASS   : console_screen::StreamStatistics::test_liveValues(window)
+PASS   : console_screen::StreamStatistics::test_passive(inline)
+SKIP   : console_screen::StreamStatistics::test_passive(window) The offscreen platform activates passive windows. Run this case with the Windows platform.
+C:\Users\david\.codex\worktrees\stream-toolbar\chiaki-ng-ui\gui\tests\qml\tst_StreamStatistics.qml(189) : failure location
+PASS   : console_screen::StreamStatistics::test_sessionReplacement(inline)
+PASS   : console_screen::StreamStatistics::test_sessionReplacement(window)
+PASS   : console_screen::StreamStatistics::test_visibilityAndTeardown(inline)
+PASS   : console_screen::StreamStatistics::test_visibilityAndTeardown(window)
+PASS   : console_screen::StreamStatistics::test_zeroAndFiniteValues(inline)
+PASS   : console_screen::StreamStatistics::test_zeroAndFiniteValues(window)
+PASS   : console_screen::StreamStatistics::cleanupTestCase()
+Totals: 23 passed, 0 failed, 1 skipped, 0 blacklisted, 2191ms
+********* Finished testing of console_screen *********

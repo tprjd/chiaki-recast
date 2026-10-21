@@ -1,0 +1,15 @@
+chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+chiaki.gui: [libplacebo] Registering hook pass: aggregation
+qrc:/Main.qml:447:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+qrc:/Main.qml:417:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+qrc:/Main.qml:387:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+qrc:/StreamView.qml:422:5: QML StreamMenuWindow: Binding loop detected for property "y":
+qrc:/StreamView.qml:428:9

@@ -3,6 +3,7 @@
 #include <QFont>
 #include <QGuiApplication>
 #include <QQuickWindow>
+#include <QTranslator>
 
 #include "qmlsvgprovider.h"
 
@@ -32,6 +33,19 @@ public slots:
         qmlRegisterType<StreamTestWindow>("Chiaki.Test", 1, 0, "StreamTestWindow");
         engine->addImportPath(QStringLiteral(QUICK_TEST_SOURCE_DIR "/../imports"));
         engine->addImageProvider("svg", new QmlSvgProvider());
+        if (qEnvironmentVariableIsSet("CHIAKI_SCREEN_LONG_TRANSLATIONS")) {
+            class LongLabels : public QTranslator {
+                QString translate(const char *context, const char *source, const char *, int) const override
+                {
+                    if (QByteArrayView(context) != "StreamMenuContent") return {};
+                    return QString::fromUtf8(source) + QStringLiteral(" extended translated label");
+                }
+            };
+            auto *translator = new LongLabels;
+            translator->setParent(engine);
+            QGuiApplication::installTranslator(translator);
+            engine->retranslate();
+        }
     }
 };
 

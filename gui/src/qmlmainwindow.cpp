@@ -2819,6 +2819,26 @@ bool QmlMainWindow::event(QEvent *event)
                 session->HandleKeyboardEvent(e);
             return true;
         }
+        if (session && grab_input) {
+            auto *focused = QGuiApplication::focusWindow();
+            for (auto *popup : QGuiApplication::topLevelWindows()) {
+                if (!popup->isVisible() || popup->type() != Qt::Popup)
+                    continue;
+                for (auto *parent = popup->transientParent(); parent; parent = parent->transientParent()) {
+                    if (parent == focused) {
+                        focused = popup;
+                        break;
+                    }
+                }
+            }
+            auto *owner = focused;
+            while (owner && owner != this)
+                owner = owner->transientParent();
+            if (owner == this && focused != this && focused != quick_window) {
+                QGuiApplication::sendEvent(focused, event);
+                return true;
+            }
+        }
         QGuiApplication::sendEvent(quick_window, event);
         break;
     case QEvent::TouchBegin:

@@ -1,0 +1,42 @@
+[
+  {
+    "Suite": "StreamToolbar",
+    "ExitCode": 0
+  },
+  {
+    "Suite": "StreamInterface",
+    "ExitCode": 0
+  },
+  {
+    "Suite": "StreamStatistics",
+    "ExitCode": 0
+  },
+  {
+    "Suite": "Disconnect",
+    "ExitCode": 0
+  },
+  {
+    "Suite": "LiveConsolePin",
+    "ExitCode": 0
+  },
+  {
+    "Suite": "ConnectionLocal",
+    "ExitCode": 0
+  },
+  {
+    "Suite": "ConnectionPsn",
+    "ExitCode": 0
+  },
+  {
+    "Suite": "ConnectionWake",
+    "ExitCode": 0
+  },
+  {
+    "Suite": "SettingsDisplay",
+    "ExitCode": 0
+  },
+  {
+    "Suite": "SettingsRenderer",
+    "ExitCode": 0
+  }
+]
