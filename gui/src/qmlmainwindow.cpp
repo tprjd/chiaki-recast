@@ -2865,7 +2865,7 @@ void QmlMainWindow::startGameplayCapture(ulong timestamp)
 {
     if (gameplay_captured || !gameplayCaptureAvailable()) return;
     const auto bindings = settings->GetKeyboardMouseBindings();
-    QSet<int> held;
+    QSet<qint64> held;
 #ifdef Q_OS_WIN
     auto mouse = std::make_unique<WindowsMouseCapture>();
     if (!mouse->start(reinterpret_cast<HWND>(winId()))) {
@@ -2883,7 +2883,13 @@ void QmlMainWindow::startGameplayCapture(ulong timestamp)
     for (const auto &action : bindings) for (int input : action) {
         if (input <= 0) continue;
         const int native = KeyboardMouseNativeKey(input);
-        if (native && (GetAsyncKeyState(native) & 0x8000)) held.insert(input);
+        if (input == Qt::Key_Shift || input == Qt::Key_Control) {
+            const int sides[] = {input == Qt::Key_Shift ? VK_LSHIFT : VK_LCONTROL,
+                input == Qt::Key_Shift ? VK_RSHIFT : VK_RCONTROL};
+            for (int side : sides)
+                if (GetAsyncKeyState(side) & 0x8000)
+                    held.insert(KeyboardMousePhysicalKey(input, MapVirtualKeyW(side, MAPVK_VK_TO_VSC_EX)));
+        } else if (native && (GetAsyncKeyState(native) & 0x8000)) held.insert(input);
     }
     const struct { int native; Qt::MouseButton button; } buttons[] = {
         {GetSystemMetrics(SM_SWAPBUTTON) ? VK_RBUTTON : VK_LBUTTON, Qt::LeftButton},
@@ -2907,6 +2913,18 @@ bool QmlMainWindow::nativeEvent(const QByteArray &eventType, void *message, qint
 {
     if (eventType == "windows_generic_MSG" && gameplay_captured && gameplay_mouse) {
         const auto *native = static_cast<MSG *>(message);
+        // Qt can omit the second Shift/Ctrl press, so collect both native edges.
+        if ((native->message == WM_KEYDOWN || native->message == WM_KEYUP)
+                && (native->wParam == VK_SHIFT || native->wParam == VK_CONTROL)
+                && qint32(native->time - gameplay_input_not_before) >= 0 && gameplayForeground()
+                && !(GetKeyState(VK_MENU) & 0x8000) && !(GetKeyState(VK_LWIN) & 0x8000)
+                && !(GetKeyState(VK_RWIN) & 0x8000)) {
+            const quint32 scan = ((native->lParam >> 16) & 0xff) | (native->lParam & 0x01000000 ? 0xe000 : 0);
+            QKeyEvent event(native->message == WM_KEYDOWN ? QEvent::KeyPress : QEvent::KeyRelease,
+                native->wParam == VK_SHIFT ? Qt::Key_Shift : Qt::Key_Control,
+                Qt::NoModifier, scan, native->wParam, 0);
+            session->HandleKeyboardEvent(&event);
+        }
         if (native->message == WM_WINDOWPOSCHANGED) {
             if (!gameplay_mouse->updateClip()) releaseGameplayCapture();
         } else if (native->message == WM_INPUT && GET_RAWINPUT_CODE_WPARAM(native->wParam) == RIM_INPUT

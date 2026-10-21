@@ -19,7 +19,7 @@ bool KeyboardMouseMapper::setMouseResponse(const MouseResponse &value)
     return true;
 }
 
-void KeyboardMouseMapper::reset(const QSet<int> &held)
+void KeyboardMouseMapper::reset(const QSet<qint64> &held)
 {
     pressed.clear();
     ignored = held;
@@ -27,13 +27,14 @@ void KeyboardMouseMapper::reset(const QSet<int> &held)
     right_x = right_y = 0;
 }
 
-void KeyboardMouseMapper::key(int key, bool down)
+void KeyboardMouseMapper::key(int key, bool down, quint32 nativeScanCode)
 {
     key = NormalizeKeyboardMouseKey(key);
+    const auto physical = KeyboardMousePhysicalKey(key, nativeScanCode);
     if (!down) {
-        pressed.remove(key);
-        ignored.remove(key);
-    } else if (!ignored.contains(key)) pressed.insert(key);
+        pressed.remove(physical);
+        ignored.remove(physical);
+    } else if (!ignored.contains(physical)) pressed.insert(physical, key);
 }
 
 void KeyboardMouseMapper::mouseButton(Qt::MouseButton button, bool down)
@@ -76,26 +77,29 @@ bool KeyboardMouseMapper::advanceMouse(qint64 timestampUs)
 
 ChiakiControllerState KeyboardMouseMapper::state() const
 {
+    using namespace KeyboardMouseAction;
     ChiakiControllerState result;
     chiaki_controller_state_set_idle(&result);
     const auto active = [this](int action) {
-        return (bindings[action][0] && pressed.contains(bindings[action][0]))
-            || (bindings[action][1] && pressed.contains(bindings[action][1]));
+        for (int input : bindings[action])
+            if (input && pressed.key(input, 0)) return true;
+        return false;
     };
-    const uint32_t buttons[] = {CHIAKI_CONTROLLER_BUTTON_CROSS, CHIAKI_CONTROLLER_BUTTON_MOON,
-        CHIAKI_CONTROLLER_BUTTON_BOX, CHIAKI_CONTROLLER_BUTTON_PYRAMID,
-        CHIAKI_CONTROLLER_BUTTON_L1, CHIAKI_CONTROLLER_BUTTON_R1, 0, 0,
-        CHIAKI_CONTROLLER_BUTTON_L3, CHIAKI_CONTROLLER_BUTTON_R3,
-        CHIAKI_CONTROLLER_BUTTON_DPAD_UP, CHIAKI_CONTROLLER_BUTTON_DPAD_DOWN,
-        CHIAKI_CONTROLLER_BUTTON_DPAD_LEFT, CHIAKI_CONTROLLER_BUTTON_DPAD_RIGHT,
-        CHIAKI_CONTROLLER_BUTTON_OPTIONS, CHIAKI_CONTROLLER_BUTTON_SHARE,
-        CHIAKI_CONTROLLER_BUTTON_TOUCHPAD, CHIAKI_CONTROLLER_BUTTON_PS};
-    for (int i = 0; i < 18; ++i)
-        if (active(i + 4)) result.buttons |= buttons[i];
-    result.l2_state = active(10) ? 255 : 0;
-    result.r2_state = active(11) ? 255 : 0;
-    const int x = int(active(3)) - int(active(2));
-    const int y = int(active(1)) - int(active(0));
+    const struct { Id action; uint32_t button; } buttons[] = {
+        {Cross, CHIAKI_CONTROLLER_BUTTON_CROSS}, {Circle, CHIAKI_CONTROLLER_BUTTON_MOON},
+        {Square, CHIAKI_CONTROLLER_BUTTON_BOX}, {Triangle, CHIAKI_CONTROLLER_BUTTON_PYRAMID},
+        {L1, CHIAKI_CONTROLLER_BUTTON_L1}, {R1, CHIAKI_CONTROLLER_BUTTON_R1},
+        {L3, CHIAKI_CONTROLLER_BUTTON_L3}, {R3, CHIAKI_CONTROLLER_BUTTON_R3},
+        {DpadUp, CHIAKI_CONTROLLER_BUTTON_DPAD_UP}, {DpadDown, CHIAKI_CONTROLLER_BUTTON_DPAD_DOWN},
+        {DpadLeft, CHIAKI_CONTROLLER_BUTTON_DPAD_LEFT}, {DpadRight, CHIAKI_CONTROLLER_BUTTON_DPAD_RIGHT},
+        {Options, CHIAKI_CONTROLLER_BUTTON_OPTIONS}, {Create, CHIAKI_CONTROLLER_BUTTON_SHARE},
+        {Touchpad, CHIAKI_CONTROLLER_BUTTON_TOUCHPAD}, {PS, CHIAKI_CONTROLLER_BUTTON_PS}};
+    for (const auto &binding : buttons)
+        if (active(binding.action)) result.buttons |= binding.button;
+    result.l2_state = active(L2) ? 255 : 0;
+    result.r2_state = active(R2) ? 255 : 0;
+    const int x = int(active(LeftStickRight)) - int(active(LeftStickLeft));
+    const int y = int(active(LeftStickDown)) - int(active(LeftStickUp));
     const int scale = x && y ? 23169 : 32767;
     result.left_x = x * scale;
     result.left_y = y * scale;

@@ -1744,15 +1744,37 @@ void QmlSettings::deleteProfile(QString profile)
 
 QVariantList QmlSettings::keyboardMouseBindings() const
 {
-    static const char *names[] = {QT_TR_NOOP("Left stick up"), QT_TR_NOOP("Left stick down"),
-        QT_TR_NOOP("Left stick left"), QT_TR_NOOP("Left stick right"), QT_TR_NOOP("Cross"),
-        QT_TR_NOOP("Circle"), QT_TR_NOOP("Square"), QT_TR_NOOP("Triangle"), "L1", "R1", "L2", "R2", "L3", "R3",
-        QT_TR_NOOP("D-pad up"), QT_TR_NOOP("D-pad down"), QT_TR_NOOP("D-pad left"), QT_TR_NOOP("D-pad right"),
-        QT_TR_NOOP("Options"), QT_TR_NOOP("Create"), QT_TR_NOOP("Touchpad click"), "PS"};
+    using namespace KeyboardMouseAction;
+    static const std::array<const char *, Count> names = [] {
+        std::array<const char *, Count> names{};
+        names[LeftStickUp] = QT_TR_NOOP("Left stick up");
+        names[LeftStickDown] = QT_TR_NOOP("Left stick down");
+        names[LeftStickLeft] = QT_TR_NOOP("Left stick left");
+        names[LeftStickRight] = QT_TR_NOOP("Left stick right");
+        names[Cross] = QT_TR_NOOP("Cross");
+        names[Circle] = QT_TR_NOOP("Circle");
+        names[Square] = QT_TR_NOOP("Square");
+        names[Triangle] = QT_TR_NOOP("Triangle");
+        names[L1] = "L1";
+        names[R1] = "R1";
+        names[L2] = "L2";
+        names[R2] = "R2";
+        names[L3] = "L3";
+        names[R3] = "R3";
+        names[DpadUp] = QT_TR_NOOP("D-pad up");
+        names[DpadDown] = QT_TR_NOOP("D-pad down");
+        names[DpadLeft] = QT_TR_NOOP("D-pad left");
+        names[DpadRight] = QT_TR_NOOP("D-pad right");
+        names[Options] = QT_TR_NOOP("Options");
+        names[Create] = QT_TR_NOOP("Create");
+        names[Touchpad] = QT_TR_NOOP("Touchpad click");
+        names[PS] = "PS";
+        return names;
+    }();
     const auto bindings = settings->GetKeyboardMouseBindings();
     QVariantList result;
     for(int i = 0; i < int(bindings.size()); ++i) {
-        const int group = i < 4 ? 0 : i < 8 ? 1 : i < 14 ? 2 : i < 18 ? 3 : 4;
+        const int group = i < Cross ? 0 : i < L1 ? 1 : i < DpadUp ? 2 : i < Options ? 3 : 4;
         result.append(QVariantMap{{"action", i}, {"name", tr(names[i])}, {"group", group},
             {"primary", bindings[i][0]}, {"alternative", bindings[i][1]},
             {"primaryName", KeyboardMouseInputName(bindings[i][0])},
@@ -1765,15 +1787,15 @@ QVariantMap QmlSettings::changeKeyboardMouseBinding(int action, int slot, int in
 {
     input = NormalizeKeyboardMouseKey(input);
     QVariantMap result{{"error", ""}, {"conflict", -1}, {"name", ""}};
-    if(action < 0 || action >= 22 || slot < 0 || slot > 1 || !ValidKeyboardMouseInput(input)) {
+    auto bindings = settings->GetKeyboardMouseBindings();
+    if(action < 0 || action >= int(bindings.size()) || slot < 0 || slot >= int(bindings.front().size()) || !ValidKeyboardMouseInput(input)) {
         result["error"] = input == Qt::Key_F8 ? tr("F8 is reserved for gameplay capture and release.")
             : input == Qt::Key_F11 ? tr("F11 is reserved for fullscreen.")
             : input == Qt::Key_Alt || input == Qt::Key_Meta ? tr("Alt and Windows keys are reserved for Windows shortcuts.")
             : tr("This input cannot be assigned.");
         return result;
     }
-    auto bindings = settings->GetKeyboardMouseBindings();
-    for(int i = 0; i < 22; ++i) for(int j = 0; j < 2; ++j) {
+    for(int i = 0; i < int(bindings.size()); ++i) for(int j = 0; j < int(bindings[i].size()); ++j) {
         if(!input || bindings[i][j] != input || (i == action && j == slot)) continue;
         if(!move) {
             result["conflict"] = i;

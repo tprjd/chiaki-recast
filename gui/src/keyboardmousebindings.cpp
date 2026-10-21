@@ -9,12 +9,31 @@
 
 KeyboardMouseBindings DefaultKeyboardMouseBindings()
 {
-    return {{{Qt::Key_W, 0}, {Qt::Key_S, 0}, {Qt::Key_A, 0}, {Qt::Key_D, 0},
-        {Qt::Key_Space, 0}, {Qt::Key_Control, 0}, {Qt::Key_R, 0}, {Qt::Key_F, 0},
-        {Qt::Key_Q, 0}, {Qt::Key_E, 0}, {-int(Qt::RightButton), Qt::Key_Z},
-        {-int(Qt::LeftButton), Qt::Key_X}, {Qt::Key_Shift, 0}, {Qt::Key_C, 0},
-        {Qt::Key_Up, 0}, {Qt::Key_Down, 0}, {Qt::Key_Left, 0}, {Qt::Key_Right, 0},
-        {Qt::Key_Return, 0}, {Qt::Key_Backspace, 0}, {Qt::Key_Tab, 0}, {Qt::Key_F1, 0}}};
+    using namespace KeyboardMouseAction;
+    KeyboardMouseBindings bindings{};
+    bindings[LeftStickUp] = {Qt::Key_W, 0};
+    bindings[LeftStickDown] = {Qt::Key_S, 0};
+    bindings[LeftStickLeft] = {Qt::Key_A, 0};
+    bindings[LeftStickRight] = {Qt::Key_D, 0};
+    bindings[Cross] = {Qt::Key_Space, 0};
+    bindings[Circle] = {Qt::Key_Control, 0};
+    bindings[Square] = {Qt::Key_R, 0};
+    bindings[Triangle] = {Qt::Key_F, 0};
+    bindings[L1] = {Qt::Key_Q, 0};
+    bindings[R1] = {Qt::Key_E, 0};
+    bindings[L2] = {-int(Qt::RightButton), Qt::Key_Z};
+    bindings[R2] = {-int(Qt::LeftButton), Qt::Key_X};
+    bindings[L3] = {Qt::Key_Shift, 0};
+    bindings[R3] = {Qt::Key_C, 0};
+    bindings[DpadUp] = {Qt::Key_Up, 0};
+    bindings[DpadDown] = {Qt::Key_Down, 0};
+    bindings[DpadLeft] = {Qt::Key_Left, 0};
+    bindings[DpadRight] = {Qt::Key_Right, 0};
+    bindings[Options] = {Qt::Key_Return, 0};
+    bindings[Create] = {Qt::Key_Backspace, 0};
+    bindings[Touchpad] = {Qt::Key_Tab, 0};
+    bindings[PS] = {Qt::Key_F1, 0};
+    return bindings;
 }
 
 int KeyboardMouseNativeKey(int input)
@@ -51,6 +70,14 @@ int NormalizeKeyboardMouseKey(int input)
         if (base >= Qt::Key_Space) return QChar(ushort(base)).toUpper().unicode();
     }
 #endif
+    return input;
+}
+
+qint64 KeyboardMousePhysicalKey(int input, quint32 nativeScanCode)
+{
+    input = NormalizeKeyboardMouseKey(input);
+    if (nativeScanCode && (input == Qt::Key_Shift || input == Qt::Key_Control))
+        return (qint64(nativeScanCode) << 32) | quint32(input);
     return input;
 }
 

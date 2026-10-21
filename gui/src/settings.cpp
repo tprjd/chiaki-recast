@@ -902,8 +902,8 @@ bool Settings::GetKeyboardEnabled() const
 KeyboardMouseBindings Settings::GetKeyboardMouseBindings() const
 {
 	const auto stored = settings.value("settings/keyboard_mouse/bindings").toList();
-	if(stored.size() != 44) return DefaultKeyboardMouseBindings();
 	KeyboardMouseBindings bindings;
+	if(stored.size() != qsizetype(bindings.size() * bindings.front().size())) return DefaultKeyboardMouseBindings();
 	int i = 0;
 	for(auto &action : bindings) for(auto &input : action) {
 		bool valid = false;

@@ -49,4 +49,5 @@ private:
     bool returnEligible(const QString &id) const;
     void restore(const QString &id, bool deferred);
     void restoreNow(const QString &id);
+    void focusNotice(const QString &id, QQuickItem *target);
 };

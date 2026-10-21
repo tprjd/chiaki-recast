@@ -709,7 +709,7 @@ void StreamSession::SetMouseCameraEnabled(bool enabled)
 	mouse_camera_enabled = enabled;
 }
 
-void StreamSession::SetGameplayCapture(bool captured, const QSet<int> &held)
+void StreamSession::SetGameplayCapture(bool captured, const QSet<qint64> &held)
 {
 	gameplay_captured = captured && mouse_camera_enabled;
 	keyboard_mouse.reset(held);
@@ -823,7 +823,7 @@ void StreamSession::HandleKeyboardEvent(QKeyEvent *event)
 	{
 		if(!event->isAutoRepeat() && gameplay_captured)
 		{
-			keyboard_mouse.key(event->key(), event->type() == QEvent::KeyPress);
+			keyboard_mouse.key(event->key(), event->type() == QEvent::KeyPress, event->nativeScanCode());
 			SendFeedbackState();
 		}
 		return;

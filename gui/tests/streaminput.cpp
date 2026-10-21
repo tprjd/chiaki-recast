@@ -100,6 +100,28 @@ private slots:
         QVERIFY(input.blocked());
         QCOMPARE(input.present(&owner, "display", nullptr), reopened);
     }
+    void noticeTargetHandoff()
+    {
+        QQuickWindow window, noticeWindow;
+        QQuickItem opener(window.contentItem()), owner(window.contentItem());
+        QQuickItem inlineAction(window.contentItem()), separateAction(noticeWindow.contentItem());
+        owner.setProperty("noticesReady", true);
+        owner.setProperty("actionNoticeVisible", true);
+        StreamInputOwnership input(&window, &window);
+        opener.forceActiveFocus();
+        const auto id = input.present(&owner, "notice", &inlineAction);
+        QCoreApplication::processEvents();
+        QCOMPARE(window.activeFocusItem(), &inlineAction);
+        QCOMPARE(input.present(&owner, "notice", &separateAction), id);
+        QCoreApplication::processEvents();
+        QCOMPARE(noticeWindow.activeFocusItem(), &separateAction);
+        owner.setProperty("actionNoticeVisible", false);
+        input.dismiss(id);
+        input.settled(id);
+        QCoreApplication::processEvents();
+        QCOMPARE(window.activeFocusItem(), &opener);
+        QVERIFY(!input.blocked());
+    }
 };
 QTEST_MAIN(StreamInputTest)
 #include "streaminput.moc"

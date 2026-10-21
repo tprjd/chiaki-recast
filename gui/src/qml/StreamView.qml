@@ -363,22 +363,7 @@ Item {
     function focusNotice() {
         if (!actionNoticeVisible) return;
         const item = useSeparateMenuWindow ? actionWindowContent.item : actionNoticeInline.item;
-        noticePresentation = view.streamWindow.streamInput.present(view, "notice", null);
-        noticeFocusTimer.presentation = noticePresentation;
-        noticeFocusTimer.restart();
-    }
-    Timer {
-        id: noticeFocusTimer
-        property string presentation: ""
-        interval: 0
-        onTriggered: {
-            if (presentation !== view.noticePresentation || !view.actionNoticeVisible) return;
-            const item = view.useSeparateMenuWindow ? actionWindowContent.item : actionNoticeInline.item;
-            if (view.useSeparateMenuWindow) actionNoticeWindow.requestActivate();
-            else if (view.hostWindow && view.hostWindow.visible) view.hostWindow.requestActivate();
-            else view.streamWindow.requestActivate();
-            if (item) item.initialFocusItem.forceActiveFocus(Qt.TabFocusReason);
-        }
+        noticePresentation = view.streamWindow.streamInput.present(view, "notice", item ? item.initialFocusItem : null);
     }
     onActionNoticeVisibleChanged: {
         if (actionNoticeVisible) focusNotice();
@@ -410,6 +395,8 @@ Item {
         height: item ? item.implicitHeight : 0
         sourceComponent: actionNoticeContent
         visible: !view.useSeparateMenuWindow && view.actionNoticeVisible
+        onVisibleChanged: if (visible) view.focusNotice()
+        onLoaded: view.focusNotice()
     }
     Window {
         id: actionNoticeWindow
@@ -423,7 +410,7 @@ Item {
         y: view.streamWindow.y + view.streamWindow.height - height - 72
         width: Math.min(360, view.width - 36)
         height: actionWindowContent.item ? actionWindowContent.item.implicitHeight : 0
-        onVisibleChanged: if (visible) { requestActivate(); view.focusNotice(); }
+        onVisibleChanged: if (visible) view.focusNotice()
         onActiveChanged: if (active && visible) view.focusNotice()
         onClosing: event => { event.accepted = false; view.streamWindow.close(); }
         Shortcut { sequence: "Ctrl+O"; enabled: actionNoticeWindow.visible; onActivated: menuState.toggle() }
@@ -431,6 +418,7 @@ Item {
             id: actionWindowContent
             anchors.fill: parent
             sourceComponent: actionNoticeContent
+            onLoaded: view.focusNotice()
         }
     }
 

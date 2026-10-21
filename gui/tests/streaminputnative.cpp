@@ -197,6 +197,31 @@ private:
             QTest::qWait(30);
             QVERIFY(window.property("gameplayCaptured").toBool());
             QCOMPARE(key(VK_F8, false), 1u);
+            if (platformKeys) {
+                const auto modifier = [&](WORD code, quint32 scan, bool down, bool obsolete = false) {
+                    MSG message = {};
+                    message.hwnd = reinterpret_cast<HWND>(window.winId());
+                    message.message = down ? WM_KEYDOWN : WM_KEYUP;
+                    message.wParam = code;
+                    message.lParam = (scan & 0xff) << 16 | (scan & 0xe000 ? 0x01000000 : 0);
+                    message.time = GetTickCount() - (obsolete ? 1000 : 0);
+                    qintptr result = 0;
+                    QWindowSystemInterface::handleNativeEvent(&window, "windows_generic_MSG", &message, &result);
+                };
+                for (WORD code : {WORD(VK_SHIFT), WORD(VK_CONTROL)}) {
+                    const quint32 left = code == VK_SHIFT ? 0x2a : 0x1d;
+                    const quint32 right = code == VK_SHIFT ? 0x36 : 0xe01d;
+                    const uint32_t button = code == VK_SHIFT ? CHIAKI_CONTROLLER_BUTTON_L3 : CHIAKI_CONTROLLER_BUTTON_MOON;
+                    modifier(code, left, true, true);
+                    QCOMPARE(outgoing.buttons, 0u);
+                    modifier(code, left, true);
+                    modifier(code, right, true);
+                    modifier(code, left, false);
+                    QCOMPARE(outgoing.buttons, button);
+                    modifier(code, right, false);
+                    QCOMPARE(outgoing.buttons, 0u);
+                }
+            }
             QCOMPARE(key(VK_SPACE, true), 1u);
             QTRY_COMPARE(outgoing.buttons, uint32_t(CHIAKI_CONTROLLER_BUTTON_CROSS));
             QCOMPARE(key(VK_SPACE, false), 1u);
@@ -404,6 +429,59 @@ private:
 #endif
     }
 private slots:
+    void physicalModifiers_data()
+    {
+        QTest::addColumn<int>("key");
+        QTest::addColumn<quint32>("leftScan");
+        QTest::addColumn<quint32>("rightScan");
+        QTest::addColumn<quint32>("button");
+        QTest::newRow("shift") << int(Qt::Key_Shift) << quint32(0x2a) << quint32(0x36)
+            << quint32(CHIAKI_CONTROLLER_BUTTON_L3);
+        QTest::newRow("control") << int(Qt::Key_Control) << quint32(0x1d) << quint32(0xe01d)
+            << quint32(CHIAKI_CONTROLLER_BUTTON_MOON);
+    }
+    void physicalModifiers()
+    {
+#ifndef Q_OS_WIN
+        QSKIP("Mouse camera mode is available on Windows.");
+#endif
+        QFETCH(int, key);
+        QFETCH(quint32, leftScan);
+        QFETCH(quint32, rightScan);
+        QFETCH(quint32, button);
+        TestSettingsProfile profile;
+        Settings settings(profile.name);
+        settings.SetMouseCameraEnabled(true);
+        settings.SetHardwareDecoder({});
+        StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
+            QByteArray(CHIAKI_SESSION_AUTH_SIZE, '\0'), QByteArray(16, '\0'), {}, {}, false, false, false, false);
+        StreamSession session(info);
+        const auto event = [&](quint32 scan, bool down) {
+            QKeyEvent event(down ? QEvent::KeyPress : QEvent::KeyRelease, key, Qt::NoModifier,
+                scan, key == Qt::Key_Shift ? 0x10 : 0x11, 0);
+            session.HandleKeyboardEvent(&event);
+        };
+        session.SetGameplayCapture(true);
+        event(leftScan, true);
+        event(rightScan, true);
+        event(leftScan, false);
+        QCOMPARE(outgoing.buttons, button);
+        event(rightScan, false);
+        QCOMPARE(outgoing.buttons, 0u);
+        session.SetGameplayCapture(false);
+        session.SetGameplayCapture(true, {KeyboardMousePhysicalKey(key, leftScan), KeyboardMousePhysicalKey(key, rightScan)});
+        event(leftScan, false);
+        event(rightScan, true);
+        QCOMPARE(outgoing.buttons, 0u);
+        event(leftScan, true);
+        QCOMPARE(outgoing.buttons, button);
+        event(leftScan, false);
+        QCOMPARE(outgoing.buttons, 0u);
+        event(rightScan, false);
+        event(rightScan, true);
+        QCOMPARE(outgoing.buttons, button);
+        session.SetGameplayCapture(false);
+    }
     void resetKeyboardMouseDefaults()
     {
 #ifndef Q_OS_WIN

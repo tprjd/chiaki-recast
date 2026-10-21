@@ -373,7 +373,7 @@ class StreamSession : public QObject
 #endif
 		void HandleKeyboardEvent(QKeyEvent *event);
 		void SetMouseCameraEnabled(bool enabled);
-		void SetGameplayCapture(bool captured, const QSet<int> &held = {});
+		void SetGameplayCapture(bool captured, const QSet<qint64> &held = {});
 		void SetMouseResponse(const MouseResponse &response) { keyboard_mouse.setMouseResponse(response); }
 		void SetKeyboardMouseBindings(const KeyboardMouseBindings &bindings) { keyboard_mouse.setBindings(bindings); }
 		void HandleRelativeMouseMove(double dx, double dy);

@@ -41,11 +41,17 @@ QString StreamInputOwnership::present(QObject *owner, const QString &role, QQuic
 {
     if (!owner) return {};
     const auto existing = current.value(owner);
-    if (presentations.contains(existing) && presentations.value(existing).active) return existing;
+    if (presentations.contains(existing) && presentations.value(existing).active) {
+        if (role == "notice" && focusTarget) {
+            ++focusGeneration;
+            focusNotice(existing, focusTarget);
+        }
+        return existing;
+    }
     const bool previous = blocked();
     ++focusGeneration;
     const auto id = QString::number(++serial);
-    auto *window = focusTarget ? focusTarget->window() : nullptr;
+    auto *window = focusTarget && role != "notice" ? focusTarget->window() : nullptr;
     if (!window) {
         if (auto *item = qobject_cast<QQuickItem *>(owner)) window = item->window();
     }
@@ -75,18 +81,23 @@ QString StreamInputOwnership::present(QObject *owner, const QString &role, QQuic
     changed(previous);
     if (target && presentations.contains(id) && current.value(owner) == id) {
         if (role == "notice") {
-            const auto generation = focusGeneration;
-            QPointer<QQuickItem> target = focusTarget;
-            QTimer::singleShot(0, this, [this, id, generation, target] {
-                if (generation != focusGeneration || !presentations.contains(id)
-                        || !presentations.value(id).active || presentations.value(id).epoch != epoch || !target) return;
-                if (auto *window = target->window(); window && window->isVisible()) window->requestActivate();
-                else if (host) host->requestActivate();
-                target->forceActiveFocus(Qt::TabFocusReason);
-            });
+            focusNotice(id, target);
         } else target->forceActiveFocus(Qt::TabFocusReason);
     }
     return id;
+}
+
+void StreamInputOwnership::focusNotice(const QString &id, QQuickItem *focusTarget)
+{
+    const auto generation = focusGeneration;
+    QPointer<QQuickItem> target = focusTarget;
+    QTimer::singleShot(0, this, [this, id, generation, target] {
+        if (generation != focusGeneration || !presentations.contains(id)
+                || !presentations.value(id).active || presentations.value(id).epoch != epoch || !target) return;
+        if (auto *window = target->window(); window && window->isVisible()) window->requestActivate();
+        else if (host) host->requestActivate();
+        target->forceActiveFocus(Qt::TabFocusReason);
+    });
 }
 
 void StreamInputOwnership::dismiss(const QString &id)
