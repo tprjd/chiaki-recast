@@ -1,0 +1,13 @@
+{
+    "allPassed": true,
+    "allWorkerErrorsAndPendingWorkerCleanup": true,
+    "checks": 64,
+    "ownedRefreshCancellationFailureAndVideoDisabled": true,
+    "persistentStartErrorRetryPinAndVideoHandoff": true,
+    "profileChangesScopeRefreshWorkerAndRetry": true,
+    "psnCancels": 5,
+    "psnWorkers": 14,
+    "registrationOnlyRetryCompletionAndDuplicateOwnership": true,
+    "stageRestrictionsCancelAndLateEvents": true,
+    "starts": 8
+}
