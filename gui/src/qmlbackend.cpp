@@ -471,6 +471,15 @@ void QmlBackend::reconnectPsn()
 void QmlBackend::profileChanged()
 {
     ++profile_generation;
+    for (auto *request : findChildren<PSNAccountID *>())
+        request->Invalidate();
+    if (!psn_auth_attempt.isEmpty()) {
+        psn_auth_pending = false;
+        psn_auth_attempt["phase"] = "failure";
+        psn_auth_attempt["profileValid"] = false;
+        psn_auth_attempt["message"] = tr("The profile changed. Sign in again in the current profile.");
+        emit psnAuthAttemptChanged();
+    }
     // Stop replies before the old profile's Settings object can be removed.
     for (auto *token : findChildren<PSNToken *>())
         delete token;
@@ -2043,30 +2052,21 @@ QUrl QmlBackend::psnLoginUrl() const
 
 bool QmlBackend::handlePsnLoginRedirect(const QUrl &url)
 {
-    if (!url.toString().startsWith(QString::fromStdString(PSNAuth::REDIRECT_PAGE)))
-    {
-        emit psnLoginAccountIdError(QString("Redirect URL invalid does not start with:\n") + QString::fromStdString(PSNAuth::REDIRECT_PAGE));
+    const auto id = startPsnAuth(url);
+    if (id.isEmpty() || psn_auth_attempt.value("phase") == "failure") {
+        emit psnLoginAccountIdError(id.isEmpty() ? tr("PSN sign-in is already in progress.") : psn_auth_attempt.value("message").toString());
         return false;
     }
-
-    const QString code = QUrlQuery(url).queryItemValue("code");
-    if (code.isEmpty()) {
-        qCWarning(chiakiGui) << "Invalid code from redirect url";
-        emit psnLoginAccountIdError("Redirect URL invalid");
-        return false;
-    }
-    PSNAccountID *psnId = new PSNAccountID(settings, this);
-    connect(psnId, &PSNAccountID::AccountIDResponse, this, [this, psnId](const QString &accountId) {
-        emit psnLoginAccountIdDone(accountId);
+    const auto generation = profile_generation;
+    auto connection = std::make_shared<QMetaObject::Connection>();
+    *connection = connect(this, &QmlBackend::psnAuthAttemptChanged, this, [this, id, generation, connection] {
+        if (psn_auth_attempt.value("id") != id || generation != profile_generation) { disconnect(*connection); return; }
+        const auto phase = psn_auth_attempt.value("phase").toString();
+        if (phase != "success" && phase != "failure") return;
+        disconnect(*connection);
+        if (phase == "success") emit psnLoginAccountIdDone(psn_auth_attempt.value("accountId").toString());
+        else emit psnLoginAccountIdError(psn_auth_attempt.value("message").toString());
     });
-    connect(psnId, &PSNAccountID::AccountIDResponse, this, &QmlBackend::updatePsnHosts);
-    connect(psnId, &PSNAccountID::AccountIDError, [this](const QString &error) {
-        qCWarning(chiakiGui) << "Could not retrieve psn token or account Id!" << error;
-        emit psnLoginAccountIdError(error);
-    });
-    connect(psnId, &PSNAccountID::Finished, psnId, &QObject::deleteLater);
-    psnId->GetPsnAccountId(code);
-    emit psnTokenChanged();
     return true;
 }
 
@@ -2922,7 +2922,6 @@ QString QmlBackend::openPsnLink()
 {
     QUrl url = psnLoginUrl();
     QDesktopServices::openUrl(url);
-    url = psnLoginUrl();
     return QString(url.toEncoded());
 }
 
@@ -2936,38 +2935,84 @@ QString QmlBackend::openPlaceboOptionsLink()
 
 bool QmlBackend::checkPsnRedirectURL(const QUrl &url) const
 {
-    return url.toString().startsWith(QString::fromStdString(PSNAuth::REDIRECT_PAGE));
+    const QUrl destination(QString::fromStdString(PSNAuth::REDIRECT_PAGE));
+    return url.isValid() && url.scheme() == destination.scheme() && url.host() == destination.host()
+        && url.port(-1) == -1 && url.userInfo().isEmpty() && !url.hasFragment() && url.path() == destination.path();
+}
+
+QString QmlBackend::startPsnAuth(const QUrl &url)
+{
+    if (psn_auth_pending) return {};
+    const QString id = QString::number(++psn_auth_generation);
+    const auto codes = QUrlQuery(url).allQueryItemValues("code", QUrl::FullyDecoded);
+    psn_auth_attempt = {{"id", id}, {"phase", "exchanging"}, {"profileValid", true}};
+    if (!checkPsnRedirectURL(url) || codes.size() != 1 || codes.first().trimmed().isEmpty()) {
+        psn_auth_attempt["phase"] = "failure";
+        psn_auth_attempt["inputRejected"] = true;
+        psn_auth_attempt["message"] = tr("Paste the complete Sign-in redirect URL from your browser. It must contain an authorization code.");
+        emit psnAuthAttemptChanged();
+        return id;
+    }
+    psn_auth_pending = true;
+    const auto generation = profile_generation;
+    auto owned = [this, id, generation] { return psn_auth_pending && profile_generation == generation && psn_auth_attempt.value("id") == id; };
+    auto *request = new PSNAccountID(settings, this);
+    connect(request, &PSNAccountID::Progress, this, [this, owned] {
+        if (!owned()) return;
+        psn_auth_attempt["phase"] = "account";
+        emit psnAuthAttemptChanged();
+    });
+    connect(request, &PSNAccountID::AccountIDError, this, [this, owned](const QString &, const QString &message) {
+        if (!owned()) return;
+        psn_auth_pending = false;
+        psn_auth_attempt["phase"] = "failure";
+        psn_auth_attempt["message"] = message;
+        psn_auth_attempt["errorText"] = message;
+        emit psnAuthAttemptChanged();
+    });
+    connect(request, &PSNAccountID::AccountIDResponse, this, [this, owned, generation](const QString &account_id) {
+        if (!owned()) return;
+        psn_auth_pending = false;
+        psn_auth_attempt["phase"] = "success";
+        psn_auth_attempt["accountId"] = account_id;
+        settings_qml->setRemotePlayAsk(false);
+        if (generation != profile_generation) return;
+        emit settings_qml->psnAuthTokenChanged();
+        if (generation != profile_generation) return;
+        emit settings_qml->psnRefreshTokenChanged();
+        if (generation != profile_generation) return;
+        emit settings_qml->psnAuthTokenExpiryChanged();
+        if (generation != profile_generation) return;
+        emit settings_qml->psnAccountIdChanged();
+        if (generation != profile_generation) return;
+        emit psnTokenChanged();
+        if (generation != profile_generation) return;
+        emit psnAuthAttemptChanged();
+        if (generation == profile_generation) updatePsnHosts();
+    });
+    connect(request, &PSNAccountID::Finished, request, &QObject::deleteLater);
+    emit psnAuthAttemptChanged();
+    request->GetPsnAccountId(codes.first());
+    return id;
 }
 
 void QmlBackend::initPsnAuth(const QUrl &url, const QJSValue &callback)
 {
-    const QJSValue cb = callback;
-    if (!url.toString().startsWith(QString::fromStdString(PSNAuth::REDIRECT_PAGE)))
-    {
-        if (cb.isCallable())
-            cb.call({QString("[E] Invalid URL: Please make sure you have copy and pasted the URL correctly."), false, true});
+    const auto id = startPsnAuth(url);
+    if (!callback.isCallable()) return;
+    if (id.isEmpty() || psn_auth_attempt.value("phase") == "failure") {
+        callback.call({id.isEmpty() ? tr("PSN sign-in is already in progress.") : psn_auth_attempt.value("message").toString(), false, true});
         return;
     }
-    const QString code = QUrlQuery(url).queryItemValue("code");
-    if (code.isEmpty())
-    {
-        if (cb.isCallable())
-            cb.call({QString("[E] Invalid code from redirect url."), false, true});
-        return;
-    }
-    PSNAccountID *psnId = new PSNAccountID(settings, this);
-    connect(psnId, &PSNAccountID::AccountIDResponse, this, &QmlBackend::updatePsnHosts);
-    connect(psnId, &PSNAccountID::AccountIDError, this, [cb](const QString &error) {
-        if (cb.isCallable())
-            cb.call({error, false, true});
+    const auto generation = profile_generation;
+    auto connection = std::make_shared<QMetaObject::Connection>();
+    *connection = connect(this, &QmlBackend::psnAuthAttemptChanged, this, [this, id, generation, callback, connection] {
+        if (psn_auth_attempt.value("id") != id || generation != profile_generation) { disconnect(*connection); return; }
+        const auto phase = psn_auth_attempt.value("phase").toString();
+        if (phase != "success" && phase != "failure") return;
+        disconnect(*connection);
+        callback.call({phase == "success" ? tr("PSN remote access is ready.") : psn_auth_attempt.value("message").toString(), phase == "success", true});
     });
-    connect(psnId, &PSNAccountID::AccountIDResponse, this, [cb]() {
-        if (cb.isCallable())
-            cb.call({QString("[I] PSN Remote Connection Tokens Generated."), true, true});
-    });
-    connect(psnId, &PSNAccountID::Finished, psnId, &QObject::deleteLater);
-    psnId->GetPsnAccountId(code);
-    emit psnTokenChanged();
 }
 
 void QmlBackend::refreshAuth()

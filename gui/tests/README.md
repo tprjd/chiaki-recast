@@ -252,6 +252,27 @@ The fake backend supplies native results. It does not simulate discovery,
 wake packets, or a session. Isolated native checks cover those handlers with
 transport disabled. Real console wake-up still needs a console.
 
+## PSN setup tests
+
+`PsnSetupHarness.qml` loads production `PSNTokenDialog.qml`. It supplies the
+backend, navigation, and browser creation boundary. `PsnSetup` checks redirect
+privacy, explicit copy and paste, input rejection, browser fallback and recovery,
+actual progress states, persistent failure, retry, closure, and both supported
+window sizes. The supplied browser does not contact Sony.
+
+The native backend owns `psnAuthAttempt` across screen closure. `startPsnAuth`
+returns its opaque ID and rejects a second active request. Profile changes
+invalidate the request before a result can save in another profile. Credentials
+save only after both the token and Account ID responses pass validation.
+
+The controlled native checks and captures are in
+`.scratch/psn-dialog-refresh/evidence/ticket01-*`. They use isolated INI files
+and controlled network replies. They check actual native persistence and visible
+production screens at 900 by 600 and 1280 by 720, with measured DPR 1.25.
+The native Qt build lacks QtWebEngine, so its browser check proves external
+fallback. The embedded route uses the supplied browser in screen tests.
+Real PSN sign-in and physical controller input remain separate checks.
+
 ## Steam shortcut checks
 
 `SteamShortcut` loads the production `SteamShortcutDialog.qml` with a supplied
