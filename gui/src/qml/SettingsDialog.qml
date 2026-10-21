@@ -2080,7 +2080,7 @@ FocusScope {
                                 C.Button {
                                     id: aboutButton
                                     objectName: "aboutSettings"
-                                    text: qsTr("About %1-ng").arg(Qt.application.name)
+                                    text: qsTr("About Chiaki Recast")
                                     Accessible.name: text
                                     font.pixelSize: 14
                                     lastInFocusChain: true
@@ -2214,12 +2214,13 @@ FocusScope {
         ConfirmDialog {
             id: aboutDialog
             objectName: "aboutDialog"
-            title: qsTr("About %1-ng").arg(Qt.application.name)
+            title: qsTr("About Chiaki Recast")
             cancelText: qsTr("Close")
             imageSource: "qrc:icons/chiaking-logo.svg"
             textFormat: Text.RichText
             navigation: dialog.navigation
-            text: "<h1>chiaki-ng</h1> by Street Pea, version %1
+            text: "<h1>Chiaki Recast</h1> version %1
+                        <h2>Fork of chiaki-ng</h2> by Street Pea and contributors
                         <h2>Fork of Chiaki</h2> by Florian Markl at version 2.1.1
 
                         <p>This program is free software: you can redistribute it and/or modify

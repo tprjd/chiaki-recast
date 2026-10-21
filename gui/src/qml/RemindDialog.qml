@@ -35,7 +35,7 @@ ConfirmDialog {
             return;
         }
         navigation.showRemindDialog(qsTr("PSN sign-in"),
-            qsTr("Sign in to PSN to register consoles automatically and use Remote Play outside your home network. Sign-in saves your account credentials in chiaki-ng. You can also set this up later in Settings, under Config."),
+            qsTr("Sign in to PSN to register consoles automatically and use Remote Play outside your home network. Sign-in saves your account credentials in Chiaki Recast. You can also set this up later in Settings, under Config."),
             true, () => navigation.showPSNTokenDialog(false));
     }
 }

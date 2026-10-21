@@ -25,7 +25,7 @@ Pane {
         {
             navigation.initialAsk = true;
             if(backend.settings.addSteamShortcutAsk && (typeof backend.createSteamShortcut === "function"))
-                navigation.showRemindDialog(qsTr("Steam shortcut"), qsTr("Create or update a non-Steam game for chiaki-ng with the official artwork and controller layout. You can also set this up later from the console library."), false, () => navigation.showSteamShortcutDialog(true));
+                navigation.showRemindDialog(qsTr("Steam shortcut"), qsTr("Create or update a non-Steam game for Chiaki Recast with the official artwork and controller layout. You can also set this up later from the console library."), false, () => navigation.showSteamShortcutDialog(true));
             else
                 navigation.showPsnReminder();
         }

@@ -84,7 +84,7 @@ FocusScope {
                     width: 29; height: 31; radius: 8; color: "#63b7ff"
                     Label { anchors.centerIn: parent; text: "χ"; font.pixelSize: 24; font.bold: true; color: "#102030"; Accessible.ignored: true }
                 }
-                Label { text: "chiaki-ng"; font.pixelSize: content.width < 1000 ? 17 : 20; font.bold: true }
+                Label { text: "Chiaki Recast"; Layout.fillWidth: true; wrapMode: Text.WordWrap; font.pixelSize: content.width < 1000 ? 17 : 20; font.bold: true }
             }
             SetupButton {
                 objectName: "pinConsoles"

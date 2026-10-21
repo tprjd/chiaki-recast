@@ -234,7 +234,7 @@ FocusScope {
                         Accessible.ignored: true
                     }
                 }
-                Label { visible: !library.collapsedSidebar; text: "chiaki-ng"; font.pixelSize: 20; font.bold: true }
+                Label { visible: !library.collapsedSidebar; text: "Chiaki Recast"; Layout.fillWidth: true; wrapMode: Text.WordWrap; font.pixelSize: 18; font.bold: true }
             }
             ConsoleButton {
                 id: consolesButton

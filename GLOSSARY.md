@@ -1,6 +1,6 @@
-# chiaki-ng
+# Chiaki Recast
 
-chiaki-ng connects to PlayStation consoles for Remote Play.
+Chiaki Recast connects to PlayStation consoles for Remote Play. It is a fork of chiaki-ng.
 
 ## Language
 
@@ -19,5 +19,5 @@ An automatic connection attempt to a selected registered console when the app st
 The transition of a console from rest mode so that it becomes available for Remote Play.
 
 **Sign-in redirect URL**:
-The complete browser URL returned after PSN sign-in. It contains the authorization code used to complete sign-in in chiaki-ng.
+The complete browser URL returned after PSN sign-in. It contains the authorization code used to complete sign-in in Chiaki Recast.
 _Avoid_: Token, token string

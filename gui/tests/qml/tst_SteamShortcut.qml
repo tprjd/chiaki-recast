@@ -59,10 +59,11 @@ TestCase {
                 showPsnReminder: () => psnReminder.offerPsnReminder()}});
     }
     function test_defaultsAndNameValidation() {
+        tests.width = 900; tests.height = 600;
         const dialog = open();
         verify(dialog);
         const name = findChild(dialog, "steamName");
-        compare(name.text, "chiaki-ng Guest");
+        compare(name.text, "Chiaki Recast Guest");
         compare(findChild(dialog, "steamOptions").text, "--profile=Guest");
         name.text = "  ";
         verify(!findChild(dialog, "steamCreate").enabled);
@@ -79,8 +80,9 @@ TestCase {
         tryVerify(() => calls.length > 0);
     }
     function test_optionalInputsAndTerminalSuccess() {
+        tests.width = 900; tests.height = 600;
         const dialog = open("");
-        compare(findChild(dialog, "steamName").text, "chiaki-ng");
+        compare(findChild(dialog, "steamName").text, "Chiaki Recast");
         compare(findChild(dialog, "steamOptions").text, "");
         findChild(dialog, "steamName").text = "  My shortcut  ";
         findChild(dialog, "steamOptions").text = " --profile=custom ";

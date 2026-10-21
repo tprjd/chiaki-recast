@@ -2,7 +2,7 @@
 <component type="desktop">
   <id>io.github.streetpea.Chiaki4deck</id>
   <launchable type="desktop-id">chiaking.desktop</launchable>
-  <name>chiaki-ng</name>
+  <name>Chiaki Recast</name>
   <summary>Free and Open Source Client for PlayStation Remote Play</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>AGPL-3.0-only</project_license>
@@ -14,7 +14,7 @@
   <url type="contact">https://discord.gg/tAMbRuwXDH</url>
   <description>
     <p>
-      chiaki-ng is the next-generation of Chiaki, adding new features and ongoing support as the original project (Chiaki) is in maintenance mode. It is a free and Open Source Client for PlayStation 4 and PlayStation 5 Remote Play. It can be used to play in real time on a PlayStation as long as there is a network connection.
+      Chiaki Recast is a PlayStation 4 and PlayStation 5 Remote Play client with a redesigned desktop interface, forked from chiaki-ng. It can be used to play in real time on a PlayStation as long as there is a network connection.
     </p>
   </description>
   <screenshots>

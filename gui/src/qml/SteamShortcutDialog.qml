@@ -142,12 +142,12 @@ FocusScope {
                             visible: dialog.phase === "form"
                             Layout.fillWidth: true; spacing: 10
                             SteamLabel { text: qsTr("STEAM SHORTCUT"); color: "#9ca8b9"; font.pixelSize: 11; font.letterSpacing: 1.5 }
-                            SteamLabel { text: qsTr("Launch chiaki-ng from Steam"); font.pixelSize: 22; font.bold: true }
+                            SteamLabel { text: qsTr("Launch Chiaki Recast from Steam"); font.pixelSize: 22; font.bold: true }
                             SteamLabel { text: qsTr("Steam game name"); Layout.topMargin: 12 }
                             SteamField {
                                 id: nameField
                                 objectName: "steamName"
-                                text: dialog.backend.settings.currentProfile ? qsTr("chiaki-ng %1").arg(dialog.backend.settings.currentProfile) : qsTr("chiaki-ng")
+                                text: dialog.backend.settings.currentProfile ? qsTr("Chiaki Recast %1").arg(dialog.backend.settings.currentProfile) : qsTr("Chiaki Recast")
                                 Accessible.name: qsTr("Steam game name")
                                 firstInFocusChain: true
                             }

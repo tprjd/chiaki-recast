@@ -18,6 +18,7 @@ TestCase {
     Button { id: behind; anchors.centerIn: parent; text: "Behind"; onClicked: tests.behindClicks++ }
     QtObject { id: navigation; function restoreMainFocus() { fallbackFocus.forceActiveFocus(Qt.TabFocusReason); } }
     function test_rendererReportsActualFallback() {
+        tests.width = 900; tests.height = 600;
         const loader = createTemporaryObject(rendererLoader, tests);
         tryCompare(loader, "status", Loader.Ready);
         const dialog = loader.item;
@@ -27,7 +28,7 @@ TestCase {
         dialog.open();
         tryCompare(dialog, "opened", true);
         const message = findChild(dialog.contentItem, "confirmationMessage");
-        verify(message.text.includes("switched to OpenGL"));
+        verify(message.text.includes("Chiaki Recast switched to OpenGL"));
         verify(message.text.includes(dialog.reason));
         compare(message.textFormat, Text.PlainText);
         const close = findChild(dialog.footer, "confirmationCancel");
@@ -79,11 +80,13 @@ TestCase {
             const harness = createTemporaryObject(settingsComponent, tests);
             harness.screen.currentCategory = 8;
             opener = findChild(harness, "aboutSettings");
+            compare(opener.text, "About Chiaki Recast");
             opener.forceActiveFocus(Qt.TabFocusReason);
             keyClick(Qt.Key_Return);
             dialog = findChild(harness, "aboutDialog");
             const message = findChild(dialog.contentItem, "confirmationMessage");
-            for (const phrase of ["chiaki-ng", "Street Pea", "version " + Qt.application.version, "Chiaki", "Florian Markl", "2.1.1", "GNU Affero General Public License version 3", "Free Software Foundation", "WITHOUT ANY WARRANTY", "MERCHANTABILITY", "FITNESS FOR A PARTICULAR PURPOSE", "GNU General Public License"])
+            compare(dialog.title, "About Chiaki Recast");
+            for (const phrase of ["Chiaki Recast", "chiaki-ng", "Street Pea", "version " + Qt.application.version, "Chiaki", "Florian Markl", "2.1.1", "GNU Affero General Public License version 3", "Free Software Foundation", "WITHOUT ANY WARRANTY", "MERCHANTABILITY", "FITNESS FOR A PARTICULAR PURPOSE", "GNU General Public License"])
                 verify(message.text.includes(phrase), "About retains " + phrase);
             const logo = findChild(dialog.contentItem, "informationLogo");
             tryCompare(logo, "status", Image.Ready);
