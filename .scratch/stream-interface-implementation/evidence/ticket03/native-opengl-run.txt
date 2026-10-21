@@ -1,0 +1,35 @@
+{
+    "allPassed": true,
+    "captures": [
+        {
+            "dpr": 1.25,
+            "file": "900-statistics.png",
+            "logicalHeight": 600,
+            "logicalWidth": 900,
+            "method": "Separate QQuickWindow.grabWindow",
+            "physicalHeight": 750,
+            "physicalWidth": 1125
+        },
+        {
+            "dpr": 1.25,
+            "file": "1280-statistics.png",
+            "logicalHeight": 720,
+            "logicalWidth": 1280,
+            "method": "Separate QQuickWindow.grabWindow",
+            "physicalHeight": 900,
+            "physicalWidth": 1600
+        },
+        {
+            "dpr": 1.25,
+            "file": "1920-statistics.png",
+            "logicalHeight": 1080,
+            "logicalWidth": 1920,
+            "method": "Separate QQuickWindow.grabWindow",
+            "physicalHeight": 1350,
+            "physicalWidth": 2400
+        }
+    ],
+    "checks": 51,
+    "runtimeRendererBackend": 1,
+    "transport": "Real QmlBackend and StreamSession handlers, intercepted Start/Stop/GoToBed; test-only video-ready and metric inputs"
+}

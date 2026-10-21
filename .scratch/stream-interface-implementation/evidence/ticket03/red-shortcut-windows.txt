@@ -1,0 +1,44 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : console_screen::StreamInterface::initTestCase()
+PASS   : console_screen::StreamInterface::test_closeNativeWindow(window)
+PASS   : console_screen::StreamInterface::test_configuredDisconnect(inline-stop)
+PASS   : console_screen::StreamInterface::test_configuredDisconnect(inline-sleep)
+PASS   : console_screen::StreamInterface::test_configuredDisconnect(window-stop)
+PASS   : console_screen::StreamInterface::test_configuredDisconnect(window-sleep)
+PASS   : console_screen::StreamInterface::test_controls(inline)
+PASS   : console_screen::StreamInterface::test_controls(window)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-cancel)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-escape)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-disconnect)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(inline-sleep)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(window-cancel)
+FAIL!  : console_screen::StreamInterface::test_disconnectEntry(window-escape) property opened
+   Actual   (): true
+   Expected (): false
+C:\Users\david\.codex\worktrees\stream-statistics\chiaki-ng-ui\gui\tests\qml\tst_StreamInterface.qml(77) : failure location
+PASS   : console_screen::StreamInterface::test_disconnectEntry(window-disconnect)
+PASS   : console_screen::StreamInterface::test_disconnectEntry(window-sleep)
+PASS   : console_screen::StreamInterface::test_exclusions(inline-pin)
+PASS   : console_screen::StreamInterface::test_exclusions(inline-connecting)
+PASS   : console_screen::StreamInterface::test_exclusions(inline-failure)
+PASS   : console_screen::StreamInterface::test_exclusions(window-pin)
+PASS   : console_screen::StreamInterface::test_exclusions(window-connecting)
+PASS   : console_screen::StreamInterface::test_exclusions(window-failure)
+PASS   : console_screen::StreamInterface::test_menuRoundTrip(inline)
+PASS   : console_screen::StreamInterface::test_menuRoundTrip(window)
+PASS   : console_screen::StreamInterface::test_repeatAndDestruction(inline)
+PASS   : console_screen::StreamInterface::test_repeatAndDestruction(window)
+PASS   : console_screen::StreamInterface::test_sessionRemoval(inline)
+PASS   : console_screen::StreamInterface::test_sessionRemoval(window)
+PASS   : console_screen::StreamInterface::test_sessionReplacement(inline)
+PASS   : console_screen::StreamInterface::test_sessionReplacement(window)
+PASS   : console_screen::StreamInterface::test_settingsActions(inline-false)
+PASS   : console_screen::StreamInterface::test_settingsActions(inline-true)
+PASS   : console_screen::StreamInterface::test_settingsActions(window-false)
+PASS   : console_screen::StreamInterface::test_settingsActions(window-true)
+PASS   : console_screen::StreamInterface::test_shortcutDuringClosure(inline)
+PASS   : console_screen::StreamInterface::test_shortcutDuringClosure(window)
+PASS   : console_screen::StreamInterface::cleanupTestCase()
+Totals: 36 passed, 1 failed, 0 skipped, 0 blacklisted, 32866ms
+********* Finished testing of console_screen *********

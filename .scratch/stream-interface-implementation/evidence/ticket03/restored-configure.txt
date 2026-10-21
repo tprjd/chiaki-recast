@@ -1,0 +1,73 @@
+-- Speex DSP found echo cancelling and noise suppression enabled
+CMake Warning (policy) at CMakeLists.txt:114 (find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+This warning is for project developers.  Use -Wno-author or -Wno-policy to
+suppress it.
+
+-- Could NOT find nanopb (missing: nanopb_DIR)
+-- Python install dir: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/python3.14/site-packages
+-- Using CMake version 4.4.4
+-- curl version=[8.11.0-DEV]
+-- CMake platform flags: WIN32 GCC MINGW
+-- Performing Test HAVE_WIN32_WINNT
+-- Performing Test HAVE_WIN32_WINNT - Success
+-- Found _WIN32_WINNT=0xa00
+-- Picky compiler options: -Werror-implicit-function-declaration -W -Wall -pedantic -Wbad-function-cast -Wconversion -Winline -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-format-nonliteral -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wsign-conversion -Wno-error=sign-conversion -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wclobbered -Wmissing-parameter-type -Wold-style-declaration -Wstrict-aliasing=3 -Wtrampolines -Wno-pedantic-ms-format -Wformat=2 -Warray-bounds=2 -ftree-vrp -Wduplicated-cond -Wnull-dereference -fdelete-null-pointer-checks -Wshift-negative-value -Wshift-overflow=2 -Walloc-zero -Wduplicated-branches -Wformat-truncation=2 -Wimplicit-fallthrough -Wrestrict -Warith-conversion -Wdouble-promotion -Wenum-conversion -Wpragmas -Wunused-const-variable
+-- Protocols: http https scp sftp ws wss
+-- Features: alt-svc AsynchDNS HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL SSPI threadsafe UnixSockets
+-- Enabled SSL backends: Schannel
+-- Steam shortcut enabled
+-- FFMPEG Decoder enabled
+-- Could NOT find ILClient (missing: ILClient_libbcm_host_LIBRARY ILClient_libvcilcs_LIBRARY ILClient_libvchiq_arm_LIBRARY ILClient_libvcos_LIBRARY ILClient_INCLUDE_DIR ILClient_SOURCE_DIR) 
+-- Pi Decoder disabled
+-- Steamdeck native gyro and hatpics disabled
+-- SDL version 2.32.10 is >= 2.0.14, disabling Setsu
+-- Setsu disabled
+CMake Warning at C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:339 (message):
+  This project is using headers of the GuiPrivate module and will therefore
+  be tied to this specific Qt module build version.  Running this project
+  against other versions of the Qt modules may crash at any arbitrary point.
+  This is not a bug, but a result of using Qt internals.  You have been
+  warned!
+
+  You can disable this warning by setting QT_NO_PRIVATE_MODULE_WARNING to ON.
+Call Stack (most recent call first):
+  C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6GuiPrivate/Qt6GuiPrivateConfig.cmake:48 (_qt_internal_show_private_module_warning)
+  C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/Qt6Config.cmake:257 (find_package)
+  gui/CMakeLists.txt:12 (find_package)
+
+
+-- Could NOT find Qt6WebEngineQuick (missing: Qt6WebEngineQuick_DIR)
+CMake Warning at gui/CMakeLists.txt:15 (find_package):
+  Found package configuration file:
+
+    C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/Qt6Config.cmake
+
+  but it set Qt6_FOUND to FALSE so package "Qt6" is considered to be NOT
+  FOUND.  Reason given by package:
+
+  Failed to find required Qt component "WebEngineQuick".
+
+  Expected Config file at
+  "C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6WebEngineQuick/Qt6WebEngineQuickConfig.cmake"
+  does NOT exist
+
+
+
+  Configuring with --debug-find-pkg=Qt6WebEngineQuick might reveal details
+  why the package was not found.
+
+  Configuring with -DQT_DEBUG_FIND_PACKAGE=ON will print the values of some
+  of the path variables that find_package uses to try and find the package.
+
+
+
+CMake Warning (author) at gui/CMakeLists.txt:156 (install):
+  Target chiaki has RESOURCE files but no RESOURCE DESTINATION.
+This warning is for project developers.  Use -Wno-author to suppress it.
+
+-- Configuring done (1.6s)
+-- Generating done (0.4s)
+-- Build files have been written to: C:/Users/david/.cache/chiaki-ui-native/build
