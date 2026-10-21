@@ -7,6 +7,7 @@ Ticket 03 remains incomplete until real mouse and The First Descendant trials es
 
 The implementation starts at integration revision `70ecfdd26c1e2053a9297081dd46c1ef6c8cff66`.
 Tested standalone response implementation: `9d8fd01d4bd4c9c8fea3eb7793d0060c6fe82438`.
+Tested combined response and bindings implementation: `763c8861986d9ecd5f4ae47726934d4b715830ea`.
 The response implementation commit contains this record and the maintained checks below.
 Build directory: `build/keyboard-mouse-native` in the response worktree.
 Configuration: Release, GCC 16.2.0 UCRT64, Qt 6.11.2, SDL controller support, Steam shortcuts, and tests enabled.
@@ -62,6 +63,34 @@ The focused QML checks cover numeric entry, invalid edit recovery, mode-off disa
 The stream menu checks cover the inline and native-window routes. The toolbar layout checks cover both routes at the existing test sizes.
 Screenshot: `build/mouse-response-minimum.png` in the response worktree.
 Test logs use the `kbm-response-` prefix in the system temporary directory.
+
+## Combined page verification
+
+The combined implementation includes binding revision `8e90e912f94fea72943d52ebcbd2755ff0c44d23`.
+Both settings snapshots remain separate and apply before the same capture start.
+The shared page has one mode selector, two tabs, one settings object, and one save message.
+Search selects the Bindings tab, loads its pane, and focuses the Cross primary slot without opening assignment.
+The native route checks load the full binding pane with the real settings bridge in OpenGL and Vulkan windows.
+Both checks retain the session, restore the stream's focus on close, and leave capture released.
+
+The final focused results are:
+
+| Check | Result | Log in the system temporary directory |
+| --- | --- | --- |
+| Combined page at 900 by 600 | 3 passed | `kbm-response-combined-page.txt` |
+| Numeric response, load validation, and traces | 5 passed | `kbm-response-merged-numeric.txt` |
+| Response and binding capture snapshots, binding validation | 5 passed | `kbm-response-merged-snapshots.txt` |
+| Combined native settings, OpenGL | 3 passed | `kbm-response-merged-opengl.txt` |
+| Combined native settings, Vulkan | 3 passed | `kbm-response-merged-vulkan.txt` |
+| Existing keyboard settings | 43 passed | `kbm-response-final-SettingsKeys.txt` |
+| Existing settings search | 27 passed | `kbm-response-final-SettingsSearch.txt` |
+| Stream interface | 39 passed | `kbm-response-final-StreamInterface.txt` |
+| Stream toolbar layout | 20 passed | `kbm-response-toolbar-layout.txt` |
+
+Each Qt test result includes setup and cleanup cases.
+The existing keyboard, search, stream interface, and layout suites ran before the final binding merge.
+The focused combined checks ran after that merge. Unrelated suites did not run again.
+The screenshot waits for the Material checkbox animation and verifies the checkbox and saved mode value before capture.
 
 ## Open acceptance work
 
