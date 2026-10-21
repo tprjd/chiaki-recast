@@ -20,7 +20,7 @@ DialogView {
         if(dialog.fromReminder && Chiaki.settings.remotePlayAsk)
         {
             if(!Chiaki.settings.psnRefreshToken || !Chiaki.settings.psnAuthToken || !Chiaki.settings.psnAuthTokenExpiry || !Chiaki.settings.psnAccountId)
-                root.showRemindDialog(qsTr("Remote Play via PSN"), qsTr("Would you like to connect to PSN?\nThis enables:\n- Automatic registration\n- Playing outside of your home network without port forwarding?") + "\n\n" + qsTr("(Note: If you select no now and want to do this later, go to the Config section of the settings.)"), true, () => root.showPSNTokenDialog(false));
+                root.showRemindDialog(qsTr("PSN sign-in"), qsTr("Sign in to PSN to register consoles automatically and use Remote Play outside your home network. Sign-in saves your account credentials in chiaki-ng. You can also set this up later in Settings, under Config."), true, () => root.showPSNTokenDialog(false));
             else
                 Chiaki.settings.remotePlayAsk = false;
         }
