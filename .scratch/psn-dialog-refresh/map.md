@@ -11,7 +11,7 @@ Specification: [PSN sign-in and remaining dialogs](spec.md)
 | [01: PSN setup and credential renewal](issues/01-psn-setup-and-renewal.md) | claimed | None |
 | [02: Account-ID retrieval for registration](issues/02-registration-account-id.md) | ready-for-agent | 01 |
 | [03: Steam shortcut creation and results](issues/03-steam-shortcut-results.md) | claimed | None |
-| [04: Startup reminder choices](issues/04-startup-reminders.md) | ready-for-agent | None |
+| [04: Startup reminder choices](issues/04-startup-reminders.md) | claimed | None |
 | [05: Explicit confirmations and registration choice](issues/05-confirmations-and-registration.md) | resolved | None |
 | [06: Disconnect confirmations in both renderer routes](issues/06-disconnect-confirmations.md) | ready-for-agent | None |
 | [07: About and renderer notices](issues/07-about-and-renderer-notices.md) | ready-for-agent | None |

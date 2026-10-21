@@ -1,6 +1,6 @@
 # 04: Startup reminder choices
 
-Status: ready-for-agent
+Status: claimed
 Type: task
 Blocked by: None (can start immediately)
 
