@@ -181,15 +181,12 @@ Item {
                        qsTr("Vulkan renderer initialization failed and chiaki-ng switched to OpenGL.\n\nReason: %1").arg(reason));
     }
 
+    function showPsnReminder() { remindDialog.offerPsnReminder(); }
+
     function showRemindDialog(title, text, remotePlay, callback) {
+        if (remindDialog.visible) return false;
         rememberMainFocus();
-        remindDialog.title = title;
-        remindDialog.text = text;
-        remindDialog.remotePlay = remotePlay;
-        remindDialog.callback = callback;
-        remindDialog.newDialogOpen = false;
-        remindDialog.restoreFocusItem = Window.window.activeFocusItem;
-        remindDialog.open();
+        return remindDialog.showReminder(title, text, remotePlay, callback, Window.window.activeFocusItem);
     }
 
 
@@ -557,6 +554,7 @@ Item {
 
     RemindDialog {
         id: remindDialog
+        navigation: root
     }
 
     Connections {

@@ -178,6 +178,21 @@ production `RegistrationMethodDialog.qml`. Both suites check long text at
 900 by 600 and 1280 by 720. Backend commands are controlled test observations.
 Real registration and native input capture require separate acceptance checks.
 
+## Startup reminder tests
+
+`RemindersHarness.qml` loads production `MainView.qml`, `RemindDialog.qml`, and
+the Steam setup screen through a real `StackView`. `Reminders` checks all three
+choices, Escape, the controller triangle/Y dismissal key, initial Later focus,
+focus return, duplicate requests, startup eligibility, and Steam-then-PSN order.
+The long-text checks use 900 by 600 and 1280 by 720 logical pixels.
+
+The navigation contract remains `showRemindDialog(title, text, remotePlay, callback)`.
+Set up now starts that callback after the popup closes. Later leaves the preference
+unchanged. Don't ask again disables the selected reminder. Setup completion uses
+the existing preference and credential-presence contract. The Steam route tests
+use controlled final outcomes and check that success alone disables its reminder.
+These tests do not create Steam files or authenticate a PSN account.
+
 ## Settings screen tests
 
 `SettingsHarness.qml` loads the production Settings screen with synthetic

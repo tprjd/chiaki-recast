@@ -1,0 +1,15 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::Reminders::initTestCase()
+QWARN  : console_screen::Reminders::test_escapeLeavesPreferenceUnchanged() file:///C:/Users/david/.codex/worktrees/psn-reminders/chiaki-ng-ui/gui/tests/qml/tst_Reminders.qml: Setting initial properties failed: RemindDialog does not have a property called backend
+QWARN  : console_screen::Reminders::test_escapeLeavesPreferenceUnchanged() file:///C:/Users/david/.codex/worktrees/psn-reminders/chiaki-ng-ui/gui/tests/qml/tst_Reminders.qml: Setting initial properties failed: RemindDialog does not have a property called navigation
+QWARN  : console_screen::Reminders::test_escapeLeavesPreferenceUnchanged() file:///C:/Users/david/.codex/worktrees/psn-reminders/chiaki-ng-ui/gui/src/qml/RemindDialog.qml:18: ReferenceError: root is not defined
+QWARN  : console_screen::Reminders::test_escapeLeavesPreferenceUnchanged() file:///C:/Users/david/.codex/worktrees/psn-reminders/chiaki-ng-ui/gui/src/qml/RemindDialog.qml:17: ReferenceError: root is not defined
+QWARN  : console_screen::Reminders::test_escapeLeavesPreferenceUnchanged() file:///C:/Users/david/.codex/worktrees/psn-reminders/chiaki-ng-ui/gui/src/qml/RemindDialog.qml:90: ReferenceError: root is not defined
+QWARN  : console_screen::Reminders::test_escapeLeavesPreferenceUnchanged() file:///C:/Users/david/.codex/worktrees/psn-reminders/chiaki-ng-ui/gui/src/qml/RemindDialog.qml:111: ReferenceError: root is not defined
+QWARN  : console_screen::Reminders::test_escapeLeavesPreferenceUnchanged() file:///C:/Users/david/.codex/worktrees/psn-reminders/chiaki-ng-ui/gui/src/qml/RemindDialog.qml:132: ReferenceError: root is not defined
+FAIL!  : console_screen::Reminders::test_escapeLeavesPreferenceUnchanged() Uncaught exception: Property 'showReminder' of object RemindDialog_QMLTYPE_4(0x2b184eeb440) is not a function
+C:\Users\david\.codex\worktrees\psn-reminders\chiaki-ng-ui\gui\tests\qml\tst_Reminders.qml(21) : failure location
+PASS   : console_screen::Reminders::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 5ms
+********* Finished testing of console_screen *********
