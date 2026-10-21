@@ -336,6 +336,13 @@ StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObje
 	dpad_touch_value = QPair<uint16_t, uint16_t>(0,0);
 	dpad_touch_increment = connect_info.dpad_touch_increment;
 	dpad_touch_timer = new QTimer(this);
+	gameplay_mouse_timer = new QTimer(this);
+	gameplay_mouse_timer->setTimerType(Qt::PreciseTimer);
+	gameplay_mouse_timer->setInterval(4);
+	connect(gameplay_mouse_timer, &QTimer::timeout, this, [this] {
+		if(gameplay_captured && keyboard_mouse.advanceMouse(gameplay_mouse_clock.nsecsElapsed() / 1000))
+			SendFeedbackState();
+	});
 	connect(dpad_touch_timer, &QTimer::timeout, this, &StreamSession::DpadSendFeedbackState);
 	dpad_touch_timer->setInterval(DPAD_TOUCH_UPDATE_INTERVAL_MS);
 	dpad_touch_stop_timer = new QTimer(this);
@@ -706,6 +713,7 @@ void StreamSession::SetGameplayCapture(bool captured, const QSet<int> &held)
 {
 	gameplay_captured = captured && mouse_camera_enabled;
 	keyboard_mouse.reset(held);
+	gameplay_mouse_timer->stop();
 	chiaki_controller_state_set_idle(&keyboard_state);
 	chiaki_controller_state_set_idle(&touch_state);
 	chiaki_controller_state_set_idle(&dpad_touch_state);
@@ -715,6 +723,8 @@ void StreamSession::SetGameplayCapture(bool captured, const QSet<int> &held)
 	dpad_touch_stop_timer->stop();
 	if(gameplay_captured)
 	{
+		gameplay_mouse_clock.start();
+		gameplay_mouse_timer->start();
 		if(input_block == 2) input_block = 0;
 		SendFeedbackState();
 	}
@@ -724,6 +734,12 @@ void StreamSession::SetGameplayCapture(bool captured, const QSet<int> &held)
 		chiaki_controller_state_set_idle(&neutral);
 		chiaki_session_set_controller_state(&session, &neutral);
 	}
+}
+
+void StreamSession::HandleRelativeMouseMove(double dx, double dy)
+{
+	if(gameplay_captured)
+		keyboard_mouse.mouseMove(dx, dy, gameplay_mouse_clock.nsecsElapsed() / 1000);
 }
 
 bool StreamSession::SendGameplayFeedback()
@@ -737,7 +753,15 @@ bool StreamSession::SendGameplayFeedback()
 
 void StreamSession::HandleMousePressEvent(QMouseEvent *event)
 {
-	if(mouse_camera_enabled) return;
+	if(mouse_camera_enabled)
+	{
+		if(gameplay_captured)
+		{
+			keyboard_mouse.mouseButton(event->button(), true);
+			SendFeedbackState();
+		}
+		return;
+	}
 	if(!mouse_touch_enabled)
 		return;
 	// left button for touchpad gestures, others => touchpad click
@@ -748,7 +772,15 @@ void StreamSession::HandleMousePressEvent(QMouseEvent *event)
 
 void StreamSession::HandleMouseReleaseEvent(QMouseEvent *event)
 {
-	if(mouse_camera_enabled) return;
+	if(mouse_camera_enabled)
+	{
+		if(gameplay_captured)
+		{
+			keyboard_mouse.mouseButton(event->button(), false);
+			SendFeedbackState();
+		}
+		return;
+	}
 	if(!mouse_touch_enabled)
 		return;
 	// left button => end of touchpad gesture

@@ -41,6 +41,7 @@ extern "C" {
 #include <cstring>
 #include <utility>
 #include <memory>
+#include <vector>
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
@@ -49,6 +50,86 @@ extern "C" {
 #endif
 
 Q_LOGGING_CATEGORY(chiakiGui, "chiaki.gui", QtInfoMsg);
+
+#ifdef Q_OS_WIN
+class WindowsMouseCapture
+{
+public:
+    ~WindowsMouseCapture() { release(); }
+    bool start(HWND target)
+    {
+        window = target;
+        if (!registration(previous) || !GetClipCursor(&previous_clip)) return false;
+        const int desktopX = GetSystemMetrics(SM_XVIRTUALSCREEN), desktopY = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        const RECT desktop = {desktopX, desktopY, desktopX + GetSystemMetrics(SM_CXVIRTUALSCREEN),
+            desktopY + GetSystemMetrics(SM_CYVIRTUALSCREEN)};
+        previously_unclipped = EqualRect(&previous_clip, &desktop);
+        const RAWINPUTDEVICE mouse = {1, 2, 0, window};
+        if (!RegisterRawInputDevices(&mouse, 1, sizeof(mouse))) return false;
+        registered = true;
+        if (updateClip()) return true;
+        release();
+        return false;
+    }
+    bool updateClip()
+    {
+        RECT client;
+        if (!GetClientRect(window, &client)) return false;
+        POINT topLeft{client.left, client.top}, bottomRight{client.right, client.bottom};
+        if (!ClientToScreen(window, &topLeft) || !ClientToScreen(window, &bottomRight)
+                || topLeft.x >= bottomRight.x || topLeft.y >= bottomRight.y) return false;
+        RECT next = {topLeft.x, topLeft.y, bottomRight.x, bottomRight.y};
+        if (!ClipCursor(&next)) return false;
+        clip = next;
+        clipped = true;
+        return true;
+    }
+    void release()
+    {
+        if (clipped) {
+            RECT current;
+            if (!GetClipCursor(&current) || EqualRect(&current, &clip)) {
+                if (!ClipCursor(previously_unclipped ? nullptr : &previous_clip) && !ClipCursor(nullptr))
+                    qCWarning(chiakiGui) << "Failed to release gameplay cursor confinement" << GetLastError();
+            }
+            clipped = false;
+        }
+        if (registered) {
+            RAWINPUTDEVICE current;
+            // Raw Input registration is process-wide. Do not remove a newer owner's registration.
+            if (registration(current) && current.hwndTarget == window && current.dwFlags == 0) {
+                if (!RegisterRawInputDevices(&previous, 1, sizeof(previous))) {
+                    qCWarning(chiakiGui) << "Failed to restore mouse Raw Input registration" << GetLastError();
+                    const RAWINPUTDEVICE remove = {1, 2, RIDEV_REMOVE, nullptr};
+                    RegisterRawInputDevices(&remove, 1, sizeof(remove));
+                }
+            }
+            registered = false;
+        }
+    }
+private:
+    static bool registration(RAWINPUTDEVICE &mouse)
+    {
+        UINT count = 0;
+        const auto result = GetRegisteredRawInputDevices(nullptr, &count, sizeof(RAWINPUTDEVICE));
+        if (result == UINT(-1) && GetLastError() != ERROR_INSUFFICIENT_BUFFER) return false;
+        std::vector<RAWINPUTDEVICE> devices(count);
+        if (count) {
+            const auto copied = GetRegisteredRawInputDevices(devices.data(), &count, sizeof(RAWINPUTDEVICE));
+            if (copied == UINT(-1)) return false;
+            devices.resize(copied);
+        }
+        mouse = {1, 2, RIDEV_REMOVE, nullptr};
+        for (const auto &device : devices)
+            if (device.usUsagePage == 1 && device.usUsage == 2) mouse = device;
+        return true;
+    }
+    HWND window = nullptr;
+    RAWINPUTDEVICE previous = {};
+    RECT previous_clip = {}, clip = {};
+    bool registered = false, clipped = false, previously_unclipped = false;
+};
+#endif
 
 static void detectOpenGLGpuVendor(QmlMainWindow *window)
 {
@@ -743,8 +824,7 @@ void QmlMainWindow::presentFrame(ChiakiFfmpegFrame frame, int32_t frames_lost)
 
     if (!has_video) {
         has_video = true;
-        if (!stream_input->blocked() && settings->GetHideCursor())
-            setCursor(Qt::BlankCursor);
+        updateCursor();
         emit hasVideoChanged();
     }
     scheduleUpdate();
@@ -1225,8 +1305,7 @@ bool QmlMainWindow::queueStoredFrame(AVFrame *frame, double pts, float duration,
 
     if (!has_video) {
         has_video = true;
-        if (!stream_input->blocked() && settings->GetHideCursor())
-            setCursor(Qt::BlankCursor);
+        updateCursor();
         emit hasVideoChanged();
     }
     scheduleUpdate();
@@ -1721,8 +1800,7 @@ renderer_backend_ready:
     stream_input = new StreamInputOwnership(this, quick_window, this);
     connect(stream_input, &StreamInputOwnership::captureChanged, this, [this](bool blocked) {
         if (blocked) releaseGameplayCapture();
-        if (blocked) setCursor(Qt::ArrowCursor);
-        else if (has_video && this->settings->GetHideCursor()) setCursor(Qt::BlankCursor);
+        updateCursor();
         if (session) session->BlockInput(blocked);
         emit gameplayCaptureChanged();
     });
@@ -2743,34 +2821,63 @@ void QmlMainWindow::render()
 bool QmlMainWindow::gameplayCaptureAvailable() const
 {
     return settings->GetMouseCameraEnabled() && session && session->GetConnected()
-        && !session->GetCantDisplay() && isActive() && !stream_input->blocked();
+        && !session->GetCantDisplay() && gameplayForeground() && !stream_input->blocked();
+}
+
+bool QmlMainWindow::gameplayForeground() const
+{
+#ifdef Q_OS_WIN
+    return isActive() && GetForegroundWindow() == reinterpret_cast<HWND>(winId());
+#else
+    return isActive();
+#endif
 }
 
 void QmlMainWindow::updateMouseCameraMode()
 {
     releaseGameplayCapture();
     if (session) session->SetMouseCameraEnabled(settings->GetMouseCameraEnabled());
+    updateCursor();
     emit gameplayCaptureChanged();
+}
+
+void QmlMainWindow::updateCursor()
+{
+    const bool hidden = gameplay_captured || (!settings->GetMouseCameraEnabled() && has_video
+        && isActive() && !stream_input->blocked() && settings->GetHideCursor());
+    setCursor(hidden ? Qt::BlankCursor : Qt::ArrowCursor);
 }
 
 void QmlMainWindow::releaseGameplayCapture()
 {
 #ifdef Q_OS_WIN
     gameplay_input_not_before = GetTickCount();
+    gameplay_mouse.reset();
 #endif
     if (!gameplay_captured) return;
     gameplay_captured = false;
     if (session) session->SetGameplayCapture(false);
-    setCursor(has_video && isActive() && !stream_input->blocked() && settings->GetHideCursor()
-        ? Qt::BlankCursor : Qt::ArrowCursor);
+    updateCursor();
     emit gameplayCaptureChanged();
 }
 
 void QmlMainWindow::startGameplayCapture(ulong timestamp)
 {
-    if (!gameplayCaptureAvailable()) return;
+    if (gameplay_captured || !gameplayCaptureAvailable()) return;
     QSet<int> held;
 #ifdef Q_OS_WIN
+    auto mouse = std::make_unique<WindowsMouseCapture>();
+    if (!mouse->start(reinterpret_cast<HWND>(winId()))) {
+        qCWarning(chiakiGui) << "Failed to start gameplay mouse capture" << GetLastError();
+        updateCursor();
+        return;
+    }
+    gameplay_mouse = std::move(mouse);
+    gameplay_mouse_not_before = GetTickCount();
+    // Remove old raw packets before this capture starts, with the required foreground cleanup.
+    MSG pending;
+    while (PeekMessage(&pending, reinterpret_cast<HWND>(winId()), WM_INPUT, WM_INPUT, PM_REMOVE))
+        DefWindowProc(pending.hwnd, pending.message, pending.wParam, pending.lParam);
     // Include keys held before the window received focus; they need a release first.
     for (int code = 'A'; code <= 'Z'; ++code)
         if (GetAsyncKeyState(code) & 0x8000) held.insert(code);
@@ -2781,13 +2888,44 @@ void QmlMainWindow::startGameplayCapture(ulong timestamp)
     };
     for (const auto &binding : special)
         if (GetAsyncKeyState(binding.native) & 0x8000) held.insert(binding.key);
+    const struct { int native; Qt::MouseButton button; } buttons[] = {
+        {GetSystemMetrics(SM_SWAPBUTTON) ? VK_RBUTTON : VK_LBUTTON, Qt::LeftButton},
+        {GetSystemMetrics(SM_SWAPBUTTON) ? VK_LBUTTON : VK_RBUTTON, Qt::RightButton}, {VK_MBUTTON, Qt::MiddleButton},
+        {VK_XBUTTON1, Qt::BackButton}, {VK_XBUTTON2, Qt::ForwardButton}
+    };
+    for (const auto &binding : buttons)
+        if (GetAsyncKeyState(binding.native) & 0x8000) held.insert(-int(binding.button));
 #endif
     session->SetGameplayCapture(true, held);
     gameplay_input_not_before = timestamp;
     gameplay_captured = true;
-    setCursor(Qt::BlankCursor);
+    updateCursor();
     emit gameplayCaptureChanged();
 }
+
+#ifdef Q_OS_WIN
+bool QmlMainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr *result)
+{
+    if (eventType == "windows_generic_MSG" && gameplay_captured && gameplay_mouse) {
+        const auto *native = static_cast<MSG *>(message);
+        if (native->message == WM_WINDOWPOSCHANGED) {
+            if (!gameplay_mouse->updateClip()) releaseGameplayCapture();
+        } else if (native->message == WM_INPUT && GET_RAWINPUT_CODE_WPARAM(native->wParam) == RIM_INPUT
+                && isActive() && GetForegroundWindow() == reinterpret_cast<HWND>(winId())
+                && qint32(native->time - gameplay_mouse_not_before) >= 0) {
+            RAWINPUT input;
+            UINT size = sizeof(input);
+            const auto copied = GetRawInputData(reinterpret_cast<HRAWINPUT>(native->lParam), RID_INPUT,
+                &input, &size, sizeof(RAWINPUTHEADER));
+            if (copied != UINT(-1) && copied >= sizeof(RAWINPUTHEADER) + sizeof(RAWMOUSE)
+                    && input.header.dwType == RIM_TYPEMOUSE && !(input.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE))
+                session->HandleRelativeMouseMove(input.data.mouse.lLastX, input.data.mouse.lLastY);
+        }
+    }
+    // Qt must reach DefWindowProc for WM_INPUT foreground-packet cleanup.
+    return QWindow::nativeEvent(eventType, message, result);
+}
+#endif
 
 bool QmlMainWindow::handleShortcut(QKeyEvent *event)
 {
@@ -2892,6 +3030,16 @@ bool QmlMainWindow::event(QEvent *event)
             }
         }
     }
+    if (gameplay_captured && (event->type() == QEvent::MouseMove || event->type() == QEvent::MouseButtonPress
+            || event->type() == QEvent::MouseButtonRelease || event->type() == QEvent::MouseButtonDblClick)) {
+        auto *mouse = static_cast<QMouseEvent *>(event);
+        if (mouse->source() != Qt::MouseEventNotSynthesized || !mouse->timestamp()
+                || qint32(mouse->timestamp() - gameplay_input_not_before) < 0) return true;
+        if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)
+            session->HandleMousePressEvent(mouse);
+        else if (event->type() == QEvent::MouseButtonRelease) session->HandleMouseReleaseEvent(mouse);
+        return true;
+    }
     switch (event->type()) {
     case QEvent::MouseMove:
     case QEvent::MouseButtonPress:
@@ -2910,11 +3058,11 @@ bool QmlMainWindow::event(QEvent *event)
         QGuiApplication::sendEvent(quick_window, event);
         break;
     case QEvent::Wheel:
+        if (gameplay_captured) return true;
         if (!session || stream_input->blocked())
             QGuiApplication::sendEvent(quick_window, event);
         break;
     case QEvent::MouseButtonDblClick:
-        if (gameplay_captured) return true;
         if(!settings->GetFullscreenDoubleClickEnabled())
             break;
         if (session && !stream_input->blocked()) {

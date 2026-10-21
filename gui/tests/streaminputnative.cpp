@@ -13,9 +13,11 @@
 #endif
 
 static ChiakiControllerState outgoing;
+static bool mouseMotionObserved = false;
 extern "C" ChiakiErrorCode __wrap_chiaki_session_set_controller_state(ChiakiSession *, ChiakiControllerState *state)
 {
     outgoing = *state;
+    mouseMotionObserved |= state->right_x != 0 || state->right_y != 0;
     return CHIAKI_ERR_SUCCESS;
 }
 
@@ -24,6 +26,20 @@ struct TestSettingsProfile {
     ~TestSettingsProfile() {
         QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
     }
+};
+
+class InputTestWindow : public QmlMainWindow
+{
+public:
+    InputTestWindow(Settings *settings, bool controlledForeground)
+        : QmlMainWindow(settings), controlled_foreground(controlledForeground) {}
+protected:
+    bool gameplayForeground() const override
+    {
+        return controlled_foreground ? isActive() : QmlMainWindow::gameplayForeground();
+    }
+private:
+    bool controlled_foreground;
 };
 
 class StreamInputNativeTest : public QObject
@@ -41,7 +57,7 @@ private:
         settings.SetRenderBackend(qEnvironmentVariable("CHIAKI_INPUT_TEST_RENDERER") == "vulkan" ? RenderBackend::Vulkan : RenderBackend::OpenGL);
         settings.SetHardwareDecoder({});
         settings.SetKeyboardEnabled(true);
-        QmlMainWindow window(&settings);
+        InputTestWindow window(&settings, platformKeys);
         auto *backend = window.getBackend();
         backend->stopAutoConnect();
         StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
@@ -251,7 +267,237 @@ private:
         QVERIFY(!input->blocked());
         window.hide();
     }
+private:
+    void runMouse(bool nativeInput)
+    {
+#ifndef Q_OS_WIN
+        QSKIP("Mouse capture requires Windows.");
+#else
+        TestSettingsProfile profile;
+        Settings settings(profile.name);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetRenderBackend(RenderBackend::OpenGL);
+        settings.SetHardwareDecoder({});
+        settings.SetMouseCameraEnabled(true);
+        settings.SetHideCursor(true);
+        InputTestWindow window(&settings, !nativeInput);
+        auto *backend = window.getBackend();
+        backend->stopAutoConnect();
+        StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
+            QByteArray(CHIAKI_SESSION_AUTH_SIZE, '\0'), QByteArray(16, '\0'), {}, {}, false, false, false, false);
+        StreamSession session(info);
+        struct SessionBoundary {
+            QmlBackend *backend;
+            ~SessionBoundary() { backend->session = nullptr; backend->sessionChanged(nullptr); }
+        } cleanup{backend};
+        session.connected = true;
+        backend->session = &session;
+        backend->sessionChanged(&session);
+        window.resize(900, 600);
+        window.show();
+        window.requestActivate();
+        QTRY_VERIFY(window.isActive());
+        const auto hwnd = reinterpret_cast<HWND>(window.winId());
+        if (nativeInput) {
+            SetForegroundWindow(hwnd);
+            QTRY_COMPARE(GetForegroundWindow(), hwnd);
+        }
+        const auto registration = [] {
+            UINT count = 0;
+            GetRegisteredRawInputDevices(nullptr, &count, sizeof(RAWINPUTDEVICE));
+            std::vector<RAWINPUTDEVICE> devices(count);
+            if (count) GetRegisteredRawInputDevices(devices.data(), &count, sizeof(RAWINPUTDEVICE));
+            for (const auto &device : devices)
+                if (device.usUsagePage == 1 && device.usUsage == 2) return device;
+            return RAWINPUTDEVICE{1, 2, RIDEV_REMOVE, nullptr};
+        };
+        struct RestoreRegistration {
+            RAWINPUTDEVICE original;
+            ~RestoreRegistration() { RegisterRawInputDevices(&original, 1, sizeof(original)); }
+        } restore{registration()};
+        QWindow other;
+        RAWINPUTDEVICE previous = {1, 2, 0, reinterpret_cast<HWND>(other.winId())};
+        QVERIFY(RegisterRawInputDevices(&previous, 1, sizeof(previous)));
+        RECT before;
+        QVERIFY(GetClipCursor(&before));
+        window.has_video = true;
+        window.startGameplayCapture(GetTickCount());
+        QVERIFY(window.gameplayCaptured());
+        QCOMPARE(registration().hwndTarget, hwnd);
+        QCOMPARE(registration().dwFlags, DWORD(0));
+        RECT client;
+        QVERIFY(GetClientRect(hwnd, &client));
+        POINT topLeft{client.left, client.top}, bottomRight{client.right, client.bottom};
+        QVERIFY(ClientToScreen(hwnd, &topLeft));
+        QVERIFY(ClientToScreen(hwnd, &bottomRight));
+        RECT clipped;
+        QVERIFY(GetClipCursor(&clipped));
+        QCOMPARE(clipped.left, topLeft.x);
+        QCOMPARE(clipped.right, bottomRight.x);
+        QCOMPARE(clipped.top, topLeft.y);
+        QCOMPARE(clipped.bottom, bottomRight.y);
+        QCOMPARE(window.cursor().shape(), Qt::BlankCursor);
+        window.resize(960, 640);
+        QCoreApplication::processEvents();
+        QVERIFY(window.gameplayCaptured());
+        QVERIFY(GetClientRect(hwnd, &client));
+        bottomRight = {client.right, client.bottom};
+        QVERIFY(ClientToScreen(hwnd, &bottomRight));
+        QVERIFY(GetClipCursor(&clipped));
+        QCOMPARE(clipped.right, bottomRight.x);
+        QCOMPARE(clipped.bottom, bottomRight.y);
+        const auto mouse = [&window](QEvent::Type type, Qt::MouseButton button, ulong timestamp) {
+            QMouseEvent event(type, QPointF(10, 10), QPointF(10, 10), button,
+                type == QEvent::MouseButtonRelease ? Qt::NoButton : button, Qt::NoModifier);
+            event.setTimestamp(timestamp);
+            QCoreApplication::sendEvent(&window, &event);
+        };
+        mouse(QEvent::MouseButtonPress, Qt::LeftButton, GetTickCount());
+        QCOMPARE(outgoing.r2_state, uint8_t(255));
+        mouse(QEvent::MouseButtonRelease, Qt::LeftButton, GetTickCount());
+        const auto state = window.windowState();
+        mouse(QEvent::MouseButtonDblClick, Qt::LeftButton, GetTickCount());
+        QCOMPARE(outgoing.r2_state, uint8_t(255));
+        QCOMPARE(window.windowState(), state);
+        mouse(QEvent::MouseButtonRelease, Qt::LeftButton, GetTickCount());
+        QCOMPARE(outgoing.r2_state, uint8_t(0));
+        mouseMotionObserved = false;
+        if (nativeInput) {
+            INPUT input = {};
+            input.type = INPUT_MOUSE;
+            input.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_MOVE_NOCOALESCE;
+            input.mi.dx = 8;
+            input.mi.dy = -4;
+            QCOMPARE(SendInput(1, &input, sizeof(input)), 1u);
+        } else session.HandleRelativeMouseMove(8, -4);
+        QTRY_VERIFY(mouseMotionObserved);
+        QTRY_COMPARE(outgoing.right_x, int16_t(0));
+        QCOMPARE(outgoing.right_y, int16_t(0));
+        QQuickItem owner;
+        const auto presentation = window.streamInput()->present(&owner, "menu");
+        QVERIFY(!window.gameplayCaptured());
+        QCOMPARE(registration().hwndTarget, previous.hwndTarget);
+        QVERIFY(GetClipCursor(&clipped));
+        QVERIFY(EqualRect(&before, &clipped));
+        QCOMPARE(window.cursor().shape(), Qt::ArrowCursor);
+        window.streamInput()->dismiss(presentation);
+        window.streamInput()->settled(presentation);
+        QCOMPARE(window.cursor().shape(), Qt::ArrowCursor);
+        window.startGameplayCapture(GetTickCount());
+        QVERIFY(window.gameplayCaptured());
+        mouse(QEvent::MouseButtonPress, Qt::LeftButton, GetTickCount() - 1000);
+        QCOMPARE(outgoing.r2_state, uint8_t(0));
+        QWindow newestOwner;
+        RAWINPUTDEVICE newer = {1, 2, 0, reinterpret_cast<HWND>(newestOwner.winId())};
+        QVERIFY(RegisterRawInputDevices(&newer, 1, sizeof(newer)));
+        QFocusEvent focusOut(QEvent::FocusOut);
+        QCoreApplication::sendEvent(&window, &focusOut);
+        QVERIFY(!window.gameplayCaptured());
+        QCOMPARE(registration().hwndTarget, newer.hwndTarget);
+        QVERIFY(GetClipCursor(&clipped));
+        QVERIFY(EqualRect(&before, &clipped));
+#endif
+    }
 private slots:
+    void mouseDesktop() { runMouse(false); }
+    void spontaneousMouse()
+    {
+        if (!qEnvironmentVariableIsSet("CHIAKI_INPUT_TEST_MOUSE"))
+            QSKIP("Set CHIAKI_INPUT_TEST_MOUSE=1 for foreground Win32 mouse injection.");
+        runMouse(true);
+    }
+    void mouseMotion()
+    {
+        KeyboardMouseMapper mapper;
+        mapper.mouseMove(8, -4, 0);
+        mapper.advanceMouse(0);
+        QCOMPARE(mapper.state().right_x, int16_t(8000));
+        QCOMPARE(mapper.state().right_y, int16_t(-4000));
+        mapper.advanceMouse(12000);
+        QCOMPARE(mapper.state().right_x, int16_t(8000));
+        mapper.advanceMouse(16000);
+        QCOMPARE(mapper.state().right_x, int16_t(0));
+        QCOMPARE(mapper.state().right_y, int16_t(0));
+        mapper.mouseMove(1000, 1000, 20000);
+        mapper.advanceMouse(20000);
+        QCOMPARE(mapper.state().right_x, int16_t(23170));
+        QCOMPARE(mapper.state().right_y, int16_t(23170));
+        mapper.reset();
+        mapper.advanceMouse(24000);
+        QCOMPARE(mapper.state().right_x, int16_t(0));
+        QCOMPARE(mapper.state().right_y, int16_t(0));
+        const auto trace = [](int intervalUs) {
+            KeyboardMouseMapper timed;
+            qint64 response = 0;
+            for (int now = 0; now < 64000; now += 1000) {
+                if (now < 32000 && now % intervalUs == 0)
+                    timed.mouseMove(intervalUs / 1000, 0, now);
+                if (now % 4000 == 0) {
+                    timed.advanceMouse(now);
+                    response += timed.state().right_x;
+                }
+            }
+            return response;
+        };
+        // Equal 32-count traces at 1000 Hz and 125 Hz have equal unsaturated response.
+        QCOMPARE(trace(1000), qint64(128000));
+        QCOMPARE(trace(8000), qint64(128000));
+    }
+    void mouseTriggers()
+    {
+#ifndef Q_OS_WIN
+        QSKIP("Mouse camera mode is available on Windows.");
+#endif
+        TestSettingsProfile profile;
+        Settings settings(profile.name);
+        settings.SetMouseCameraEnabled(true);
+        settings.SetHardwareDecoder({});
+        StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
+            QByteArray(CHIAKI_SESSION_AUTH_SIZE, '\0'), QByteArray(16, '\0'), {}, {}, false, false, false, false);
+        StreamSession session(info);
+        session.SetGameplayCapture(true);
+        const auto mouse = [&session](Qt::MouseButton button, bool down) {
+            QMouseEvent event(down ? QEvent::MouseButtonPress : QEvent::MouseButtonRelease,
+                QPointF(10, 10), QPointF(10, 10), button, down ? button : Qt::NoButton, Qt::NoModifier);
+            if (down) session.HandleMousePressEvent(&event); else session.HandleMouseReleaseEvent(&event);
+        };
+        const auto key = [&session](int code, bool down) {
+            QKeyEvent event(down ? QEvent::KeyPress : QEvent::KeyRelease, code, Qt::NoModifier);
+            session.HandleKeyboardEvent(&event);
+        };
+        mouse(Qt::LeftButton, true);
+        QCOMPARE(outgoing.r2_state, uint8_t(255));
+        key(Qt::Key_X, true);
+        mouse(Qt::LeftButton, false);
+        QCOMPARE(outgoing.r2_state, uint8_t(255));
+        key(Qt::Key_X, false);
+        QCOMPARE(outgoing.r2_state, uint8_t(0));
+        mouse(Qt::RightButton, true);
+        key(Qt::Key_Z, true);
+        key(Qt::Key_Z, false);
+        QCOMPARE(outgoing.l2_state, uint8_t(255));
+        mouse(Qt::RightButton, false);
+        QCOMPARE(outgoing.l2_state, uint8_t(0));
+        for (const auto button : {Qt::MiddleButton, Qt::BackButton, Qt::ForwardButton}) {
+            mouse(button, true);
+            QCOMPARE(outgoing.buttons, 0u);
+            QCOMPARE(outgoing.l2_state, uint8_t(0));
+            QCOMPARE(outgoing.r2_state, uint8_t(0));
+            mouse(button, false);
+        }
+        mouse(Qt::LeftButton, true);
+        session.SetGameplayCapture(false);
+        QCOMPARE(outgoing.r2_state, uint8_t(0));
+        session.SetGameplayCapture(true, {-int(Qt::LeftButton)});
+        mouse(Qt::LeftButton, true);
+        QCOMPARE(outgoing.r2_state, uint8_t(0));
+        mouse(Qt::LeftButton, false);
+        mouse(Qt::LeftButton, true);
+        QCOMPARE(outgoing.r2_state, uint8_t(255));
+        session.SetGameplayCapture(false);
+    }
     void keyboardCapture()
     {
 #ifndef Q_OS_WIN

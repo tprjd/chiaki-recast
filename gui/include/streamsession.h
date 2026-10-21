@@ -236,6 +236,8 @@ class StreamSession : public QObject
 		bool dpad_regular;
 		bool mouse_camera_enabled = false;
 		bool gameplay_captured = false;
+		QTimer *gameplay_mouse_timer = nullptr;
+		QElapsedTimer gameplay_mouse_clock;
 		KeyboardMouseMapper keyboard_mouse;
 		bool SendGameplayFeedback();
 		bool dpad_regular_touch_switched;
@@ -372,6 +374,7 @@ class StreamSession : public QObject
 		void HandleKeyboardEvent(QKeyEvent *event);
 		void SetMouseCameraEnabled(bool enabled);
 		void SetGameplayCapture(bool captured, const QSet<int> &held = {});
+		void HandleRelativeMouseMove(double dx, double dy);
 		void HandleTouchEvent(QTouchEvent *event, qreal width, qreal height);
 		void HandleDpadTouchEvent(ChiakiControllerState *state, bool placeholder = false);
 		void HandleMouseReleaseEvent(QMouseEvent *event);

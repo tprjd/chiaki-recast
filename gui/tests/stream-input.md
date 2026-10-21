@@ -88,3 +88,75 @@ screen suite remains registered as `chiaki-console-screen`.
 These checks do not prove live console input, console sleep, physical controller
 input, desktop composition, or display scaling. The complete prerequisite
 acceptance matrix remains in `.scratch/stream-input-ownership/spec.md`.
+
+## Mouse capture interface
+
+`QmlMainWindow::startGameplayCapture(timestamp)` starts foreground mouse Raw
+Input on its Qt window. Capture requires both Qt activation and the actual
+Windows foreground HWND. The adapter saves the previous mouse registration and
+cursor clip. Capture uses no background input flag and keeps Qt mouse button
+messages. Release restores the previous registration unless a newer owner has
+replaced it. An unrestricted cursor restores with `ClipCursor(nullptr)` so a
+display change cannot retain old desktop bounds. Capture setup failure restores
+partial native state and leaves gameplay capture released.
+
+`releaseGameplayCapture()` releases the adapter and clears the session mapper.
+The existing owner, focus, session, and exit paths call this method. Window
+position changes update confinement in physical screen coordinates. Absolute
+device motion and old queued Raw Input packets do not enter the mapper. Qt
+cursor position events never supply camera movement.
+
+`KeyboardMouseMapper` has these input methods:
+
+| Method | Input |
+| --- | --- |
+| `reset(held)` | Clear mapped state and ignore held inputs until release. |
+| `key(code, down)` | Qt key value and press state. |
+| `mouseButton(button, down)` | Left, right, middle, back, or forward button. |
+| `mouseMove(dx, dy, timestampUs)` | Relative counts and monotonic microseconds since capture start. |
+| `advanceMouse(timestampUs)` | Update the right stick. Return whether its output changed. |
+| `state()` | Return the mapped controller state. |
+
+Held mouse inputs use negative Qt button values. Keyboard inputs use positive
+Qt key values. Both use the same held-input set so either trigger alternative
+can keep the action pressed.
+
+`StreamSession::HandleRelativeMouseMove(dx, dy)` supplies the capture-relative
+clock. A precise 4 ms timer advances the mapper and sends changed output through
+the existing controller feedback path. Capture release stops this timer.
+
+The provisional response uses a trailing 16 ms count window and 1,000 stick
+units per count in that window. This is a gain of 16 stick units per count per
+second. Output has a radial limit of 32,767. Idle output becomes exactly zero
+when the last count leaves the window, normally within 20 ms with the 4 ms
+timer. Scheduler delays can increase that time. Ticket 03 owns calibration.
+
+## Check mouse output and native capture
+
+The `chiaki-gameplay-mouse-motion` entry checks the production mapper with timed
+125 Hz and 1,000 Hz traces. Each 32-count trace has the same total unsaturated
+response. It also checks idle centre, saturation, and reset. The
+`chiaki-gameplay-mouse-triggers` entry checks emitted controller state for both
+trigger alternatives, unassigned buttons, release, and held-button rearming.
+
+The `chiaki-gameplay-mouse-desktop` entry reads actual Win32 registration and
+cursor bounds. It checks resize, prior registration restoration, newer-owner
+protection, double-click firing, stale Qt events, owner release, focus release,
+and the cursor shape after capture ends. This test and `platformKeyboard` use
+a test subclass that supplies controlled foreground eligibility. All capture,
+release, event routing, registration, and confinement code remains production
+code. These checks do not prove actual Windows foreground eligibility.
+
+An optional foreground test injects relative movement through Win32 `SendInput`.
+Run it in a separate process:
+
+```powershell
+$env:CHIAKI_INPUT_TEST_MOUSE = '1'
+./build/input-native/gui/tests/chiaki-stream-input-native-tests.exe spontaneousMouse -o mouse-injected.log,txt
+Remove-Item Env:CHIAKI_INPUT_TEST_MOUSE
+```
+
+On 2026-10-21, this optional test failed its foreground-window precondition
+before injection. It provides no Raw Input delivery evidence. Physical mouse
+movement, display changes, capture API failure injection, and live console
+acceptance remain unverified.

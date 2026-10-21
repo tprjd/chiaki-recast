@@ -9,6 +9,7 @@
 #include <QWindow>
 #include <QQuickWindow>
 #include <QLoggingCategory>
+#include <memory>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -42,6 +43,9 @@ class QmlBackend;
 class QOffscreenSurface;
 class QOpenGLContext;
 class QOpenGLFramebufferObject;
+#ifdef Q_OS_WIN
+class WindowsMouseCapture;
+#endif
 
 class QmlMainWindow : public QWindow
 {
@@ -149,6 +153,9 @@ signals:
     void queueDepthAverageChanged();
     void pendingFrameAgeChanged();
 
+protected:
+    virtual bool gameplayForeground() const;
+
 private:
     bool makeOpenGLContextCurrent();
     void doneOpenGLContextCurrent();
@@ -182,6 +189,10 @@ private:
     void releaseGameplayCapture();
     void startGameplayCapture(ulong timestamp);
     void updateMouseCameraMode();
+    void updateCursor();
+#ifdef Q_OS_WIN
+    bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result) override;
+#endif
     bool event(QEvent *event) override;
     bool eventFilter(QObject *object, QEvent *event) override;
     QObject *focusObject() const override;
@@ -208,6 +219,10 @@ private:
     bool gameplay_captured = false;
     bool capture_key_down = false;
     ulong gameplay_input_not_before = 0;
+#ifdef Q_OS_WIN
+    std::unique_ptr<WindowsMouseCapture> gameplay_mouse;
+    DWORD gameplay_mouse_not_before = 0;
+#endif
     QMetaObject::Connection mouse_camera_connection;
     int dropped_frames = 0;
     bool is_window_adjustable = false;
