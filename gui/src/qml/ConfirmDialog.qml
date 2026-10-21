@@ -5,6 +5,8 @@ import QtQuick.Controls
 Dialog {
     id: dialog
     property alias text: message.text
+    property alias textFormat: message.textFormat
+    property url imageSource: ""
     property string cancelText: qsTr("Cancel")
     property string actionText: ""
     property string secondaryActionText: ""
@@ -69,7 +71,21 @@ Dialog {
     }
     contentItem: ScrollView {
         id: scroll
+        focusPolicy: dialog.actionText.length ? Qt.NoFocus : Qt.TabFocus
+        background: Rectangle {
+            color: "transparent"
+            border.color: scroll.visualFocus ? "#69b8ff" : "transparent"
+            radius: 8
+        }
         Keys.onYesPressed: dialog.choose("cancel")
+        Keys.onPressed: event => {
+            if (event.key === Qt.Key_PageDown || event.key === Qt.Key_Down)
+                contentItem.contentY = Math.max(0, Math.min(contentHeight - height, contentItem.contentY + (event.key === Qt.Key_PageDown ? height : 40)));
+            else if (event.key === Qt.Key_PageUp || event.key === Qt.Key_Up)
+                contentItem.contentY = Math.max(0, contentItem.contentY - (event.key === Qt.Key_PageUp ? height : 40));
+            else return;
+            event.accepted = true;
+        }
         clip: true
         contentWidth: availableWidth
         implicitHeight: body.implicitHeight
@@ -78,6 +94,15 @@ Dialog {
             width: scroll.availableWidth
             spacing: 20
             Keys.onEscapePressed: dialog.choose("cancel")
+            Image {
+                objectName: "informationLogo"
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 112
+                Layout.preferredHeight: 112
+                visible: source.toString().length > 0
+                source: dialog.imageSource
+                fillMode: Image.PreserveAspectFit
+            }
             Label {
                 id: message
                 objectName: "confirmationMessage"
@@ -105,6 +130,7 @@ Dialog {
                 objectName: "confirmationAction"
                 Layout.fillWidth: true
                 text: dialog.actionText
+                visible: dialog.actionText.length > 0
                 textFormat: Text.PlainText
                 primary: true
                 onClicked: dialog.choose("primary")
@@ -128,8 +154,8 @@ Dialog {
                 Layout.fillWidth: true
                 text: dialog.cancelText
                 onClicked: dialog.choose("cancel")
-                KeyNavigation.up: secondaryButton.visible ? secondaryButton : primaryButton
-                KeyNavigation.down: primaryButton
+                KeyNavigation.up: secondaryButton.visible ? secondaryButton : primaryButton.visible ? primaryButton : scroll
+                KeyNavigation.down: primaryButton.visible ? primaryButton : scroll
             }
         }
     }
