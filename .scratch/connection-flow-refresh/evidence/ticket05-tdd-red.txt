@@ -49,4 +49,3 @@ C:\Users\david\.codex\worktrees\connection-live-pin\chiaki-ng-ui\gui\tests\qml\t
 PASS   : console_screen::ConnectionLocal::cleanupTestCase()
 Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 33ms
 ********* Finished testing of console_screen *********
-

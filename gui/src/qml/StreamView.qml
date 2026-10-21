@@ -40,6 +40,7 @@ Item {
     }
 
     function releaseInput() {
+        if (!restoreFocusItems.length) return;
         Chiaki.window.releaseInput();
         let item = restoreFocusItems.pop();
         if (item && item.visible)
