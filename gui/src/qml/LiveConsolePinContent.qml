@@ -54,7 +54,6 @@ ConsolePinContent {
     }
     onLivePhaseChanged: {
         if (livePhase !== "form") clear();
-        if (livePhase === "form") Qt.callLater(focusPin);
     }
     onSubmitted: value => send(value)
     onCancelled: cancel()

@@ -30,7 +30,8 @@ TestCase {
         compare(harness.backend.window.grabs, 1);
     }
     function test_cancelWaitsForNativeCleanup_data() {
-        return [{tag: "button", escape: false}, {tag: "escape", escape: true}, {tag: "submitting", submitting: true}];
+        return [{tag: "button", escape: false}, {tag: "escape", escape: true}, {tag: "submitting", submitting: true},
+            {tag: "escape-while-submitting", submitting: true, escape: true}, {tag: "ctrl-q", ctrlQ: true}, {tag: "right-click", rightClick: true}];
     }
     function test_cancelWaitsForNativeCleanup(data) {
         const harness = createTemporaryObject(harnessComponent, tests);
@@ -42,7 +43,9 @@ TestCase {
             keyClick(Qt.Key_Return);
             compare(harness.backend.commands.length, 1);
         }
-        if (data.escape) keyClick(Qt.Key_Escape);
+        if (data.ctrlQ) keyClick(Qt.Key_Q, Qt.ControlModifier);
+        else if (data.rightClick) mouseClick(harness.prompt, 2, 2, Qt.RightButton);
+        else if (data.escape) keyClick(Qt.Key_Escape);
         else mouseClick(findChild(harness.prompt, "pinCancel"));
         keyClick(Qt.Key_Escape);
         compare(harness.backend.commands.filter(command => command.name === "cancel").length, 1);

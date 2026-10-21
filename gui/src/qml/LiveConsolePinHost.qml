@@ -61,11 +61,11 @@ FocusScope {
         active: false
         sourceComponent: LiveConsolePinContent {
             backend: host.backend
-            requestId: host.currentId
+            requestId: ""
             navigation: host.navigation
             showSidebar: true
         }
-        onLoaded: item.focusPin()
+        onLoaded: { item.requestId = host.currentId; item.focusPin(); }
     }
     Window {
         id: pinWindow
@@ -88,10 +88,10 @@ FocusScope {
             active: false
             sourceComponent: LiveConsolePinContent {
                 backend: host.backend
-                requestId: host.currentId
+                requestId: ""
                 navigation: host.navigation
             }
-            onLoaded: { pinWindow.requestActivate(); item.focusPin(); }
+            onLoaded: { item.requestId = host.currentId; pinWindow.requestActivate(); item.focusPin(); }
         }
     }
 }

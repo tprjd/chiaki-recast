@@ -4,9 +4,10 @@ PASS   : console_screen::LiveConsolePin::initTestCase()
 PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(button)
 PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(escape)
 PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(submitting)
-PASS   : console_screen::LiveConsolePin::test_captureGuidedWorkspace(900)
-PASS   : console_screen::LiveConsolePin::test_captureGuidedWorkspace(1280)
-PASS   : console_screen::LiveConsolePin::test_captureGuidedWorkspace(compact)
+PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(escape-while-submitting)
+PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(ctrl-q)
+QWARN  : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(right-click) qt.qml.context: file:///C:/Users/david/.codex/worktrees/connection-live-pin/chiaki-ng-ui/gui/src/qml/LiveConsolePinHost.qml:57:71 Parameter "mouse" is not declared. Injection of parameters into signal handlers is deprecated. Use JavaScript functions with formal parameters instead.
+PASS   : console_screen::LiveConsolePin::test_cancelWaitsForNativeCleanup(right-click)
 PASS   : console_screen::LiveConsolePin::test_compactWindowCloseUsesTheSameCancelAndWaits()
 PASS   : console_screen::LiveConsolePin::test_contentAndActionsRemainReachable(900)
 PASS   : console_screen::LiveConsolePin::test_contentAndActionsRemainReachable(1280)
@@ -22,5 +23,5 @@ PASS   : console_screen::LiveConsolePin::test_privacyHidesRevealedPinAndConsoleI
 PASS   : console_screen::LiveConsolePin::test_replacementAndRemovalClearInputWithoutSendingToNewRequest()
 PASS   : console_screen::LiveConsolePin::test_routeHandoffRetainsOnePromptAndReleasesAfterNativeAcceptance()
 PASS   : console_screen::LiveConsolePin::cleanupTestCase()
-Totals: 22 passed, 0 failed, 0 skipped, 0 blacklisted, 556ms
+Totals: 22 passed, 0 failed, 0 skipped, 0 blacklisted, 374ms
 ********* Finished testing of console_screen *********

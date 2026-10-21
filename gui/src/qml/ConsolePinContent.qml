@@ -36,7 +36,7 @@ FocusScope {
     onPrivateModeChanged: if (privateMode) revealed = false
     onPhaseChanged: {
         clear();
-        Qt.callLater(focusAction);
+        focusTimer.restart();
     }
     function focusAction() {
         if (phase === "saved") doneButton.forceActiveFocus(Qt.TabFocusReason);
@@ -45,6 +45,7 @@ FocusScope {
         else content.forceActiveFocus(Qt.TabFocusReason);
     }
     function clear() { pin = ""; revealed = false; }
+    Timer { id: focusTimer; interval: 0; onTriggered: content.focusAction() }
     function focusPin() { pinField.readOnly = false; pinField.forceActiveFocus(Qt.TabFocusReason); }
     function submit() { if (phase === "form" && validPin && !submitting) submitted(pin); }
     function revealFocus() {

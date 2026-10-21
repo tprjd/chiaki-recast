@@ -1408,9 +1408,9 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
         }
         if (!incorrect && session_pin_auto_submitted && session_pin_request.isEmpty())
             return;
-        if (!session_pin_request.isEmpty() && (session_pin_request.value("phase") == "form"
-                && (session_pin_request.value("incorrect").toBool() || !incorrect)
-                || !incorrect && session_pin_request.value("phase") == "submitting"))
+        if (!session_pin_request.isEmpty() && ((session_pin_request.value("phase") == "form"
+                && (session_pin_request.value("incorrect").toBool() || !incorrect))
+                || (!incorrect && session_pin_request.value("phase") == "submitting")))
             return;
         session_pin_request = {{"id", QString::number(++session_pin_generation)},
             {"attemptId", QString::number(attempt_id)}, {"phase", "form"}, {"incorrect", incorrect},
@@ -1455,6 +1455,9 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
             session_pin_accepted = true;
             session_pin_request.clear();
             emit sessionPinRequestChanged();
+            if (!owned_session || session != owned_session || connection_generation != attempt_id
+                    || connection_cancelled || connection_dismissed || connection_profile_generation != profile_generation)
+                return;
             setDiscoveryEnabled(false);
             connection_attempt["cancelable"] = true;
             setConnectionPhase((session_info.audio_video_disabled & CHIAKI_VIDEO_DISABLED) || window->hasVideo()
