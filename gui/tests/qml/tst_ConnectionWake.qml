@@ -1,6 +1,8 @@
 import QtQuick
+import QtQuick.Controls
 import QtTest
 import "fixtures"
+import "../../src/qml"
 
 TestCase {
     id: testCase
@@ -10,6 +12,18 @@ TestCase {
     visible: true
     when: windowShown
     Component { id: harnessComponent; ConnectionHarness { wakeScreen: true } }
+    Component {
+        id: stackComponent
+        StackView {
+            id: stack
+            width: 1280; height: 720
+            property var backend
+            property var navigation
+            initialItem: Component { AutoConnectView { backend: stack.backend; navigation: stack.navigation } }
+            replaceExit: Transition { NumberAnimation { property: "opacity"; to: 0; duration: 200 } }
+        }
+    }
+    Component { id: blankComponent; Item {} }
     function control(harness, name) { return findChild(harness.screen, "connection" + name); }
     function activate(item) { item.forceActiveFocus(Qt.TabFocusReason); keyClick(Qt.Key_Return); }
     function test_startupWaitIdentifiesSelectedConsole() {
@@ -75,6 +89,16 @@ TestCase {
         harness.screenActive = false;
         compare(harness.backend.commands.length, 0);
         compare(harness.actions.length, 0);
+    }
+    function test_oldExitCannotDismissANewWait() {
+        const harness = createTemporaryObject(harnessComponent, testCase, {screenActive: false});
+        harness.backend.change({phase: "waking", context: "wake", waitingForWake: true});
+        const stack = createTemporaryObject(stackComponent, testCase, {backend: harness.backend, navigation: harness});
+        harness.backend.change({phase: "connecting", waitingForWake: false});
+        stack.replace(blankComponent);
+        harness.backend.change({id: "2", phase: "waiting", context: "startup", waitingForWake: true});
+        wait(300);
+        compare(harness.backend.commands.length, 0);
     }
     function test_fallbackAppearsOnlyWhenThePsnRouteStarts() {
         const harness = createTemporaryObject(harnessComponent, testCase);
