@@ -1,0 +1,13 @@
+64 warnings generated.
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:13:21: error: narrowing conversion from 'qsizetype' (aka 'long long') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions,-warnings-as-errors]
+   13 |     const int pos = id.indexOf(QLatin1Char('#'));
+      |                     ^
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:39:25: error: narrowing conversion from 'qreal' (aka 'double') to 'float' [bugprone-narrowing-conversions,-warnings-as-errors]
+   39 |     float icon_aspect = view_box.width() / view_box.height();
+      |                         ^
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:88:25: error: narrowing conversion from 'qreal' (aka 'double') to 'float' [bugprone-narrowing-conversions,-warnings-as-errors]
+   88 |     float icon_aspect = view_box.width() / view_box.height();
+      |                         ^
+Suppressed 61 warnings (61 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+3 warnings treated as errors

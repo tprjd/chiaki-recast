@@ -1,0 +1,30 @@
+23884 warnings generated.
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:13:21: warning: narrowing conversion from 'qsizetype' (aka 'long long') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+   13 |     const int pos = id.indexOf(QLatin1Char('#'));
+      |                     ^
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:31:41: warning: 2 adjacent parameters of 'drawConsoleImage' of similar type ('const QString &') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   31 | QImage QmlSvgProvider::drawConsoleImage(const QString &file_name, const QString &state, QSize *size, const QSize &requested_size) const
+      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:31:56: note: the first parameter in the range is 'file_name'
+   31 | QImage QmlSvgProvider::drawConsoleImage(const QString &file_name, const QString &state, QSize *size, const QSize &requested_size) const
+      |                                                        ^~~~~~~~~
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:31:82: note: the last parameter in the range is 'state'
+   31 | QImage QmlSvgProvider::drawConsoleImage(const QString &file_name, const QString &state, QSize *size, const QSize &requested_size) const
+      |                                                                                  ^~~~~
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:39:25: warning: narrowing conversion from 'qreal' (aka 'double') to 'float' [bugprone-narrowing-conversions]
+   39 |     float icon_aspect = view_box.width() / view_box.height();
+      |                         ^
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:80:40: warning: 2 adjacent parameters of 'drawButtonImage' of similar type ('const QString &') are easily swapped by mistake [bugprone-easily-swappable-parameters]
+   80 | QImage QmlSvgProvider::drawButtonImage(const QString &file_name, const QString &button, QSize *size, const QSize &requested_size) const
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:80:55: note: the first parameter in the range is 'file_name'
+   80 | QImage QmlSvgProvider::drawButtonImage(const QString &file_name, const QString &button, QSize *size, const QSize &requested_size) const
+      |                                                       ^~~~~~~~~
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:80:81: note: the last parameter in the range is 'button'
+   80 | QImage QmlSvgProvider::drawButtonImage(const QString &file_name, const QString &button, QSize *size, const QSize &requested_size) const
+      |                                                                                 ^~~~~~
+C:\Users\david\Projects\chiaki-ng-ui\gui\src\qmlsvgprovider.cpp:88:25: warning: narrowing conversion from 'qreal' (aka 'double') to 'float' [bugprone-narrowing-conversions]
+   88 |     float icon_aspect = view_box.width() / view_box.height();
+      |                         ^
+Suppressed 23879 warnings (23879 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
