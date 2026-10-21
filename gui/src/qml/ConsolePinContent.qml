@@ -8,6 +8,7 @@ FocusScope {
     property bool privateMode: false
     property string consoleName: ""
     property string title: qsTr("Save console login PIN")
+    property string contextLabel: qsTr("Console settings")
     property string heading: qsTr("Sign in automatically")
     property string message: qsTr("Save the four-digit login PIN for this console user.")
     property string submitText: qsTr("Save PIN")
@@ -17,9 +18,14 @@ FocusScope {
     property string guidanceDetailTitle: qsTr("Saved for this console")
     property string actionHelp: qsTr("Stored for this console.")
     property bool showSidebar: false
+    property bool settingsEnabled: true
     property string phase: "form"
     property string failureText: ""
     property bool submitting: false
+    property bool busy: false
+    property bool canCancel: true
+    property bool showCancel: false
+    property bool showBack: false
     property bool revealed: false
     property alias pin: pinField.text
     readonly property bool validPin: pin.length === 4 && /^[0-9]{4}$/.test(pin)
@@ -30,9 +36,13 @@ FocusScope {
     onPrivateModeChanged: if (privateMode) revealed = false
     onPhaseChanged: {
         clear();
+        Qt.callLater(focusAction);
+    }
+    function focusAction() {
         if (phase === "saved") doneButton.forceActiveFocus(Qt.TabFocusReason);
         else if (phase === "form") focusPin();
-        else backButton.forceActiveFocus(Qt.TabFocusReason);
+        else if (showBack || phase === "failure") backButton.forceActiveFocus(Qt.TabFocusReason);
+        else content.forceActiveFocus(Qt.TabFocusReason);
     }
     function clear() { pin = ""; revealed = false; }
     function focusPin() { pinField.readOnly = false; pinField.forceActiveFocus(Qt.TabFocusReason); }
@@ -83,6 +93,7 @@ FocusScope {
             ConsoleButton {
                 Layout.fillWidth: true
                 text: qsTr("Settings"); icon.source: "qrc:/icons/options.svg"
+                enabled: content.settingsEnabled
                 onClicked: content.settingsRequested()
             }
             Item { Layout.fillHeight: true }
@@ -105,7 +116,7 @@ FocusScope {
             }
             Label {
                 visible: content.showSidebar
-                text: qsTr("Console settings")
+                text: content.contextLabel
                 padding: 8; font.pixelSize: 11; color: "#9ca8b9"
                 background: Rectangle { color: "transparent"; radius: 16; border.color: "#2b323e" }
             }
@@ -146,11 +157,13 @@ FocusScope {
                         RowLayout {
                             Layout.fillWidth: true; Layout.topMargin: 4; spacing: 15
                             Label {
+                                visible: !content.busy
                                 text: content.phase === "saved" ? "✓" : content.phase === "failure" ? "!" : "○"
                                 font.pixelSize: 26; color: content.phase === "saved" ? "#80dcb0" : content.phase === "failure" ? "#ffb0af" : "#63b7ff"
                                 Layout.alignment: Qt.AlignTop; Layout.preferredWidth: 30
                                 Accessible.ignored: true
                             }
+                            BusyIndicator { visible: content.busy; running: visible; Layout.preferredWidth: 30; Layout.preferredHeight: 30 }
                             ColumnLayout {
                                 Layout.fillWidth: true; spacing: 8
                                 Label {
@@ -204,7 +217,7 @@ FocusScope {
                             RowLayout {
                                 Layout.fillWidth: true; spacing: 10
                                 Label { text: content.actionHelp; font.pixelSize: 11; color: "#9ca8b9"; Layout.fillWidth: true; wrapMode: Text.Wrap }
-                                SetupButton { objectName: "pinCancel"; text: qsTr("Cancel"); Layout.maximumWidth: 140; onClicked: content.cancelled() }
+                                SetupButton { objectName: "pinCancel"; text: qsTr("Cancel"); enabled: content.canCancel; Layout.maximumWidth: 140; onClicked: content.cancelled() }
                                 SetupButton {
                                     objectName: "pinSubmit"
                                     Layout.maximumWidth: 140
@@ -229,9 +242,15 @@ FocusScope {
                             text: qsTr("Done"); primary: true; onClicked: content.done()
                         }
                         SetupButton {
+                            visible: content.showCancel
+                            text: qsTr("Cancelling…"); enabled: content.canCancel
+                            Layout.alignment: Qt.AlignRight
+                            onClicked: content.cancelled()
+                        }
+                        SetupButton {
                             id: backButton
                             objectName: "pinBack"
-                            visible: content.phase === "failure"
+                            visible: content.phase === "failure" || content.showBack
                             Layout.alignment: Qt.AlignRight
                             text: qsTr("Back to consoles"); onClicked: content.cancelled()
                         }

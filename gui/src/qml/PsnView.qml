@@ -137,42 +137,6 @@ Rectangle {
         onTriggered: root.showMainView()
     }
 
-    Dialog {
-        id: sessionPinDialog
-        parent: Overlay.overlay
-        x: Math.round((root.width - width) / 2)
-        y: Math.round((root.height - height) / 2)
-        title: qsTr("Console Login PIN")
-        modal: true
-        closePolicy: Popup.NoAutoClose
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        onAboutToShow: {
-            standardButton(Dialog.Ok).enabled = Qt.binding(function() {
-                return pinField.acceptableInput;
-            });
-            textVisible = false
-            view.grabInput(pinField);
-        }
-        onClosed: {
-            textVisible = true
-            view.releaseInput()
-        }
-        onAccepted: Chiaki.enterPin(pinField.text)
-        onRejected: Chiaki.stopSession(false)
-        Material.roundedScale: Material.MediumScale
-
-        TextField {
-            id: pinField
-            echoMode: Chiaki.settings.streamerMode ? TextInput.Password : TextInput.Normal
-            implicitWidth: 200
-            validator: RegularExpressionValidator { regularExpression: /[0-9]{4}/ }
-            Keys.onReturnPressed: {
-                if(sessionPinDialog.standardButton(Dialog.Ok).enabled)
-                    sessionPinDialog.standardButton(Dialog.Ok).clicked()
-            }
-        }
-    }
-
     Connections {
         target: Chiaki
 
@@ -236,11 +200,6 @@ Rectangle {
             closeTimer.start();
         }
 
-        function onSessionPinDialogRequested() 
-        {
-            if (sessionPinDialog.opened)
-                return;
-            sessionPinDialog.open();
-        }
+
     }
 }

@@ -81,7 +81,7 @@ FocusScope {
     Component.onCompleted: Qt.callLater(focusAction)
     Component.onDestruction: if (managesAttempt && !leaving && attempt.id && phase !== "ready") backend.dismissConnection(attempt.id)
     Keys.onEscapePressed: terminal ? back() : cancel()
-    Shortcut { sequence: "Ctrl+Q"; enabled: view.visible; onActivated: view.terminal ? view.back() : view.cancel() }
+    Shortcut { sequence: "Ctrl+Q"; enabled: view.visible && view.enabled; onActivated: view.terminal ? view.back() : view.cancel() }
     MouseArea { anchors.fill: parent; acceptedButtons: Qt.RightButton; onClicked: view.terminal ? view.back() : view.cancel() }
     Connections { target: view.Window.window; function onActiveFocusItemChanged() { Qt.callLater(view.ensureFocusVisible); } }
 

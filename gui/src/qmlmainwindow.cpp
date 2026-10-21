@@ -1732,9 +1732,10 @@ renderer_backend_ready:
     connect(backend, &QmlBackend::sessionChanged, this, [this, exit_app_on_stream_exit](StreamSession *s) {
         session = s;
         stream_session_active.storeRelease(s ? 1 : 0);
-        grab_input = 0;
+        if (backend->sessionPinRequest().isEmpty())
+            grab_input = 0;
         if (session)
-            session->BlockInput(0);
+            session->BlockInput(grab_input);
         update_timer->stop();
         {
             QMutexLocker locker(&placebo_state_mutex);

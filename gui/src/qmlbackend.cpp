@@ -452,6 +452,8 @@ void QmlBackend::profileChanged()
         }
         emit connectionAttemptChanged();
     }
+    session_pin_request.clear();
+    emit sessionPinRequestChanged();
     QString profile = settings->GetCurrentProfile();
     Settings *settings_copy = new Settings(profile);
     if(settings_allocd)
@@ -852,6 +854,10 @@ void QmlBackend::setConnectionPhase(const QString &phase)
 
 void QmlBackend::beginConnection(const StreamSessionConnectInfo &info, const QVariantMap &target)
 {
+    session_pin_request.clear();
+    session_pin_auto_submitted = false;
+    session_pin_accepted = false;
+    emit sessionPinRequestChanged();
     connection_target = target;
     connection_profile_generation = profile_generation;
     connection_cancelled = false;
@@ -877,6 +883,8 @@ void QmlBackend::failConnection(const QString &title, const QString &text)
     connection_attempt["errorText"] = text;
     connection_attempt["phase"] = "failure";
     connection_attempt["cleanupPending"] = session != nullptr;
+    session_pin_request.clear();
+    emit sessionPinRequestChanged();
     emit connectionAttemptChanged();
 }
 
@@ -899,15 +907,25 @@ bool QmlBackend::retryConnection(const QString &attempt_id)
 
 bool QmlBackend::cancelConnection(const QString &attempt_id)
 {
+    const QPointer<StreamSession> owned_session(session);
+    const auto attempt_generation = connection_generation;
     const auto phase = connection_attempt.value("phase").toString();
+    const bool pin_pending = session_pin_request.value("attemptId") == attempt_id
+        && (session_pin_request.value("phase") == "form" || session_pin_request.value("phase") == "submitting");
     if (attempt_id.isEmpty() || connection_attempt.isEmpty()
             || attempt_id != connection_attempt.value("id").toString() || connection_cancelled
-            || phase == "failure" || phase == "ready" || phase == "cancelled")
+            || phase == "failure" || (phase == "ready" && !pin_pending) || phase == "cancelled")
         return false;
-    if (connection_attempt.value("route") == "psn" && (connectState() == PsnConnectState::LinkingConsole
+    if (!pin_pending && connection_attempt.value("route") == "psn" && (connectState() == PsnConnectState::LinkingConsole
             || connectState() == PsnConnectState::RegisteringConsole || connectState() == PsnConnectState::DataConnectionFinished))
         return false;
     connection_cancelled = true;
+    if (pin_pending) {
+        session_pin_request["phase"] = "cancelling";
+        emit sessionPinRequestChanged();
+        if (session != owned_session || connection_generation != attempt_generation || !connection_cancelled)
+            return true;
+    }
     wakeup_start = false;
     wakeup_nickname.clear();
     wakeup_start_timer->stop();
@@ -915,7 +933,9 @@ bool QmlBackend::cancelConnection(const QString &attempt_id)
     psn_auto_connect_timer->stop();
     if (session) {
         setConnectionPhase(QStringLiteral("cancelling"));
-        if (!session_info.duid.isEmpty() && !session->IsConnected())
+        if (!owned_session || session != owned_session || connection_generation != attempt_generation)
+            return true;
+        if (!pin_pending && !session_info.duid.isEmpty() && !session->IsConnected())
             session->CancelPsnConnection(false);
         else
             session->Stop();
@@ -934,6 +954,8 @@ bool QmlBackend::dismissConnection(const QString &attempt_id)
     if (connection_attempt.value("cleanupPending").toBool() && connection_attempt.value("phase") != "ready")
         cancelConnection(attempt_id);
     connection_dismissed = true;
+    session_pin_request.clear();
+    emit sessionPinRequestChanged();
     emit connectionAttemptChanged();
     return true;
 }
@@ -1185,6 +1207,12 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
             connection_dismissed = true;
         else if (connection_attempt.value("phase") != "failure")
             connection_attempt["phase"] = "cancelled";
+        if (session_pin_request.value("phase") == "cancelling" && !connection_dismissed
+                && connection_profile_generation == profile_generation)
+            session_pin_request["phase"] = "cancelled";
+        else
+            session_pin_request.clear();
+        emit sessionPinRequestChanged();
         emit connectionAttemptChanged();
         emit sessionChanged(session);
 
@@ -1202,12 +1230,24 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
     connect(session, &StreamSession::LoginPINRequested, this, [this, connect_info, owned_session, attempt_id](bool incorrect) {
         if (!owned_session || session != owned_session || connection_generation != attempt_id
                 || connection_cancelled || connection_dismissed || connection_profile_generation != profile_generation
-                || connection_attempt.value("phase") == "failure")
+                || connection_attempt.value("phase") == "failure" || session_pin_accepted)
             return;
-        if (!connect_info.initial_login_pin.isEmpty() && incorrect == false)
+        if (!connect_info.initial_login_pin.isEmpty() && !incorrect && !session_pin_auto_submitted && session_pin_request.isEmpty()) {
+            session_pin_auto_submitted = true;
             session->SetLoginPIN(connect_info.initial_login_pin);
-        else
-            emit sessionPinDialogRequested(incorrect);
+            return;
+        }
+        if (!incorrect && session_pin_auto_submitted && session_pin_request.isEmpty())
+            return;
+        if (!session_pin_request.isEmpty() && (session_pin_request.value("phase") == "form"
+                && (session_pin_request.value("incorrect").toBool() || !incorrect)
+                || !incorrect && session_pin_request.value("phase") == "submitting"))
+            return;
+        session_pin_request = {{"id", QString::number(++session_pin_generation)},
+            {"attemptId", QString::number(attempt_id)}, {"phase", "form"}, {"incorrect", incorrect},
+            {"name", connection_attempt.value("name")}};
+        emit sessionPinRequestChanged();
+        emit sessionPinDialogRequested(incorrect);
     });
 
     connect(session, &StreamSession::DataHolepunchProgress, this, [this, owned_session, attempt_id](bool finished) {
@@ -1242,6 +1282,9 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
                 || connection_attempt.value("phase") == "failure")
             return;
         if (session->IsConnected()) {
+            session_pin_accepted = true;
+            session_pin_request.clear();
+            emit sessionPinRequestChanged();
             setDiscoveryEnabled(false);
             setConnectionPhase((session_info.audio_video_disabled & CHIAKI_VIDEO_DISABLED) || window->hasVideo()
                 ? QStringLiteral("ready") : QStringLiteral("video"));
@@ -1310,6 +1353,10 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
 
 bool QmlBackend::closeRequested()
 {
+    if (!session_pin_request.isEmpty()) {
+        cancelSessionPin(session_pin_request.value("id").toString());
+        return false;
+    }
     if (!connection_dismissed && connection_attempt.value("route") == "local"
             && connection_attempt.value("phase") != "ready" && connection_attempt.value("cleanupPending").toBool()) {
         cancelConnection(connection_attempt.value("id").toString());
@@ -1808,11 +1855,43 @@ void QmlBackend::sessionGoHome()
     session->GoHome();
 }
 
-void QmlBackend::enterPin(const QString &pin)
+bool QmlBackend::enterPin(const QString &request_id, const QString &pin)
 {
-    qCInfo(chiakiGui) << "Set login pin " << pin;
-    if (session)
-        session->SetLoginPIN(pin);
+    if (request_id.isEmpty() || request_id != session_pin_request.value("id").toString()
+            || session_pin_request.value("attemptId") != connection_attempt.value("id")
+            || session_pin_request.value("phase") != "form" || !session || connection_cancelled || connection_dismissed
+            || connection_profile_generation != profile_generation || pin.size() != 4)
+        return false;
+    for (const QChar digit : pin)
+        if (digit < QLatin1Char('0') || digit > QLatin1Char('9'))
+            return false;
+    const QPointer<StreamSession> owned_session(session);
+    const auto attempt_generation = connection_generation;
+    session_pin_request["phase"] = "submitting";
+    emit sessionPinRequestChanged();
+    if (!owned_session || session != owned_session || connection_generation != attempt_generation || connection_cancelled
+            || connection_dismissed || connection_profile_generation != profile_generation
+            || session_pin_request.value("id") != request_id || session_pin_request.value("phase") != "submitting")
+        return false;
+    owned_session->SetLoginPIN(pin);
+    return true;
+}
+
+bool QmlBackend::cancelSessionPin(const QString &request_id)
+{
+    if (request_id.isEmpty() || request_id != session_pin_request.value("id").toString()
+            || session_pin_request.value("attemptId") != connection_attempt.value("id")
+            || connection_profile_generation != profile_generation || !session)
+        return false;
+    return cancelConnection(session_pin_request.value("attemptId").toString());
+}
+
+bool QmlBackend::dismissSessionPin(const QString &request_id)
+{
+    if (request_id.isEmpty() || request_id != session_pin_request.value("id").toString()
+            || session_pin_request.value("phase") != "cancelled")
+        return false;
+    return dismissConnection(session_pin_request.value("attemptId").toString());
 }
 
 QUrl QmlBackend::psnLoginUrl() const
