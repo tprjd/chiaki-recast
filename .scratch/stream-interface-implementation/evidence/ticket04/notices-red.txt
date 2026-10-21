@@ -1,0 +1,10 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::StreamNotices::initTestCase()
+FAIL!  : console_screen::StreamNotices::test_networkThresholdAndAudio(inline) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(21) : failure location
+FAIL!  : console_screen::StreamNotices::test_networkThresholdAndAudio(window) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(21) : failure location
+PASS   : console_screen::StreamNotices::cleanupTestCase()
+Totals: 2 passed, 2 failed, 0 skipped, 0 blacklisted, 78ms
+********* Finished testing of console_screen *********

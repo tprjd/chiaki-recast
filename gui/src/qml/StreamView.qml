@@ -73,11 +73,15 @@ Item {
     }
     Component.onDestruction: {
         menuState.releaseInput();
+        view.releaseNoticeInput(false);
         if (connectionInputGrabbed) view.streamWindow.releaseInput();
     }
     onWidthChanged: updateSeparateMenuGeometry()
     onHeightChanged: updateSeparateMenuGeometry()
-    onUseSeparateMenuWindowChanged: updateSeparateMenuGeometry()
+    onUseSeparateMenuWindowChanged: {
+        updateSeparateMenuGeometry();
+        if (actionNoticeVisible) noticeFocusTimer.restart();
+    }
 
     Connections {
         target: view.hostWindow
@@ -201,30 +205,6 @@ Item {
             }
 
             Label {
-                id: audioVideoDisabledTitleLabel
-                anchors {
-                    bottom: spinner.top
-                    horizontalCenter: spinner.horizontalCenter
-                }
-                text: (view.settings.audioVideoDisabled & 0x01) ? qsTr("Audio and Video Disabled") : qsTr("Video Disabled")
-                font.pixelSize: 24
-                visible: !sessionLoading && !sessionError && (view.settings.audioVideoDisabled & 0x02)
-            }
-
-            Label {
-                id: audioVideoDisabledTextLabel
-                anchors {
-                    top: audioVideoDisabledTitleLabel.bottom
-                    horizontalCenter: audioVideoDisabledTitleLabel.horizontalCenter
-                    topMargin: 10
-                }
-                horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 20
-                text: (view.settings.audioVideoDisabled & 0x01) ? qsTr("You have disabled audio and video in your settings.\nTo re-enable change Audio/Video to Audio and Video Enabled in the General tab of the settings.") : qsTr("You have disabled video in your settings.\nTo re-enable change Audio/Video to Audio and Video Enabled in the General tab of the settings.")
-                visible: !sessionLoading && !sessionError && (view.settings.audioVideoDisabled & 0x02)
-            }
-
-            Label {
                 id: errorTitleLabel
                 anchors {
                     bottom: spinner.top
@@ -270,63 +250,148 @@ Item {
         }
     }
 
-    ColumnLayout {
-        id: cantDisplayMessage
-        anchors.centerIn: parent
-        opacity: view.streamWindow.hasVideo && view.backend.session && view.backend.session.cantDisplay ? 1.0 : 0.0
-        visible: opacity
-        spacing: 30
+    readonly property bool noticesReady: !!view.backend.session && view.backend.session.connected
+        && !sessionLoading && !sessionError && !view.backend.sessionPinRequest.id
+        && !sessionStopDialog.opened && !menuState.disconnectPending
+    readonly property bool audioNoticeVisible: noticesReady && view.settings.audioVideoDisabled === 1
+    property real networkNoticeOpacity: networkIndicatorTimer.running ? 1 : 0
+    property var networkNoticeSession: null
+    Behavior on networkNoticeOpacity { NumberAnimation { duration: 400 } }
+    readonly property bool passiveNoticesVisible: noticesReady && !(menuState.open || menuState.closing)
+        && (networkNoticeSession === view.backend.session && networkNoticeOpacity > 0 || audioNoticeVisible)
+    Timer {
+        id: networkIndicatorTimer
+        running: view.noticesReady && Number.isFinite(view.backend.session.averagePacketLoss)
+            && view.backend.session.averagePacketLoss > (view.settings.wifiDroppedNotif * 0.01)
+        interval: 400
+        onRunningChanged: if (running) view.networkNoticeSession = view.backend.session
+    }
 
-        Behavior on opacity { NumberAnimation { duration: 250 } }
-
-        onVisibleChanged: {
-            if (visible) {
-                menuState.close();
-                view.grabInput(goToHomeButton);
-            } else {
-                view.releaseInput();
-            }
+    Component {
+        id: passiveNoticesContent
+        StreamPassiveNotices {
+            networkOpacity: view.networkNoticeSession === view.backend.session ? view.networkNoticeOpacity : 0
+            audioDisabled: view.audioNoticeVisible
+            packetLoss: view.backend.session && Number.isFinite(view.backend.session.averagePacketLoss) ? view.backend.session.averagePacketLoss : 0
         }
-
-        Label {
-            Layout.alignment: Qt.AlignCenter
-            text: qsTr("The screen contains content that can't be displayed using Remote Play.")
-        }
-
-        Button {
-            id: goToHomeButton
-            Layout.alignment: Qt.AlignCenter
-            Layout.preferredHeight: 60
-            text: qsTr("Go to Home Screen")
-            Material.background: activeFocus ? parent.Material.accent : undefined
-            Material.roundedScale: Material.SmallScale
-            onClicked: view.backend.sessionGoHome()
-            Keys.onReturnPressed: clicked()
-            Keys.onEscapePressed: clicked()
+    }
+    Loader {
+        id: passiveNoticesInline
+        objectName: "streamPassiveNoticesInline"
+        anchors { top: parent.top; right: parent.right; margins: 18 }
+        width: Math.min(320, view.width - 36)
+        height: item ? item.implicitHeight : 0
+        visible: !view.useSeparateMenuWindow && view.passiveNoticesVisible
+        sourceComponent: passiveNoticesContent
+    }
+    Window {
+        id: passiveNoticesWindow
+        objectName: "streamPassiveNoticesWindow"
+        transientParent: view.streamWindow
+        flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowTransparentForInput | Qt.WindowDoesNotAcceptFocus
+        modality: Qt.NonModal
+        color: "transparent"
+        visible: view.useSeparateMenuWindow && view.passiveNoticesVisible
+        x: view.streamWindow.x + view.streamWindow.width - width - 18
+        y: view.streamWindow.y + 18
+        width: Math.min(320, view.width - 36)
+        height: passiveWindowContent.item ? passiveWindowContent.item.implicitHeight : 0
+        Loader {
+            id: passiveWindowContent
+            width: parent.width
+            sourceComponent: passiveNoticesContent
         }
     }
 
-    RoundButton {
-        anchors {
-            right: parent.right
-            top: parent.top
-            margins: 40
+    readonly property bool videoDisabled: !!(view.settings.audioVideoDisabled & 0x02)
+    readonly property bool blockedContent: !videoDisabled && view.streamWindow.hasVideo
+        && !!view.backend.session && view.backend.session.cantDisplay
+    readonly property bool actionNoticeVisible: noticesReady && !(menuState.open || menuState.closing)
+        && (videoDisabled || blockedContent)
+    property bool noticeInputGrabbed: false
+    property var noticeReturnFocusItem: null
+
+    function focusNotice() {
+        if (!actionNoticeVisible) return;
+        const item = useSeparateMenuWindow ? actionWindowContent.item : actionNoticeInline.item;
+        if (useSeparateMenuWindow) actionNoticeWindow.requestActivate();
+        else if (view.hostWindow && view.hostWindow.visible) view.hostWindow.requestActivate();
+        else view.streamWindow.requestActivate();
+        if (item) item.initialFocusItem.forceActiveFocus(Qt.TabFocusReason);
+    }
+    function releaseNoticeInput(restoreFocus) {
+        // A notice can yield after a menu or dialog has already captured input.
+        if (!noticeInputGrabbed) return;
+        noticeInputGrabbed = false;
+        view.streamWindow.releaseInput();
+        if (restoreFocus) {
+            const item = noticeReturnFocusItem;
+            Qt.callLater(() => {
+                if (!view.noticesReady || view.actionNoticeVisible || menuState.open || menuState.closing) return;
+                if (view.hostWindow && view.hostWindow.visible) view.hostWindow.requestActivate();
+                else view.streamWindow.requestActivate();
+                if (item && item.visible) item.forceActiveFocus(Qt.TabFocusReason);
+            });
         }
-        icon.source: "qrc:/icons/discover-off-24px.svg"
-        icon.width: 50
-        icon.height: 50
-        padding: 20
-        checked: true
-        opacity: networkIndicatorTimer.running ? 0.7 : 0.0
-        visible: opacity
-        Material.background: Material.accent
-
-        Behavior on opacity { NumberAnimation { duration: 400 } }
-
-        Timer {
-            id: networkIndicatorTimer
-            running: view.backend.session?.averagePacketLoss > (view.settings.wifiDroppedNotif * 0.01)
-            interval: 400
+        if (restoreFocus || !view.backend.session || !(blockedContent || videoDisabled))
+            noticeReturnFocusItem = null;
+    }
+    onActionNoticeVisibleChanged: {
+        if (actionNoticeVisible) {
+            if (!noticeInputGrabbed) {
+                if (!noticeReturnFocusItem)
+                    noticeReturnFocusItem = view.hostWindow ? view.hostWindow.activeFocusItem : null;
+                view.streamWindow.grabInput();
+                noticeInputGrabbed = true;
+            }
+            noticeFocusTimer.restart();
+        } else {
+            releaseNoticeInput(noticesReady && !(menuState.open || menuState.closing));
+        }
+    }
+    Timer { id: noticeFocusTimer; interval: 0; onTriggered: view.focusNotice() }
+    Component {
+        id: actionNoticeContent
+        StreamActionNotice {
+            blocked: view.blockedContent
+            audioDisabled: !!(view.settings.audioVideoDisabled & 0x01)
+            enabled: view.actionNoticeVisible
+            onTriggered: {
+                if (!view.actionNoticeVisible || !view.backend.session || !view.backend.session.connected) return;
+                if (view.blockedContent) view.backend.sessionGoHome();
+                else menuState.toggle();
+            }
+        }
+    }
+    Loader {
+        id: actionNoticeInline
+        objectName: "streamActionNoticeInline"
+        anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: 72 }
+        width: Math.min(360, view.width - 36)
+        height: item ? item.implicitHeight : 0
+        sourceComponent: actionNoticeContent
+        visible: !view.useSeparateMenuWindow && view.actionNoticeVisible
+    }
+    Window {
+        id: actionNoticeWindow
+        objectName: "streamActionNoticeWindow"
+        transientParent: view.streamWindow
+        flags: Qt.Tool | Qt.FramelessWindowHint
+        modality: Qt.NonModal
+        color: "transparent"
+        visible: view.useSeparateMenuWindow && view.actionNoticeVisible
+        x: view.streamWindow.x + Math.round((view.streamWindow.width - width) / 2)
+        y: view.streamWindow.y + view.streamWindow.height - height - 72
+        width: Math.min(360, view.width - 36)
+        height: actionWindowContent.item ? actionWindowContent.item.implicitHeight : 0
+        onVisibleChanged: if (visible) { requestActivate(); noticeFocusTimer.restart(); }
+        onActiveChanged: if (active && visible) noticeFocusTimer.restart()
+        onClosing: event => { event.accepted = false; view.streamWindow.close(); }
+        Shortcut { sequence: "Ctrl+O"; enabled: actionNoticeWindow.visible; onActivated: menuState.toggle() }
+        Loader {
+            id: actionWindowContent
+            anchors.fill: parent
+            sourceComponent: actionNoticeContent
         }
     }
 
@@ -428,7 +493,7 @@ Item {
         onCloseRequested: menuState.close()
         onCloseAnimationFinished: {
             menuState.closing = false;
-            if (!sessionStopDialog.opened && !view.backend.sessionPinRequest.id && !view.sessionLoading && !menuState.open) {
+            if (!sessionStopDialog.opened && !view.backend.sessionPinRequest.id && !view.sessionLoading && !menuState.open && !view.actionNoticeVisible) {
                 if (view.hostWindow) view.hostWindow.requestActivate();
                 if (menuState.returnFocusItem && menuState.returnFocusItem.visible)
                     menuState.returnFocusItem.forceActiveFocus(Qt.TabFocusReason);
@@ -442,7 +507,10 @@ Item {
         backend: view.backend
         hostWindow: view.streamWindow
         onInputRequested: view.grabInput(null)
-        onInputReleased: view.releaseInput()
+        onInputReleased: {
+            view.releaseInput();
+            if (view.actionNoticeVisible) noticeFocusTimer.restart();
+        }
     }
 
     Timer {
@@ -455,6 +523,10 @@ Item {
         target: view.backend
 
         function onSessionChanged() {
+            view.networkNoticeSession = null;
+            if (view.noticesReady && Number.isFinite(view.backend.session.averagePacketLoss)
+                    && view.backend.session.averagePacketLoss > (view.settings.wifiDroppedNotif * 0.01))
+                networkIndicatorTimer.restart();
             if (!view.backend.session) {
                 menuState.disconnectPending = false;
                 menuState.close();

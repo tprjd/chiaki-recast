@@ -346,7 +346,21 @@ load the same component supplied by `StreamView`. `menuState` in `StreamView`
 owns menu closure and input capture. `StreamMenuWindow` owns its native window
 and focus timer. `StreamStatsContent.qml` is the existing shared statistics
 presentation. Its inline and separate-window wrappers remain in `StreamView`.
-Notices remain in `StreamView` and use the same supplied state.
+`StreamNotice`, `StreamPassiveNotices`, and `StreamActionNotice` share notice
+content between the inline and native window hosts. `StreamView` owns their
+conditions, warning timer, input capture, and guarded session actions.
+
+`StreamNotices` checks the configured packet-loss threshold and 400 ms warning
+pulse, audio and network stacking, blocked content, disabled video, combined
+disabled media, and session replacement and teardown. It checks production home
+and menu actions, menu and dialog priority, keyboard input, input balance, and
+focus return. Layout checks cover 900 by 600, 1280 by 720, and 1920 by 1080 logical
+pixels, long text, and dark, bright, and detailed backgrounds. Captures under
+`build/notice-*.png` are Qt component images. They do not prove desktop composition.
+
+`StreamHarness.nativeHost` places the supplied stream view and game focus target
+inside its visible `StreamTestWindow`. Separate notice windows retain this actual
+native parent. The default remains the screen runner's window for existing tests.
 
 `StreamStatistics` checks the six live values, units, finite-value fallbacks,
 valid zeros, large values, long labels, preference and visibility changes,

@@ -1,0 +1,42 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::StreamNotices::initTestCase()
+FAIL!  : console_screen::StreamNotices::test_layout(inline-900-dark) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(inline-900-bright) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(inline-900-detail) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(inline-1280-dark) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(inline-1280-bright) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(inline-1280-detail) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(inline-1920-dark) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(inline-1920-bright) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(inline-1920-detail) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(window-900-dark) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(window-900-bright) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(window-900-detail) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(window-1280-dark) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(window-1280-bright) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(window-1280-detail) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(window-1920-dark) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(window-1920-bright) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+FAIL!  : console_screen::StreamNotices::test_layout(window-1920-detail) 'verify()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\stream-notices\chiaki-ng-ui\gui\tests\qml\tst_StreamNotices.qml(206) : failure location
+PASS   : console_screen::StreamNotices::cleanupTestCase()
+Totals: 2 passed, 18 failed, 0 skipped, 0 blacklisted, 3636ms
+********* Finished testing of console_screen *********
