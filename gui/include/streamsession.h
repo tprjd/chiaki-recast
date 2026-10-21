@@ -31,6 +31,7 @@
 #include "sessionlog.h"
 #include "controllermanager.h"
 #include "settings.h"
+#include "keyboardmousemapper.h"
 
 #include <QObject>
 #include <QImage>
@@ -233,6 +234,10 @@ class StreamSession : public QObject
 		bool keyboard_controller_enabled;
 		bool mouse_touch_enabled;
 		bool dpad_regular;
+		bool mouse_camera_enabled = false;
+		bool gameplay_captured = false;
+		KeyboardMouseMapper keyboard_mouse;
+		bool SendGameplayFeedback();
 		bool dpad_regular_touch_switched;
 		uint dpad_touch_shortcut1;
 		uint dpad_touch_shortcut2;
@@ -365,6 +370,8 @@ class StreamSession : public QObject
 		ChiakiPiDecoder *GetPiDecoder()	{ return pi_decoder; }
 #endif
 		void HandleKeyboardEvent(QKeyEvent *event);
+		void SetMouseCameraEnabled(bool enabled);
+		void SetGameplayCapture(bool captured, const QSet<int> &held = {});
 		void HandleTouchEvent(QTouchEvent *event, qreal width, qreal height);
 		void HandleDpadTouchEvent(ChiakiControllerState *state, bool placeholder = false);
 		void HandleMouseReleaseEvent(QMouseEvent *event);

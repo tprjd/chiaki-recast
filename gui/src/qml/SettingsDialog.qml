@@ -95,7 +95,7 @@ FocusScope {
     }
     readonly property bool compact: width < 760
     readonly property var categories: [qsTr("General"), qsTr("Video"), qsTr("Stream"),
-        qsTr("Audio/Wifi"), qsTr("Consoles"), qsTr("Keys"), qsTr("Controllers"), qsTr("Remote"), qsTr("Config")]
+        qsTr("Audio/Wifi"), qsTr("Consoles"), qsTr("Keyboard and mouse"), qsTr("Controllers"), qsTr("Remote"), qsTr("Config")]
     property int consoleProfileEpoch: 0
     property string consoleProfileKey: backend.settings.currentProfile
     property var pendingConsoleAction: null
@@ -239,7 +239,7 @@ FocusScope {
         case 2: item = consoleSelection; break;
         case 3: item = audioOutDevice; break;
         case 4: item = registerNewButton; break;
-        case 5: item = resetAllKeys; break;
+        case 5: item = dialog.backend.settings.mouseCameraSupported ? mouseCameraEnabled : resetAllKeys; break;
         case 6: item = controllerMappingChange; break;
         case 7: item = firstRemoteFocusableItem(); break;
         case 8: item = profile; break;
@@ -1601,10 +1601,26 @@ FocusScope {
                         id: keysLayout
                         width: Math.max(0, keysFlick.width - 14)
                         spacing: 16
-                        Label { text: qsTr("Keys"); font.pixelSize: 24; font.bold: true }
-                        Label { text: qsTr("Keyboard and mouse"); font.pixelSize: 14; font.bold: true }
+                        Label { text: qsTr("Keyboard and mouse"); font.pixelSize: 24; font.bold: true }
+                        C.CheckBox {
+                            id: mouseCameraEnabled
+                            objectName: "mouseCameraEnabled"
+                            visible: dialog.backend.settings.mouseCameraSupported
+                            text: qsTr("Enable mouse camera mode")
+                            Accessible.name: text
+                            Accessible.description: qsTr("During a stream, press F8 to capture or release your controls.")
+                            checked: dialog.backend.settings.mouseCameraEnabled
+                            onToggled: dialog.backend.settings.mouseCameraEnabled = checked
+                        }
+                        Label {
+                            visible: dialog.backend.settings.mouseCameraSupported
+                            Layout.fillWidth: true
+                            text: qsTr("During a stream, press F8 to capture or release your controls.")
+                            wrapMode: Text.WordWrap
+                        }
                         Frame {
                             Layout.fillWidth: true
+                            enabled: !dialog.backend.settings.mouseCameraEnabled
                             background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
                             RowLayout {
                                 anchors.fill: parent
@@ -1632,6 +1648,7 @@ FocusScope {
                         }
                         RowLayout {
                             Layout.fillWidth: true
+                            enabled: !dialog.backend.settings.mouseCameraEnabled
                             Label { text: qsTr("Key assignments"); font.pixelSize: 14; font.bold: true; Layout.fillWidth: true }
                             C.Button {
                                 font.pixelSize: 14
@@ -1644,6 +1661,7 @@ FocusScope {
                         }
                         Frame {
                             Layout.fillWidth: true
+                            enabled: !dialog.backend.settings.mouseCameraEnabled
                             background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
                             GridLayout {
                                 anchors.fill: parent

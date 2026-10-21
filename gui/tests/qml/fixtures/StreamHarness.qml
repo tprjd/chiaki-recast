@@ -44,6 +44,7 @@ Item {
         property int videoPreset: 1
         property bool showStreamStats: true
         property bool streamerMode: false
+        property bool mouseCameraEnabled: false
         property int audioVideoDisabled: 0
         property bool dpadTouchEnabled: false
         property int wifiDroppedNotif: 3
@@ -60,6 +61,8 @@ Item {
         property int videoMode: 0
         property int videoPreset: 1
         property bool hasVideo: true
+        property bool gameplayCaptured: false
+        readonly property bool gameplayCaptureAvailable: !streamInput.blocked
         property bool keepVideo: false
         property int droppedFrames: 3
         property real queueDepthAverage: 1.2

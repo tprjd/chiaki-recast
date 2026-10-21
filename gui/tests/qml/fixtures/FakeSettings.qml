@@ -4,6 +4,9 @@ import QtQuick
 QtObject {
     id: settings
     property int changeCount: 0
+    property bool mouseCameraSupported: true
+    property bool mouseCameraEnabled: false
+    onMouseCameraEnabledChanged: changeCount++
     property var actions: []
     function record(name, args) { actions = actions.concat([{name: name, args: args || []}]); }
     property bool remotePlayAsk: false

@@ -423,6 +423,8 @@ class Settings : public QObject
 
 		bool GetKeyboardEnabled() const;
 		void SetKeyboardEnabled(bool enabled);
+		bool GetMouseCameraEnabled() const;
+		void SetMouseCameraEnabled(bool enabled);
 
 		bool GetMouseTouchEnabled() const;
 		void SetMouseTouchEnabled(bool enabled);
@@ -708,6 +710,7 @@ class Settings : public QObject
 		QMap<Qt::Key, int> GetControllerMappingForDecoding();
 
 	signals:
+		void MouseCameraEnabledChanged();
 		void RegisteredHostsUpdated();
 		void HiddenHostsUpdated();
 		void ManualHostsUpdated();

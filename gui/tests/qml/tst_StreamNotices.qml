@@ -13,6 +13,28 @@ TestCase {
     Component { id: harnessComponent; StreamHarness { anchors.fill: parent } }
     function routes() { return [{tag: "inline", separate: false}, {tag: "window", separate: true}]; }
     function passiveHost(h, separate) { return findChild(h.screen, separate ? "streamPassiveNoticesWindow" : "streamPassiveNoticesInline"); }
+    function test_gameplayCaptureNotice_data() { return routes(); }
+    function test_gameplayCaptureNotice(data) {
+        const h = createTemporaryObject(harnessComponent, tests);
+        h.nativeHost = data.separate;
+        h.window.runtimeRendererBackend = data.separate ? 1 : 0;
+        h.settings.mouseCameraEnabled = true;
+        const host = findChild(h.screen, data.separate ? "gameplayNoticeWindow" : "gameplayNoticeInline");
+        tryCompare(host, "visible", true);
+        const notice = findChild(host, "gameplayCaptureNotice");
+        compare(notice.title, "Keyboard and mouse ready · F8 to capture.");
+        compare(h.window.grabs, 0);
+        h.window.gameplayCaptured = true;
+        compare(notice.title, "Mouse captured · F8 to release.");
+        verify(!notice.activeFocus);
+        h.window.gameplayCaptured = false;
+        const id = h.window.streamInput.present(h.opener, "menu");
+        tryCompare(host, "visible", false);
+        h.window.streamInput.dismiss(id);
+        h.window.streamInput.settled(id);
+        tryCompare(host, "visible", true);
+        compare(h.window.gameplayCaptured, false);
+    }
     function test_networkThresholdAndAudio_data() { return routes(); }
     function test_networkThresholdAndAudio(data) {
         const h = createTemporaryObject(harnessComponent, tests);

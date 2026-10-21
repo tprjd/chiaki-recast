@@ -134,6 +134,19 @@ TestCase {
         verify(reset.activeFocus);
     }
 
+    function test_mouseCameraModeIsSeparateFromLegacyControls() {
+        const harness = createHarness();
+        const mode = findChild(harness, "mouseCameraEnabled");
+        verify(mode, "The capture mode has a separate switch");
+        compare(mode.checked, false);
+        mode.forceActiveFocus(Qt.TabFocusReason);
+        keyClick(Qt.Key_Space);
+        compare(harness.settings.mouseCameraEnabled, true);
+        compare(harness.settings.keyboardEnabled, false);
+        compare(harness.settings.mouseTouchEnabled, false);
+        compare(findChild(harness, "keyboardEnabled").enabled, false);
+    }
+
     function test_completeListRemainsReachable_data() {
         return [{tag: "desktop", width: 1280, height: 720}, {tag: "minimum", width: 900, height: 600}];
     }

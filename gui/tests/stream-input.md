@@ -37,7 +37,19 @@ callbacks, destruction, reentrant callbacks, and session capture rules.
 The desktop tests require an interactive desktop and OpenGL or Vulkan support.
 They check real backend session changes, settings transitions, cursor state,
 blocked feedback, and resumption after held buttons release in both feedback
-paths. The test settings use a temporary INI directory.
+paths. Each native test uses a separate test profile and clears that profile on exit.
+
+Run each native window test in a separate process. Qt renderer setup can block
+when the same process creates a second complete stream window. The CTest entries
+select one window test per process.
+
+The `chiaki-gameplay-keyboard-output` entry checks saved mode settings, every
+default keyboard action, opposing and diagonal movement, triggers, held-key
+quarantine, and exclusive output through both session feedback paths.
+`chiaki-gameplay-keyboard-desktop` supplies timestamped events through Qt's
+platform input interface. It checks production window routing, F8 repeat,
+Ctrl shortcuts, overlapping owners, obsolete key events, session replacement,
+and obsolete session notifications. It does not inject operating-system keys.
 
 ## Check native keys separately
 
@@ -51,10 +63,16 @@ $env:CHIAKI_INPUT_TEST_KEYS = '1'
 Remove-Item Env:CHIAKI_INPUT_TEST_KEYS
 ```
 
-A successful `SendInput` return alone does not prove key delivery. The initial
-attempt on this desktop did not observe mapped console feedback. Keep this
-result separate from constructed QKeyEvent checks and from the deterministic
-native test results. Physical key delivery still needs acceptance evidence.
+A successful `SendInput` return alone does not prove key delivery. This test
+requires the stream window to be the Windows foreground window before it sends
+keys. A foreground check failure is an environment failure, not input evidence.
+The keyboard case uses a fresh window. Settings-window activation from the
+ownership case must not run at the same time as keyboard injection.
+
+On 2026-10-21, an injected-key run passed F8, autorepeat, mapped Space, Ctrl+Q,
+Ctrl+O, menu release, and disconnect release. Later attempts could not obtain
+Windows foreground focus, so the complete final injected-key case remains
+unverified. Physical F8, F11, Alt+Tab, and live-console checks remain open.
 
 ## Run the screen checks
 

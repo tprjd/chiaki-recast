@@ -215,6 +215,7 @@ StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObje
 	dpad_regular_touch_switched = false;
 	rumble_haptics_intensity = RumbleHapticsIntensity::Off;
 	input_block = 0;
+	mouse_camera_enabled = connect_info.settings->GetMouseCameraEnabled();
 	player_index = 0;
 	memset(led_color, 0, sizeof(led_color));
 	packet_loss_max = connect_info.packet_loss_max;
@@ -695,8 +696,48 @@ void StreamSession::GoHome()
 	chiaki_session_go_home(&session);
 }
 
+void StreamSession::SetMouseCameraEnabled(bool enabled)
+{
+	SetGameplayCapture(false);
+	mouse_camera_enabled = enabled;
+}
+
+void StreamSession::SetGameplayCapture(bool captured, const QSet<int> &held)
+{
+	gameplay_captured = captured && mouse_camera_enabled;
+	keyboard_mouse.reset(held);
+	chiaki_controller_state_set_idle(&keyboard_state);
+	chiaki_controller_state_set_idle(&touch_state);
+	chiaki_controller_state_set_idle(&dpad_touch_state);
+	touch_tracker.clear();
+	mouse_touch_id = dpad_touch_id = -1;
+	dpad_touch_timer->stop();
+	dpad_touch_stop_timer->stop();
+	if(gameplay_captured)
+	{
+		if(input_block == 2) input_block = 0;
+		SendFeedbackState();
+	}
+	else
+	{
+		ChiakiControllerState neutral;
+		chiaki_controller_state_set_idle(&neutral);
+		chiaki_session_set_controller_state(&session, &neutral);
+	}
+}
+
+bool StreamSession::SendGameplayFeedback()
+{
+	if(!gameplay_captured) return false;
+	auto state = keyboard_mouse.state();
+	if(input_block) chiaki_controller_state_set_idle(&state);
+	chiaki_session_set_controller_state(&session, &state);
+	return true;
+}
+
 void StreamSession::HandleMousePressEvent(QMouseEvent *event)
 {
+	if(mouse_camera_enabled) return;
 	if(!mouse_touch_enabled)
 		return;
 	// left button for touchpad gestures, others => touchpad click
@@ -707,6 +748,7 @@ void StreamSession::HandleMousePressEvent(QMouseEvent *event)
 
 void StreamSession::HandleMouseReleaseEvent(QMouseEvent *event)
 {
+	if(mouse_camera_enabled) return;
 	if(!mouse_touch_enabled)
 		return;
 	// left button => end of touchpad gesture
@@ -724,6 +766,7 @@ void StreamSession::HandleMouseReleaseEvent(QMouseEvent *event)
 
 void StreamSession::HandleMouseMoveEvent(QMouseEvent *event, qreal width, qreal height)
 {
+	if(mouse_camera_enabled) return;
 	if(!mouse_touch_enabled)
 		return;
 	// left button with move => touchpad gesture, otherwise ignore
@@ -744,6 +787,15 @@ void StreamSession::HandleMouseMoveEvent(QMouseEvent *event, qreal width, qreal 
 
 void StreamSession::HandleKeyboardEvent(QKeyEvent *event)
 {
+	if(mouse_camera_enabled)
+	{
+		if(!event->isAutoRepeat() && gameplay_captured)
+		{
+			keyboard_mouse.key(event->key(), event->type() == QEvent::KeyPress);
+			SendFeedbackState();
+		}
+		return;
+	}
 	if(!keyboard_controller_enabled)
 		return;
 	if(key_map.contains(Qt::Key(event->key())) == false)
@@ -800,6 +852,7 @@ void StreamSession::HandleKeyboardEvent(QKeyEvent *event)
 
 void StreamSession::HandleTouchEvent(QTouchEvent *event, qreal width, qreal height)
 {
+	if(gameplay_captured) return;
 	//unset touchpad (we will set it if user touches edge of screen)
 	touch_state.buttons &= ~CHIAKI_CONTROLLER_BUTTON_TOUCHPAD;
 
@@ -1034,6 +1087,7 @@ void StreamSession::WaitHaptics()
 
 void StreamSession::DpadSendFeedbackState()
 {
+	if(SendGameplayFeedback()) return;
 	ChiakiControllerState state;
 	chiaki_controller_state_set_idle(&state);
 
@@ -1090,6 +1144,7 @@ void StreamSession::DpadSendFeedbackState()
 
 void StreamSession::SendFeedbackState()
 {
+	if(SendGameplayFeedback()) return;
 	ChiakiControllerState state;
 	chiaki_controller_state_set_idle(&state);
 

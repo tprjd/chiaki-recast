@@ -41,6 +41,9 @@ extern "C" {
 #include <cstring>
 #include <utility>
 #include <memory>
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 #if defined(Q_OS_MACOS)
 #include <objc/message.h>
 #endif
@@ -342,6 +345,7 @@ QmlMainWindow::QmlMainWindow(const StreamSessionConnectInfo &connect_info)
 
 QmlMainWindow::~QmlMainWindow()
 {
+    releaseGameplayCapture();
     Q_ASSERT(!placebo_swapchain);
 
     if (render_backend == RenderBackend::Vulkan)
@@ -544,7 +548,11 @@ void QmlMainWindow::setVideoPreset(VideoPreset preset)
 
 void QmlMainWindow::setSettings(Settings *new_settings)
 {
+    releaseGameplayCapture();
+    disconnect(mouse_camera_connection);
     settings = new_settings;
+    mouse_camera_connection = connect(settings, &Settings::MouseCameraEnabledChanged, this, &QmlMainWindow::updateMouseCameraMode);
+    updateMouseCameraMode();
     QString profile = settings->GetCurrentProfile();
     qCCritical(chiakiGui) << "Current Profile: " << profile;
     if(profile.isEmpty())
@@ -1712,16 +1720,46 @@ renderer_backend_ready:
 
     stream_input = new StreamInputOwnership(this, quick_window, this);
     connect(stream_input, &StreamInputOwnership::captureChanged, this, [this](bool blocked) {
+        if (blocked) releaseGameplayCapture();
         if (blocked) setCursor(Qt::ArrowCursor);
         else if (has_video && this->settings->GetHideCursor()) setCursor(Qt::BlankCursor);
         if (session) session->BlockInput(blocked);
+        emit gameplayCaptureChanged();
     });
     backend = new QmlBackend(settings, this);
+    mouse_camera_connection = connect(settings, &Settings::MouseCameraEnabledChanged, this, &QmlMainWindow::updateMouseCameraMode);
+    connect(this, &QWindow::activeChanged, this, [this] {
+        if (!isActive()) releaseGameplayCapture();
+#ifdef Q_OS_WIN
+        if (!(GetAsyncKeyState(VK_F8) & 0x8000)) capture_key_down = false;
+#endif
+        emit gameplayCaptureChanged();
+    });
+    connect(qGuiApp, &QGuiApplication::aboutToQuit, this, &QmlMainWindow::releaseGameplayCapture);
+    qGuiApp->installEventFilter(this);
+    connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state) {
+        if (state != Qt::ApplicationActive) releaseGameplayCapture();
+    });
     connect(backend, &QmlBackend::sessionChanged, this, [this, exit_app_on_stream_exit](StreamSession *s) {
+        releaseGameplayCapture();
         session = s;
+        if (s) {
+            s->SetMouseCameraEnabled(this->settings->GetMouseCameraEnabled());
+            connect(s, &StreamSession::ConnectedChanged, this, [this, s] {
+                if (session != s) return;
+                if (!s->GetConnected()) releaseGameplayCapture();
+                emit gameplayCaptureChanged();
+            });
+            connect(s, &StreamSession::CantDisplayChanged, this, [this, s](bool blocked) {
+                if (session != s) return;
+                if (blocked) releaseGameplayCapture();
+                emit gameplayCaptureChanged();
+            });
+        }
         stream_input->sessionChanged(s != nullptr, !backend->sessionPinRequest().isEmpty(),
             backend->connectionAttempt().value("route") == "psn");
         stream_session_active.storeRelease(s ? 1 : 0);
+        emit gameplayCaptureChanged();
         update_timer->stop();
         dropped_frames_current.storeRelaxed(0);
         dropped_frames = 0;
@@ -2702,6 +2740,55 @@ void QmlMainWindow::render()
 
 }
 
+bool QmlMainWindow::gameplayCaptureAvailable() const
+{
+    return settings->GetMouseCameraEnabled() && session && session->GetConnected()
+        && !session->GetCantDisplay() && isActive() && !stream_input->blocked();
+}
+
+void QmlMainWindow::updateMouseCameraMode()
+{
+    releaseGameplayCapture();
+    if (session) session->SetMouseCameraEnabled(settings->GetMouseCameraEnabled());
+    emit gameplayCaptureChanged();
+}
+
+void QmlMainWindow::releaseGameplayCapture()
+{
+#ifdef Q_OS_WIN
+    gameplay_input_not_before = GetTickCount();
+#endif
+    if (!gameplay_captured) return;
+    gameplay_captured = false;
+    if (session) session->SetGameplayCapture(false);
+    setCursor(has_video && isActive() && !stream_input->blocked() && settings->GetHideCursor()
+        ? Qt::BlankCursor : Qt::ArrowCursor);
+    emit gameplayCaptureChanged();
+}
+
+void QmlMainWindow::startGameplayCapture(ulong timestamp)
+{
+    if (!gameplayCaptureAvailable()) return;
+    QSet<int> held;
+#ifdef Q_OS_WIN
+    // Include keys held before the window received focus; they need a release first.
+    for (int code = 'A'; code <= 'Z'; ++code)
+        if (GetAsyncKeyState(code) & 0x8000) held.insert(code);
+    const struct { int native; int key; } special[] = {
+        {VK_SPACE, Qt::Key_Space}, {VK_CONTROL, Qt::Key_Control}, {VK_SHIFT, Qt::Key_Shift},
+        {VK_UP, Qt::Key_Up}, {VK_DOWN, Qt::Key_Down}, {VK_LEFT, Qt::Key_Left}, {VK_RIGHT, Qt::Key_Right},
+        {VK_RETURN, Qt::Key_Return}, {VK_BACK, Qt::Key_Backspace}, {VK_TAB, Qt::Key_Tab}, {VK_F1, Qt::Key_F1}
+    };
+    for (const auto &binding : special)
+        if (GetAsyncKeyState(binding.native) & 0x8000) held.insert(binding.key);
+#endif
+    session->SetGameplayCapture(true, held);
+    gameplay_input_not_before = timestamp;
+    gameplay_captured = true;
+    setCursor(Qt::BlankCursor);
+    emit gameplayCaptureChanged();
+}
+
 bool QmlMainWindow::handleShortcut(QKeyEvent *event)
 {
     if (event->modifiers() == Qt::NoModifier) {
@@ -2756,8 +2843,55 @@ bool QmlMainWindow::nvidiaCard() const
     return nvidia_card;
 }
 
+bool QmlMainWindow::eventFilter(QObject *object, QEvent *event)
+{
+    if (gameplay_captured && event->type() == QEvent::ShortcutOverride) {
+        auto *key = static_cast<QKeyEvent *>(event);
+        if (!key->modifiers().testFlag(Qt::AltModifier) && !key->modifiers().testFlag(Qt::MetaModifier)) {
+            key->accept();
+            return true;
+        }
+    }
+    return QWindow::eventFilter(object, event);
+}
+
 bool QmlMainWindow::event(QEvent *event)
 {
+    if (event->type() == QEvent::FocusOut) releaseGameplayCapture();
+    if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
+        auto *key = static_cast<QKeyEvent *>(event);
+        if (key->key() == Qt::Key_F8 && event->type() == QEvent::KeyRelease
+                && key->spontaneous() && !key->isAutoRepeat()) capture_key_down = false;
+        if (gameplay_captured && (!key->spontaneous() || !key->timestamp())) return true;
+        if (settings->GetMouseCameraEnabled() && key->spontaneous() && key->timestamp()) {
+            const bool down = event->type() == QEvent::KeyPress;
+            const bool obsolete = qint32(key->timestamp() - gameplay_input_not_before) < 0;
+            if (key->key() == Qt::Key_F8) {
+                if (obsolete) return true;
+                if (!key->isAutoRepeat()) {
+                    if (down && !capture_key_down) {
+                        capture_key_down = true;
+                        if (gameplay_captured) releaseGameplayCapture();
+                        else startGameplayCapture(key->timestamp());
+                    }
+                }
+                return true;
+            }
+            if (gameplay_captured) {
+                if (obsolete) return true;
+                if (key->modifiers().testFlag(Qt::AltModifier) || key->modifiers().testFlag(Qt::MetaModifier)) {
+                    releaseGameplayCapture();
+                } else {
+                    if (key->key() == Qt::Key_F11) {
+                        if (down && !key->isAutoRepeat()) {
+                            if (windowState() != Qt::WindowFullScreen) fullscreenTime(); else normalTime();
+                        }
+                    } else session->HandleKeyboardEvent(key);
+                    return true;
+                }
+            }
+        }
+    }
     switch (event->type()) {
     case QEvent::MouseMove:
     case QEvent::MouseButtonPress:
@@ -2780,6 +2914,7 @@ bool QmlMainWindow::event(QEvent *event)
             QGuiApplication::sendEvent(quick_window, event);
         break;
     case QEvent::MouseButtonDblClick:
+        if (gameplay_captured) return true;
         if(!settings->GetFullscreenDoubleClickEnabled())
             break;
         if (session && !stream_input->blocked()) {
@@ -2864,6 +2999,7 @@ bool QmlMainWindow::event(QEvent *event)
         QGuiApplication::sendEvent(quick_window, event);
         break;
     case QEvent::Close:
+        releaseGameplayCapture();
         if (!backend->closeRequested()) {
             event->ignore();
             return true;

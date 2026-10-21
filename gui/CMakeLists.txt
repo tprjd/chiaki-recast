@@ -20,6 +20,8 @@ if(WIN32)
 endif()
 
 set(SOURCE_FILES
+	include/keyboardmousemapper.h
+	src/keyboardmousemapper.cpp
 	include/streaminputownership.h
 	src/streaminputownership.cpp
 	include/exception.h

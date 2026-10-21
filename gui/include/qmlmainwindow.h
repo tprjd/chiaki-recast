@@ -47,6 +47,8 @@ class QmlMainWindow : public QWindow
 {
     Q_OBJECT
     Q_PROPERTY(StreamInputOwnership *streamInput READ streamInput CONSTANT)
+    Q_PROPERTY(bool gameplayCaptured READ gameplayCaptured NOTIFY gameplayCaptureChanged)
+    Q_PROPERTY(bool gameplayCaptureAvailable READ gameplayCaptureAvailable NOTIFY gameplayCaptureChanged)
     Q_PROPERTY(bool hasVideo READ hasVideo NOTIFY hasVideoChanged)
     Q_PROPERTY(int droppedFrames READ droppedFrames NOTIFY droppedFramesChanged)
     Q_PROPERTY(bool keepVideo READ keepVideo WRITE setKeepVideo NOTIFY keepVideoChanged)
@@ -119,6 +121,8 @@ public:
     void setVideoPreset(VideoPreset mode);
 
     StreamInputOwnership *streamInput() const { return stream_input; }
+    bool gameplayCaptured() const { return gameplay_captured; }
+    bool gameplayCaptureAvailable() const;
 
 public slots:
     void resetPlaceboQueue();
@@ -133,6 +137,7 @@ public slots:
     AVBufferRef *vulkanHwDeviceCtx();
 
 signals:
+    void gameplayCaptureChanged();
     void hasVideoChanged();
     void droppedFramesChanged();
     void keepVideoChanged();
@@ -174,7 +179,11 @@ private:
     void refreshPendingFrameAge();
     void snapshotPendingFrame();
     bool handleShortcut(QKeyEvent *event);
+    void releaseGameplayCapture();
+    void startGameplayCapture(ulong timestamp);
+    void updateMouseCameraMode();
     bool event(QEvent *event) override;
+    bool eventFilter(QObject *object, QEvent *event) override;
     QObject *focusObject() const override;
     void updateQueueDepthAverage(int depth);
     void updatePendingFrameAge(double age);
@@ -196,6 +205,10 @@ private:
     bool keep_video = false;
     RenderBackend render_backend = RenderBackend::Vulkan;
     StreamInputOwnership *stream_input = nullptr;
+    bool gameplay_captured = false;
+    bool capture_key_down = false;
+    ulong gameplay_input_not_before = 0;
+    QMetaObject::Connection mouse_camera_connection;
     int dropped_frames = 0;
     bool is_window_adjustable = false;
     bool is_stream_window_adjustable = false;

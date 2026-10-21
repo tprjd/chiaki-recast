@@ -814,6 +814,26 @@ bool QmlSettings::keyboardEnabled() const
     return settings->GetKeyboardEnabled();
 }
 
+bool QmlSettings::mouseCameraSupported() const
+{
+#ifdef Q_OS_WIN
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool QmlSettings::mouseCameraEnabled() const
+{
+    return settings->GetMouseCameraEnabled();
+}
+
+void QmlSettings::setMouseCameraEnabled(bool enabled)
+{
+    settings->SetMouseCameraEnabled(enabled);
+    emit mouseCameraEnabledChanged();
+}
+
 void QmlSettings::setKeyboardEnabled(bool enabled)
 {
     settings->SetKeyboardEnabled(enabled);
@@ -1817,6 +1837,7 @@ void QmlSettings::setSettings(Settings *new_settings)
 
 void QmlSettings::refreshAllKeys()
 {
+    emit mouseCameraEnabledChanged();
     emit remotePlayAskChanged();
     emit addSteamShortcutAskChanged();
     emit hideCursorChanged();

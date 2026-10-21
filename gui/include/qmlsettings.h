@@ -82,6 +82,8 @@ class QmlSettings : public QObject
     Q_PROPERTY(QString psnAccountId READ psnAccountId WRITE setPsnAccountId NOTIFY psnAccountIdChanged)
     Q_PROPERTY(bool mouseTouchEnabled READ mouseTouchEnabled WRITE setMouseTouchEnabled NOTIFY mouseTouchEnabledChanged)
     Q_PROPERTY(bool keyboardEnabled READ keyboardEnabled WRITE setKeyboardEnabled NOTIFY keyboardEnabledChanged)
+    Q_PROPERTY(bool mouseCameraEnabled READ mouseCameraEnabled WRITE setMouseCameraEnabled NOTIFY mouseCameraEnabledChanged)
+    Q_PROPERTY(bool mouseCameraSupported READ mouseCameraSupported CONSTANT)
     Q_PROPERTY(bool dpadTouchEnabled READ dpadTouchEnabled WRITE setDpadTouchEnabled NOTIFY dpadTouchEnabledChanged)
     Q_PROPERTY(bool iDROnFECFailureEnabled READ iDROnFECFailureEnabled WRITE setIDROnFECFailureEnabled NOTIFY iDROnFECFailureEnabledChanged)
     Q_PROPERTY(uint16_t dpadTouchIncrement READ dpadTouchIncrement WRITE setDpadTouchIncrement NOTIFY dpadTouchIncrementChanged)
@@ -530,6 +532,9 @@ public:
 
     bool keyboardEnabled() const;
     void setKeyboardEnabled(bool enabled);
+    bool mouseCameraEnabled() const;
+    void setMouseCameraEnabled(bool enabled);
+    bool mouseCameraSupported() const;
 
     bool dpadTouchEnabled() const;
     void setDpadTouchEnabled(bool enabled);
@@ -593,6 +598,7 @@ public:
     Q_INVOKABLE QString stringForStreamMenuShortcut() const;
 
 signals:
+    void mouseCameraEnabledChanged();
     void resolutionLocalPS4Changed();
     void resolutionRemotePS4Changed();
     void resolutionLocalPS5Changed();

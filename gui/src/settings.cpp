@@ -897,6 +897,22 @@ bool Settings::GetKeyboardEnabled() const
 {
 	return settings.value("settings/keyboard_enabled", true).toBool();
 }
+
+bool Settings::GetMouseCameraEnabled() const
+{
+#ifdef Q_OS_WIN
+	const auto value = settings.value("settings/keyboard_mouse/enabled", false).toString();
+	return value == "true" || value == "1";
+#else
+	return false;
+#endif
+}
+
+void Settings::SetMouseCameraEnabled(bool enabled)
+{
+	settings.setValue("settings/keyboard_mouse/enabled", enabled);
+	emit MouseCameraEnabledChanged();
+}
 void Settings::SetKeyboardEnabled(bool enabled)
 {
 	settings.setValue("settings/keyboard_enabled", enabled);

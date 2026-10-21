@@ -291,6 +291,39 @@ Item {
             packetLoss: view.backend.session && Number.isFinite(view.backend.session.averagePacketLoss) ? view.backend.session.averagePacketLoss : 0
         }
     }
+    readonly property bool gameplayNoticeVisible: view.settings.mouseCameraEnabled
+        && (view.streamWindow.gameplayCaptured || view.noticesReady && view.streamWindow.gameplayCaptureAvailable)
+        && !(menuState.open || menuState.closing)
+    Component {
+        id: gameplayNoticeContent
+        StreamNotice {
+            objectName: "gameplayCaptureNotice"
+            title: view.streamWindow.gameplayCaptured
+                ? qsTr("Mouse captured · F8 to release.") : qsTr("Keyboard and mouse ready · F8 to capture.")
+            message: ""
+        }
+    }
+    Loader {
+        objectName: "gameplayNoticeInline"
+        anchors { bottom: parent.bottom; left: parent.left; margins: 18 }
+        width: Math.min(340, view.width - 36)
+        height: item ? item.implicitHeight : 0
+        visible: !view.useSeparateMenuWindow && view.gameplayNoticeVisible
+        sourceComponent: gameplayNoticeContent
+    }
+    Window {
+        objectName: "gameplayNoticeWindow"
+        transientParent: view.streamWindow
+        flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowTransparentForInput | Qt.WindowDoesNotAcceptFocus
+        modality: Qt.NonModal
+        color: "transparent"
+        visible: view.useSeparateMenuWindow && view.gameplayNoticeVisible
+        x: view.streamWindow.x + 18
+        y: view.streamWindow.y + view.streamWindow.height - height - 18
+        width: Math.min(340, view.width - 36)
+        height: gameplayWindowContent.item ? gameplayWindowContent.item.implicitHeight : 0
+        Loader { id: gameplayWindowContent; width: parent.width; sourceComponent: gameplayNoticeContent }
+    }
     Loader {
         id: passiveNoticesInline
         objectName: "streamPassiveNoticesInline"

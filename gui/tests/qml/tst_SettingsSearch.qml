@@ -19,6 +19,13 @@ TestCase {
         search.forceActiveFocus(Qt.TabFocusReason);
         keyClick(Qt.Key_Return);
     }
+    function test_captureModeSearch() {
+        const h = createTemporaryObject(harnessComponent, testCase);
+        searchFor(h, "F8 gameplay capture");
+        compare(h.screen.currentCategory, 5);
+        tryCompare(findChild(h, "mouseCameraEnabled"), "activeFocus", true);
+        compare(h.settings.mouseCameraEnabled, false);
+    }
     function test_linkedDisplayAndNestedColorRouting() {
         const h = createTemporaryObject(linkedHarnessComponent, testCase);
         h.backend.window.videoPreset = 5;
@@ -141,7 +148,7 @@ TestCase {
             "streamMenuShortcut1", "streamMenuShortcut2", "streamMenuShortcut3", "streamMenuShortcut4",
             "decoder", "useZeroCopy", "windowType", "customResolutionWidth", "customResolutionHeight", "fullscreenDoubleClick", "hideCursor", "vSyncEnabled", "videoPreset", "queueDepthLimit", "rendererBackend", "customRendererSettings", "displaySettings", "consoleSelection",
             "audioOutDevice", "audioInDevice", "audioBufferSize", "audioVolume", "startMicUnmuted", "speechProcessing", "noiseSuppressLevel", "echoSuppressLevel", "wifiDroppedNotif", "packetLossReportedMax", "iDROnFECFailureEnabled", "showStreamStats",
-            "registerConsole", "registeredConsoleInfo0", "autoConnectConsole0", "deleteRegisteredConsole0", "hiddenConsoleInfo0", "unhideConsole0", "keyboardEnabled", "mouseTouchEnabled", "resetAllKeys",
+            "registerConsole", "registeredConsoleInfo0", "autoConnectConsole0", "deleteRegisteredConsole0", "hiddenConsoleInfo0", "unhideConsole0", "mouseCameraEnabled", "keyboardEnabled", "mouseTouchEnabled", "resetAllKeys",
             "controllerMappingChange", "controllerMappingReset", "allowJoystickBackgroundEvents", "buttonsByPosition", "dpadTouchEnabled", "dpadTouchIncrement", "dpadTouchShortcut1", "dpadTouchShortcut2", "dpadTouchShortcut3", "dpadTouchShortcut4", "rumbleHapticsIntensity", "hapticOverride",
             "openPsnLogin", "portGuessingEnabled", "portGuessCount", "portGuessSocketCount", "manageProfiles", "exportSettings", "importSettings", "logSanitize", "logVerbose", "aboutSettings"
         ];
@@ -151,7 +158,7 @@ TestCase {
         for (const key of keys) targets.push("keyMapping" + key.buttonValue);
         for (const target of targets) {
             const search = findChild(h, "settingsSearch");
-            const terms = ["General", "Video", "Stream", "Audio/Wifi", "Consoles", "Keys", "Controllers", "Remote", "Config"];
+            const terms = ["General", "Video", "Stream", "Audio/Wifi", "Consoles", "Keyboard and mouse", "Controllers", "Remote", "Config"];
             let query = "";
             for (const term of terms) {
                 search.text = term;

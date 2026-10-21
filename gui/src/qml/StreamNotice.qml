@@ -46,6 +46,7 @@ Rectangle {
             }
             Label {
                 objectName: "streamNoticeMessage"
+                visible: text.length > 0
                 Layout.fillWidth: true
                 text: notice.message
                 color: "#e0e5ed"
