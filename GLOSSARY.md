@@ -17,3 +17,7 @@ An automatic connection attempt to a selected registered console when the app st
 
 **Console wake-up**:
 The transition of a console from rest mode so that it becomes available for Remote Play.
+
+**Sign-in redirect URL**:
+The complete browser URL returned after PSN sign-in. It contains the authorization code used to complete sign-in in chiaki-ng.
+_Avoid_: Token, token string
