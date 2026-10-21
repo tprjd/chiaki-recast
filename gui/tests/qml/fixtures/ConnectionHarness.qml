@@ -7,6 +7,7 @@ Item {
     height: 720
     property alias backend: fakeBackend
     property bool screenActive: true
+    property bool wakeScreen: false
     readonly property var screen: screenLoader.item
     property var actions: []
     function showMainView() { actions = actions.concat(["consoles"]); }
@@ -29,6 +30,8 @@ Item {
         id: screenLoader
         anchors.fill: parent
         active: harness.screenActive
-        sourceComponent: ConnectionView { backend: fakeBackend; navigation: harness }
+        sourceComponent: harness.wakeScreen ? wakeComponent : localComponent
     }
+    Component { id: localComponent; ConnectionView { backend: fakeBackend; navigation: harness } }
+    Component { id: wakeComponent; AutoConnectView { backend: fakeBackend; navigation: harness } }
 }

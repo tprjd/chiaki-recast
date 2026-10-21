@@ -279,12 +279,15 @@ private:
     static QVariantMap connectionTargetKey(const QVariantMap &host);
     int resolveConnectionTarget() const;
     bool connectionTargetValid() const;
-    void beginConnection(const StreamSessionConnectInfo &info, const QVariantMap &target);
+    void beginConnection(const StreamSessionConnectInfo &info, const QVariantMap &target, const QString &context = {});
     void startPsnConnection(const StreamSessionConnectInfo &info, const QVariantMap &target, bool continue_attempt = false);
     void watchConnectionToken(PSNToken *token);
     void finishPsnCleanup();
     void failConnection(const QString &title, const QString &text);
     void setConnectionPhase(const QString &phase);
+    void beginAutoConnect(const HostMAC &mac);
+    void autoConnectPsn();
+    void clearWakeWait();
     bool sendWakeup(const DisplayServer &server);
     bool sendWakeup(const QString &host, const QByteArray &regist_key, bool ps5);
     void updateControllers();
