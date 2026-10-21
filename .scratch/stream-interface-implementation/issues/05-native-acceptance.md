@@ -17,7 +17,7 @@ Parent and specification: [implementation map](../map.md).
 - [x] Run combined production QML cases through the single composed boundary. Cover menu/pop-up transitions, statistics suppression and return, simultaneous notices, blocked content, disabled media, session replacement/destruction, and connection/PIN/disconnect priority.
 - [x] Use isolated settings and controlled session state for native checks. Exercise the real application bindings and handlers while intercepting transport commands. Do not change the user's settings or operate their real console.
 - [x] Exercise both the inline and separate-window renderer routes. Verify the approved A appearance, transparent backgrounds, opaque readable text, visible focus, and absence of a large opaque window or full-screen dimming layer.
-- [x] Verify toolbar and pop-up placement after window movement, resize, fullscreen changes, and display-scale changes. Check 900×600, 1280×720, and 1920×1080 logical layouts, plus 100%, 150%, and 200% scaling where available.
+- [x] Verify final placement and movement at 900x600 and measured DPR 1 on both renderer routes, per the user-reduced remaining test scope. See the acceptance record for earlier-source resize/fullscreen and three-size results. Final-host resize/fullscreen and live DPI transitions remain unverified; no final pass is claimed for them.
 - [x] Check long translated labels, the longest quality preset, Zoom and Custom, large metric values, and notice combinations. Controls and notices do not clip or overlap, and no popup is cut off by its native host.
 - [x] Verify actual window activation, initial Resume focus, keyboard/controller key handling, Escape order, focus restoration, single input release, input return to the stream, and no unwanted interception outside interactive regions.
 - [x] Confirm that passive statistics and routine notices do not take focus. Check that session teardown or route changes cannot leave overlays visible or input captured.
@@ -41,7 +41,7 @@ the recorded focus-outline fix and notice integration after the toolbar's normal
 
 Resolved after the user limited remaining tests to one resolution and one scale.
 Final source `62f9676e`, with integration/review merge `faadb689b`, passes native
-900�600 DPR 1 acceptance: OpenGL 270 checks and Vulkan 251 checks. Real Windows
+900x600 DPR 1 acceptance: OpenGL 270 checks and Vulkan 251 checks. Real Windows
 pointer input, native focus, outside-click Escape, actual Main settings navigation,
 modal priority, session replacement and cleanup pass. Reliable desktop duplication
 captures show production composition. The final Qt 6.7 affected cases pass.
