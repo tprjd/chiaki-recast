@@ -13,13 +13,13 @@ Specification: [PSN sign-in and remaining dialogs](spec.md)
 | [03: Steam shortcut creation and results](issues/03-steam-shortcut-results.md) | resolved | None |
 | [04: Startup reminder choices](issues/04-startup-reminders.md) | resolved | None |
 | [05: Explicit confirmations and registration choice](issues/05-confirmations-and-registration.md) | resolved | None |
-| [06: Disconnect confirmations in both renderer routes](issues/06-disconnect-confirmations.md) | claimed | None |
+| [06: Disconnect confirmations in both renderer routes](issues/06-disconnect-confirmations.md) | resolved | None |
 | [07: About and renderer notices](issues/07-about-and-renderer-notices.md) | resolved | None |
 | [08: Integrated native acceptance](issues/08-native-acceptance.md) | ready-for-agent | 02, 03, 04, 05, 06, 07 |
 
 ## Execution order
 
-- Ticket 06 is claimed. No other ticket is open and unblocked. Ticket 08 waits for 06.
+- Tickets 01 through 07 are resolved. Ticket 08 is open and unblocked. The first eligible ticket is 08.
 - Ticket 08 starts after 02, 03, 04, 05, 06, and 07 are resolved. Ticket 01 is included through 02.
 - Every feature ticket includes its own focused tests. Ticket 08 verifies the integrated production build and cross-flow behavior.
 - Shared-file overlap requires coordination, not extra blocking edges. Allow only one writer to the shared native build cache.
@@ -71,3 +71,5 @@ Integration also removes one extra blank line at the end of the information test
 2026-10-21: Resolved [ticket 02](issues/02-registration-account-id.md). Registration reuses the PSN sign-in screen and has a separate public lookup form. Public lookup validates responses, recovers after a 30-second timeout, and saves no credentials. Both routes return only to the original valid registration form. The [verification record](evidence/ticket02/verification.md) contains production-screen red/green checks, focused regressions, and inspected captures at both required sizes. The implementation merged integration tip `599413ba` before final verification. Native build and visible native acceptance remain in ticket 08.
 
 2026-10-21: Merge `e71a49c2` integrates ticket 02 from `codex/psn-registration` at `70f6891e` without conflicts. Reviewed evidence records 95 passing post-merge checks. Removed trailing whitespace from one saved red log and an extra blank line from the registration test fixture. The diff check passes. Ticket 06 is the only unresolved dependency of ticket 08.
+
+2026-10-21: Resolved [ticket 06](issues/06-disconnect-confirmations.md). Merge `9e3b24c3` integrates `codex/psn-disconnect` at `f74a445f` without conflicts. Both renderer routes use explicit disconnect, sleep, and cancel choices. The native fix supplies the real parent window and viewport-sized overlay. The [evidence record](evidence/ticket06/README.md) includes 307 Vulkan and 327 OpenGL native checks, controlled stop and sleep commands, balanced input capture, and current render-target captures. Desktop compositor captures were stale and excluded. The [cache restoration record](evidence/ticket06/cache-restoration.json) confirms 209 original source hashes and both normal targets rebuilt. Real console effects, physical controllers, final desktop composition, and the final integrated build remain for ticket 08. All seven feature tickets are resolved; ticket 08 can now start.
