@@ -54,7 +54,7 @@ FocusScope {
     }
     Keys.onEscapePressed: cancel()
     Shortcut { sequence: "Ctrl+Q"; enabled: host.blocking; onActivated: host.cancel() }
-    MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; onClicked: if (mouse.button === Qt.RightButton) host.cancel() }
+    MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons; onClicked: mouse => { if (mouse.button === Qt.RightButton) host.cancel(); } }
     Loader {
         id: inlineLoader
         anchors.fill: parent
