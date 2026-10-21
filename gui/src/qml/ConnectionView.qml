@@ -12,7 +12,8 @@ FocusScope {
     property bool managesAttempt: true
     readonly property var attempt: backend.connectionAttempt || ({})
     readonly property string phase: attempt.phase || "connecting"
-    readonly property bool terminal: phase === "failure" || phase === "cancelled"
+    readonly property bool psn: attempt.route === "psn"
+    readonly property bool terminal: phase === "failure" || phase === "cancelled" || phase === "registered"
     readonly property bool busy: !terminal && phase !== "ready"
     readonly property bool streamerMode: backend.settings.streamerMode
     property string commandAttempt: ""
@@ -123,11 +124,11 @@ FocusScope {
     ColumnLayout {
         anchors { left: sidebar.right; right: parent.right; top: parent.top; bottom: parent.bottom; margins: 24 }
         spacing: 16
-        ConnectionLabel { text: qsTr("Consoles / Connect to console"); color: "#9ca8b9"; font.pixelSize: 12 }
+        ConnectionLabel { text: view.psn ? qsTr("Consoles / Connect over PSN") : qsTr("Consoles / Connect to console"); color: "#9ca8b9"; font.pixelSize: 12 }
         RowLayout {
             Layout.fillWidth: true
-            ConnectionLabel { text: qsTr("Connect to console"); font.pixelSize: 30; font.bold: true }
-            Label { objectName: "connectionRoute"; text: qsTr("Local network"); color: "#91caff"; font.pixelSize: 13; textFormat: Text.PlainText; wrapMode: Text.Wrap; Layout.maximumWidth: 180 }
+            ConnectionLabel { text: view.psn ? qsTr("Connect over PSN") : qsTr("Connect to console"); font.pixelSize: 30; font.bold: true }
+            Label { objectName: "connectionRoute"; text: view.psn ? qsTr("Remote connection") : qsTr("Local network"); color: "#91caff"; font.pixelSize: 13; textFormat: Text.PlainText; wrapMode: Text.Wrap; Layout.maximumWidth: 180 }
         }
         ConnectionLabel { text: qsTr("Remote Play with your selected console."); color: "#9ca8b9" }
         Flickable {
@@ -162,7 +163,7 @@ FocusScope {
                                 ConnectionLabel { objectName: "connectionConsole"; text: view.consoleName; font.bold: true; font.pixelSize: 17 }
                                 ConnectionLabel {
                                     objectName: "connectionAddress"
-                                    text: view.streamerMode ? qsTr("Address hidden") : view.attempt.address || qsTr("Console address unavailable")
+                                    text: view.psn ? qsTr("PlayStation Network") : view.streamerMode ? qsTr("Address hidden") : view.attempt.address || qsTr("Console address unavailable")
                                     color: "#9ca8b9"; font.pixelSize: 12
                                 }
                             }
@@ -175,20 +176,46 @@ FocusScope {
                             ConnectionLabel {
                                 objectName: "connectionTitle"; font.pixelSize: 22; font.bold: true
                                 text: view.phase === "video" ? qsTr("Waiting for video")
+                                    : view.phase === "internet" ? qsTr("Waiting for internet")
+                                    : view.phase === "initiating" ? qsTr("Contacting PlayStation Network")
+                                    : view.phase === "linking" ? qsTr("Linking your console")
+                                    : view.phase === "registering" ? qsTr("Registering your console")
+                                    : view.phase === "registered" ? qsTr("Console registered")
+                                    : view.phase === "data" ? qsTr("Opening the data connection")
                                     : view.phase === "ready" ? qsTr("Your stream is ready")
                                     : view.phase === "failure" ? (view.streamerMode ? qsTr("Could not start Remote Play") : view.attempt.errorTitle || qsTr("Could not start Remote Play"))
-                                    : view.phase === "cancelling" ? qsTr("Cancelling connection")
+                                    : view.phase === "cancelling" ? (view.psn ? qsTr("Cancelling remote connection") : qsTr("Cancelling connection"))
                                     : view.phase === "cancelled" ? qsTr("Connection cancelled") : qsTr("Connecting to console")
                             }
                         }
                         ConnectionLabel {
                             objectName: "connectionDescription"; color: "#adb8c8"
-                            text: view.phase === "video" ? qsTr("The session is connected. Waiting for the first video frame.")
+                            text: view.phase === "video" ? (view.psn ? qsTr("The remote connection is ready. Waiting for the first video frame.") : qsTr("The session is connected. Waiting for the first video frame."))
+                                : view.phase === "internet" ? qsTr("Waiting for an internet connection to reach PlayStation Network.")
+                                : view.phase === "initiating" ? qsTr("Preparing a remote connection to your console.")
+                                : view.phase === "linking" ? qsTr("This step must finish before cancellation is available.")
+                                : view.phase === "registering" ? qsTr("Automatic registration is in progress.")
+                                : view.phase === "registered" ? qsTr("Registration is complete. Return to the library to connect.")
+                                : view.phase === "data" ? qsTr("Your console is linked. Establishing the Remote Play connection.")
                                 : view.phase === "ready" ? qsTr("Opening your Remote Play stream.")
-                                : view.phase === "failure" ? qsTr("Check that the console is on and Remote Play is enabled.")
+                                : view.phase === "failure" ? (view.psn ? qsTr("Check that your console is online and available for Remote Play.") : qsTr("Check that the console is on and Remote Play is enabled."))
                                 : view.phase === "cancelling" ? qsTr("Waiting for the current connection attempt to stop.")
                                 : view.phase === "cancelled" ? qsTr("Your console is still available in the library.")
                                 : qsTr("Opening a Remote Play session on your local network.")
+                        }
+                        ConnectionLabel {
+                            objectName: "connectionCompleted"
+                            visible: view.psn && text.length > 0
+                            color: "#8cd5b0"
+                            text: (view.attempt.completedStages || []).map(stage => {
+                                switch (stage) {
+                                case "psn": return qsTr("✓ Reached PlayStation Network");
+                                case "linking": return qsTr("✓ Console linked");
+                                case "registration": return qsTr("✓ Registration completed");
+                                case "data": return qsTr("✓ Data connection opened");
+                                default: return "";
+                                }
+                            }).filter(text => text.length > 0).join("\n")
                         }
                         ConnectionLabel {
                             objectName: "connectionInvalidTarget"; color: "#ffb4ab"
@@ -243,11 +270,11 @@ FocusScope {
                     Layout.fillWidth: true; Layout.preferredWidth: workspace.width * 0.36; Layout.alignment: Qt.AlignTop
                     spacing: 16
                     ConnectionLabel { text: qsTr("GOOD TO KNOW"); color: "#9ca8b9"; font.pixelSize: 11; font.letterSpacing: 1.5 }
-                    ConnectionLabel { text: qsTr("Ready for Remote Play"); font.pixelSize: 21; font.bold: true }
-                    ConnectionLabel { text: qsTr("Keep your console on and connected to your local network."); color: "#adb8c8" }
+                    ConnectionLabel { text: view.psn ? qsTr("Connect away from home") : qsTr("Ready for Remote Play"); font.pixelSize: 21; font.bold: true }
+                    ConnectionLabel { text: view.psn ? qsTr("Keep your console connected to the internet. A remote connection can take longer to start.") : qsTr("Keep your console on and connected to your local network."); color: "#adb8c8" }
                     Rectangle { Layout.fillWidth: true; height: 1; color: "#2b323e" }
-                    ConnectionLabel { text: qsTr("Connection, then video"); font.bold: true }
-                    ConnectionLabel { text: qsTr("The session can connect before the first video frame arrives."); color: "#adb8c8" }
+                    ConnectionLabel { text: view.psn ? qsTr("A brief wait") : qsTr("Connection, then video"); font.bold: true }
+                    ConnectionLabel { text: view.psn ? qsTr("Some connection steps must finish before cancellation is available.") : qsTr("The session can connect before the first video frame arrives."); color: "#adb8c8" }
                 }
             }
         }

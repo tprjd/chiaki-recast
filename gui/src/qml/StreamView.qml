@@ -12,7 +12,7 @@ Item {
     id: view
 
     readonly property var hostWindow: view.Window.window
-    readonly property bool managedConnection: Chiaki.connectionAttempt.route === "local" && Chiaki.connectionAttempt.presented
+    readonly property bool managedConnection: !!Chiaki.connectionAttempt.presented
     property bool legacySessionError: false
     property bool legacySessionLoading: true
     readonly property bool sessionError: managedConnection ? Chiaki.connectionAttempt.phase === "failure" : legacySessionError
