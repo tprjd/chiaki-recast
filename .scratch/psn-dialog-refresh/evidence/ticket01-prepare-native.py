@@ -83,4 +83,3 @@ path.write_text(path.read_text(encoding='utf-8') + '\nQImage QmlMainWindow::nati
 path = source / 'gui/CMakeLists.txt'
 path.write_text(path.read_text(encoding='utf-8') + '\ntarget_sources(chiaki PRIVATE ' + (qa / 'contracts.cpp').as_posix() + ')\n', encoding='utf-8')
 print('Staged isolated PSN setup contracts at', qa)
-

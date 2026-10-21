@@ -146,4 +146,3 @@ void initializePsnSetupQa() {
  config.setValue("settings/remote_play_ask",false); config.setValue("settings/add_steam_shortcut_ask",false); config.setValue("settings/render_backend","opengl"); config.setValue("settings/auto_discovery",false); config.setValue("settings/auto_connect_mac",""); config.sync();
  QTimer::singleShot(300,qApp,contracts);
 }
-
