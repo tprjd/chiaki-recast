@@ -23,6 +23,7 @@ FocusScope {
     property string failureText: ""
     property bool submitting: false
     property bool busy: false
+    property bool incorrectPin: false
     property bool canCancel: true
     property bool showCancel: false
     property bool showBack: false
@@ -159,8 +160,8 @@ FocusScope {
                             Layout.fillWidth: true; Layout.topMargin: 4; spacing: 15
                             Label {
                                 visible: !content.busy
-                                text: content.phase === "saved" ? "✓" : content.phase === "failure" ? "!" : "○"
-                                font.pixelSize: 26; color: content.phase === "saved" ? "#80dcb0" : content.phase === "failure" ? "#ffb0af" : "#63b7ff"
+                                text: content.phase === "saved" ? "✓" : content.phase === "failure" || content.incorrectPin ? "!" : "○"
+                                font.pixelSize: 26; color: content.phase === "saved" ? "#80dcb0" : content.phase === "failure" || content.incorrectPin ? "#ffb0af" : "#63b7ff"
                                 Layout.alignment: Qt.AlignTop; Layout.preferredWidth: 30
                                 Accessible.ignored: true
                             }

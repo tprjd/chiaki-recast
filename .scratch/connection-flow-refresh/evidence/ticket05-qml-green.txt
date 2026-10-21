@@ -23,5 +23,5 @@ PASS   : console_screen::LiveConsolePin::test_privacyHidesRevealedPinAndConsoleI
 PASS   : console_screen::LiveConsolePin::test_replacementAndRemovalClearInputWithoutSendingToNewRequest()
 PASS   : console_screen::LiveConsolePin::test_routeHandoffRetainsOnePromptAndReleasesAfterNativeAcceptance()
 PASS   : console_screen::LiveConsolePin::cleanupTestCase()
-Totals: 23 passed, 0 failed, 0 skipped, 0 blacklisted, 385ms
+Totals: 23 passed, 0 failed, 0 skipped, 0 blacklisted, 380ms
 ********* Finished testing of console_screen *********

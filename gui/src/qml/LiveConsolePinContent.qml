@@ -31,6 +31,7 @@ ConsolePinContent {
     phase: livePhase === "form" || livePhase === "submitting" ? "form" : livePhase
     submitting: livePhase !== "form" || commandPending
     busy: livePhase === "submitting" || livePhase === "cancelling"
+    incorrectPin: livePhase === "form" && !!request.incorrect
     canCancel: ownsRequest && (livePhase === "form" || livePhase === "submitting")
     showCancel: livePhase === "cancelling"
     showBack: livePhase === "cancelled"
