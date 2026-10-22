@@ -118,7 +118,7 @@
   "evidence": [
     {
       "path": ".gitattributes",
-      "sha256": "8b9c3028d6467ff3be7c793141927841d70f47f52d0590677438f488ca154992"
+      "sha256": "e97602ab9cac70102245345c5ab0fc9830df8b17f1072b188265a662a3a547ae"
     },
     {
       "path": "embedded-details.png",
