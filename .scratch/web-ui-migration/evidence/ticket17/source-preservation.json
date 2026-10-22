@@ -1,0 +1,88 @@
+[
+  {
+    "path": "gui/src/settings.cpp",
+    "method": "bool Settings::ExportSettings(",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "method": "static bool ValidateSettingsImport(",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "method": "bool Settings::SetCurrentProfile(",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "method": "bool Settings::DeleteProfile(",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "method": "QVariantMap QmlSettings::exportSettings()",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "method": "QVariantMap QmlSettings::importSettings()",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "method": "void QmlSettings::setSettings(",
+    "equal": true
+  },
+  {
+    "path": "gui/tests/embeddedsetup.cpp",
+    "method": "    void profileImportValidation()",
+    "equal": true
+  },
+  {
+    "path": "gui/tests/embeddedsetup.cpp",
+    "method": "    void profileSettingsPage()",
+    "equal": true
+  },
+  {
+    "path": "gui/tests/embeddedsetup.cpp",
+    "method": "    void profileFiles()",
+    "equal": true
+  },
+  {
+    "path": "gui/tests/embeddedsetup.cpp",
+    "method": "    void rendererFiles()",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "method": "bool Settings::ImportSettings(",
+    "equal": true,
+    "reference": "cleanup/profileDefaultImport pass"
+  },
+  {
+    "path": "gui/web/src/Controllers.svelte",
+    "equal": true,
+    "reference": "ticket17 start"
+  },
+  {
+    "path": "gui/web/src/KeyboardMouse.svelte",
+    "equal": true,
+    "reference": "ticket17 start"
+  },
+  {
+    "path": "gui/src/qml/StreamRoot.qml",
+    "equal": true,
+    "reference": "ticket17 start"
+  },
+  {
+    "path": "gui/src/streaminputownership.cpp",
+    "equal": true,
+    "reference": "ticket17 start"
+  },
+  {
+    "path": "gui/src/qmlmainwindow.cpp",
+    "equal": true,
+    "reference": "ticket17 start"
+  }
+]

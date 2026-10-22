@@ -1739,20 +1739,6 @@ QVariantList QmlSettings::registeredHosts() const
     return out;
 }
 
-QStringList QmlSettings::profiles() const
-{
-    QStringList out = settings->GetProfiles();
-    out.prepend("default");
-    out.append("create new profile");
-    return out;
-}
-
-void QmlSettings::deleteProfile(QString profile)
-{
-    if(!profile.isEmpty())
-        settings->DeleteProfile(std::move(profile));
-}
-
 QVariantList QmlSettings::keyboardMouseBindings() const
 {
     using namespace KeyboardMouseAction;

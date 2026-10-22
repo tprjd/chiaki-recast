@@ -1,0 +1,67 @@
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index f61c320e..bdec5c4d 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -383,6 +383,62 @@ class EmbeddedSetupTest : public QObject
+     }
+ 
+ private slots:
++    void profileImportValidation()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto cleanup = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        settings.SetAudioVolume(37);
++        const uint8_t mac[6] = {0, 1, 2, 3, 4, 5};
++        settings.AddHiddenHost(HiddenHost(HostMAC(mac), "Keep hidden"));
++        QTemporaryDir files;
++        const auto invalid = files.filePath("invalid.ini");
++        {
++            QSettings file(invalid, QSettings::IniFormat);
++            file.setValue("version", 2);
++            file.setValue("settings/this_profile", profile);
++            file.setValue("settings/audio_volume", 1);
++            file.beginWriteArray("registered_hosts", 1);
++            file.setArrayIndex(0);
++            file.setValue("server_mac", QByteArray("short"));
++            file.endArray();
++        }
++        settings.ImportSettings(invalid);
++        QCOMPARE(settings.GetHiddenHosts().size(), 1);
++        Settings reopened(profile);
++        QCOMPARE(reopened.GetAudioVolume(), 37);
++        QCOMPARE(reopened.GetHiddenHosts().size(), 1);
++    }
++
++    void profileSettingsPage()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto cleanup = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        QList<QPointer<PsnReply>> network;
++        PsnRequests requests;
++        requests.networkManager = [&](QObject *owner) { return new PsnNetwork(network, owner); };
++        requests.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **, size_t *, ChiakiLog *) { return CHIAKI_ERR_CANCELED; };
++        requests.connect = [](StreamSession *, const QString &, bool) { return CHIAKI_ERR_CANCELED; };
++        requests.startSession = [](ChiakiSession *) { return CHIAKI_ERR_CANCELED; };
++        RegistrationTransport registration;
++        QmlNativeServices services(&settings, requests, [](const QString &, const QStringList &) { return false; }, registration.boundary(), controlledDiscovery());
++        SetupWindow setup(services.backend());
++        setup.resize(1280, 900);
++        setup.show();
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
++        script(setup.view(), "document.querySelector('.open-settings').click()");
++        QTRY_VERIFY(script(setup.view(), "[...document.querySelectorAll('.category-nav button')].some(e=>e.textContent==='Profiles')").toBool());
++    }
++
+     void controllerSettings()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);

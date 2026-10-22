@@ -1,0 +1,1757 @@
+diff --git a/gui/include/qmlsettings.h b/gui/include/qmlsettings.h
+index 809e7868..8ac535b9 100644
+--- a/gui/include/qmlsettings.h
++++ b/gui/include/qmlsettings.h
+@@ -620,10 +620,10 @@ public:
+     Q_INVOKABLE void refreshAudioDevices();
+     Q_INVOKABLE QString changeControllerKey(int button, int key);
+     Q_INVOKABLE void clearKeyMapping();
+-    Q_INVOKABLE void exportSettings();
++    Q_INVOKABLE QVariantMap exportSettings();
+     Q_INVOKABLE QString chooseSteamBasePath();
+     Q_INVOKABLE QVariantMap exportPlaceboSettings();
+-    Q_INVOKABLE void importSettings();
++    Q_INVOKABLE QVariantMap importSettings();
+     Q_INVOKABLE QVariantMap importPlaceboSettings();
+     Q_INVOKABLE void deleteProfile(QString profile);
+     Q_INVOKABLE QString stringForDpadShortcut() const;
+diff --git a/gui/include/settings.h b/gui/include/settings.h
+index 5e086385..41060f77 100644
+--- a/gui/include/settings.h
++++ b/gui/include/settings.h
+@@ -221,8 +221,8 @@ class Settings : public QObject
+ 	public:
+ 		explicit Settings(const QString &conf, QObject *parent = nullptr);
+ 
+-		void ExportSettings(QString filepath);
+-		void ImportSettings(QString filepath);
++		bool ExportSettings(QString filepath);
++		bool ImportSettings(QString filepath);
+ 
+ 		bool ExportPlaceboSettings(QString filepath);
+ 		bool ImportPlaceboSettings(QString filepath);
+@@ -421,7 +421,7 @@ class Settings : public QObject
+ 		void SetPsnAuthTokenExpiry(QString expiry_date);
+ 
+ 		QString GetCurrentProfile() const;
+-		void SetCurrentProfile(QString profile);
++		bool SetCurrentProfile(QString profile);
+ 
+ 		bool GetKeyboardEnabled() const;
+ 		void SetKeyboardEnabled(bool enabled);
+@@ -469,7 +469,7 @@ class Settings : public QObject
+ 		uint GetStreamMenuShortcut4() const;
+ 		void SetStreamMenuShortcut4(uint button);
+ 
+-		void DeleteProfile(QString profile);
++		bool DeleteProfile(QString profile);
+ 
+ 		QString GetPsnAccountId() const;
+ 		void SetPsnAccountId(QString account_id);
+diff --git a/gui/include/setupbridge.h b/gui/include/setupbridge.h
+index 74b83bb4..ae718bec 100644
+--- a/gui/include/setupbridge.h
++++ b/gui/include/setupbridge.h
+@@ -37,6 +37,8 @@ public:
+     Q_INVOKABLE QVariantMap openPsnExternal(const QString &profile);
+     Q_INVOKABLE QVariantMap copyPsnSignInLink(const QString &profile);
+     Q_INVOKABLE QVariantMap submitPsnRedirect(const QString &profile, const QString &url);
++    Q_INVOKABLE QVariantMap profileAction(const QString &action, const QString &key, const QString &name, bool confirmed, const QString &profile);
++    Q_INVOKABLE QVariantMap settingsFileAction(const QString &action, const QString &profile);
+     Q_INVOKABLE QVariantMap setGeneralSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
+     Q_INVOKABLE QVariantMap setMediaSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
+     Q_INVOKABLE QVariantMap refreshAudioDevices();
+@@ -70,6 +72,7 @@ private:
+     QString identity(const QVariantMap &host) const;
+     QmlBackend *backend;
+     QHash<QString, QString> keys;
++    QHash<QString, QString> profileKeys;
+     quint64 generation = 0;
+     quint64 revision = 0;
+     QString selectedKey;
+diff --git a/gui/src/qml/ProfileDialog.qml b/gui/src/qml/ProfileDialog.qml
+deleted file mode 100644
+index f2cfbb01..00000000
+--- a/gui/src/qml/ProfileDialog.qml
++++ /dev/null
+@@ -1,130 +0,0 @@
+-import QtQuick
+-import QtQuick.Layouts
+-import QtQuick.Controls
+-import QtQuick.Controls.Material
+-import org.streetpea.chiaking
+-import "controls" as C
+-import "SettingsSearch.js" as Search
+-
+-DialogView {
+-    id: dialog
+-    objectName: "profileDialog"
+-    property var backend: Chiaki
+-    property var navigation: root
+-    property var searchRoute: null
+-    function revealSetting(route) { Search.reveal(dialog, route, "profiles", "profileSelection"); }
+-    StackView.onActivated: Qt.callLater(function() {
+-        if (!searchRoute) return;
+-        const route = searchRoute;
+-        searchRoute = null;
+-        revealSetting(route);
+-    })
+-    property string selectedProfile: backend.settings.currentProfile || "default"
+-    readonly property bool creating: selectedProfile === "create new profile"
+-    readonly property bool canDelete: backend.settings.profiles.indexOf(selectedProfile) >= 0
+-        && selectedProfile !== "default" && !creating && selectedProfile !== backend.settings.currentProfile
+-    title: qsTr("Profiles")
+-    Material.theme: Material.Dark
+-    Material.primary: "#11151c"
+-    Material.background: "#11151c"
+-    function close() { navigation.closeDialog(); }
+-    buttonText: deleteBox.visible && deleteBox.checked ? qsTr("Delete Profile") : creating ? qsTr("Create Profile") : qsTr("Switch Profile")
+-    buttonEnabled: backend.settings.profiles.indexOf(selectedProfile) >= 0
+-        && (creating ? profileName.text.trim().length > 0
+-                     : selectedProfile !== (backend.settings.currentProfile || "default"))
+-    onAccepted: {
+-        if (!buttonEnabled) return;
+-        if (canDelete && deleteBox.checked)
+-            backend.settings.deleteProfile(selectedProfile);
+-        else if (creating)
+-            backend.settings.currentProfile = profileName.text.trim();
+-        else
+-            backend.settings.currentProfile = selectedProfile === "default" ? "" : selectedProfile;
+-        close();
+-    }
+-    function refreshSelection() {
+-        profileComboBox.popup.close();
+-        selectedProfile = backend.settings.currentProfile || "default";
+-        deleteBox.checked = false;
+-        profileName.clear();
+-    }
+-    Item {
+-        Connections {
+-            target: dialog.backend.settings
+-            function onProfilesChanged() { dialog.refreshSelection(); }
+-            function onCurrentProfileChanged() { dialog.refreshSelection(); }
+-        }
+-        Rectangle { anchors.fill: parent; color: "#11151c" }
+-        ColumnLayout {
+-            anchors { top: parent.top; left: parent.left; right: parent.right; margins: 24 }
+-            spacing: 14
+-            Label {
+-                objectName: "activeProfile"
+-                Layout.fillWidth: true
+-                wrapMode: Text.Wrap
+-                font.pixelSize: 14
+-                text: qsTr("Current profile: %1").arg(dialog.backend.settings.streamerMode ? qsTr("Hidden") : (dialog.backend.settings.currentProfile || qsTr("default")))
+-            }
+-            Frame {
+-                Layout.fillWidth: true
+-                background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+-                GridLayout {
+-                    anchors.fill: parent
+-                    columns: 2
+-                    columnSpacing: 24
+-                    rowSpacing: 12
+-                    Label { text: qsTr("User profile"); font.pixelSize: 14; Layout.fillWidth: true }
+-                    C.ComboBox {
+-                        id: profileComboBox
+-                        objectName: "profileSelection"
+-                        Accessible.name: qsTr("User profile")
+-                        Layout.preferredWidth: 450
+-                        Layout.fillWidth: true
+-                        Layout.minimumWidth: 0
+-                        firstInFocusChain: true
+-                        font.pixelSize: 14
+-                        popup.width: width
+-                        model: dialog.backend.settings.profiles.map(function(name, index) {
+-                            if (name === "default") return qsTr("default");
+-                            if (name === "create new profile") return qsTr("Create new profile");
+-                            return dialog.backend.settings.streamerMode ? qsTr("Profile %1").arg(index) : name;
+-                        })
+-                        currentIndex: dialog.backend.settings.profiles.indexOf(dialog.selectedProfile)
+-                        onActivated: index => {
+-                            dialog.selectedProfile = dialog.backend.settings.profiles[index];
+-                            deleteBox.checked = false;
+-                        }
+-                        lastInFocusChain: !dialog.creating && !dialog.canDelete
+-                    }
+-                    Label { text: qsTr("New profile name"); font.pixelSize: 14; visible: dialog.creating }
+-                    C.TextField {
+-                        id: profileName
+-                        objectName: "newProfileName"
+-                        Accessible.name: qsTr("New profile name")
+-                        Layout.fillWidth: true
+-                        Layout.minimumWidth: 0
+-                        font.pixelSize: 14
+-                        visible: dialog.creating
+-                        echoMode: dialog.backend.settings.streamerMode ? TextInput.Password : TextInput.Normal
+-                        lastInFocusChain: true
+-                    }
+-                    Label { text: qsTr("Delete selected profile"); font.pixelSize: 14; visible: dialog.canDelete }
+-                    C.CheckBox {
+-                        id: deleteBox
+-                        objectName: "deleteProfile"
+-                        Accessible.name: qsTr("Delete selected profile")
+-                        visible: dialog.canDelete
+-                        lastInFocusChain: true
+-                    }
+-                }
+-            }
+-            Label {
+-                Layout.fillWidth: true
+-                wrapMode: Text.Wrap
+-                font.pixelSize: 14
+-                color: "#aeb9c8"
+-                text: qsTr("Select a profile, then use the action above. The default and current profiles cannot be deleted.")
+-            }
+-        }
+-    }
+-}
+diff --git a/gui/src/qml/SettingsDialog.qml b/gui/src/qml/SettingsDialog.qml
+index fe57a7b6..94695543 100644
+--- a/gui/src/qml/SettingsDialog.qml
++++ b/gui/src/qml/SettingsDialog.qml
+@@ -84,12 +84,10 @@ FocusScope {
+             return;
+         }
+         const opener = entry.page === "display" ? "displaySettings"
+-            : entry.page === "profiles" ? "manageProfiles"
+             : "customRendererSettings";
+         revealSetting(entry.category, opener, undefined, "videoPreset", function(item) {
+             if (!item || item.objectName !== opener || !item.visible || !item.enabled) return;
+             if (entry.page === "display") navigation.showDisplaySettingsDialog(entry);
+-            else if (entry.page === "profiles") navigation.showProfileDialog(entry);
+             else navigation.showPlaceboSettingsDialog(entry);
+         });
+     }
+@@ -242,7 +240,7 @@ FocusScope {
+         case 5: item = dialog.backend.settings.mouseCameraSupported ? keyboardMousePage.firstFocusItem : resetAllKeys; break;
+         case 6: item = allowJoystickBackgroundEvents; break;
+         case 7: item = firstRemoteFocusableItem(); break;
+-        case 8: item = profile; break;
++        case 8: item = logSanitizeBox; break;
+         }
+         if (item)
+             item.forceActiveFocus(Qt.TabFocusReason);
+@@ -1976,7 +1974,7 @@ FocusScope {
+             }
+ 
+             Item {
+-                // Config (Options such as Import/Export and Logging)
++                // Config diagnostics retained for the remaining native setup callers.
+                 Flickable {
+                     id: configFlick
+                     objectName: "configFlick"
+@@ -1992,61 +1990,6 @@ FocusScope {
+                         width: Math.max(0, configFlick.width - 48)
+                         spacing: 14
+                         Label { text: qsTr("Config"); font.pixelSize: 24; font.bold: true }
+-                        Label { text: qsTr("Profiles"); font.pixelSize: 14; font.bold: true }
+-                        Frame {
+-                            Layout.fillWidth: true
+-                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+-                            RowLayout {
+-                                anchors.fill: parent
+-                                spacing: 24
+-                                Label {
+-                                    objectName: "configProfile"
+-                                    Layout.fillWidth: true
+-                                    wrapMode: Text.Wrap
+-                                    font.pixelSize: 14
+-                                    text: qsTr("Current profile: %1").arg(dialog.backend.settings.streamerMode ? qsTr("Hidden") : (dialog.backend.settings.currentProfile || qsTr("default")))
+-                                }
+-                                C.Button {
+-                                    id: profile
+-                                    objectName: "manageProfiles"
+-                                    text: qsTr("Manage profiles")
+-                                    Accessible.name: text
+-                                    firstInFocusChain: true
+-                                    font.pixelSize: 14
+-                                    onClicked: dialog.navigation.showProfileDialog()
+-                                    Material.roundedScale: Material.SmallScale
+-                                }
+-                            }
+-                        }
+-                        Label { text: qsTr("Settings files"); font.pixelSize: 14; font.bold: true }
+-                        Frame {
+-                            Layout.fillWidth: true
+-                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
+-                            RowLayout {
+-                                anchors.fill: parent
+-                                spacing: 12
+-                                C.Button {
+-                                    id: exportButton
+-                                    objectName: "exportSettings"
+-                                    Layout.fillWidth: true
+-                                    text: qsTr("Export settings to file")
+-                                    Accessible.name: text
+-                                    font.pixelSize: 14
+-                                    onClicked: dialog.backend.settings.exportSettings()
+-                                    Material.roundedScale: Material.SmallScale
+-                                }
+-                                C.Button {
+-                                    id: importButton
+-                                    objectName: "importSettings"
+-                                    Layout.fillWidth: true
+-                                    text: qsTr("Import settings from file")
+-                                    Accessible.name: text
+-                                    font.pixelSize: 14
+-                                    onClicked: dialog.backend.settings.importSettings()
+-                                    Material.roundedScale: Material.SmallScale
+-                                }
+-                            }
+-                        }
+                         Label { text: qsTr("Diagnostics"); font.pixelSize: 14; font.bold: true }
+                         Frame {
+                             Layout.fillWidth: true
+@@ -2054,6 +1997,8 @@ FocusScope {
+                             ColumnLayout {
+                                 anchors.fill: parent
+                                 C.CheckBox {
++                                    id: logSanitizeBox
++                                    firstInFocusChain: true
+                                     objectName: "logSanitize"
+                                     text: qsTr("Sanitize logs · Default: On")
+                                     Accessible.name: qsTr("Sanitize logs")
+diff --git a/gui/src/qml/SettingsSearch.js b/gui/src/qml/SettingsSearch.js
+index 471837bd..904bd07f 100644
+--- a/gui/src/qml/SettingsSearch.js
++++ b/gui/src/qml/SettingsSearch.js
+@@ -111,9 +111,6 @@ function entries(settings) {
+         {category: 7, group: qsTranslate("SettingsSearch", "Port guessing"), target: "portGuessingEnabled", keywords: qsTranslate("SettingsSearch", "Force STUN port guessing"), title: qsTranslate("SettingsSearch", "Port guessing"), description: qsTranslate("SettingsSearch", "Enable remote connection port guessing.")},
+         {category: 7, group: qsTranslate("SettingsSearch", "Port guessing"), target: "portGuessCount", title: qsTranslate("SettingsSearch", "Port guess count"), description: qsTranslate("SettingsSearch", "Set the number of ports to try for a remote connection.")},
+         {category: 7, group: qsTranslate("SettingsSearch", "Port guessing"), target: "portGuessSocketCount", title: qsTranslate("SettingsSearch", "Port guess socket count"), description: qsTranslate("SettingsSearch", "Set the sockets used for remote port guessing.")},
+-        {category: 8, group: qsTranslate("SettingsSearch", "Profiles"), target: "manageProfiles", title: qsTranslate("SettingsSearch", "Manage profiles"), description: qsTranslate("SettingsSearch", "Open profile selection, creation, switching and deletion.")},
+-        {category: 8, group: qsTranslate("SettingsSearch", "Settings files"), target: "exportSettings", keywords: qsTranslate("SettingsSearch", "Export settings to file"), title: qsTranslate("SettingsSearch", "Export settings"), description: qsTranslate("SettingsSearch", "Open the native file dialog to export settings.")},
+-        {category: 8, group: qsTranslate("SettingsSearch", "Settings files"), target: "importSettings", keywords: qsTranslate("SettingsSearch", "Import settings from file"), title: qsTranslate("SettingsSearch", "Import settings"), description: qsTranslate("SettingsSearch", "Open the native file dialog to import settings.")},
+         {category: 8, group: qsTranslate("SettingsSearch", "Diagnostics"), target: "logSanitize", title: qsTranslate("SettingsSearch", "Sanitize logs"), description: qsTranslate("SettingsSearch", "Remove private information from diagnostic logging.")},
+         {category: 8, group: qsTranslate("SettingsSearch", "Diagnostics"), target: "logVerbose", title: qsTranslate("SettingsSearch", "Verbose logging"), description: qsTranslate("SettingsSearch", "Include detailed diagnostic messages in logs.")},
+         {category: 8, group: qsTranslate("SettingsSearch", "Diagnostics"), target: "aboutSettings", title: qsTranslate("SettingsSearch", "About Chiaki Recast"), description: qsTranslate("SettingsSearch", "Open application version and licence information.")},
+@@ -145,10 +142,6 @@ function entries(settings) {
+         {page: "display", category: 1, group: qsTranslate("SettingsSearch", "Display target"), section: 0, target: "displayTargetPeak", title: qsTranslate("SettingsSearch", "Target peak value"), description: qsTranslate("SettingsSearch", "Set display brightness in nits. Requires Numeric Value."), fallback: "targetPeakChoice"},
+         {page: "display", category: 1, group: qsTranslate("SettingsSearch", "Display target"), section: 0, target: "targetContrastChoice", title: qsTranslate("SettingsSearch", "Target contrast"), description: qsTranslate("SettingsSearch", "Choose automatic, infinite or numeric display contrast.")},
+         {page: "display", category: 1, group: qsTranslate("SettingsSearch", "Display target"), section: 0, target: "displayTargetContrast", title: qsTranslate("SettingsSearch", "Target contrast value"), description: qsTranslate("SettingsSearch", "Set numeric display contrast. Requires Numeric Value."), fallback: "targetContrastChoice"},
+-        {page: "profiles", category: 8, group: qsTranslate("SettingsSearch", "Profiles"), section: 0, target: "profileSelection", title: qsTranslate("SettingsSearch", "User profile selection"), description: qsTranslate("SettingsSearch", "Select a profile before switching, creating or deleting.")},
+-        {page: "profiles", category: 8, group: qsTranslate("SettingsSearch", "Profiles"), section: 0, target: "newProfileName", title: qsTranslate("SettingsSearch", "New profile name"), description: qsTranslate("SettingsSearch", "Enter a name after selecting Create new profile."), fallback: "profileSelection"},
+-        {page: "profiles", category: 8, group: qsTranslate("SettingsSearch", "Profiles"), section: 0, target: "deleteProfile", title: qsTranslate("SettingsSearch", "Delete profile"), description: qsTranslate("SettingsSearch", "Select a noncurrent profile. The default and current profiles cannot be deleted."), fallback: "profileSelection"},
+-        {page: "profiles", category: 8, group: qsTranslate("SettingsSearch", "Profiles"), section: 0, target: "profileAction", title: qsTranslate("SettingsSearch", "Create or switch profile"), description: qsTranslate("SettingsSearch", "Select a profile, then use the native action above."), fallback: "profileSelection"},
+         {page: "renderer", category: 1, group: qsTranslate("SettingsSearch", "Config"), section: 0, target: "openRendererDocumentation", keywords: qsTranslate("SettingsSearch", "Libplacebo Renderer Options Details"), title: qsTranslate("SettingsSearch", "Renderer documentation"), description: qsTranslate("SettingsSearch", "Open the libplacebo renderer options documentation."), fallback: "copyRendererDocumentationUrl"},
+         {page: "renderer", category: 1, group: qsTranslate("SettingsSearch", "Config"), section: 0, target: "copyRendererDocumentationUrl", title: qsTranslate("SettingsSearch", "Copy renderer documentation URL"), description: qsTranslate("SettingsSearch", "Copy the documentation link when shown."), fallback: "openRendererDocumentation"},
+         {page: "renderer", category: 1, group: qsTranslate("SettingsSearch", "Config"), section: 0, target: "exportPlaceboSettings", title: qsTranslate("SettingsSearch", "Export renderer settings"), description: qsTranslate("SettingsSearch", "Open the native file dialog to export renderer settings.")},
+diff --git a/gui/src/qml/qml.qrc b/gui/src/qml/qml.qrc
+index 21e253d5..e3f9d310 100644
+--- a/gui/src/qml/qml.qrc
++++ b/gui/src/qml/qml.qrc
+@@ -32,7 +32,6 @@
+     <file>DisplaySettingsDialog.qml</file>
+     <file>PlaceboSettingsDialog.qml</file>
+     <file>PlaceboColorMappingDialog.qml</file>
+-    <file>ProfileDialog.qml</file>
+     <file>ConsolePinContent.qml</file>
+     <file>LiveConsolePinContent.qml</file>
+     <file>LiveConsolePinHost.qml</file>
+diff --git a/gui/src/qmlbackend.cpp b/gui/src/qmlbackend.cpp
+index 0eeb3652..dc0e1511 100644
+--- a/gui/src/qmlbackend.cpp
++++ b/gui/src/qmlbackend.cpp
+@@ -592,6 +592,7 @@ void QmlBackend::profileChanged()
+     emit sessionPinRequestChanged();
+     QString profile = settings->GetCurrentProfile();
+     Settings *settings_copy = new Settings(profile, this);
++    disconnect(settings, nullptr, this, nullptr);
+     if(settings_allocd)
+         settings->deleteLater();
+     settings_allocd = true;
+diff --git a/gui/src/qmlsettings.cpp b/gui/src/qmlsettings.cpp
+index 184729ce..03b79b5b 100644
+--- a/gui/src/qmlsettings.cpp
++++ b/gui/src/qmlsettings.cpp
+@@ -1947,7 +1947,9 @@ QString QmlSettings::changeControllerKey(int button, int key)
+ 
+ void QmlSettings::setSettings(Settings *new_settings)
+ {
++    disconnect(settings, nullptr, this, nullptr);
+     settings = new_settings;
++    QLoggingCategory::setFilterRules(QStringLiteral("chiaki.gui.debug=%1").arg(settings->GetLogVerbose() ? "true" : "false"));
+     ++settingsGeneration;
+     connect(settings, &Settings::RegisteredHostsUpdated, this, &QmlSettings::registeredHostsChanged);
+     connect(settings, &Settings::ProfilesUpdated, this, &QmlSettings::profilesChanged);
+@@ -2113,32 +2115,36 @@ void QmlSettings::refreshAllPlaceboKeys()
+     emit placeboChanged();
+ }
+ 
+-void QmlSettings::exportSettings()
++QVariantMap QmlSettings::exportSettings()
+ {
+-    QString profile = settings->GetCurrentProfile();
+-    if(profile.isEmpty())
+-        profile = "Default";
+-    QString fileName = QFileDialog::getSaveFileName(QApplication::focusWidget(), tr("Export %1 Profile To File").arg(profile),
+-                                                    QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + "/chiaki-ng-" + profile,
+-                                                    tr("Settings files (*.ini)"),
+-                                                    nullptr,
+-                                                    QFileDialog::DontUseNativeDialog | QFileDialog::DontConfirmOverwrite);
+-    if(fileName.isEmpty())
+-        return;
+-    settings->ExportSettings(std::move(fileName));
++    if(rendererFilePending) return {{"accepted", false}, {"message", tr("A settings file action is already open.")}};
++    rendererFilePending = true;
++    const auto resetPending = qScopeGuard([this] { rendererFilePending = false; });
++    const auto generation = settingsGeneration;
++    const auto profile = settings->GetCurrentProfile().isEmpty() ? QStringLiteral("Default") : settings->GetCurrentProfile();
++    const auto safeProfile = streamerMode() ? tr("Hidden") : profile;
++    QString fileName = QFileDialog::getSaveFileName(QApplication::focusWidget(), tr("Export %1 Profile To File").arg(safeProfile),
++        QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + "/chiaki-ng-" + (streamerMode() ? QStringLiteral("profile") : profile),
++        tr("Settings files (*.ini)"), nullptr, QFileDialog::DontUseNativeDialog);
++    if(generation != settingsGeneration) return {{"accepted", false}, {"message", tr("The profile changed. No file action was applied.")}};
++    if(fileName.isEmpty()) return {{"accepted", false}, {"cancelled", true}, {"message", tr("Export cancelled.")}};
++    const bool saved = settings->ExportSettings(std::move(fileName));
++    return {{"accepted", saved}, {"message", saved ? tr("Settings exported.") : tr("Settings could not be exported. Check the file permissions and free space.")}};
+ }
+ 
+-void QmlSettings::importSettings()
++QVariantMap QmlSettings::importSettings()
+ {
++    if(rendererFilePending) return {{"accepted", false}, {"message", tr("A settings file action is already open.")}};
++    rendererFilePending = true;
++    const auto resetPending = qScopeGuard([this] { rendererFilePending = false; });
++    const auto generation = settingsGeneration;
+     QString fileName = QFileDialog::getOpenFileName(QApplication::focusWidget(), tr("Import Profile From File"),
+-                                                    QStandardPaths::writableLocation(QStandardPaths::DownloadLocation),
+-                                                    tr("Settings files (*.ini)"),
+-                                                    nullptr,
+-                                                    QFileDialog::DontUseNativeDialog);
+-    if(fileName.isEmpty())
+-        return;
+-    settings->ImportSettings(std::move(fileName));
+-    refreshAllKeys();
++        QStandardPaths::writableLocation(QStandardPaths::DownloadLocation), tr("Settings files (*.ini)"), nullptr, QFileDialog::DontUseNativeDialog);
++    if(generation != settingsGeneration) return {{"accepted", false}, {"message", tr("The profile changed. No file action was applied.")}};
++    if(fileName.isEmpty()) return {{"accepted", false}, {"cancelled", true}, {"message", tr("Import cancelled.")}};
++    const bool loaded = settings->ImportSettings(std::move(fileName));
++    if(loaded) refreshAllKeys();
++    return {{"accepted", loaded}, {"message", loaded ? tr("Settings imported.") : tr("Settings could not be imported. Choose a valid settings file.")}};
+ }
+ 
+ QString QmlSettings::chooseSteamBasePath()
+diff --git a/gui/src/settings.cpp b/gui/src/settings.cpp
+index 3c0b55ca..cbdbf63b 100644
+--- a/gui/src/settings.cpp
++++ b/gui/src/settings.cpp
+@@ -14,6 +14,7 @@ extern "C" {
+ #include <QKeySequence>
+ #include <QCoreApplication>
+ #include <cmath>
++#include <limits>
+ 
+ #include <chiaki/config.h>
+ 
+@@ -199,31 +200,34 @@ Settings::Settings(const QString &conf, QObject *parent) : QObject(parent),
+ 	InitializePlaceboSettings(&placebo_settings);
+ }
+ 
+-void Settings::ExportSettings(QString filepath)
++bool Settings::ExportSettings(QString filepath)
+ {
+-	// append ini if not already added
+-	QFileInfo info(filepath);
+-	if(info.suffix().isEmpty())
+-		filepath += ".ini";
+-	QFile file(filepath);
+-	file.open(QIODevice::ReadWrite);
+-	file.close();
+-	QSettings settings_backup(filepath, QSettings::IniFormat);
+-	SaveRegisteredHosts(&settings_backup);
+-	SaveHiddenHosts(&settings_backup);
+-	SaveManualHosts(&settings_backup);
+-	SaveControllerMappings(&settings_backup);
+-    QStringList keys = settings.allKeys();
+-    for( QStringList::iterator i = keys.begin(); i != keys.end(); i++ )
+-    {
+-        settings_backup.setValue( *i, settings.value( *i ) );
+-    }
+-	// set hw decoder to auto since it's recommended and a platform specific decoder could cause a crash if imported on another platform
+-	settings_backup.setValue("settings/hw_decoder", "auto");
+-	settings_backup.setValue("settings/this_profile", GetCurrentProfile());
++	if(QFileInfo(filepath).suffix().isEmpty()) filepath += ".ini";
++	QTemporaryDir temporary(QFileInfo(filepath).absolutePath() + "/.chiaki-settings-XXXXXX");
++	if(!temporary.isValid()) return false;
++	const auto temporaryPath = temporary.filePath("settings.ini");
++	{
++		QSettings backup(temporaryPath, QSettings::IniFormat);
++		for(const auto &key : settings.allKeys()) backup.setValue(key, settings.value(key));
++		for(const auto &array : {"registered_hosts", "hidden_hosts", "manual_hosts", "controller_mappings"}) backup.remove(array);
++		SaveRegisteredHosts(&backup);
++		SaveHiddenHosts(&backup);
++		SaveManualHosts(&backup);
++		SaveControllerMappings(&backup);
++		// A platform-specific decoder can fail on another computer.
++		backup.setValue("settings/hw_decoder", "auto");
++		backup.setValue("settings/this_profile", GetCurrentProfile());
++		backup.sync();
++		if(backup.status() != QSettings::NoError) return false;
++	}
++	QFile source(temporaryPath);
++	if(!source.open(QIODevice::ReadOnly)) return false;
++	const auto bytes = source.readAll();
++	if(source.error() != QFileDevice::NoError) return false;
++	QSaveFile output(filepath);
++	return output.open(QIODevice::WriteOnly) && output.write(bytes) == bytes.size() && output.commit();
+ }
+ 
+-
+ bool Settings::ExportPlaceboSettings(QString filepath)
+ {
+ 	if(QFileInfo(filepath).suffix().isEmpty()) filepath += ".ini";
+@@ -259,43 +263,115 @@ QMap<QString, QString> Settings::GetPlaceboValues()
+ 	return placeboMap;
+ }
+ 
+-void Settings::ImportSettings(QString filepath)
+-{
+-	QSettings settings_backup(filepath, QSettings::IniFormat);
+-	LoadRegisteredHosts(&settings_backup);
+-	LoadHiddenHosts(&settings_backup);
+-	LoadManualHosts(&settings_backup);
+-	LoadControllerMappings(&settings_backup);
+-	QString profile = settings_backup.value("settings/this_profile").toString();
+-	if(profile.isEmpty())
+-	{
+-		settings.clear();
+-		SaveRegisteredHosts();
+-		SaveHiddenHosts();
+-		SaveManualHosts();
+-		SaveControllerMappings();
+-		QStringList keys = settings_backup.allKeys();
+-		for( QStringList::iterator i = keys.begin(); i != keys.end(); i++ )
+-		{
+-			settings.setValue( *i, settings_backup.value( *i ) );
++static bool ValidateSettingsImport(QSettings &backup)
++{
++	bool valid = false;
++	const int version = backup.value("version").toInt(&valid);
++	if(!valid || version < 1 || version > SETTINGS_VERSION) return false;
++	// Inspect the original arrays before migration can normalize malformed entries.
++	for(const auto &array : {QStringLiteral("registered_hosts"), QStringLiteral("hidden_hosts"),
++		QStringLiteral("manual_hosts"), QStringLiteral("controller_mappings"), QStringLiteral("profiles")}) {
++		backup.beginGroup(array);
++		const auto end = qScopeGuard([&] { backup.endGroup(); });
++		const auto keys = backup.allKeys();
++		if(keys.isEmpty()) continue;
++		const int count = backup.value("size").toInt(&valid);
++		if(!valid || count < 0) return false;
++		for(const auto &key : keys) {
++			if(key == "size") continue;
++			const auto index = key.section('/', 0, 0).toInt(&valid);
++			// Older QSettings writers retain inactive entries above size.
++			if(!valid || index < 1 || !key.contains('/')) return false;
++		}
++		// Each array entry must exist; count is limited by its actual keys.
++		if(count > keys.size()) return false;
++		for(int i = 1; i <= count; ++i) {
++			backup.beginGroup(QString::number(i));
++			const auto entryEnd = qScopeGuard([&] { backup.endGroup(); });
++			if(backup.allKeys().isEmpty()) return false;
++			if(array == "registered_hosts" || array == "hidden_hosts") {
++				const auto mac = backup.value(version == 1 && array == "registered_hosts" ? "ps4_mac" : "server_mac").toByteArray();
++				if(mac.size() != 6) return false;
++				if(array == "registered_hosts") {
++					if(backup.value("rp_regist_key").toByteArray().size() != CHIAKI_SESSION_AUTH_SIZE
++						|| backup.value("rp_key").toByteArray().size() != 16) return false;
++					if(version > 1) {
++						const int target = backup.value("target").toInt(&valid);
++						if(!valid || (target != CHIAKI_TARGET_PS4_UNKNOWN && target != CHIAKI_TARGET_PS4_8
++							&& target != CHIAKI_TARGET_PS4_9 && target != CHIAKI_TARGET_PS4_10
++							&& target != CHIAKI_TARGET_PS5_UNKNOWN && target != CHIAKI_TARGET_PS5_1)) return false;
++					}
++				}
++			} else if(array == "manual_hosts") {
++				const int id = backup.value("id").toInt(&valid);
++				if(!valid || id < 0 || id == std::numeric_limits<int>::max() || backup.value("host").toString().trimmed().isEmpty()) return false;
++				if(backup.value("registered").toBool() && backup.value("registered_mac").toByteArray().size() != 6) return false;
++			} else if(array == "controller_mappings") {
++				if(backup.value("vidpid", backup.value("guid")).toString().isEmpty()
++					|| backup.value("controller_mapping").toString().isEmpty()) return false;
++			} else if(backup.value("settings/profile_name").toString().isEmpty()) return false;
+ 		}
+-		SetCurrentProfile(std::move(profile));
+ 	}
+-	else
++	return backup.status() == QSettings::NoError;
++}
++
++bool Settings::ImportSettings(QString filepath)
++{
++	QFile source(filepath);
++	if(!source.open(QIODevice::ReadOnly)) return false;
++	const auto bytes = source.readAll();
++	if(source.error() != QFileDevice::NoError || bytes.isEmpty()) return false;
++	QTemporaryDir temporary;
++	if(!temporary.isValid()) return false;
++	const auto temporaryPath = temporary.filePath("settings.ini");
+ 	{
+-		QSettings profile_settings(QCoreApplication::organizationName(), QStringLiteral("%1-%2").arg(QCoreApplication::applicationName(), profile));
+-		profile_settings.clear();
+-		SaveRegisteredHosts(&profile_settings);
+-		SaveHiddenHosts(&profile_settings);
+-		SaveManualHosts(&profile_settings);
+-		SaveControllerMappings(&profile_settings);
+-		QStringList keys = settings_backup.allKeys();
+-		for( QStringList::iterator i = keys.begin(); i != keys.end(); i++ )
+-		{
+-			profile_settings.setValue( *i, settings_backup.value( *i ) );
+-		}
+-		SetCurrentProfile(std::move(profile));
++		QFile staging(temporaryPath);
++		if(!staging.open(QIODevice::WriteOnly) || staging.write(bytes) != bytes.size() || !staging.flush()) return false;
++	}
++	QSettings backup(temporaryPath, QSettings::IniFormat);
++	backup.setFallbacksEnabled(false);
++	if(!ValidateSettingsImport(backup)) return false;
++	MigrateSettings(&backup);
++	MigrateVideoProfile(&backup);
++	MigrateControllerMappings(&backup);
++	backup.setValue("version", SETTINGS_VERSION);
++	const auto profile = backup.value("settings/this_profile").toString();
++	QSettings destination(QCoreApplication::organizationName(), profile.isEmpty() ? QCoreApplication::applicationName()
++		: QStringLiteral("%1-%2").arg(QCoreApplication::applicationName(), profile));
++	destination.setFallbacksEnabled(false);
++	const auto values = [](QSettings &store) {
++		QVariantMap result;
++		for(const auto &key : store.allKeys()) result.insert(key, store.value(key));
++		return result;
++	};
++	const auto replace = [](QSettings &store, const QVariantMap &map) {
++		store.clear();
++		for(auto it = map.cbegin(); it != map.cend(); ++it) store.setValue(it.key(), it.value());
++		store.sync();
++		return store.status() == QSettings::NoError;
++	};
++	const auto previous = values(destination);
++	const auto previousDefault = values(default_settings);
++	const auto previousProfiles = profiles;
++	if(destination.status() != QSettings::NoError || default_settings.status() != QSettings::NoError || !destination.isWritable()) return false;
++	if(!replace(destination, values(backup))) {
++		replace(destination, previous);
++		return false;
++	}
++	if(!profile.isEmpty() && !profiles.contains(profile)) profiles.append(profile);
++	// Keep the local profile catalog while replacing the selected profile's values.
++	SaveProfiles();
++	default_settings.setValue("settings/current_profile", profile);
++	default_settings.sync();
++	if(default_settings.status() != QSettings::NoError) {
++		replace(destination, previous);
++		replace(default_settings, previousDefault);
++		profiles = previousProfiles;
++		return false;
+ 	}
++	if(profiles != previousProfiles) emit ProfilesUpdated();
++	emit CurrentProfileChanged();
++	return true;
+ }
+ 
+ bool Settings::ImportPlaceboSettings(QString filepath)
+@@ -918,16 +994,24 @@ QString Settings::GetCurrentProfile() const
+ 	return default_settings.value("settings/current_profile").toString();
+ }
+ 
+-void Settings::SetCurrentProfile(QString profile)
++bool Settings::SetCurrentProfile(QString profile)
+ {
+-	if(!profile.isEmpty() && !profiles.contains(profile))
+-	{
+-		profiles.append(profile);
++	const auto previous = GetCurrentProfile();
++	const auto previousProfiles = profiles;
++	if(!profile.isEmpty() && !profiles.contains(profile)) profiles.append(profile);
++	SaveProfiles();
++	default_settings.setValue("settings/current_profile", profile);
++	default_settings.sync();
++	if(default_settings.status() != QSettings::NoError) {
++		profiles = previousProfiles;
+ 		SaveProfiles();
+-		emit ProfilesUpdated();
++		default_settings.setValue("settings/current_profile", previous);
++		default_settings.sync();
++		return false;
+ 	}
+-	default_settings.setValue("settings/current_profile", profile);
++	if(profiles != previousProfiles) emit ProfilesUpdated();
+ 	emit CurrentProfileChanged();
++	return true;
+ }
+ 
+ bool Settings::GetKeyboardEnabled() const
+@@ -2122,24 +2206,32 @@ void Settings::SaveProfiles()
+ 	default_settings.endArray();
+ }
+ 
+-void Settings::DeleteProfile(QString profile)
++bool Settings::DeleteProfile(QString profile)
+ {
+-	QSettings delete_profile(QCoreApplication::organizationName(), QStringLiteral("%1-%2").arg(QCoreApplication::applicationName(), profile));
+-	registered_hosts.clear();
+-	manual_hosts.clear();
+-	controller_mappings.clear();
+-	SaveRegisteredHosts(&delete_profile);
+-	SaveHiddenHosts(&delete_profile);
+-	SaveManualHosts(&delete_profile);
+-	SaveControllerMappings(&delete_profile);
+-	delete_profile.remove("settings");
+-	profiles.removeOne(profile);
++	if(profile.isEmpty() || profile == GetCurrentProfile() || !profiles.contains(profile)) return false;
++	QSettings destination(QCoreApplication::organizationName(), QStringLiteral("%1-%2").arg(QCoreApplication::applicationName(), profile));
++	destination.setFallbacksEnabled(false);
++	if(!destination.isWritable()) return false;
++	QVariantMap previous;
++	for(const auto &key : destination.allKeys()) previous.insert(key, destination.value(key));
++	const auto previousProfiles = profiles;
++	destination.clear();
++	destination.sync();
++	if(destination.status() == QSettings::NoError) {
++		profiles.removeOne(profile);
++		SaveProfiles();
++		default_settings.sync();
++		if(default_settings.status() == QSettings::NoError) {
++			emit ProfilesUpdated();
++			return true;
++		}
++	}
++	for(auto it = previous.cbegin(); it != previous.cend(); ++it) destination.setValue(it.key(), it.value());
++	destination.sync();
++	profiles = previousProfiles;
+ 	SaveProfiles();
+-	emit ProfilesUpdated();
+-	LoadRegisteredHosts();
+-	LoadHiddenHosts();
+-	LoadManualHosts();
+-	LoadControllerMappings();
++	default_settings.sync();
++	return false;
+ }
+ 
+ void Settings::LoadRegisteredHosts(QSettings *qsettings)
+diff --git a/gui/src/setupbridge.cpp b/gui/src/setupbridge.cpp
+index 7cccfedf..e1f32ecd 100644
+--- a/gui/src/setupbridge.cpp
++++ b/gui/src/setupbridge.cpp
+@@ -12,6 +12,7 @@
+ #include <cmath>
+ #include <QHostAddress>
+ #include <QRegularExpression>
++#include <QDesktopServices>
+ 
+ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
+     : QObject(parent), backend(backend)
+@@ -40,6 +41,7 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
+     accountExpiry.setSingleShot(true);
+     connect(&accountExpiry, &QTimer::timeout, this, &SetupBridge::refresh);
+     auto *settings = backend->qmlSettings();
++    connect(settings, &QmlSettings::profilesChanged, this, &SetupBridge::refresh);
+     connect(settings, &QmlSettings::currentProfileChanged, this, [this] {
+         invalidateControllerMapping(tr("The profile changed. Select the controller again."));
+     });
+@@ -94,6 +96,8 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
+     connect(settings, &QmlSettings::mouseTouchEnabledChanged, this, &SetupBridge::refresh);
+     connect(settings, &QmlSettings::controllerMappingChanged, this, &SetupBridge::refresh);
+     decoders = settings->availableDecoders();
++    connect(settings, &QmlSettings::logSanitizeChanged, this, &SetupBridge::refresh);
++    connect(settings, &QmlSettings::logVerboseChanged, this, &SetupBridge::refresh);
+     connect(settings, &QmlSettings::disconnectActionChanged, this, &SetupBridge::refresh);
+     connect(settings, &QmlSettings::suspendActionChanged, this, &SetupBridge::refresh);
+     connect(settings, &QmlSettings::audioVideoDisabledChanged, this, &SetupBridge::refresh);
+@@ -183,6 +187,7 @@ void SetupBridge::refresh()
+     if (generation != backend->profileGeneration()) {
+         generation = backend->profileGeneration();
+         keys.clear();
++        profileKeys.clear();
+         selectedKey.clear();
+         credentialsRejected = false;
+     }
+@@ -501,6 +506,7 @@ void SetupBridge::refresh()
+     auto *settings = backend->qmlSettings();
+     QVariantMap general{{"disconnectAction", settings->disconnectAction()}, {"suspendAction", settings->suspendAction()},
+         {"audioVideoDisabled", settings->audioVideoDisabled()}, {"streamerMode", privateMode},
++        {"logSanitize", settings->logSanitize()}, {"logVerbose", settings->logVerbose()},
+         {"streamMenuEnabled", settings->streamMenuEnabled()}, {"streamMenuShortcut1", settings->streamMenuShortcut1()},
+         {"streamMenuShortcut2", settings->streamMenuShortcut2()}, {"streamMenuShortcut3", settings->streamMenuShortcut3()},
+         {"streamMenuShortcut4", settings->streamMenuShortcut4()}};
+@@ -699,8 +705,24 @@ void SetupBridge::refresh()
+     const auto phase = nativeAttempt.value("phase").toString();
+     const bool pending = nativeAttempt.value("presented").toBool() && !phase.isEmpty()
+         && phase != "failure" && phase != "cancelled" && phase != "registered";
++    QVariantList profiles;
++    QHash<QString, QString> updatedProfileKeys;
++    auto names = backend->nativeSettings()->GetProfiles();
++    names.prepend(QString());
++    int profileIndex = 0;
++    for(const auto &name : names) {
++        auto key = profileKeys.value(name);
++        if(key.isEmpty()) key = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        updatedProfileKeys.insert(name, key);
++        const bool active = name == backend->qmlSettings()->currentProfile();
++        profiles.append(QVariantMap{{"key", key}, {"label", name.isEmpty() ? tr("default") : privateMode ? tr("Profile %1").arg(++profileIndex) : name},
++            {"active", active}, {"deletable", !name.isEmpty() && !active}});
++    }
++    profileKeys = updatedProfileKeys;
++    const QVariantMap profileState{{"items", profiles}, {"current", privateMode ? tr("Hidden") : backend->qmlSettings()->currentProfile().isEmpty() ? tr("default") : backend->qmlSettings()->currentProfile()},
++        {"logDirectory", privateMode ? tr("Log directory hidden") : backend->qmlSettings()->logDirectory()}};
+     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
+-        {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
++        {"profiles", profileState}, {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
+         {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
+             || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
+     if (!suspended) emit stateChanged(state);
+@@ -781,7 +803,7 @@ QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &
+     if (profileGeneration != QString::number(backend->profileGeneration()))
+         return reject(QT_TR_NOOP("The profile changed. Try again in the current profile."));
+     auto *settings = backend->qmlSettings();
+-    const bool boolean = name == "streamerMode" || name == "streamMenuEnabled"
++    const bool boolean = name == "streamerMode" || name == "streamMenuEnabled" || name == "logSanitize" || name == "logVerbose"
+ #ifdef CHIAKI_GUI_ENABLE_STEAMDECK_NATIVE
+         || name == "steamDeckHaptics" || name == "verticalDeck"
+ #endif
+@@ -805,6 +827,8 @@ QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &
+     if (name == "disconnectAction") settings->setDisconnectAction(value.toInt());
+     else if (name == "suspendAction") settings->setSuspendAction(value.toInt());
+     else if (name == "audioVideoDisabled") settings->setAudioVideoDisabled(value.toInt());
++    else if (name == "logSanitize") settings->setLogSanitize(value.toBool());
++    else if (name == "logVerbose") settings->setLogVerbose(value.toBool());
+     else if (name == "streamerMode") settings->setStreamerMode(value.toBool());
+     else if (name == "streamMenuEnabled") settings->setStreamMenuEnabled(value.toBool());
+     else if (name == "streamMenuShortcut1") settings->setStreamMenuShortcut1(value.toUInt());
+@@ -1954,3 +1978,47 @@ QVariantMap SetupBridge::rendererAction(const QString &action, const QString &pr
+     if(action == "restartRenderer") return settings->restartApplication();
+     return {{"accepted", false}};
+ }
++
++QVariantMap SetupBridge::profileAction(const QString &action, const QString &key, const QString &name, bool confirmed, const QString &profile)
++{
++    if(!currentProfile(profile)) return {{"accepted", false}, {"message", tr("The profile changed. Select the profile again.")}};
++    if(suspended || state.value("connectionBusy").toBool()) return {{"accepted", false}, {"message", tr("Finish the current connection before changing profiles.")}};
++    QString target;
++    if(action == "create") {
++        target = name.trimmed();
++        if(target.isEmpty()) return {{"accepted", false}, {"message", tr("Enter a profile name.")}};
++    } else {
++        const auto it = std::find_if(profileKeys.cbegin(), profileKeys.cend(), [&](const QString &value) { return value == key; });
++        if(it == profileKeys.cend()) return {{"accepted", false}, {"message", tr("Select an available profile.")}};
++        target = it.key();
++    }
++    if(action == "delete") {
++        if(!confirmed || target.isEmpty() || target == backend->qmlSettings()->currentProfile())
++            return {{"accepted", false}, {"message", tr("The default and current profiles cannot be deleted. Confirm deletion of another profile.")}};
++        const bool deleted = backend->nativeSettings()->DeleteProfile(target);
++        refresh();
++        return {{"accepted", deleted}, {"message", deleted ? tr("Profile deleted.") : tr("The profile could not be deleted.")}};
++    }
++    if(action != "create" && action != "switch") return {{"accepted", false}};
++    const bool saved = backend->nativeSettings()->SetCurrentProfile(target);
++    refresh();
++    return {{"accepted", saved}, {"message", saved ? tr("Profile selected.") : tr("The profile could not be selected.")}};
++}
++
++QVariantMap SetupBridge::settingsFileAction(const QString &action, const QString &profile)
++{
++    if(!currentProfile(profile)) return {{"accepted", false}, {"message", tr("The profile changed. Try again in the current profile.")}};
++    if(action == "exportSettings") return backend->qmlSettings()->exportSettings();
++    if(action == "importSettings") {
++        if(suspended || state.value("connectionBusy").toBool()) return {{"accepted", false}, {"message", tr("Finish the current connection before importing settings.")}};
++        auto reply = backend->qmlSettings()->importSettings();
++        reply.insert("profileGeneration", QString::number(backend->profileGeneration()));
++        refresh();
++        return reply;
++    }
++    if(action == "openLogDirectory") {
++        const bool opened = QDesktopServices::openUrl(QUrl::fromLocalFile(backend->qmlSettings()->logDirectory()));
++        return {{"accepted", opened}, {"message", opened ? tr("Log directory opened.") : tr("The log directory could not be opened.")}};
++    }
++    return {{"accepted", false}};
++}
+diff --git a/gui/tests/CMakeLists.txt b/gui/tests/CMakeLists.txt
+index 96faad20..d682f08f 100644
+--- a/gui/tests/CMakeLists.txt
++++ b/gui/tests/CMakeLists.txt
+@@ -57,6 +57,9 @@ if(TARGET chiaki-gui)
+         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+     add_test(NAME chiaki-remote-native-connection COMMAND chiaki-embedded-setup-tests remoteNativeConnection)
+     set_tests_properties(chiaki-remote-native-connection PROPERTIES LABELS desktop)
++    add_test(NAME chiaki-embedded-profiles COMMAND chiaki-embedded-setup-tests profileImportValidation profileSettingsPage profileFiles)
++    set_tests_properties(chiaki-embedded-profiles PROPERTIES
++        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+     add_test(NAME chiaki-embedded-settings COMMAND chiaki-embedded-setup-tests generalSettings settingsValidation settingsRestart)
+     set_tests_properties(chiaki-embedded-settings PROPERTIES LABELS desktop)
+     add_test(NAME chiaki-embedded-video-audio COMMAND chiaki-embedded-setup-tests videoAudioSettings videoAudioState videoAudioRestart videoAudioDevices)
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index f61c320e..cf800182 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -284,6 +284,16 @@ class EmbeddedSetupTest : public QObject
+             Qt::QueuedConnection, Q_ARG(QList<DiscoveryHost>, hosts)));
+     }
+ 
++    PsnRequests controlledProfileRequests(QList<QPointer<PsnReply>> &network)
++    {
++        PsnRequests requests;
++        requests.networkManager = [&network](QObject *owner) { return new PsnNetwork(network, owner); };
++        requests.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **, size_t *, ChiakiLog *) { return CHIAKI_ERR_CANCELED; };
++        requests.connect = [](StreamSession *, const QString &, bool) { return CHIAKI_ERR_CANCELED; };
++        requests.startSession = [](ChiakiSession *) { return CHIAKI_ERR_CANCELED; };
++        return requests;
++    }
++
+     DiscoveryRequests controlledDiscovery()
+     {
+         return {[](ChiakiDiscoveryService *, ChiakiDiscoveryServiceOptions *, ChiakiLog *) { return CHIAKI_ERR_SUCCESS; },
+@@ -383,6 +393,321 @@ class EmbeddedSetupTest : public QObject
+     }
+ 
+ private slots:
++    void profileImportValidation()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto cleanup = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        settings.SetAudioVolume(37);
++        const uint8_t mac[6] = {0, 1, 2, 3, 4, 5};
++        settings.AddHiddenHost(HiddenHost(HostMAC(mac), "Keep hidden"));
++        QTemporaryDir files;
++        const auto invalid = files.filePath("invalid.ini");
++        {
++            QSettings file(invalid, QSettings::IniFormat);
++            file.setValue("version", 2);
++            file.setValue("settings/this_profile", profile);
++            file.setValue("settings/audio_volume", 1);
++            file.beginWriteArray("registered_hosts", 1);
++            file.setArrayIndex(0);
++            file.setValue("server_mac", QByteArray("short"));
++            file.endArray();
++        }
++        QVERIFY(!settings.ImportSettings(invalid));
++        const auto preserved = [&] {
++            QCOMPARE(settings.GetHiddenHosts().size(), 1);
++            Settings reopened(profile);
++            QCOMPARE(reopened.GetAudioVolume(), 37);
++            QCOMPARE(reopened.GetHiddenHosts().size(), 1);
++        };
++        preserved();
++        for(const auto &contents : QList<QByteArray>{"[General]\nversion=99\n", "[broken\nvalue=1\n", "[General]\nversion=2\n[registered_hosts]\nsize=-1\n",
++            "[General]\nversion=2\n[registered_hosts]\nsize=1\n1\\server_mac=@ByteArray(123456)\n1\\target=1000100\n",
++            "[General]\nversion=2\n[hidden_hosts]\nsize=1\n1\\server_mac=@ByteArray(short)\n",
++            "[General]\nversion=2\n[manual_hosts]\nsize=1\n1\\id=-1\n1\\host=console.test\n",
++            "[General]\nversion=2\n[controller_mappings]\nsize=1\n1\\vidpid=0x1:0x2\n"}) {
++            { QFile file(invalid); QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate)); QCOMPARE(file.write(contents), contents.size()); }
++            QVERIFY(!settings.ImportSettings(invalid));
++            preserved();
++        }
++        // Version 1 exports use ps4_mac/ps4_nickname and hw_decode_engine.
++        {
++            QSettings legacy(invalid, QSettings::IniFormat);
++            legacy.clear();
++            legacy.setValue("version", 1);
++            legacy.setValue("settings/this_profile", profile);
++            legacy.setValue("settings/audio_volume", 19);
++            legacy.setValue("settings/hw_decode_engine", "none");
++            legacy.beginWriteArray("registered_hosts", 1);
++            legacy.setArrayIndex(0);
++            legacy.setValue("ps4_mac", QByteArray("123456"));
++            legacy.setValue("ps4_nickname", "Legacy console");
++            legacy.setValue("rp_regist_key", QByteArray(CHIAKI_SESSION_AUTH_SIZE, 'a'));
++            legacy.setValue("rp_key", QByteArray(16, 'b'));
++            legacy.endArray();
++            // Older writers can retain inactive entries after a removal.
++            legacy.setValue("registered_hosts/2/server_mac", QByteArray("old"));
++        }
++        QVERIFY(settings.ImportSettings(invalid));
++        Settings legacy(profile);
++        QCOMPARE(legacy.GetAudioVolume(), 19);
++        QCOMPARE(legacy.GetRegisteredHosts().size(), 1);
++        QCOMPARE(legacy.GetRegisteredHosts().first().GetServerNickname(), QStringLiteral("Legacy console"));
++        QCOMPARE(legacy.GetRegisteredHosts().first().GetTarget(), CHIAKI_TARGET_PS4_10);
++        QVERIFY(!legacy.DeleteProfile(profile));
++        QVERIFY(!legacy.DeleteProfile({}));
++    }
++
++    void profileSettingsPage()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const QString guest = profile + "-Guest";
++        const auto cleanup = qScopeGuard([&] {
++            for(const auto &name : {profile, guest}) QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        QVERIFY(settings.SetCurrentProfile(profile));
++        settings.SetDiscoveryEnabled(false);
++        settings.SetAudioVolume(37);
++        QList<QPointer<PsnReply>> network;
++        const auto requests = controlledProfileRequests(network);
++        RegistrationTransport registration;
++        QmlNativeServices services(&settings, requests, [](const QString &, const QStringList &) { return false; }, registration.boundary(), controlledDiscovery());
++        auto *backend = services.backend();
++        auto *shared = backend->qmlSettings();
++        SetupWindow setup(backend);
++        setup.resize(1280, 900);
++        setup.show();
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
++        script(setup.view(), "document.querySelector('.open-settings').click()");
++        QTRY_VERIFY(script(setup.view(), "[...document.querySelectorAll('.category-nav button')].some(e=>e.textContent==='Profiles')").toBool());
++        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='Profiles').click()");
++        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#profileSelection')").toBool());
++        const auto initialGeneration = setup.bridge()->snapshot().value("profileGeneration").toString();
++        script(setup.view(), "{const select=document.querySelector('#profileSelection');select.value='create';select.dispatchEvent(new Event('change',{bubbles:true}));}");
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('#profileAction').disabled").toBool());
++        QVERIFY(fill(setup.view(), "#newProfileName", "  " + guest + "  "));
++        QVERIFY(click(setup.view(), "#profileAction"));
++        QTRY_COMPARE(shared->currentProfile(), guest);
++        QCOMPARE(backend->qmlSettings(), shared);
++        QVERIFY(backend->nativeSettings() != &settings);
++        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), SDL_MIX_MAXVOLUME);
++        backend->nativeSettings()->SetAudioVolume(63);
++        const auto choose = [&](const QString &label) {
++            script(setup.view(), QString("{const select=document.querySelector('#profileSelection');select.value=[...select.options].find(e=>e.textContent===%1).value;select.dispatchEvent(new Event('change',{bubbles:true}));}").arg(QString::fromUtf8(QJsonDocument(QJsonArray{label}).toJson(QJsonDocument::Compact)).mid(1).chopped(1)));
++        };
++        choose(profile);
++        QVERIFY(!script(setup.view(), "document.querySelector('#deleteProfile')?.checked").toBool());
++        QVERIFY(click(setup.view(), "#profileAction"));
++        QTRY_COMPARE(shared->currentProfile(), profile);
++        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 37);
++        Settings reopened(guest);
++        QCOMPARE(reopened.GetAudioVolume(), 63);
++        const auto currentGeneration = setup.bridge()->snapshot().value("profileGeneration").toString();
++        QVERIFY(!setup.bridge()->profileAction("create", {}, "Obsolete", false, initialGeneration).value("accepted").toBool());
++        QSignalSpy settingsSignals(shared, &QmlSettings::registeredHostsChanged);
++        QSignalSpy backendSignals(backend, &QmlBackend::hostsChanged);
++        QVERIFY(QMetaObject::invokeMethod(&settings, "RegisteredHostsUpdated", Qt::DirectConnection));
++        QVERIFY(QMetaObject::invokeMethod(&settings, "CurrentProfileChanged", Qt::DirectConnection));
++        QCOMPARE(settingsSignals.count(), 0);
++        QCOMPARE(backendSignals.count(), 0);
++        QCOMPARE(setup.bridge()->snapshot().value("profileGeneration").toString(), currentGeneration);
++        choose("default");
++        QVERIFY(!script(setup.view(), "!!document.querySelector('#deleteProfile')").toBool());
++        choose(guest);
++        QVERIFY(click(setup.view(), "#deleteProfile"));
++        QVERIFY(click(setup.view(), "#profileAction"));
++        QTRY_VERIFY(!backend->nativeSettings()->GetProfiles().contains(guest));
++        QCOMPARE(shared->currentProfile(), profile);
++        QSettings deleted(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + guest);
++        QVERIFY(deleted.allKeys().isEmpty());
++        shared->setStreamerMode(true);
++        QTRY_VERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains(profile.toUtf8()));
++        QTRY_VERIFY(script(setup.view(), "!document.body.textContent.includes('" + profile + "')").toBool());
++        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='General').click()");
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-log-directory]')?.textContent==='Log directory hidden'").toBool());
++        QVERIFY(click(setup.view(), "#logSanitize"));
++        QTRY_VERIFY(!shared->logSanitize());
++        QVERIFY(click(setup.view(), "#logVerbose"));
++        QTRY_VERIFY(shared->logVerbose());
++        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
++        QVERIFY(!settingRequest(setup.view(), "logVerbose", QStringLiteral("true"), generation).value("accepted").toBool());
++        PsnBrowserOpener opener;
++        QDesktopServices::setUrlHandler("file", &opener, "open");
++        const auto resetOpener = qScopeGuard([] { QDesktopServices::unsetUrlHandler("file"); });
++        QVERIFY(click(setup.view(), "#openLogDirectory"));
++        QTRY_COMPARE(opener.url, QUrl::fromLocalFile(shared->logDirectory()));
++        for(const auto zoom : {1.0, 2.0}) {
++            setup.resize(int(1280 * zoom), int(900 * zoom));
++            setup.view()->setZoomFactor(zoom);
++            QTRY_VERIFY(script(setup.view(), "innerWidth>=1024 && document.documentElement.scrollWidth<=innerWidth").toBool());
++        }
++        Settings persisted(profile);
++        QCOMPARE(persisted.GetAudioVolume(), 37);
++        QVERIFY(!persisted.GetLogSanitize());
++        QVERIFY(persisted.GetLogVerbose());
++        QProcess restarted;
++        auto environment = QProcessEnvironment::systemEnvironment();
++        environment.insert("CHIAKI_PROFILE_RESTART", profile);
++        restarted.setProcessEnvironment(environment);
++        QTemporaryDir result;
++        const auto log = result.filePath("restart.txt");
++        restarted.start(QCoreApplication::applicationFilePath(), {"profileRestartRead", "-o", log + ",txt"});
++        QVERIFY(restarted.waitForStarted());
++        QTRY_COMPARE_WITH_TIMEOUT(restarted.state(), QProcess::NotRunning, 20000);
++        QCOMPARE(restarted.exitStatus(), QProcess::NormalExit);
++        { QFile file(log); QVERIFY(file.open(QIODevice::ReadOnly)); qInfo().noquote() << file.readAll(); }
++        QCOMPARE(restarted.exitCode(), 0);
++    }
++
++    void profileFiles()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const QString next = profile + "-next";
++        const auto cleanup = qScopeGuard([&] {
++            for(const auto &name : {profile, next}) QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        QVERIFY(settings.SetCurrentProfile(profile));
++        settings.SetDiscoveryEnabled(false);
++        settings.SetAudioVolume(37);
++        settings.SetPsnAuthToken("private-import-auth");
++        settings.SetPsnRefreshToken("private-import-refresh");
++        settings.SetPsnAccountId("private-import-account");
++        QList<QPointer<PsnReply>> network;
++        const auto requests = controlledProfileRequests(network);
++        RegistrationTransport registration;
++        QmlNativeServices services(&settings, requests, [](const QString &, const QStringList &) { return false; }, registration.boundary(), controlledDiscovery());
++        auto *backend = services.backend();
++        auto *shared = backend->qmlSettings();
++        SetupWindow setup(backend);
++        setup.resize(1280, 900);
++        setup.show();
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
++        script(setup.view(), "document.querySelector('.open-settings').click()");
++        const auto profiles = [&] {
++            script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='Profiles').click()");
++            QTRY_VERIFY(script(setup.view(), "document.querySelector('#importSettings')?.disabled===false").toBool());
++        };
++        profiles();
++        const auto pick = [&](const QString &action, const QString &path, bool cancel = false, const std::function<void()> &before = {}) {
++            QTimer completion;
++            completion.setInterval(10);
++            connect(&completion, &QTimer::timeout, &completion, [&] {
++                for(auto *widget : QApplication::topLevelWidgets()) if(auto *picker = qobject_cast<QFileDialog *>(widget)) {
++                    if(!picker->isVisible()) continue;
++                    completion.stop();
++                    if(before) before();
++                    if(!cancel) picker->selectFile(path);
++                    QMetaObject::invokeMethod(picker, "done", Qt::DirectConnection, Q_ARG(int, cancel ? QDialog::Rejected : QDialog::Accepted));
++                    return;
++                }
++            });
++            completion.start();
++            QVERIFY(click(setup.view(), "#" + action));
++            QTRY_VERIFY(!completion.isActive());
++        };
++        const auto message = [&] { return script(setup.view(), "document.querySelector('.settings-message')?.textContent").toString(); };
++        QTemporaryDir files;
++        const auto output = files.filePath("profile.ini");
++        pick("exportSettings", output);
++        QTRY_COMPARE(message(), QStringLiteral("Settings exported."));
++        {
++            QSettings file(output, QSettings::IniFormat);
++            QCOMPARE(file.value("settings/audio_volume").toInt(), 37);
++            QCOMPARE(file.value("settings/hw_decoder").toString(), QStringLiteral("auto"));
++            QCOMPARE(file.value("settings/this_profile").toString(), profile);
++            QCOMPARE(file.value("settings/psn_auth_token").toString(), QStringLiteral("private-import-auth"));
++        }
++        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
++        pick("importSettings", {}, true);
++        QTRY_COMPARE(message(), QStringLiteral("Import cancelled."));
++        QCOMPARE(setup.bridge()->snapshot().value("profileGeneration").toString(), generation);
++        pick("exportSettings", {}, true);
++        QTRY_COMPARE(message(), QStringLiteral("Export cancelled."));
++        const auto invalid = files.filePath("invalid.ini");
++        { QFile file(invalid); QVERIFY(file.open(QIODevice::WriteOnly)); file.write("[General]\nversion=99\n[settings]\naudio_volume=1\n"); }
++        pick("importSettings", invalid);
++        QTRY_VERIFY(message().contains("could not be imported"));
++        QCOMPARE(shared->currentProfile(), profile);
++        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 37);
++        QCOMPARE(setup.bridge()->snapshot().value("profileGeneration").toString(), generation);
++        QFile original(output);
++        QVERIFY(original.open(QIODevice::ReadOnly));
++        const auto originalBytes = original.readAll();
++        original.close();
++        QVERIFY(QFile::setPermissions(output, QFile::ReadOwner | QFile::ReadGroup | QFile::ReadOther));
++        const auto resetPermissions = qScopeGuard([&] { QFile::setPermissions(output, QFile::ReadOwner | QFile::WriteOwner); });
++        pick("exportSettings", output);
++        QTRY_VERIFY(message().contains("could not be exported"));
++        QVERIFY(original.open(QIODevice::ReadOnly));
++        QCOMPARE(original.readAll(), originalBytes);
++        original.close();
++        QVERIFY(QFile::setPermissions(output, QFile::ReadOwner | QFile::WriteOwner));
++        pick("exportSettings", files.filePath("missing/profile.ini"));
++        QTRY_VERIFY(message().contains("could not be exported"));
++        {
++            QSettings file(output, QSettings::IniFormat);
++            file.setValue("settings/audio_volume", 63);
++            file.setValue("settings/disconnect_action", 1);
++        }
++        pick("importSettings", output);
++        QTRY_COMPARE(message(), QStringLiteral("Settings imported."));
++        QCOMPARE(backend->qmlSettings(), shared);
++        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 63);
++        Settings imported(profile);
++        QCOMPARE(imported.GetAudioVolume(), 63);
++        QVERIFY(setup.bridge()->snapshot().value("profileGeneration").toString() != generation);
++        // A default-profile file must replace the default store, even when a named profile is active.
++        { QSettings file(output, QSettings::IniFormat); file.setValue("settings/this_profile", ""); file.setValue("settings/audio_volume", 21); }
++        pick("importSettings", output);
++        QTRY_COMPARE(message(), QStringLiteral("Settings imported."));
++        QCOMPARE(shared->currentProfile(), QString());
++        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 21);
++        Settings defaultProfile(QString{});
++        QCOMPARE(defaultProfile.GetAudioVolume(), 21);
++        QCOMPARE(imported.GetAudioVolume(), 63);
++        // Profile replacement makes both native and WebChannel pending results obsolete.
++        QVariantMap nested;
++        pick("importSettings", output, false, [&] {
++            nested = shared->exportPlaceboSettings();
++            shared->setCurrentProfile(next);
++        });
++        QVERIFY(!nested.value("accepted").toBool());
++        QCOMPARE(shared->currentProfile(), next);
++        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), SDL_MIX_MAXVOLUME);
++        QVERIFY(!setup.bridge()->settingsFileAction("importSettings", generation).value("accepted").toBool());
++        QVERIFY(!setup.bridge()->settingsFileAction("readFile", setup.bridge()->snapshot().value("profileGeneration").toString()).value("accepted").toBool());
++        shared->setStreamerMode(true);
++        const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
++        for(const auto &privateValue : {profile, next, files.path(), QStringLiteral("private-import-auth"), QStringLiteral("private-import-refresh"), QStringLiteral("private-import-account")}) {
++            QVERIFY(!snapshot.contains(privateValue.toUtf8()));
++            QVERIFY(!script(setup.view(), "document.body.textContent").toString().contains(privateValue));
++        }
++        setup.view()->reload();
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
++        script(setup.view(), "document.querySelector('.open-settings').click()");
++        profiles();
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-active-profile]')?.textContent.includes('Hidden')").toBool());
++    }
++
++    void profileRestartRead()
++    {
++        const auto profile = qEnvironmentVariable("CHIAKI_PROFILE_RESTART");
++        if(profile.isEmpty()) QSKIP("Only launched by profileSettingsPage");
++        Settings restarted(profile);
++        QCOMPARE(restarted.GetCurrentProfile(), profile);
++        QCOMPARE(restarted.GetAudioVolume(), 37);
++        QVERIFY(!restarted.GetLogSanitize());
++        QVERIFY(restarted.GetLogVerbose());
++    }
++
+     void controllerSettings()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+@@ -3513,7 +3838,9 @@ private slots:
+         settings.SetDiscoveryEnabled(false);
+         settings.SetPlaceboPreset(PlaceboPreset::Custom);
+         settings.SetPlaceboDebandIterations(7);
+-        QmlNativeServices services(&settings);
++        QList<QPointer<PsnReply>> network;
++        RegistrationTransport registration;
++        QmlNativeServices services(&settings, controlledProfileRequests(network), {}, registration.boundary(), controlledDiscovery());
+         auto *backend = services.backend();
+         backend->stopAutoConnect();
+         backend->setDiscoveryEnabled(false);
+diff --git a/gui/tests/qml/fixtures/SettingsHarness.qml b/gui/tests/qml/fixtures/SettingsHarness.qml
+index 4a63fa42..30dff839 100644
+--- a/gui/tests/qml/fixtures/SettingsHarness.qml
++++ b/gui/tests/qml/fixtures/SettingsHarness.qml
+@@ -15,7 +15,6 @@ Item {
+     function showRegistDialog(host, ps5) { record("register", [host, ps5]); }
+     function showDisplaySettingsDialog() { record("display"); }
+     function showPlaceboSettingsDialog() { record("renderer"); }
+-    function showProfileDialog() { record("profiles"); }
+     function showPSNTokenDialog(remote) { record("login", [remote]); }
+     function showConfirmDialog(title, text, actionText, callback, cancel) { record("confirm", [title, text, actionText, callback, cancel]); }
+     FakeSettings { id: fakeSettings }
+diff --git a/gui/tests/qml/fixtures/SettingsSearchHarness.qml b/gui/tests/qml/fixtures/SettingsSearchHarness.qml
+index 9f5078e0..6fa8a578 100644
+--- a/gui/tests/qml/fixtures/SettingsSearchHarness.qml
++++ b/gui/tests/qml/fixtures/SettingsSearchHarness.qml
+@@ -16,7 +16,6 @@ Item {
+     function showDisplaySettingsDialog(route) { pages.push(displayComponent, {searchRoute: route || null}); }
+     function showPlaceboSettingsDialog(route) { pages.push(rendererComponent, {searchRoute: route || null}); }
+     function showPlaceboColorMappingDialog(route) { pages.push(colorComponent, {searchRoute: route || null}); }
+-    function showProfileDialog(route) { pages.push(profileComponent, {searchRoute: route || null}); }
+     function showConfirmDialog(title, text, actionText, accept, cancel) { collaborators.showConfirmDialog(title, text, actionText, accept, cancel); }
+     function showRegistDialog(host, ps5) { collaborators.showRegistDialog(host, ps5); }
+     SettingsHarness { id: collaborators; visible: false; screenActive: false }
+@@ -30,5 +29,4 @@ Item {
+     Component { id: displayComponent; DisplaySettingsDialog { backend: collaborators.backend; navigation: harness } }
+     Component { id: rendererComponent; PlaceboSettingsDialog { backend: collaborators.backend; navigation: harness } }
+     Component { id: colorComponent; PlaceboColorMappingDialog { backend: collaborators.backend; navigation: harness } }
+-    Component { id: profileComponent; ProfileDialog { backend: collaborators.backend; navigation: harness } }
+ }
+diff --git a/gui/tests/qml/tst_SettingsConfig.qml b/gui/tests/qml/tst_SettingsConfig.qml
+index 9d15a26f..5213447d 100644
+--- a/gui/tests/qml/tst_SettingsConfig.qml
++++ b/gui/tests/qml/tst_SettingsConfig.qml
+@@ -11,45 +11,8 @@ TestCase {
+     visible: true
+     when: windowShown
+     Component { id: harnessComponent; SettingsHarness {} }
+-    function test_actionsAndPrivacy() {
+-        const harness = createTemporaryObject(harnessComponent, testCase);
+-        findChild(harness, "settingsCategory8").forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Return);
+-        const profile = findChild(harness, "configProfile");
+-        verify(profile);
+-        verify(profile.text.includes("Test profile"));
+-        harness.settings.streamerMode = true;
+-        verify(!profile.text.includes("Test profile"));
+-        harness.settings.actions = [];
+-        for (const action of ["exportSettings", "importSettings"]) {
+-            const button = findChild(harness, action);
+-            button.forceActiveFocus(Qt.TabFocusReason);
+-            keyClick(Qt.Key_Return);
+-        }
+-        compare(harness.settings.actions.length, 2);
+-        compare(harness.settings.actions[0].name, "exportSettings");
+-        compare(harness.settings.actions[1].name, "importSettings");
+-        findChild(harness, "manageProfiles").forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Return);
+-        compare(harness.actions[0].name, "profiles");
+-    }
+-    Component {
+-        id: navigationHarness
+-        Item {
+-            id: root
+-            width: 900; height: 600
+-            function closeDialog() { pages.pop(); }
+-            function showProfileDialog() { pages.push(profileComponent); }
+-            SettingsHarness { id: collaborators; visible: false; screenActive: false }
+-            StackView {
+-                id: pages
+-                objectName: "settingsStack"
+-                anchors.fill: parent
+-                initialItem: SettingsDialog { backend: collaborators.backend; navigation: root }
+-            }
+-            Component { id: profileComponent; ProfileDialog { backend: collaborators.backend; navigation: root } }
+-        }
+-    }
++
++
+     function test_loggingRefreshAndAboutCancel() {
+         const harness = createTemporaryObject(harnessComponent, testCase, {screenActive: false});
+         harness.settings.logSanitize = true;
+@@ -71,7 +34,7 @@ TestCase {
+         harness.settings.logVerbose = false;
+         harness.settings.changeCount = 0;
+         waitForRendering(harness);
+-        verify(findChild(harness, "configProfile").text.includes("Changed profile"));
++        verify(findChild(harness, "settingsProfile").text.includes("Changed profile"));
+         verify(findChild(harness, "logSanitize").checked);
+         verify(!findChild(harness, "logVerbose").checked);
+         const about = findChild(harness, "aboutSettings");
+@@ -84,22 +47,7 @@ TestCase {
+         compare(harness.settings.changeCount, 0);
+         compare(harness.actions.length, 0);
+     }
+-    function test_backRestoresConfigOpener() {
+-        const harness = createTemporaryObject(navigationHarness, testCase);
+-        const pages = findChild(harness, "settingsStack");
+-        findChild(harness, "settingsCategory8").forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Return);
+-        const opener = findChild(harness, "manageProfiles");
+-        opener.forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Return);
+-        tryCompare(pages, "depth", 2);
+-        tryCompare(pages, "busy", false);
+-        findChild(harness, "profileSelection").forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Escape);
+-        tryCompare(pages, "depth", 1);
+-        tryCompare(pages, "busy", false);
+-        tryCompare(opener, "activeFocus", true);
+-    }
++
+     function test_bounds_data() {
+         return [{tag: "desktop", width: 1280, height: 720}, {tag: "minimum", width: 900, height: 600}];
+     }
+@@ -108,7 +56,7 @@ TestCase {
+         findChild(harness, "settingsCategory8").forceActiveFocus(Qt.TabFocusReason);
+         keyClick(Qt.Key_Return);
+         waitForRendering(harness);
+-        for (const name of ["manageProfiles", "exportSettings", "importSettings", "logSanitize", "logVerbose", "aboutSettings"]) {
++        for (const name of ["logSanitize", "logVerbose", "aboutSettings"]) {
+             const control = findChild(harness, name);
+             control.forceActiveFocus(Qt.TabFocusReason);
+             wait(20);
+diff --git a/gui/tests/qml/tst_SettingsProfiles.qml b/gui/tests/qml/tst_SettingsProfiles.qml
+deleted file mode 100644
+index 4574cd3b..00000000
+--- a/gui/tests/qml/tst_SettingsProfiles.qml
++++ /dev/null
+@@ -1,194 +0,0 @@
+-import QtQuick
+-import QtQuick.Controls
+-import QtTest
+-import "fixtures"
+-import "../../src/qml"
+-
+-TestCase {
+-    id: testCase
+-    name: "SettingsProfiles"
+-    width: 1280; height: 720
+-    visible: true
+-    when: windowShown
+-    Component {
+-        id: harnessComponent
+-        Item {
+-            id: root
+-            width: 1280; height: 720
+-            property alias settings: fakeSettings
+-            property alias screen: loader.item
+-            property int closeCount: 0
+-            function closeDialog() { closeCount++; }
+-            FakeSettings {
+-                id: fakeSettings
+-                currentProfile: "Primary"
+-                profiles: ["default", "Primary", "Guest", "create new profile"]
+-                function deleteProfile(name) { record("deleteProfile", [name]); }
+-            }
+-            QtObject { id: fakeBackend; property var settings: fakeSettings }
+-            Loader { id: loader; anchors.fill: parent; sourceComponent: ProfileDialog { backend: fakeBackend; navigation: root } }
+-        }
+-    }
+-    function choose(combo, index) {
+-        combo.forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Return);
+-        tryCompare(combo.popup, "visible", true);
+-        keyClick(Qt.Key_Home);
+-        for (let i = 0; i < index; i++) keyClick(Qt.Key_Down);
+-        keyClick(Qt.Key_Return);
+-        tryCompare(combo.popup, "visible", false);
+-    }
+-    function test_switchIsExplicitAndDefaultUsesEmptyKey() {
+-        const harness = createTemporaryObject(harnessComponent, testCase);
+-        verify(harness);
+-        const combo = findChild(harness, "profileSelection");
+-        verify(combo);
+-        compare(combo.currentIndex, 1);
+-        verify(!harness.screen.buttonEnabled);
+-        harness.settings.changeCount = 0;
+-        choose(combo, 0);
+-        compare(harness.settings.currentProfile, "Primary");
+-        compare(harness.settings.changeCount, 0);
+-        verify(!findChild(harness, "deleteProfile").visible);
+-        keyClick(Qt.Key_Menu);
+-        compare(harness.settings.currentProfile, "");
+-        compare(harness.settings.changeCount, 1);
+-        compare(harness.closeCount, 1);
+-    }
+-    function test_protectedAndDeleteCases() {
+-        const harness = createTemporaryObject(harnessComponent, testCase);
+-        const combo = findChild(harness, "profileSelection");
+-        const deletion = findChild(harness, "deleteProfile");
+-        verify(!deletion.visible);
+-        choose(combo, 0);
+-        verify(!deletion.visible);
+-        choose(combo, 3);
+-        verify(!deletion.visible);
+-        choose(combo, 2);
+-        verify(deletion.visible);
+-        deletion.forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Space);
+-        compare(harness.settings.actions.length, 0);
+-        keyClick(Qt.Key_Menu);
+-        compare(harness.settings.actions.length, 1);
+-        compare(harness.settings.actions[0].name, "deleteProfile");
+-        compare(harness.settings.actions[0].args[0], "Guest");
+-        compare(harness.settings.currentProfile, "Primary");
+-        compare(harness.closeCount, 1);
+-    }
+-    function test_creationIsTrimmedAndExplicit() {
+-        const harness = createTemporaryObject(harnessComponent, testCase);
+-        const combo = findChild(harness, "profileSelection");
+-        choose(combo, 3);
+-        const name = findChild(harness, "newProfileName");
+-        verify(name.visible);
+-        verify(!harness.screen.buttonEnabled);
+-        name.forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Return);
+-        keyClick(Qt.Key_Space);
+-        verify(!harness.screen.buttonEnabled);
+-        keyClick(Qt.Key_A);
+-        keyClick(Qt.Key_Space);
+-        compare(harness.settings.currentProfile, "Primary");
+-        verify(harness.screen.buttonEnabled);
+-        keyClick(Qt.Key_Return);
+-        compare(harness.settings.currentProfile, "Primary");
+-        keyClick(Qt.Key_Menu);
+-        compare(harness.settings.currentProfile, "a");
+-        compare(harness.closeCount, 1);
+-    }
+-    function test_staleSelectionIsCleared_data() {
+-        return [{tag: "profile", profile: true}, {tag: "list", profile: false}];
+-    }
+-    function test_staleSelectionIsCleared(data) {
+-        const harness = createTemporaryObject(harnessComponent, testCase);
+-        const combo = findChild(harness, "profileSelection");
+-        const deletion = findChild(harness, "deleteProfile");
+-        choose(combo, 2);
+-        deletion.forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Space);
+-        if (data.profile) harness.settings.currentProfile = "Guest";
+-        else harness.settings.profiles = ["default", "Primary", "Replacement", "create new profile"];
+-        verify(!deletion.checked);
+-        verify(!harness.screen.buttonEnabled);
+-        combo.forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Menu);
+-        compare(harness.settings.actions.length, 0);
+-        compare(harness.closeCount, 0);
+-    }
+-    function test_popupRefreshAndEscapeDoNotWrite() {
+-        const harness = createTemporaryObject(harnessComponent, testCase);
+-        const combo = findChild(harness, "profileSelection");
+-        combo.forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Return);
+-        tryCompare(combo.popup, "visible", true);
+-        harness.settings.profiles = ["default", "Primary", "Other", "create new profile"];
+-        tryCompare(combo.popup, "visible", false);
+-        harness.settings.changeCount = 0;
+-        keyClick(Qt.Key_Escape);
+-        compare(harness.settings.changeCount, 0);
+-        compare(harness.settings.actions.length, 0);
+-        compare(harness.closeCount, 1);
+-    }
+-    function test_privacyAndBounds_data() {
+-        return [{tag: "desktop", width: 1280, height: 720}, {tag: "minimum", width: 900, height: 600}];
+-    }
+-    function test_privacyAndBounds(data) {
+-        const harness = createTemporaryObject(harnessComponent, testCase, {width: data.width, height: data.height});
+-        harness.settings.streamerMode = true;
+-        const combo = findChild(harness, "profileSelection");
+-        verify(!combo.displayText.includes("Primary"));
+-        verify(!combo.model.join(" ").includes("Guest"));
+-        verify(!findChild(harness, "activeProfile").text.includes("Primary"));
+-        choose(combo, 3);
+-        const field = findChild(harness, "newProfileName");
+-        compare(field.echoMode, TextInput.Password);
+-        waitForRendering(harness);
+-        for (const control of [combo, field]) {
+-            const point = control.mapToItem(harness, 0, 0);
+-            verify(point.x >= 0 && point.x + control.width <= harness.width);
+-            verify(point.y >= 0 && point.y + control.height <= harness.height);
+-        }
+-    }
+-    function test_cancelCreationAndDeletion() {
+-        for (const creating of [true, false]) {
+-            const harness = createTemporaryObject(harnessComponent, testCase);
+-            const combo = findChild(harness, "profileSelection");
+-            choose(combo, creating ? 3 : 2);
+-            if (creating) {
+-                const name = findChild(harness, "newProfileName");
+-                name.forceActiveFocus(Qt.TabFocusReason);
+-                keyClick(Qt.Key_Return);
+-                keyClick(Qt.Key_A);
+-                keyClick(Qt.Key_Escape);
+-                compare(harness.closeCount, 0);
+-            } else {
+-                findChild(harness, "deleteProfile").forceActiveFocus(Qt.TabFocusReason);
+-                keyClick(Qt.Key_Space);
+-            }
+-            harness.settings.changeCount = 0;
+-            keyClick(Qt.Key_Escape);
+-            compare(harness.closeCount, 1);
+-            compare(harness.settings.actions.length, 0);
+-            compare(harness.settings.changeCount, 0);
+-            harness.destroy();
+-        }
+-    }
+-    function test_profileChangeClearsDraftName() {
+-        const harness = createTemporaryObject(harnessComponent, testCase);
+-        const combo = findChild(harness, "profileSelection");
+-        choose(combo, 3);
+-        const name = findChild(harness, "newProfileName");
+-        name.forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Return);
+-        keyClick(Qt.Key_A);
+-        harness.settings.currentProfile = "Guest";
+-        compare(name.text, "");
+-        verify(!name.visible);
+-        verify(!harness.screen.buttonEnabled);
+-        combo.forceActiveFocus(Qt.TabFocusReason);
+-        keyClick(Qt.Key_Menu);
+-        compare(harness.settings.currentProfile, "Guest");
+-        compare(harness.closeCount, 0);
+-    }
+-}
+diff --git a/gui/tests/qml/tst_SettingsSearch.qml b/gui/tests/qml/tst_SettingsSearch.qml
+index ac0ca3f3..f842c437 100644
+--- a/gui/tests/qml/tst_SettingsSearch.qml
++++ b/gui/tests/qml/tst_SettingsSearch.qml
+@@ -19,6 +19,15 @@ TestCase {
+         search.forceActiveFocus(Qt.TabFocusReason);
+         keyClick(Qt.Key_Return);
+     }
++    function test_migratedProfileMetadataRemoved() {
++        const h = createTemporaryObject(harnessComponent, testCase);
++        const search = findChild(h, "settingsSearch");
++        search.text = "Config";
++        const targets = h.screen.searchResults.map(row => row.target);
++        for (const removed of ["manageProfiles", "profileSelection", "profileAction", "newProfileName", "deleteProfile", "importSettings", "exportSettings"])
++            verify(targets.indexOf(removed) < 0);
++        for (const retained of ["logSanitize", "logVerbose", "aboutSettings"]) verify(targets.indexOf(retained) >= 0);
++    }
+     function test_captureModeSearch() {
+         const h = createTemporaryObject(harnessComponent, testCase);
+         searchFor(h, "F8 gameplay capture");
+@@ -133,7 +142,7 @@ TestCase {
+             "audioOutDevice", "audioInDevice", "audioBufferSize", "audioVolume", "startMicUnmuted", "speechProcessing", "noiseSuppressLevel", "echoSuppressLevel", "wifiDroppedNotif", "packetLossReportedMax", "iDROnFECFailureEnabled", "showStreamStats",
+             "registerConsole", "registeredConsoleInfo0", "autoConnectConsole0", "deleteRegisteredConsole0", "hiddenConsoleInfo0", "unhideConsole0", "mouseCameraEnabled", "keyboardEnabled", "mouseTouchEnabled", "resetAllKeys",
+             "allowJoystickBackgroundEvents", "buttonsByPosition", "dpadTouchEnabled", "dpadTouchIncrement", "dpadTouchShortcut1", "dpadTouchShortcut2", "dpadTouchShortcut3", "dpadTouchShortcut4", "rumbleHapticsIntensity", "hapticOverride",
+-            "openPsnLogin", "portGuessingEnabled", "portGuessCount", "portGuessSocketCount", "manageProfiles", "exportSettings", "importSettings", "logSanitize", "logVerbose", "aboutSettings"
++            "openPsnLogin", "portGuessingEnabled", "portGuessCount", "portGuessSocketCount", "logSanitize", "logVerbose", "aboutSettings"
+         ];
+         for (const console of ["PS4", "PS5"]) for (const route of ["Local", "Remote"])
+             for (const name of console === "PS5" ? ["resolution", "fps", "bitrate", "codec"] : ["resolution", "fps", "bitrate"])
+@@ -261,14 +270,7 @@ TestCase {
+             compare(h.settings.changeCount, 0, target + " search does not write");
+             while (h.pages.depth > 1) { keyClick(Qt.Key_Escape); tryVerify(() => !h.pages.busy); }
+         }
+-        for (const target of ["profileSelection", "newProfileName", "deleteProfile", "profileAction"]) {
+-            selectTarget(h, "Config", target);
+-            tryCompare(h.pages, "depth", 2);
+-            tryCompare(findChild(h.pages.currentItem, "profileSelection"), "activeFocus", true);
+-            keyClick(Qt.Key_Escape);
+-            tryCompare(h.pages, "depth", 1);
+-            tryCompare(findChild(h.pages.currentItem, "manageProfiles"), "activeFocus", true);
+-        }
++
+         compare(h.actions.length, 0);
+     }
+     function test_linkedPrerequisitesAndProfileChanges() {
+@@ -313,15 +315,7 @@ TestCase {
+         keyClick(Qt.Key_Return);
+         tryCompare(findChild(h.pages.currentItem, "keyMapping2"), "activeFocus", true);
+     }
+-    function test_profileRoutes() {
+-        const h = createTemporaryObject(linkedHarnessComponent, testCase, {width: 900, height: 600});
+-        for (const target of ["profileSelection", "newProfileName", "deleteProfile", "profileAction"]) {
+-            selectTarget(h, "Config", target);
+-            tryCompare(h.pages, "depth", 2);
+-            keyClick(Qt.Key_Escape);
+-            tryCompare(h.pages, "depth", 1);
+-        }
+-    }
++
+     function test_searchExplainsOuterPrerequisitesAndNativeNames() {
+         const h = createTemporaryObject(harnessComponent, testCase);
+         const search = findChild(h, "settingsSearch");
+@@ -332,7 +326,7 @@ TestCase {
+         h.backend.window.videoPreset = 5;
+         h.settings.placeboColorMappingEnabled = false;
+         verify(h.screen.searchResults[0].description.indexOf("Color mapping enabled") >= 0);
+-        for (const query of ["Audio/Video", "Use zero copy", "Start mic unmuted", "Request IDR frame on FEC failure", "Login to PSN", "Force STUN port guessing", "Export settings to file"]) {
++        for (const query of ["Audio/Video", "Use zero copy", "Start mic unmuted", "Request IDR frame on FEC failure", "Login to PSN", "Force STUN port guessing"]) {
+             search.text = query;
+             verify(h.screen.searchResults.length > 0, query + " uses the native setting name");
+         }
+@@ -360,10 +354,6 @@ TestCase {
+         compare(h.settings.bitrateLocalPS5, 0);
+         compare(h.settings.bitrateRemotePS4, 0);
+         h.settings.actions = [];
+-        searchFor(h, "Export settings to file");
+-        compare(h.settings.actions.length, 0);
+-        keyClick(Qt.Key_Return);
+-        compare(h.settings.actions[0].name, "exportSettings");
+         searchFor(h, "Registered console information");
+         tryCompare(findChild(h, "registeredConsolesEmpty"), "activeFocus", true);
+         searchFor(h, "Unhide console");
+diff --git a/gui/web/src/Settings.svelte b/gui/web/src/Settings.svelte
+index 38a22797..fa3a3b9d 100644
+--- a/gui/web/src/Settings.svelte
++++ b/gui/web/src/Settings.svelte
+@@ -2,8 +2,9 @@
+   import { tick, onMount } from 'svelte';
+   import KeyboardMouse from './KeyboardMouse.svelte';
+   import Controllers from './Controllers.svelte';
++  import Profiles from './Profiles.svelte';
+   import { moveFocus } from './navigation';
+-  import { generalSettings, mediaSettings, rendererSettings, colorMappingSettings, settingConditionMet, keyboardMouseSettings, controllerSettings } from './settings';
++  import { generalSettings, mediaSettings, rendererSettings, colorMappingSettings, profileSettings, settingConditionMet, keyboardMouseSettings, controllerSettings } from './settings';
+   import SettingField from './SettingField.svelte';
+   import type { State, connectSetup } from './bridge';
+   let { current, connection, close, t }: {
+@@ -18,15 +19,18 @@
+   let controllerTarget = $state('');
+   let search: HTMLInputElement;
+   const values = $derived({ ...current.generalSettings, ...current.mediaSettings, ...current.rendererSettings, ...current.keyboardMouse.values, ...current.controllerSetup.values });
+-  const fields = $derived([...generalSettings, ...mediaSettings, ...rendererSettings, ...colorMappingSettings, ...controllerSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
++  const fields = $derived([...profileSettings, ...generalSettings, ...mediaSettings, ...rendererSettings, ...colorMappingSettings, ...controllerSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
+     const choices = current.mediaChoices[field.key];
+     if (field.key.startsWith('bitrate')) return { ...field, automatic: [0, 2, 6, 10, 15][Number(values[`resolution${field.key.slice(7)}`])] };
+     return choices ? { ...field, options: choices.map(choice => choice.label), optionValues: choices.map(choice => choice.value) } : field;
+   }));
+-  const categories = ['General', 'Video', 'Stream', 'Audio/Wifi', 'Display', 'Renderer', 'Color mapping', 'Keyboard and mouse', 'Controllers'];
++  const categories = ['General', 'Video', 'Stream', 'Audio/Wifi', 'Display', 'Renderer', 'Color mapping', 'Keyboard and mouse', 'Controllers', 'Profiles'];
+   const visibleFields = $derived(fields.filter(field => (field.category ?? 'General') === category));
+   const groups = $derived([...new Set(visibleFields.map(field => field.group))]);
+   const searchFields = $derived([...fields,
++    { key: 'profileSelection', label: 'Create or switch profile', category: 'Profiles', group: 'Profiles', description: 'Select a profile, then use the explicit action.' },
++    { key: 'newProfileName', label: 'New profile name', category: 'Profiles', group: 'Profiles', description: 'Create a named profile.' },
++    { key: 'deleteProfile', label: 'Delete selected profile', category: 'Profiles', group: 'Profiles', description: 'The default and current profiles cannot be deleted.' },
+     ...['controllerMappingChange', 'controllerMappingReset'].map((key, index) => ({ key, label: index ? 'Reset controller mapping' : 'Change controller mapping', category: 'Controllers', group: 'Controller mapping', description: 'Select a controller by pressing a button.' })),
+     ...['enableAnalogStickMapping', 'controllerMappingApply', 'controllerMappingCancel'].map((key, index) => ({ key, label: ['Analog stick and L2/R2 mapping', 'Apply controller mapping', 'Cancel controller mapping'][index], category: 'Controllers', group: 'Controller mapping', description: 'Select a controller before editing its mappings.' })),
+     ...current.controllerSetup.targets.flatMap(mapping => [0, 1].map(slot => ({ key: `controllerMap${mapping.buttonValue}Slot${slot}`, label: `${mapping.buttonName} ${t(slot ? 'alternate input' : 'primary input')}`, category: 'Controllers', group: 'Controller mapping', description: 'Assign a controller input.' }))),
+@@ -59,8 +63,8 @@
+     pending = true;
+     try {
+       const action = key === 'restartRenderer' || rendererSettings.find(field => field.key === key)?.action;
+-      const reply = await (action ? connection.rendererAction(key, generation) : Object.hasOwn(current.controllerSetup.values, key) ? connection.controllerSetting(key, value, generation) : Object.hasOwn(current.rendererSettings, key) ? connection.rendererSetting(key, value, generation) : Object.hasOwn(current.generalSettings, key) ? connection.generalSetting(key, value as boolean | number, generation) : connection.mediaSetting(key, value, generation));
+-      if (generation !== current.profileGeneration) return;
++      const reply = await (profileSettings.some(field => field.key === key && field.action) ? connection.settingsFileAction(key, generation) : action ? connection.rendererAction(key, generation) : Object.hasOwn(current.controllerSetup.values, key) ? connection.controllerSetting(key, value, generation) : Object.hasOwn(current.rendererSettings, key) ? connection.rendererSetting(key, value, generation) : Object.hasOwn(current.generalSettings, key) ? connection.generalSetting(key, value as boolean | number, generation) : connection.mediaSetting(key, value, generation));
++      if (generation !== current.profileGeneration && !(key === 'importSettings' && reply.accepted && reply.profileGeneration === current.profileGeneration)) return;
+       message = reply.message ?? (reply.accepted ? t('Saved') : t('The setting could not be saved.'));
+     } catch {
+       message = t('The setting could not be saved.');
+@@ -128,6 +132,8 @@
+         {/if}
+       {/if}
+       {#if category === 'Audio/Wifi'}<button disabled={pending} onclick={() => connection.refreshAudioDevices()}>{t('Refresh audio devices')}</button>{/if}
++      {#if category === 'Profiles'}<Profiles {current} {connection} {t} />{/if}
++      {#if category === 'General'}<p data-log-directory>{current.profiles.logDirectory}</p>{/if}
+       {#key current.profileGeneration}
+       {#if category === 'Keyboard and mouse'}
+         <KeyboardMouse {current} {connection} {t} target={keyboardMouseTarget} />
+diff --git a/gui/web/src/bridge.ts b/gui/web/src/bridge.ts
+index b4d40e59..76a74022 100644
+--- a/gui/web/src/bridge.ts
++++ b/gui/web/src/bridge.ts
+@@ -16,6 +16,7 @@ export interface State {
+   mediaSettings: Record<string, boolean | number | string>;
+   mediaChoices: Record<string, { label: string; value: string }[]>;
+   generalSettings: Record<string, boolean | number>;
++  profiles: { items: { key: string; label: string; active: boolean; deletable: boolean }[]; current: string; logDirectory: string };
+   controllerSetup: {
+     values: Record<string, boolean | number>; devices: { name: string; type: string; playStation: boolean; steamVirtual: boolean }[];
+     operation: string; phase: string; message: string; type: string; altered: boolean; analog: boolean; button: number; slot: number;
+@@ -34,8 +35,10 @@ export interface State {
+     refresh: { phase?: string; message?: string } };
+ }
+ export interface Registration { busy: boolean; savedAccount: boolean; context?: string; id?: string; phase?: string; message?: string; diagnostics?: string; profileValid?: boolean; connectKey?: string }
+-interface Reply { accepted: boolean; message?: string; context?: string; address?: string; ps5?: boolean; id?: string; route?: string; accountId?: string; form?: string }
++interface Reply { accepted: boolean; profileGeneration?: string; message?: string; context?: string; address?: string; ps5?: boolean; id?: string; route?: string; accountId?: string; form?: string }
+ interface NativeBridge {
++  profileAction(action: string, key: string, name: string, confirmed: boolean, profile: string, callback: (reply: Reply) => void): void;
++  settingsFileAction(action: string, profile: string, callback: (reply: Reply) => void): void;
+   setControllerSetting(name: string, value: boolean | number | string, profile: string, callback: (reply: Reply) => void): void;
+   beginControllerMapping(reset: boolean, profile: string, callback: (reply: Reply) => void): void;
+   controllerMappingAction(action: string, operation: string, profile: string, callback: (reply: Reply) => void): void;
+@@ -119,6 +122,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
+   resetKeyboardKeys(form: string, profile: string): Promise<Reply>;
+   rendererSetting(name: string, value: boolean | number | string, profileGeneration: string): Promise<Reply>;
+   rendererAction(action: string, profileGeneration: string): Promise<Reply>;
++  profileAction(action: string, key: string, name: string, confirmed: boolean, profile: string): Promise<Reply>;
++  settingsFileAction(action: string, profile: string): Promise<Reply>;
+   dispose(): void;
+ }> {
+   return new Promise((resolve, reject) => {
+@@ -188,6 +193,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
+         resetKeyboardKeys: (form, profile) => new Promise(done => setup.resetKeyboardKeys(form, profile, done)),
+         rendererSetting: (name, value, generation) => new Promise(done => setup.setRendererSetting(name, value, generation, done)),
+         rendererAction: (action, generation) => new Promise(done => setup.rendererAction(action, generation, done)),
++        profileAction: (action, key, name, confirmed, profile) => new Promise(done => setup.profileAction(action, key, name, confirmed, profile, done)),
++        settingsFileAction: (action, profile) => new Promise(done => setup.settingsFileAction(action, profile, done)),
+         dispose() {
+           setup.stateChanged.disconnect(update);
+           window.removeEventListener('pageshow', refresh);
+diff --git a/gui/web/src/settings.ts b/gui/web/src/settings.ts
+index 8b9bab80..02d8bb05 100644
+--- a/gui/web/src/settings.ts
++++ b/gui/web/src/settings.ts
+@@ -172,3 +172,11 @@ export const colorMappingSettings: Setting[] = [
+   {"key": "placeboToneMappingContrastRecovery", "label": "Contrast Recovery", "group": "Tone-mapping 3", "description": "Recover contrast after tone mapping.", "defaultLabel": "0.30", "category": "Color mapping", "min": 0.0, "max": 2.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
+   {"key": "placeboToneMappingContrastSmoothness", "label": "Contrast Smoothness", "group": "Tone-mapping 3", "description": "Set contrast recovery smoothing.", "defaultLabel": "3.5", "category": "Color mapping", "min": 1.0, "max": 32.0, "step": 0.1, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]}
+ ];
++
++export const profileSettings: Setting[] = [
++  { key: 'logSanitize', category: 'General', group: 'Privacy and logs', label: 'Sanitize logs', description: 'Hide private values in application logs.', defaultLabel: 'On' },
++  { key: 'logVerbose', category: 'General', group: 'Privacy and logs', label: 'Verbose logging', description: 'Include detailed messages in application logs.', defaultLabel: 'Off' },
++  { key: 'exportSettings', category: 'Profiles', group: 'Settings files', label: 'Export settings to file', description: 'Export the current profile through the native file dialog.', defaultLabel: '', action: true },
++  { key: 'importSettings', category: 'Profiles', group: 'Settings files', label: 'Import settings from file', description: 'Replace the profile named in a valid settings file. Invalid files keep your settings.', defaultLabel: '', action: true },
++  { key: 'openLogDirectory', category: 'General', group: 'Privacy and logs', label: 'Open log directory', description: 'Open the folder that contains application logs.', defaultLabel: '', action: true },
++];
