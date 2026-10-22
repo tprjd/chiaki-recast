@@ -4,7 +4,7 @@
 
 **Blocked by:** None (can start immediately).
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 3, 4, 78, 79, 83, 86, 87, 88.
 
