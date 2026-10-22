@@ -42,7 +42,7 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [21: macOS package](issues/21-macos-web-native-package.md): claimed after ticket 04. Source and package workflow checks are available; native Mac build, signing, and hardware acceptance are unavailable on this host.
 - [09: Automatic PSN registration](issues/09-automatic-psn-registration.md): resolved. Independent automatic action, current target guards, native save-once completion, hidden resource preparation, native progress/retry/cancel, and cleanup before playback are verified. The carried local-DUID manual context case is verified. All ten automatic rows and affected manual form/progress pass across the final groups. Latest controller integration is merged; bounded source checks preserve valid passes. [Verification](evidence/ticket09/verification.md) records identities and limits. Live services, physical input/focus, graphics, packages, and the combined chooser remain in ticket 23.
 - [10: Wake and auto-connect](issues/10-wake-and-auto-connect.md): claimed after ticket 08.
-- [22: Session and setup recovery](issues/22-session-and-setup-recovery.md): ready after ticket 08.
+- [22: Session and setup recovery](issues/22-session-and-setup-recovery.md): claimed after ticket 08.
 - Remaining tickets wait for their declared blockers.
 
 ## Integration history
