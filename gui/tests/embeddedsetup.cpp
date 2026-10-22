@@ -1388,7 +1388,8 @@ private slots:
         auto discovery = controlledDiscovery();
         discovery.wakeup = [&](ChiakiLog *, ChiakiDiscovery *, const char *, uint64_t, bool) { ++wakes; return CHIAKI_ERR_SUCCESS; };
         Settings startupSettings(profile);
-        QmlNativeServices services(&startupSettings, transport, {}, {}, discovery);
+        RegistrationTransport registration;
+        QmlNativeServices services(&startupSettings, transport, [](const QString &, const QStringList &) { return false; }, registration.boundary(), discovery);
         auto *backend = services.backend();
         ApplicationController controller(&services);
         const auto releaseOnExit = qScopeGuard([&] { release.release(); listRelease.release(); });
@@ -4665,7 +4666,9 @@ private slots:
         settings.SetAddSteamShortcutAsk(false);
         settings.SetPlaceboPreset(PlaceboPreset::Fast);
         settings.SetManualHost(ManualHost(-1, "private.example", false, {}));
-        QmlNativeServices services(&settings);
+        QList<QPointer<PsnReply>> requests;
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, controlledPsn(requests), [](const QString &, const QStringList &) { return false; }, registration.boundary(), controlledDiscovery());
         services.backend()->stopAutoConnect();
         services.backend()->setDiscoveryEnabled(false);
         SetupWindow setup(services.backend());
@@ -4793,6 +4796,8 @@ private slots:
             QTRY_VERIFY(!backend->discoveryEnabled());
             QVERIFY(setup.view()->grab().save(evidence.filePath(QString("setup-restored-%1.png").arg(pass))));
         }
+        QVERIFY(requests.isEmpty());
+        QVERIFY(registration.requests.isEmpty());
     }
 
     void videoAudioSettings()

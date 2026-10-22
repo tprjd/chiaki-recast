@@ -1,0 +1,14 @@
+[
+  {
+    "url": "https://github.com/qt/qtwebengine/blob/v6.9.3/src/core/web_engine_context.cpp#L961",
+    "sha256": "9563d8465c1a2a20b19a85906e42cc12765737d60c616ae42113937e86fe31c8"
+  },
+  {
+    "url": "https://github.com/qt/qtwebengine/blob/v6.9.3/src/core/process_main.cpp#L24",
+    "sha256": "1e065811ead31cfa7d3f9eeb7856ba05b4b39fd1685082e4791a183c7087cf39"
+  },
+  {
+    "url": "https://github.com/qt/qtwebengine/blob/v6.9.3/src/core/doc/src/qtwebengine-platform-notes.qdoc.in",
+    "sha256": "cb6abc7c0876c56115e6635493014225ca934e8bba4982f0f30b3fc6e3143dab"
+  }
+]
