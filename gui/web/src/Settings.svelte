@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tick, onMount } from 'svelte';
-  import { generalSettings } from './settings';
+  import { generalSettings, mediaSettings } from './settings';
   import SettingField from './SettingField.svelte';
   import type { State, connectSetup } from './bridge';
   let { current, connection, close, t }: {
@@ -8,28 +8,38 @@
     close: () => void; t: (text: string) => string;
   } = $props();
   let query = $state('');
+  let category = $state('General');
   let message = $state('');
   let pending = $state(false);
   let search: HTMLInputElement;
-  const fields = $derived(generalSettings.filter(field => Object.hasOwn(current.generalSettings, field.key)));
-  const groups = $derived([...new Set(fields.map(field => field.group))]);
+  const values = $derived({ ...current.generalSettings, ...current.mediaSettings });
+  const fields = $derived([...generalSettings, ...mediaSettings].filter(field => Object.hasOwn(values, field.key)).map(field => {
+    const choices = current.mediaChoices[field.key];
+    if (field.key.startsWith('bitrate')) return { ...field, automatic: [0, 2, 6, 10, 15][Number(values[`resolution${field.key.slice(7)}`])] };
+    return choices ? { ...field, options: choices.map(choice => choice.label), optionValues: choices.map(choice => choice.value) } : field;
+  }));
+  const categories = ['General', 'Video', 'Stream', 'Audio/Wifi'];
+  const visibleFields = $derived(fields.filter(field => (field.category ?? 'General') === category));
+  const groups = $derived([...new Set(visibleFields.map(field => field.group))]);
   const results = $derived(fields.filter(field => query.trim().toLocaleLowerCase().split(/\s+/)
-    .every(term => `${t('General')} ${t(field.group)} ${t(field.label)} ${t(field.description)}`.toLocaleLowerCase().includes(term))));
+    .every(term => `${t(field.category ?? 'General')} ${t(field.group)} ${t(field.label)} ${t(field.description)}`.toLocaleLowerCase().includes(term))));
   onMount(() => { document.getElementById('disconnectAction')?.focus(); });
 
   async function reveal(key: string, requires?: string) {
     query = '';
+    category = fields.find(field => field.key === key)?.category ?? 'General';
+    if (category === 'Audio/Wifi') connection.refreshAudioDevices();
     await tick();
-    const target = document.getElementById(requires && !current.generalSettings[requires] ? requires : key);
+    const field = fields.find(field => field.key === key);
+    const target = document.getElementById(requires && !values[requires] ? requires : field?.requiresValue && values[field.requiresValue.key] !== field.requiresValue.value ? field.requiresValue.key : key);
     target?.focus();
     target?.scrollIntoView({ block: 'nearest' });
   }
-  async function change(key: string, value: boolean | number) {
+  async function change(key: string, value: boolean | number | string, generation = current.profileGeneration) {
     if (pending) return;
-    const generation = current.profileGeneration;
     pending = true;
     try {
-      const reply = await connection.generalSetting(key, value, generation);
+      const reply = await (Object.hasOwn(current.generalSettings, key) ? connection.generalSetting(key, value as boolean | number, generation) : connection.mediaSetting(key, value, generation));
       message = reply.accepted ? t('Saved') : reply.message ?? t('The setting could not be saved.');
     } catch {
       message = t('The setting could not be saved.');
@@ -44,7 +54,7 @@
     } else if (event.key === 'PageDown' && event.target === search) {
       event.preventDefault();
       if (query) document.querySelector<HTMLButtonElement>('.settings-results button')?.focus();
-      else document.getElementById('disconnectAction')?.focus();
+      else document.getElementById(visibleFields[0]?.key)?.focus();
     }
   }
 </script>
@@ -60,7 +70,9 @@
 </label>
 <div class="settings-layout">
   <nav class="category-nav" aria-label={t('Settings categories')}>
-    <button aria-current="page" onclick={() => reveal('disconnectAction')}>{t('General')}</button>
+    {#each categories as item}
+      <button aria-current={category === item ? 'page' : undefined} onclick={() => { category = item; query = ''; if (item === 'Audio/Wifi') connection.refreshAudioDevices(); }}>{t(item)}</button>
+    {/each}
   </nav>
   <div class="settings-content">
     {#if query.trim()}
@@ -68,25 +80,29 @@
         <h2>{t('Search results')}</h2>
         <p role="status">{results.length ? `${results.length} ${t('settings found')}` : t('No matching settings')}</p>
         {#each results as field}
-          <button onclick={() => reveal(field.key, field.requires)}><strong>{t(field.label)}</strong><span>{t('General')} / {t(field.group)}</span></button>
+          <button onclick={() => reveal(field.key, field.requires)}><strong>{t(field.label)}</strong><span>{t(field.category ?? 'General')} / {t(field.group)}</span></button>
         {/each}
       </section>
     {:else}
-      <h2>{t('General')}</h2>
+      <h2>{t(category)}</h2>
       <p class="settings-note">{t('Changes are saved automatically.')}</p>
+      {#if category !== 'General'}<p class="settings-note">{t('Stream settings apply to the next session. Audio volume also changes the current session.')}</p>{/if}
+      {#if category === 'Audio/Wifi'}<button disabled={pending} onclick={() => connection.refreshAudioDevices()}>{t('Refresh audio devices')}</button>{/if}
+      {#key current.profileGeneration}
       {#each groups as group}
         <section class="settings-group" aria-label={t(group)}>
           <h3>{t(group)}</h3>
           <div class="setting-rows">
-            {#each fields.filter(field => field.group === group) as field (field.key)}
-              {#if !field.requires || current.generalSettings[field.requires]}
-                <SettingField {field} value={current.generalSettings[field.key]} disabled={pending}
-                  change={value => change(field.key, value)} {t} />
+            {#each visibleFields.filter(field => field.group === group) as field (field.key)}
+              {#if (!field.requires || values[field.requires]) && (!field.requiresValue || values[field.requiresValue.key] === field.requiresValue.value)}
+                <SettingField {field} value={values[field.key]} disabled={pending}
+                  generation={current.profileGeneration} change={(value, generation) => change(field.key, value, generation)} {t} />
               {/if}
             {/each}
           </div>
         </section>
       {/each}
+      {/key}
     {/if}
     <p class="settings-message" role="status">{message}</p>
   </div>
