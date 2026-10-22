@@ -1,0 +1,31 @@
+c7a5c7d155b90692bac096461671221f32575d04
+737e75141d044e72a8ba83e7f7fd008d87cd2b58
+
+Algorithm : SHA256
+Hash      : B9C2C0CE404889562374D9E284FD4B2F1A334DA1AC30FC580CFF6A501FE9FCED
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\src\setupbridge.cpp
+
+Algorithm : SHA256
+Hash      : 7C9A16590E61D3C4F29743F6FD50ABC5B11B4DC02D126A46C8500F0CA6C1C71B
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\web\src\Pairing.svelte
+
+Algorithm : SHA256
+Hash      : 78F9155009C594CE1C9C0AAFD8A18874DCF33F5A0E07FA40C7D6960A691B94A8
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp
+
+Algorithm : SHA256
+Hash      : 6D79A9A167153B2A5050176C0564FA01F4F3C2D8E4ADA8DDC4720D2BA0DE7E52
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\chiaki-embedded-setup-tests.exe
+
+Algorithm : SHA256
+Hash      : C8C00333324594CB250D62123408F160005358D96817AB1D44B6EF7D98C62B8B
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\web\app.js
+
+Algorithm : SHA256
+Hash      : BA2A32BA00581C7EE60CA0947C58D11741A119DA4DB43F41F059CD208A53BA92
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\web\app.css
+
+ M gui/tests/README.md
+ m third-party/gf-complete
+?? .scratch/web-ui-migration/evidence/ticket07/
+?? embedded-manual.png

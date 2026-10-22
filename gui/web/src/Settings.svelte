@@ -3,7 +3,7 @@
   import KeyboardMouse from './KeyboardMouse.svelte';
   import Controllers from './Controllers.svelte';
   import { moveFocus } from './navigation';
-  import { generalSettings, mediaSettings, rendererSettings, keyboardMouseSettings, controllerSettings } from './settings';
+  import { generalSettings, mediaSettings, rendererSettings, colorMappingSettings, settingConditionMet, keyboardMouseSettings, controllerSettings } from './settings';
   import SettingField from './SettingField.svelte';
   import type { State, connectSetup } from './bridge';
   let { current, connection, close, t }: {
@@ -18,7 +18,7 @@
   let controllerTarget = $state('');
   let search: HTMLInputElement;
   const values = $derived({ ...current.generalSettings, ...current.mediaSettings, ...current.rendererSettings, ...current.keyboardMouse.values, ...current.controllerSetup.values });
-  const fields = $derived([...generalSettings, ...mediaSettings, ...rendererSettings, ...controllerSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
+  const fields = $derived([...generalSettings, ...mediaSettings, ...rendererSettings, ...colorMappingSettings, ...controllerSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
     const choices = current.mediaChoices[field.key];
     if (field.key.startsWith('bitrate')) return { ...field, automatic: [0, 2, 6, 10, 15][Number(values[`resolution${field.key.slice(7)}`])] };
     return choices ? { ...field, options: choices.map(choice => choice.label), optionValues: choices.map(choice => choice.value) } : field;
@@ -40,19 +40,21 @@
 
   async function reveal(key: string, requires?: string) {
     query = '';
-    category = searchFields.find(field => field.key === key)?.category ?? 'General';
+    const field = fields.find(field => field.key === key);
+    const unmet = field?.when?.find(condition => !settingConditionMet(condition, values));
+    const focusKey = unmet?.key ?? key;
+    category = searchFields.find(field => field.key === focusKey)?.category ?? 'General';
     controllerTarget = key;
     keyboardMouseTarget = requires && !values[requires] ? requires
       : category === 'Keyboard and mouse' && values.mouseCameraEnabled && (key.startsWith('keyMapping') || ['keyboardEnabled', 'mouseTouchEnabled', 'resetAllKeys'].includes(key)) ? 'mouseCameraEnabled' : key;
     if (category === 'Audio/Wifi') connection.refreshAudioDevices();
     await tick();
-    const field = fields.find(field => field.key === key);
-    const unmet = field?.when?.find(condition => values[condition.key] !== condition.value);
     const target = document.getElementById(unmet ? unmet.key : requires && !values[requires] ? requires : field?.requiresValue && values[field.requiresValue.key] !== field.requiresValue.value ? field.requiresValue.key : key);
     target?.focus();
     target?.scrollIntoView({ block: 'nearest' });
   }
   async function change(key: string, value: boolean | number | string, generation = current.profileGeneration) {
+    if (key === 'openPlaceboColorMapping') { await reveal('placeboGamutMappingFunction'); return; }
     if (pending) return;
     pending = true;
     try {
@@ -69,7 +71,7 @@
     moveFocus(event, document.querySelector('[data-setup-panel]')!);
     if (event.key === 'Escape') {
       event.preventDefault();
-      if (query) { query = ''; search.focus(); } else close();
+      if (query) { query = ''; search.focus(); } else if (category === 'Color mapping') reveal('openPlaceboColorMapping'); else close();
     } else if (event.key === 'PageUp') {
       event.preventDefault(); search.focus();
     } else if (event.key === 'PageDown') {
@@ -110,6 +112,13 @@
     {:else}
       <h2>{t(category)}</h2>
       <p class="settings-note">{t('Changes are saved automatically.')}</p>
+      {#if category === 'Color mapping'}
+        <button class="back-consoles" id="backRenderer" onclick={() => reveal('openPlaceboColorMapping')}>{t('Back to Renderer')}</button>
+        {#if values.videoPreset !== 5 || !values.placeboColorMappingEnabled || values.placeboColorMappingPreset !== 0}
+          <p>{t('Requires the Custom render preset, Color Mapping Enabled, and the Custom color mapping preset in Renderer.')}</p>
+          <button class="back-consoles" onclick={() => reveal('openPlaceboColorMapping')}>{t('Configure color mapping in Renderer')}</button>
+        {/if}
+      {/if}
       {#if ['Video', 'Stream', 'Audio/Wifi'].includes(category)}<p class="settings-note">{t('Stream settings apply to the next session. Audio volume also changes the current session.')}</p>{/if}
       {#if category === 'Renderer'}
         <p data-renderer-runtime>{current.rendererStatus.runtimeBackend === undefined ? t('No native stream window is active.') : `${t('Active native renderer')}: ${current.rendererStatus.runtimeBackend === 0 ? 'Vulkan' : 'OpenGL'}`}</p>
@@ -129,7 +138,7 @@
           <h3>{t(group)}</h3>
           <div class="setting-rows">
             {#each visibleFields.filter(field => field.group === group) as field (field.key)}
-              {#if (!field.requires || values[field.requires]) && (!field.requiresValue || values[field.requiresValue.key] === field.requiresValue.value) && (!field.when || field.when.every(condition => values[condition.key] === condition.value))}
+              {#if (!field.requires || values[field.requires]) && (!field.requiresValue || values[field.requiresValue.key] === field.requiresValue.value) && (!field.when || field.when.every(condition => settingConditionMet(condition, values)))}
                 <SettingField {field} value={values[field.key] ?? false} disabled={pending}
                   generation={current.profileGeneration} change={(value, generation) => change(field.key, value, generation)} {t} />
               {/if}

@@ -8,6 +8,7 @@
 #include <QGuiApplication>
 #include <QWindow>
 #include <QWidget>
+#include <QApplication>
 
 static QVector<QPair<uint32_t, Qt::Key>> key_map = {
     { CHIAKI_CONTROLLER_BUTTON_DPAD_UP, Qt::Key_Up },
@@ -138,6 +139,7 @@ void QmlController::sendKey(Qt::Key key, Qt::KeyboardModifiers modifiers)
 {
     auto *native_window = qobject_cast<QWindow *>(target.data());
     auto *widget = qobject_cast<QWidget *>(target.data());
+    if (widget && QApplication::activeModalWidget()) widget = QApplication::activeModalWidget();
     QObject *receiver = widget && widget->isVisible() ? static_cast<QObject *>(widget->focusWidget())
         : native_window && native_window->isVisible() ? native_window : QGuiApplication::focusWindow();
     if (widget && !receiver) receiver = widget->focusProxy() ? widget->focusProxy() : widget;

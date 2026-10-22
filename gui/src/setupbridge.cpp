@@ -25,6 +25,8 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, &SetupBridge::refresh);
     connect(backend->qmlSettings(), &QmlSettings::currentProfileChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::psnAuthAttemptChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::registrationAttemptChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::accountLookupChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::psnRefreshChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::psnTokenChanged, this, [this] { credentialsRejected = false; refresh(); });
     connect(backend, &QmlBackend::psnCredsExpired, this, [this] { credentialsRejected = true; refresh(); });
@@ -257,7 +259,117 @@ void SetupBridge::refresh()
         }
     }
     QVariantMap strings;
-    const char *texts[] = {QT_TR_NOOP("Consoles"), QT_TR_NOOP("Search consoles"), QT_TR_NOOP("Discovery"), QT_TR_NOOP("Discovery is on"), QT_TR_NOOP("Discovery is off"),
+    const char *colorParentTexts[] = {
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping Enabled:"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Checked"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping Preset:"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Custom"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Default"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "High Quality"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping Settings:")};
+    for(const auto *text : colorParentTexts) {
+        auto key = QString::fromUtf8(text);
+        if(key.endsWith(':')) key.chop(1);
+        strings.insert(key, QCoreApplication::translate("PlaceboSettingsDialog", text));
+    }
+    const char *colorDetailTexts[] = {
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Mapping Function:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Mapping 1"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Clip"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Perceptual"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Soft Clip"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Relative"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Saturation"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Absolute"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Desaturate"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Darken"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Highlight"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Linear"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Perceptual Deadzone:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Perceptual Strength:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Colorimetric Gamma:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Soft Clip Knee:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Soft Clip Desaturation:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Size I:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Mapping 2"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Size C:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Size h:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Tricubic Enabled:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Unchecked"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Expansion Enabled:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping Function:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping 1"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Spline"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "St2094-40"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "St-2094-10"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Bt2390"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Bt2446a"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Reinhard"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Mobius"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Hable"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamma"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Linear Light"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Adaptation:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Minimum:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Maximum:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Default:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Offset:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Slope Tuning:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping 2"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Slope Offset:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Spline Contrast:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Reinhard Contrast:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Linear Knee:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Exposure:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Inverse Tone-mapping Enabled:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping 3"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping Metadata:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Any"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "None"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "HDR10"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "HDR10 Plus"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Cie_y"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone LUT Size:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Contrast Recovery:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Contrast Smoothness:")};
+    for(const auto *text : colorDetailTexts) {
+        auto key = QString::fromUtf8(text);
+        if(key.endsWith(':')) key.chop(1);
+        strings.insert(key, QCoreApplication::translate("PlaceboColorMappingDialog", text));
+    }
+    const char *colorSearchTexts[] = {
+        QT_TRANSLATE_NOOP("SettingsSearch", "Choose how out-of-gamut colors are mapped."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the deadzone. Requires the Perceptual gamut function."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set mapping strength. Requires the Perceptual gamut function."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set gamma. Requires Relative, Absolute or Darken gamut mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the knee. Requires Perceptual or Soft Clip gamut mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set desaturation. Requires Soft Clip gamut mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the intensity dimension of the gamut lookup table."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the chroma dimension of the gamut lookup table."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the hue dimension of the gamut lookup table."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Use tricubic gamut lookup interpolation."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Allow the output color gamut to expand."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Choose the algorithm for mapping display brightness."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set knee adaptation. Requires Spline or ST 2094 tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the minimum knee. Requires Spline or ST 2094 tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the maximum knee. Requires Spline or ST 2094 tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the default knee."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set knee offset. Requires BT.2390 tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Tune the slope. Requires Spline tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set slope offset. Requires Spline tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set spline contrast. Requires Spline tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set contrast. Requires Reinhard tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the linear knee. Requires Mobius or Gamma tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set exposure. Requires Linear or Linear Light tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Expand SDR brightness to HDR."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Choose the HDR metadata source."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set tone mapping lookup table precision."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Recover contrast after tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set contrast recovery smoothing.")};
+    for(const auto *text : colorSearchTexts) strings.insert(QString::fromUtf8(text), QCoreApplication::translate("SettingsSearch", text));
+    const char *texts[] = {QT_TR_NOOP("Back to Renderer"), QT_TR_NOOP("Configure color mapping in Renderer"),
+        QT_TR_NOOP("Requires the Custom render preset, Color Mapping Enabled, and the Custom color mapping preset in Renderer."), QT_TR_NOOP("Consoles"), QT_TR_NOOP("Search consoles"), QT_TR_NOOP("Discovery"), QT_TR_NOOP("Discovery is on"), QT_TR_NOOP("Discovery is off"),
         QT_TR_NOOP("No consoles found"), QT_TR_NOOP("No matching consoles"), QT_TR_NOOP("Turn on discovery to find consoles on your local network."),
         QT_TR_NOOP("Online"), QT_TR_NOOP("In standby"), QT_TR_NOOP("Status unknown"), QT_TR_NOOP("Not registered"), QT_TR_NOOP("Local network"), QT_TR_NOOP("Manual address"),
         QT_TR_NOOP("Remote connection via PSN"), QT_TR_NOOP("Console"), QT_TR_NOOP("Console unavailable"), QT_TR_NOOP("Selected"), QT_TR_NOOP("Loading consoles"), QT_TR_NOOP("Setup unavailable"), QT_TR_NOOP("Connect"), QT_TR_NOOP("Dismiss"),
@@ -323,6 +435,52 @@ void SetupBridge::refresh()
         QT_TR_NOOP("Use an existing registration, or register when you first connect. Saving an address does not pair the console or start a connection.")};
     for (const auto *text : managementTexts) strings.insert(QString::fromUtf8(text), tr(text));
     for (const auto *text : texts) strings.insert(QString::fromUtf8(text), tr(text));
+    const char *registrationTexts[] = {
+        QT_TR_NOOP("Register console"),
+        QT_TR_NOOP("View registration progress"),
+        QT_TR_NOOP("Register selected console"),
+        QT_TR_NOOP("Console and firmware"),
+        QT_TR_NOOP("PS4 firmware before 7.0"),
+        QT_TR_NOOP("PS4 firmware 7.0 to before 8.0"),
+        QT_TR_NOOP("PS4 firmware 8.0 or later"),
+        QT_TR_NOOP("Console address"),
+        QT_TR_NOOP("Use an IP address, hostname, or 255.255.255.255 for local broadcast."),
+        QT_TR_NOOP("PSN Online ID"),
+        QT_TR_NOOP("PSN Account ID in Base64"),
+        QT_TR_NOOP("Use your Account ID encoded as Base64. This is different from your PSN username."),
+        QT_TR_NOOP("Use saved Account ID"),
+        QT_TR_NOOP("Public lookup"),
+        QT_TR_NOOP("PSN sign-in"),
+        QT_TR_NOOP("Remote Play pairing code"),
+        QT_TR_NOOP("Console login PIN, optional"),
+        QT_TR_NOOP("Get your pairing code"),
+        QT_TR_NOOP("Use the same PlayStation Network account as the user signed in on your console."),
+        QT_TR_NOOP("Open Settings, System, then Remote Play. Enable Remote Play and select Link Device."),
+        QT_TR_NOOP("Open Settings, then Remote Play Connection Settings. Enable Remote Play and select Add Device."),
+        QT_TR_NOOP("Keep your console on and connected to your network. Enter the eight-digit code before it expires."),
+        QT_TR_NOOP("The Remote Play pairing code pairs the console. The optional console login PIN signs in to your console user."),
+        QT_TR_NOOP("Registering console"),
+        QT_TR_NOOP("Console registered"),
+        QT_TR_NOOP("Registration failed"),
+        QT_TR_NOOP("Address hidden"),
+        QT_TR_NOOP("Waiting for the console. Keep it on and connected to your network."),
+        QT_TR_NOOP("Closing this screen does not cancel registration. The operation can continue in the background."),
+        QT_TR_NOOP("Correct details and retry"),
+        QT_TR_NOOP("Diagnostics are hidden in streamer mode."),
+        QT_TR_NOOP("Hide diagnostics"),
+        QT_TR_NOOP("Show diagnostics"),
+        QT_TR_NOOP("Close"),
+        QT_TR_NOOP("Find a public Account ID"),
+        QT_TR_NOOP("This sends your PSN username to the third-party service psn.flipscreen.games. Your PSN privacy settings must allow anyone to find you in search. Public lookup retrieves your Account ID. It does not sign you in or save authentication credentials."),
+        QT_TR_NOOP("PSN username"),
+        QT_TR_NOOP("Retry lookup"),
+        QT_TR_NOOP("Find Account ID"),
+        QT_TR_NOOP("Cancel"),
+        QT_TR_NOOP("The profile changed. Close this screen and open registration again."),
+        QT_TR_NOOP("Registration did not start. Check your details and try again."),
+        QT_TR_NOOP("The registration context changed. Open registration again."),
+        QT_TR_NOOP("No valid saved Account ID is available.")};
+    for (const auto *text : registrationTexts) strings.insert(QString::fromUtf8(text), tr(text));
     const auto *native = backend->nativeSettings();
     const bool configured = !native->GetPsnAuthToken().isEmpty() && !native->GetPsnRefreshToken().isEmpty()
         && !native->GetPsnAccountId().isEmpty();
@@ -464,13 +622,69 @@ void SetupBridge::refresh()
         {"placeboPeakDetectionSceneThresholdHigh", settings->placeboPeakDetectionSceneThresholdHigh()},
         {"placeboPeakDetectionPeakPercentile", settings->placeboPeakDetectionPeakPercentile()},
         {"placeboPeakDetectionBlackCutoff", settings->placeboPeakDetectionBlackCutoff()},
-        {"placeboPeakDetectionAllowDelayedPeak", settings->placeboPeakDetectionAllowDelayedPeak()}};
+        {"placeboPeakDetectionAllowDelayedPeak", settings->placeboPeakDetectionAllowDelayedPeak()},
+        {"placeboColorMappingEnabled", settings->placeboColorMappingEnabled()},
+        {"placeboColorMappingPreset", settings->placeboColorMappingPreset()},
+        {"placeboGamutMappingFunction", settings->placeboGamutMappingFunction()},
+        {"placeboGamutMappingPerceptualDeadzone", settings->placeboGamutMappingPerceptualDeadzone()},
+        {"placeboGamutMappingPerceptualStrength", settings->placeboGamutMappingPerceptualStrength()},
+        {"placeboGamutMappingColorimetricGamma", settings->placeboGamutMappingColorimetricGamma()},
+        {"placeboGamutMappingSoftClipKnee", settings->placeboGamutMappingSoftClipKnee()},
+        {"placeboGamutMappingSoftClipDesat", settings->placeboGamutMappingSoftClipDesat()},
+        {"placeboGamutMappingLut3dSizeI", settings->placeboGamutMappingLut3dSizeI()},
+        {"placeboGamutMappingLut3dSizeC", settings->placeboGamutMappingLut3dSizeC()},
+        {"placeboGamutMappingLut3dSizeH", settings->placeboGamutMappingLut3dSizeH()},
+        {"placeboGamutMappingLut3dTricubicEnabled", settings->placeboGamutMappingLut3dTricubicEnabled()},
+        {"placeboGamutMappingGamutExpansionEnabled", settings->placeboGamutMappingGamutExpansionEnabled()},
+        {"placeboToneMappingFunction", settings->placeboToneMappingFunction()},
+        {"placeboToneMappingKneeAdaptation", settings->placeboToneMappingKneeAdaptation()},
+        {"placeboToneMappingKneeMinimum", settings->placeboToneMappingKneeMinimum()},
+        {"placeboToneMappingKneeMaximum", settings->placeboToneMappingKneeMaximum()},
+        {"placeboToneMappingKneeDefault", settings->placeboToneMappingKneeDefault()},
+        {"placeboToneMappingKneeOffset", settings->placeboToneMappingKneeOffset()},
+        {"placeboToneMappingSlopeTuning", settings->placeboToneMappingSlopeTuning()},
+        {"placeboToneMappingSlopeOffset", settings->placeboToneMappingSlopeOffset()},
+        {"placeboToneMappingSplineContrast", settings->placeboToneMappingSplineContrast()},
+        {"placeboToneMappingReinhardContrast", settings->placeboToneMappingReinhardContrast()},
+        {"placeboToneMappingLinearKnee", settings->placeboToneMappingLinearKnee()},
+        {"placeboToneMappingExposure", settings->placeboToneMappingExposure()},
+        {"placeboToneMappingInverseToneMappingEnabled", settings->placeboToneMappingInverseToneMappingEnabled()},
+        {"placeboToneMappingMetadata", settings->placeboToneMappingMetadata()},
+        {"placeboToneMappingToneLutSize", settings->placeboToneMappingToneLutSize()},
+        {"placeboToneMappingContrastRecovery", settings->placeboToneMappingContrastRecovery()},
+        {"placeboToneMappingContrastSmoothness", settings->placeboToneMappingContrastSmoothness()}};
     renderer.insert("targetPeakChoice", settings->displayTargetPeak() == 0 ? 0 : 1);
     renderer.insert("targetContrastChoice", settings->displayTargetContrast() == 0 ? 0 : settings->displayTargetContrast() == -1 ? 1 : 2);
     const auto *window = backend->qmlWindow();
     QVariantMap rendererStatus{{"restartRequired", settings->rendererBackend() != startupRendererBackend
         || (startupRendererBackend == 1 && settings->vSyncEnabled() != startupVSync)}};
     if(window) rendererStatus.insert("runtimeBackend", window->runtimeRendererBackend());
+    QVariantMap registration{{"busy", backend->registrationBusy()}, {"savedAccount", !native->GetPsnAccountId().isEmpty()}};
+    if (registrationContextId == registrationAttemptContext && !registrationContextId.isEmpty()) {
+        const auto attempt = backend->registrationAttempt();
+        registration["context"] = registrationContextId;
+        for (const auto &field : {"id", "phase", "message", "profileValid"})
+            if (attempt.contains(field)) registration[field] = attempt.value(field);
+        registration["diagnostics"] = privateMode ? QString() : attempt.value("diagnostics").toString();
+        if (attempt.value("phase") == "success" && attempt.value("profileValid").toBool()) {
+            for (const auto &value : hosts) {
+                const auto host = value.toMap();
+                if (host.value("mac") == attempt.value("resultMac") && host.value("address") == attempt.value("resultAddress")
+                    && host.value("registered").toBool()) {
+                    registration["connectKey"] = keys.value(identity(host));
+                    break;
+                }
+            }
+        }
+    }
+    QVariantMap lookup;
+    if (!accountRouteId.isEmpty() && accountSource == "lookup" && registrationAccountCurrent(registrationContextId, accountRouteId)) {
+        const auto attempt = backend->accountLookupAttempt();
+        lookup = {{"route", accountRouteId}};
+        if (attempt.value("id") == accountRequest)
+            for (const auto &field : {"id", "phase", "message"})
+                if (attempt.contains(field)) lookup[field] = attempt.value(field);
+    }
     const auto nativeAttempt = backend->connectionAttempt();
     QVariantMap connection;
     if (nativeAttempt.value("route") == "psn" && !backend->qmlWindow() && nativeAttempt.value("presented").toBool()) {
@@ -484,7 +698,7 @@ void SetupBridge::refresh()
         && phase != "failure" && phase != "cancelled" && phase != "registered";
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
         {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
-        {"streamerMode", privateMode}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
+        {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
             || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
     if (!suspended) emit stateChanged(state);
 }
@@ -639,6 +853,126 @@ QVariantMap SetupBridge::connectConsole(const QString &key)
     selectedKey = key;
     backend->connectToHost(index, nickname);
     return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::openRegistration(const QString &key, const QString &profile)
+{
+    if (!currentProfile(profile)) return {{"accepted", false}, {"message", tr("The profile changed. Open registration again.")}};
+    if (backend->registrationBusy()) {
+        if (registrationContextId.isEmpty() || registrationContext.value("profileGeneration").toULongLong() != backend->profileGeneration())
+            return {{"accepted", false}, {"message", tr("Wait for the current registration to finish before starting another request.")}};
+    } else {
+        int index = -1;
+        QString nickname;
+        if (!key.isEmpty() && !resolveConsole(key, index, nickname))
+            return {{"accepted", false}, {"message", tr("Console unavailable")}};
+        backend->cancelAccountLookup(accountRequest);
+        accountRouteId.clear();
+        accountRequest.clear();
+        registrationContext = backend->createRegistrationContext(index);
+        if (registrationContext.isEmpty()) return {{"accepted", false}, {"message", tr("Select a local console or enter its address.")}};
+        registrationContextId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        registrationAddress = registrationContext.value("address", "255.255.255.255").toString();
+        refresh();
+    }
+    return {{"accepted", true}, {"context", registrationContextId}, {"address", registrationAddress},
+        {"ps5", registrationContext.value("ps5", true)}};
+}
+
+QVariantMap SetupBridge::submitRegistration(const QString &context, const QVariantMap &fields)
+{
+    if (context.isEmpty() || context != registrationContextId || backend->registrationBusy()
+        || registrationContext.value("profileGeneration").toULongLong() != backend->profileGeneration())
+        return {{"accepted", false}, {"message", tr("The registration context changed. Close this screen and open registration again.")}};
+    for (const auto &field : {"address", "account", "pin", "consolePin"})
+        if (fields.value(field).metaType().id() != QMetaType::QString) return {{"accepted", false}, {"message", tr("Enter text for the address, account, and pairing codes.")}};
+    const auto target = fields.value("target");
+    const double targetNumber = target.toDouble();
+    if (target.metaType().id() == QMetaType::QString || !std::isfinite(targetNumber) || std::floor(targetNumber) != targetNumber)
+        return {{"accepted", false}, {"message", tr("Select a supported console and firmware.")}};
+    const auto address = fields.value("address").toString().trimmed();
+    const auto nativeContext = address == registrationAddress ? registrationContext : backend->createRegistrationContext();
+    const auto previous = backend->registrationAttempt().value("id");
+    registrationAttemptContext = context;
+    const bool accepted = backend->registerHost(address, fields.value("account").toString().trimmed(),
+        fields.value("pin").toString(), fields.value("consolePin").toString(), address == "255.255.255.255",
+        fields.value("target").toInt(), nativeContext);
+    if (backend->registrationAttempt().value("id") == previous) {
+        registrationAttemptContext.clear();
+        refresh();
+        return {{"accepted", false}, {"message", tr("Check the console address, Account ID, and pairing codes. The console or profile can have changed.")}};
+    }
+    registrationContext = nativeContext;
+    registrationAddress = address;
+    refresh();
+    return {{"accepted", accepted}, {"id", backend->registrationAttempt().value("id")}};
+}
+
+bool SetupBridge::registrationAccountCurrent(const QString &context, const QString &route) const
+{
+    return !context.isEmpty() && context == registrationContextId && !route.isEmpty() && route == accountRouteId
+        && registrationContext.value("profileGeneration").toULongLong() == backend->profileGeneration()
+        && backend->registrationContextCurrent(registrationContext, registrationAddress);
+}
+
+QVariantMap SetupBridge::beginRegistrationAccount(const QString &context, const QString &source)
+{
+    if (context.isEmpty() || context != registrationContextId || backend->registrationBusy()
+        || registrationContext.value("profileGeneration").toULongLong() != backend->profileGeneration()
+        || (source != "lookup" && source != "signIn" && source != "saved")) return {{"accepted", false}};
+    backend->cancelAccountLookup(accountRequest);
+    accountRequest.clear();
+    accountSource = source;
+    accountRouteId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    accountAuthBaseline = backend->psnAuthAttempt().value("id").toString();
+    refresh();
+    return {{"accepted", true}, {"route", accountRouteId}};
+}
+
+QVariantMap SetupBridge::lookupRegistrationAccount(const QString &context, const QString &route, const QString &username)
+{
+    if (!registrationAccountCurrent(context, route) || accountSource != "lookup"
+        || (!accountRequest.isEmpty() && backend->accountLookupAttempt().value("phase") == "pending")) return {{"accepted", false}};
+    accountRequest = backend->startAccountLookup(username);
+    refresh();
+    return {{"accepted", true}, {"id", accountRequest}};
+}
+
+QVariantMap SetupBridge::readRegistrationAccount(const QString &context, const QString &route, const QString &request)
+{
+    if (!registrationAccountCurrent(context, route)) return {{"accepted", false}};
+    QString account;
+    if (accountSource == "saved") account = backend->nativeSettings()->GetPsnAccountId();
+    else {
+        const auto attempt = accountSource == "lookup" ? backend->accountLookupAttempt() : backend->psnAuthAttempt();
+        if (request.isEmpty() || attempt.value("id") != request || attempt.value("phase") != "success"
+            || (accountSource == "lookup" ? request != accountRequest : request == accountAuthBaseline || !attempt.value("profileValid").toBool()))
+            return {{"accepted", false}};
+        account = attempt.value("accountId").toString();
+    }
+    const auto bytes = account.toLatin1();
+    const auto decoded = QByteArray::fromBase64Encoding(bytes, QByteArray::AbortOnBase64DecodingErrors);
+    if (!decoded || decoded.decoded.size() != CHIAKI_PSN_ACCOUNT_ID_SIZE || decoded.decoded.toBase64() != bytes)
+        return {{"accepted", false}, {"message", tr("No valid saved Account ID is available. Use public lookup or PSN sign-in.")}};
+    return {{"accepted", true}, {"accountId", account}};
+}
+
+QVariantMap SetupBridge::endRegistrationAccount(const QString &context, const QString &route)
+{
+    if (!registrationAccountCurrent(context, route)) return {{"accepted", false}};
+    accountRouteId.clear();
+    backend->cancelAccountLookup(accountRequest);
+    accountRequest.clear();
+    refresh();
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::connectRegistration(const QString &attempt)
+{
+    const auto registration = state.value("registration").toMap();
+    if (attempt.isEmpty() || registration.value("id") != attempt || registration.value("phase") != "success")
+        return {{"accepted", false}};
+    return connectConsole(registration.value("connectKey").toString());
 }
 
 QVariantMap SetupBridge::refreshPsnConsoles(const QString &profile)
@@ -1143,6 +1477,186 @@ QVariantMap SetupBridge::setRendererSetting(const QString &name, const QVariant 
     const auto type = value.metaType().id();
     const bool numeric = type == QMetaType::Double || type == QMetaType::Int || type == QMetaType::UInt || type == QMetaType::LongLong;
     const auto number = value.toDouble();
+    if(name == "placeboColorMappingEnabled") {
+        if(!(settings->videoPreset() == 5)) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboColorMappingEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboColorMappingPreset") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 2 || std::floor(number) != number) return reject();
+        settings->setPlaceboColorMappingPreset(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingFunction") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 9 || std::floor(number) != number) return reject();
+        settings->setPlaceboGamutMappingFunction(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingPerceptualDeadzone") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 1))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboGamutMappingPerceptualDeadzone(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingPerceptualStrength") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 1))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboGamutMappingPerceptualStrength(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingColorimetricGamma") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 3 || settings->placeboGamutMappingFunction() == 5 || settings->placeboGamutMappingFunction() == 7))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 10.0) return reject();
+        settings->setPlaceboGamutMappingColorimetricGamma(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingSoftClipKnee") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 1 || settings->placeboGamutMappingFunction() == 2))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboGamutMappingSoftClipKnee(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingSoftClipDesat") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 2))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboGamutMappingSoftClipDesat(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingLut3dSizeI") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1024.0 || std::floor(number) != number) return reject();
+        settings->setPlaceboGamutMappingLut3dSizeI(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingLut3dSizeC") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1024.0 || std::floor(number) != number) return reject();
+        settings->setPlaceboGamutMappingLut3dSizeC(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingLut3dSizeH") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1024.0 || std::floor(number) != number) return reject();
+        settings->setPlaceboGamutMappingLut3dSizeH(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingLut3dTricubicEnabled") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboGamutMappingLut3dTricubicEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingGamutExpansionEnabled") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboGamutMappingGamutExpansionEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingFunction") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 11 || std::floor(number) != number) return reject();
+        settings->setPlaceboToneMappingFunction(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingKneeAdaptation") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1 || settings->placeboToneMappingFunction() == 2 || settings->placeboToneMappingFunction() == 3))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingKneeAdaptation(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingKneeMinimum") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1 || settings->placeboToneMappingFunction() == 2 || settings->placeboToneMappingFunction() == 3))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 0.5) return reject();
+        settings->setPlaceboToneMappingKneeMinimum(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingKneeMaximum") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1 || settings->placeboToneMappingFunction() == 2 || settings->placeboToneMappingFunction() == 3))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.5 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingKneeMaximum(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingKneeDefault") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingKneeDefault(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingKneeOffset") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 4))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.5 || number > 2.0) return reject();
+        settings->setPlaceboToneMappingKneeOffset(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingSlopeTuning") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 10.0) return reject();
+        settings->setPlaceboToneMappingSlopeTuning(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingSlopeOffset") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingSlopeOffset(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingSplineContrast") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.5) return reject();
+        settings->setPlaceboToneMappingSplineContrast(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingReinhardContrast") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 6))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingReinhardContrast(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingLinearKnee") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 7 || settings->placeboToneMappingFunction() == 9))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingLinearKnee(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingExposure") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 10 || settings->placeboToneMappingFunction() == 11))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 10.0) return reject();
+        settings->setPlaceboToneMappingExposure(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingInverseToneMappingEnabled") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboToneMappingInverseToneMappingEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingMetadata") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 4 || std::floor(number) != number) return reject();
+        settings->setPlaceboToneMappingMetadata(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingToneLutSize") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 4096.0 || std::floor(number) != number) return reject();
+        settings->setPlaceboToneMappingToneLutSize(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingContrastRecovery") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 2.0) return reject();
+        settings->setPlaceboToneMappingContrastRecovery(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingContrastSmoothness") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 1.0 || number > 32.0) return reject();
+        settings->setPlaceboToneMappingContrastSmoothness(number);
+        return {{"accepted", true}};
+    }
     if(name == "targetPeakChoice") {
         if(!numeric || (number != 0 && number != 1)) return reject();
         settings->setDisplayTargetPeak(number == 0 ? 0 : 1000);
