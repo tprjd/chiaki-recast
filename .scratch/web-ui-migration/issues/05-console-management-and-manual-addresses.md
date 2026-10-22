@@ -60,3 +60,21 @@ does not prove real console playback. Physical focus, controllers, screen
 readers, touch, HDR, sustained media, input latency, platform packages, and
 GPU/default-preset acceptance remain in tickets 19 through 23. No new full
 native decoder or graphics matrix was run for these setup forms.
+
+Integration merge `ef14d52fc2e8ca9638babbc0e3e2bb934b542111` contains worker
+commit `c3bf624c1068820aad4c8f333cab8bad2354cd44` without conflicts.
+The merged tree matches the worker tree. GUI source matches tested merge
+`823cf551b72002b9f0b39cc7ae5dd0705e101ed4`.
+The merger independently verified 19 source hashes, four artifact hashes,
+51 evidence hashes, and all 27 preserved-source comparisons. All three
+captures were inspected. [The integration audit](../evidence/ticket05-integration/audit.json)
+records the comparison hashes. Its adjacent `verify.py` can repeat these checks.
+
+The CSS selector review confirms that ticket 15 keeps its reset dialog
+declarations. The selector uses the existing `reset-keyboard-title` label.
+Ticket 05 dialogs keep their tested styles. Native lifetime, PSN account,
+media, renderer restart, and input capture code retain their integrated behavior.
+The vendor patch remains excluded. Source whitespace checks pass.
+Valid focused results were reused, including saved-PIN result focus 3/0,
+privacy 3/0, and loopback native handoff 3/0. No build or test was repeated.
+Live-console, physical-focus, GPU, and platform acceptance remain open.
