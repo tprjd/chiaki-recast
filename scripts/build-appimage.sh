@@ -18,6 +18,7 @@ export QT_DIR="$(find ${QT_PATH} -maxdepth 1 -type d -name "${QT_VERSION}")"
 export PATH="${QT_DIR}/${GCC_STRING}/bin:$PATH"
 test "$(node --version)" = v24.16.0
 test "$(npm --version)" = 11.13.0
+bash test/linux-package-check.sh
 if [ -f "${HOME}/chiaki-venv/bin/activate" ]
 then
    source "${HOME}/chiaki-venv/bin/activate"
@@ -85,7 +86,7 @@ chmod +x linuxdeploy-${ARCH}.AppImage
 
 export LD_LIBRARY_PATH="${QT_DIR}/${GCC_STRING}/lib:$(pwd)/../build_appimage/third-party/cpp-steam-tools:${LD_LIBRARY_PATH:-}"
 export QML_SOURCES_PATHS="$(pwd)/../gui/src/qml"
-export EXTRA_QT_MODULES="widgets;webenginewidgets;webchannel;quick;qml;waylandclient;waylandcompositor"
+export EXTRA_QT_MODULES="widgets;webenginewidgets;webchannel;quick;qml;waylandclient"
 export EXTRA_PLATFORM_PLUGINS="libqwayland-egl.so;libqwayland-generic.so;libqeglfs.so;libqminimal.so;libqminimalegl.so;libqvkkhrdisplay.so;libqvnc.so;libqoffscreen.so;libqlinuxfb.so"
 curl -L -O https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-${ARCH}.AppImage
 chmod +x linuxdeploy-plugin-qt-${ARCH}.AppImage

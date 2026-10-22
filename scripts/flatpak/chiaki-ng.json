@@ -19,6 +19,7 @@
         "frontend-sources.json"
     ],
     "post-install": [
+        "bash ../test/linux-package-check.sh",
         "install -Dm755 ../scripts/psn-account-id.py /app/bin/psn-account-id",
         "if test $(uname -m) = x86_64; then install -Dm644 ../scripts/vulkan-gamescope-layers/VkLayer_FROG_gamescope_wsi.x86_64.json /app/share/vulkan/implicit_layer.d/VkLayer_FROG_gamescope_wsi.x86_64.json; fi",
         "install -Dm644 ../COPYING /app/share/licenses/chiaki-ng/COPYING",

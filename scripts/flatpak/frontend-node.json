@@ -2,7 +2,7 @@
     "name": "frontend-node",
     "buildsystem": "simple",
     "build-commands": ["mkdir -p /app/node", "cp -a bin include lib share /app/node/", "test \"$(/app/node/bin/node --version)\" = v24.16.0", "PATH=/app/node/bin:$PATH test \"$(/app/node/bin/node /app/node/lib/node_modules/npm/bin/npm-cli.js --version)\" = 11.13.0"],
-    "cleanup": ["/node"],
+    "cleanup": ["/node", "/lib/debug/node"],
     "sources": [
         {
             "type": "archive",

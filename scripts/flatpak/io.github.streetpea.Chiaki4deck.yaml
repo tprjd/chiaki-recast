@@ -96,6 +96,7 @@ modules:
       - --disable-all
       - --enable-libdrm
       - --enable-avcodec
+      - --enable-avformat
       - --enable-vulkan
       - --enable-decoder=h264
       - --enable-decoder=hevc
@@ -131,6 +132,7 @@ modules:
       - --disable-all
       - --enable-libdrm
       - --enable-avcodec
+      - --enable-avformat
       - --enable-vulkan
       - --enable-decoder=h264
       - --enable-decoder=hevc
