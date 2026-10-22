@@ -38,7 +38,9 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [07: Pairing and Account ID lookup](issues/07-pairing-and-account-id.md): claimed. Tickets 04 and 06 are integrated; the isolated worktree and native dependencies are prepared.
 - [08: PSN native streaming](issues/08-psn-native-streaming.md): resolved for native remote refresh, current opaque target connection, token-wait recovery, and guarded worker cleanup. Focused web/native and Windows worker checks pass. Live PSN playback remains hardware acceptance.
 - Tickets [19](issues/19-windows-web-native-package.md), [20](issues/20-linux-web-native-packages.md), and [21](issues/21-macos-web-native-package.md): ready after ticket 04.
-- Other tickets 05 through 23: waiting for their declared blockers.
+- [09: Automatic PSN registration](issues/09-automatic-psn-registration.md): claimed after ticket 08.
+- Tickets [10](issues/10-wake-and-auto-connect.md) and [22](issues/22-session-and-setup-recovery.md): ready after ticket 08.
+- Remaining tickets wait for their declared blockers.
 
 ## Integration history
 
@@ -62,6 +64,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - 9f37be02: merged ticket 08 worker b7866044 without conflicts. The merged tree matches the worker tree. GUI source matches tested source bf4c7e01, apart from test documentation. The [integration audit](evidence/ticket08-integration/audit.json) confirms 28 source hashes, four artifact hashes, 18 preserved-source comparisons, and 13 runtime source comparisons. Both captures were inspected. Reused native 3/0, corrected refresh 3/0, and the successful ownership, token, and affected cases from the saved groups. No build or test was repeated. The isolated group's obsolete normal-mode identifier assertion remains a recorded failure; the corrected streamer-mode check passes. Ticket 05 details and management, 04 lifetime, 06 account, and 12/13/15 settings remain. Early discovery traffic and asynchronous zoom captures do not prove isolation or 200-percent layout. Live PSN, physical focus/input, GPU, HighQuality, and platform acceptance remain open. Ticket 07 remains active and must retain its RegistrationRequests before DiscoveryRequests in the combined constructor order. The vendor patch is excluded.
 
 ## Decisions
+
+- User layout scope update: support design widths of at least 1024 CSS pixels. Keep existing responsive CSS, stop new narrower layout work, and keep 200 percent zoom checks within the supported CSS viewport width. Earlier narrow captures remain historical evidence. See the updated spec and ticket 23.
 
 - [Ticket 08](issues/08-psn-native-streaming.md) uses the existing native refresh, connection attempt, worker, and window controller. The web page presents token-wait progress before native handoff. Native failure, retry, late cancellation, stale-profile rejection, session/window cleanup, and setup restoration pass. [Verification](evidence/ticket08/verification.md) records the fail-closed session-start fixture, discovery-isolation limits, source preservation, identities, and captures. Real PSN playback and physical/hardware acceptance remain open.
 
