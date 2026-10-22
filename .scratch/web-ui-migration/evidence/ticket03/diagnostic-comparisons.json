@@ -1,0 +1,18 @@
+{
+  "directImage": {
+    "result": "negative: direct returned true, center00000000, blueoverlay",
+    "exit": "diagnostic-only failure",
+    "binarySha256": "68FA2DE4AA99DBFC72410578959CDA2FCBF1F8051F8745A8B44D03F0FB83BB23"
+  },
+  "oldImport": {
+    "result": "negative: oldcontext/noWebEngine center000000ff",
+    "exit": -1073741819,
+    "limit": "temporary partial-old-import teardown access violation after valid buffer reads",
+    "binarySha256": "A1E6A56CB697BFFA415F9410031153408A7F73C807CA6F5CE1AFD6E1E54AF029"
+  },
+  "fastParameters": {
+    "result": "positive native buffer: centerfe0000ff, blueoverlay0086ccff",
+    "exit": "diagnostic-only failure; no graphics acceptance",
+    "binarySha256": "40DE3702B0B79A3DA223C77D909C51052DCF525CAB67B0F64FE27F97C3F302EE"
+  }
+}

@@ -1,0 +1,10 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+FAIL!  : EmbeddedSetupTest::consoleLibrary() Compared values are not the same
+   Actual   (setup.windowTitle())            : "Chiaki Recast: Private profile"
+   Expected (QStringLiteral("Chiaki Recast")): "Chiaki Recast"
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(246) : failure location
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 2404ms
+********* Finished testing of EmbeddedSetupTest *********

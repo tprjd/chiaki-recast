@@ -6,6 +6,9 @@
 #include <QHash>
 #include <QStyleHints>
 #include <QGuiApplication>
+#include <QWindow>
+#include <QWidget>
+#include <QApplication>
 
 static QVector<QPair<uint32_t, Qt::Key>> key_map = {
     { CHIAKI_CONTROLLER_BUTTON_DPAD_UP, Qt::Key_Up },
@@ -51,6 +54,12 @@ QmlController::QmlController(Controller *c, uint32_t shortcut, QObject *t, QObje
             buttons |= CHIAKI_CONTROLLER_BUTTON_DPAD_DOWN;
         else if (state.left_y < -30000)
             buttons |= CHIAKI_CONTROLLER_BUTTON_DPAD_UP;
+
+        if (!navigation_enabled || wait_for_release) {
+            old_buttons = buttons;
+            if (!buttons) wait_for_release = false;
+            return;
+        }
 
         for (auto &k : std::as_const(key_map)) {
             const bool pressed = buttons & k.first;
@@ -113,8 +122,29 @@ QString QmlController::GetVIDPID() const
     return controller->GetVIDPIDString();
 }
 
+void QmlController::setTarget(QObject *new_target)
+{
+    repeat_timer->stop();
+    target = new_target;
+}
+
+void QmlController::setNavigationEnabled(bool enabled)
+{
+    repeat_timer->stop();
+    navigation_enabled = enabled;
+    wait_for_release = enabled && old_buttons != 0;
+}
+
 void QmlController::sendKey(Qt::Key key, Qt::KeyboardModifiers modifiers)
 {
+    auto *native_window = qobject_cast<QWindow *>(target.data());
+    auto *widget = qobject_cast<QWidget *>(target.data());
+    if (widget && QApplication::activeModalWidget()) widget = QApplication::activeModalWidget();
+    QObject *receiver = widget && widget->isVisible() ? static_cast<QObject *>(widget->focusWidget())
+        : native_window && native_window->isVisible() ? native_window : QGuiApplication::focusWindow();
+    if (widget && !receiver) receiver = widget->focusProxy() ? widget->focusProxy() : widget;
+    if (!receiver)
+        return;
     // SDL2-compat/SDL3 on macOS can expose a single physical controller as
     // two devices, creating two QmlController instances that both fire for
     // the same button press. Deduplicate by VID:PID + key as a workaround
@@ -131,6 +161,6 @@ void QmlController::sendKey(Qt::Key key, Qt::KeyboardModifiers modifiers)
 
     QKeyEvent press(QEvent::KeyPress, key, modifiers);
     QKeyEvent release(QEvent::KeyRelease, key, Qt::NoModifier);
-    QGuiApplication::sendEvent(target, &press);
-    QGuiApplication::sendEvent(target, &release);
+    QGuiApplication::sendEvent(receiver, &press);
+    QGuiApplication::sendEvent(receiver, &release);
 }

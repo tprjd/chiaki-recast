@@ -1,0 +1,265 @@
+[0/1] Re-running CMake...
+-- Speex DSP found echo cancelling and noise suppression enabled
+CMake Warning (policy) at CMakeLists.txt:114 (find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+This warning is for project developers.  Use -Wno-author or -Wno-policy to
+suppress it.
+
+-- Could NOT find nanopb (missing: nanopb_DIR)
+-- Python install dir: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/python3.14/site-packages
+-- Using CMake version 4.4.4
+-- curl version=[8.11.0-DEV]
+-- CMake platform flags: WIN32 GCC MINGW
+-- Performing Test HAVE_WIN32_WINNT
+-- Performing Test HAVE_WIN32_WINNT - Success
+-- Found _WIN32_WINNT=0xa00
+-- Picky compiler options: -Werror-implicit-function-declaration -W -Wall -pedantic -Wbad-function-cast -Wconversion -Winline -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-format-nonliteral -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wsign-conversion -Wno-error=sign-conversion -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wclobbered -Wmissing-parameter-type -Wold-style-declaration -Wstrict-aliasing=3 -Wtrampolines -Wno-pedantic-ms-format -Wformat=2 -Warray-bounds=2 -ftree-vrp -Wduplicated-cond -Wnull-dereference -fdelete-null-pointer-checks -Wshift-negative-value -Wshift-overflow=2 -Walloc-zero -Wduplicated-branches -Wformat-truncation=2 -Wimplicit-fallthrough -Wrestrict -Warith-conversion -Wdouble-promotion -Wenum-conversion -Wpragmas -Wunused-const-variable
+-- Could NOT find Perl (missing: PERL_EXECUTABLE) 
+CMake Warning at third-party/curl/CMakeLists.txt:444 (message):
+  Perl not found.  Will not build manuals.
+
+
+-- Protocols: http https scp sftp ws wss
+-- Features: alt-svc AsynchDNS HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL SSPI threadsafe UnixSockets
+-- Enabled SSL backends: Schannel
+-- Steam shortcut enabled
+-- FFMPEG Decoder enabled
+-- Could NOT find ILClient (missing: ILClient_libbcm_host_LIBRARY ILClient_libvcilcs_LIBRARY ILClient_libvchiq_arm_LIBRARY ILClient_libvcos_LIBRARY ILClient_INCLUDE_DIR ILClient_SOURCE_DIR) 
+-- Pi Decoder disabled
+-- Steamdeck native gyro and hatpics disabled
+-- SDL version 2.32.10 is >= 2.0.14, disabling Setsu
+-- Setsu disabled
+CMake Warning at C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:339 (message):
+  This project is using headers of the GuiPrivate module and will therefore
+  be tied to this specific Qt module build version.  Running this project
+  against other versions of the Qt modules may crash at any arbitrary point.
+  This is not a bug, but a result of using Qt internals.  You have been
+  warned!
+
+  You can disable this warning by setting QT_NO_PRIVATE_MODULE_WARNING to ON.
+Call Stack (most recent call first):
+  C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6GuiPrivate/Qt6GuiPrivateConfig.cmake:48 (_qt_internal_show_private_module_warning)
+  C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/Qt6Config.cmake:257 (find_package)
+  gui/CMakeLists.txt:12 (find_package)
+
+
+-- Could NOT find Qt6WebEngineQuick (missing: Qt6WebEngineQuick_DIR)
+CMake Warning at gui/CMakeLists.txt:15 (find_package):
+  Found package configuration file:
+
+    C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/Qt6Config.cmake
+
+  but it set Qt6_FOUND to FALSE so package "Qt6" is considered to be NOT
+  FOUND.  Reason given by package:
+
+  Failed to find required Qt component "WebEngineQuick".
+
+  Expected Config file at
+  "C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6WebEngineQuick/Qt6WebEngineQuickConfig.cmake"
+  does NOT exist
+
+
+
+  Configuring with --debug-find-pkg=Qt6WebEngineQuick might reveal details
+  why the package was not found.
+
+  Configuring with -DQT_DEBUG_FIND_PACKAGE=ON will print the values of some
+  of the path variables that find_package uses to try and find the package.
+
+
+
+CMake Warning (author) at gui/CMakeLists.txt:162 (install):
+  Target chiaki has RESOURCE files but no RESOURCE DESTINATION.
+This warning is for project developers.  Use -Wno-author to suppress it.
+
+-- Configuring done (1.9s)
+-- Generating done (0.4s)
+-- Build files have been written to: C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/build/native-stream
+[1/29] Automatic MOC for target placebo-libav-impl
+[2/27] Automatic MOC and UIC for target cpp-steam-tools
+[3/26] Building CXX object third-party/steam-tools/CMakeFiles/cpp-steam-tools.dir/src/steamtools.cpp.obj
+In file included from C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/build/native-stream/third-party/cpp-steam-tools-patched/src/steamtools.cpp:10:
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/build/native-stream/third-party/cpp-steam-tools-patched/include/vdf_parser.hpp: In function 'std::string tyti::vdf::detail::string_converter(const std::wstring&)':
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/build/native-stream/third-party/cpp-steam-tools-patched/include/vdf_parser.hpp:127:10: warning: 'template<class _Codecvt, class _Elem, class _Wide_alloc, class _Byte_alloc> class std::__cxx11::wstring_convert' is deprecated [-Wdeprecated-declarations]
+  127 |     std::wstring_convert<
+      |          ^~~~~~~~~~~~~~~
+In file included from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/locale:47,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/bits/fs_path.h:36,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/filesystem:55,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfiledevice.h:12,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfile.h:9,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfileinfo.h:9,
+                 from C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/build/native-stream/third-party/cpp-steam-tools-patched/src/steamtools.cpp:4:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/bits/locale_conv.h:265:33: note: declared here
+  265 |     class _GLIBCXX17_DEPRECATED wstring_convert
+      |                                 ^~~~~~~~~~~~~~~
+[4/26] Linking CXX shared library third-party\steam-tools\libcpp-steam-tools.dll
+[5/26] Automatic MOC for target chiaki-gui
+[6/26] Automatic RCC for src/qml/qml.qrc
+[7/26] Building CXX object gui/CMakeFiles/chiaki-gui.dir/chiaki-gui_autogen/VLDSMZLXNG/qrc_qml.cpp.obj
+[8/26] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/windowsWakeSleep.cpp.obj
+[9/26] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlnativeservices.cpp.obj
+[10/26] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlmainwindow.cpp.obj
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp: In member function 'AVBufferRef* QmlMainWindow::vulkanHwDeviceCtx()':
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1463:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1463 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+In file included from C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/include/qmlmainwindow.h:16,
+                 from C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1463:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1463 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1463:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1463 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1464:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1464 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1464:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1464 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1464:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1464 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1465:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1465 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1465:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1465 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1465:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1465 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1466:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1466 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1466:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1466 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1466:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1466 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1467:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1467 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1467:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1467 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1467:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1467 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1468:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1468 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1468:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1468 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1468:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1468 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1469:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1469 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1469:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1469 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1469:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1469 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1470:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1470 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1470:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1470 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1470:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1470 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+[11/26] Building CXX object gui/CMakeFiles/chiaki-gui.dir/chiaki-gui_autogen/mocs_compilation.cpp.obj
+[12/26] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlbackend.cpp.obj
+[13/26] Automatic MOC for target chiaki
+[14/26] Building CXX object gui/CMakeFiles/chiaki.dir/chiaki_autogen/mocs_compilation.cpp.obj
+[15/26] Building RC object gui/CMakeFiles/chiaki.dir/chiaking.rc.obj
+[16/26] Automatic MOC for target chiaki-native-services-tests
+[17/25] Automatic MOC for target chiaki-stream-input-native-tests
+[18/25] Building CXX object gui/tests/CMakeFiles/chiaki-stream-input-native-tests.dir/chiaki-stream-input-native-tests_autogen/mocs_compilation.cpp.obj
+[19/25] Building CXX object gui/CMakeFiles/chiaki.dir/src/main.cpp.obj
+[20/25] Linking CXX executable gui\chiaki.exe
+[21/25] Building CXX object gui/tests/CMakeFiles/chiaki-native-services-tests.dir/nativeservices.cpp.obj
+[22/25] Linking CXX executable gui\tests\chiaki-native-services-tests.exe
+[23/25] Building CXX object gui/tests/CMakeFiles/chiaki-stream-input-native-tests.dir/streaminputnative.cpp.obj
+[24/25] Linking CXX executable gui\tests\chiaki-stream-input-native-tests.exe

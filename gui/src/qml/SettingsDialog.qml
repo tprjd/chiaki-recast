@@ -16,15 +16,18 @@ FocusScope {
         PS5
     }
     property int selectedConsole: SettingsDialog.Console.PS5
-    property bool quitControllerMapping: true
     id: dialog
     objectName: "settingsDialog"
     property var backend: Chiaki
     property var navigation: root
+    property string rendererRestartMessage: ""
+    function restartRenderer() {
+        const result = backend.settings.restartApplication();
+        rendererRestartMessage = result && !result.accepted ? result.message : "";
+    }
     property var openExternal: function(url) { Qt.openUrlExternally(url); }
     property alias currentCategory: bar.currentIndex
     property Item restoreFocusItem
-    property var pendingMappingSearch: null
     readonly property string searchQuery: searchField.text.trim().toLocaleLowerCase()
     readonly property var searchResults: {
         const query = searchQuery;
@@ -76,22 +79,16 @@ FocusScope {
     function openSearchResult(index) {
         const entry = searchResults[index];
         if (!entry) return;
-        pendingMappingSearch = null;
         if (!entry.page) {
             revealSetting(entry.category, entry.target, entry.consoleType, entry.fallback);
             return;
         }
         const opener = entry.page === "display" ? "displaySettings"
-            : entry.page === "profiles" ? "manageProfiles"
-            : entry.page === "mapping" ? "controllerMappingChange" : "customRendererSettings";
+            : "customRendererSettings";
         revealSetting(entry.category, opener, undefined, "videoPreset", function(item) {
             if (!item || item.objectName !== opener || !item.visible || !item.enabled) return;
             if (entry.page === "display") navigation.showDisplaySettingsDialog(entry);
-            else if (entry.page === "profiles") navigation.showProfileDialog(entry);
-            else if (entry.page === "mapping") {
-                pendingMappingSearch = entry;
-                controllerMappingDialog.show({reset: false});
-            } else navigation.showPlaceboSettingsDialog(entry);
+            else navigation.showPlaceboSettingsDialog(entry);
         });
     }
     readonly property bool compact: width < 760
@@ -241,9 +238,9 @@ FocusScope {
         case 3: item = audioOutDevice; break;
         case 4: item = registerNewButton; break;
         case 5: item = dialog.backend.settings.mouseCameraSupported ? keyboardMousePage.firstFocusItem : resetAllKeys; break;
-        case 6: item = controllerMappingChange; break;
+        case 6: item = allowJoystickBackgroundEvents; break;
         case 7: item = firstRemoteFocusableItem(); break;
-        case 8: item = profile; break;
+        case 8: item = logSanitizeBox; break;
         }
         if (item)
             item.forceActiveFocus(Qt.TabFocusReason);
@@ -818,6 +815,7 @@ FocusScope {
                             }
                         }
                         Label { text: qsTr("Rendering"); font.pixelSize: 14; font.bold: true }
+                        Label { text: dialog.rendererRestartMessage; visible: text.length > 0; wrapMode: Text.Wrap; Layout.fillWidth: true; Accessible.role: Accessible.AlertMessage }
                         Frame {
                             Layout.fillWidth: true
                             background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
@@ -836,7 +834,7 @@ FocusScope {
                                 checked: dialog.backend.settings.vSyncEnabled
                                 onToggled: {
                                     dialog.backend.settings.vSyncEnabled = checked;
-                                    if (dialog.backend.window.runtimeRendererBackend === 1) dialog.backend.settings.restartApplication();
+                                    if (dialog.backend.window.runtimeRendererBackend === 1) dialog.restartRenderer();
                                 }
                             }
                             Label { text: qsTr("Render preset\nDefault: High Quality"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
@@ -883,7 +881,7 @@ FocusScope {
                                 popup.width: width
                                 model: [qsTr("Vulkan"), qsTr("OpenGL")]
                                 currentIndex: dialog.backend.settings.rendererBackend
-                                onActivated: index => { if (index !== dialog.backend.settings.rendererBackend) { dialog.backend.settings.rendererBackend = index; dialog.backend.settings.restartApplication(); } }
+                                onActivated: index => { if (index !== dialog.backend.settings.rendererBackend) { dialog.backend.settings.rendererBackend = index; dialog.restartRenderer(); } }
 
                             }
                             C.Button {
@@ -1721,25 +1719,8 @@ FocusScope {
                             ColumnLayout {
                                 anchors.fill: parent
                                 spacing: 12
-                            RowLayout {
-                                Layout.fillWidth: true
-                                C.Button {
-                                    id: controllerMappingChange
-                                    objectName: "controllerMappingChange"
-                                    firstInFocusChain: true
-                                    text: qsTr("Change controller mapping")
-                                    font.pixelSize: 14
-                                    onClicked: controllerMappingDialog.show({ reset: false })
-                                }
-                                C.Button {
-                                    id: controllerMappingReset
-                                    objectName: "controllerMappingReset"
-                                    text: qsTr("Reset controller mapping")
-                                    font.pixelSize: 14
-                                    onClicked: controllerMappingDialog.show({ reset: true })
-                                }
-                            }
                             C.CheckBox {
+                                id: allowJoystickBackgroundEvents
                                 objectName: "allowJoystickBackgroundEvents"
                                 text: qsTr("Process controller input in the background. Default: On")
                                 font.pixelSize: 14
@@ -1993,7 +1974,7 @@ FocusScope {
             }
 
             Item {
-                // Config (Options such as Import/Export and Logging)
+                // Config diagnostics retained for the remaining native setup callers.
                 Flickable {
                     id: configFlick
                     objectName: "configFlick"
@@ -2009,61 +1990,6 @@ FocusScope {
                         width: Math.max(0, configFlick.width - 48)
                         spacing: 14
                         Label { text: qsTr("Config"); font.pixelSize: 24; font.bold: true }
-                        Label { text: qsTr("Profiles"); font.pixelSize: 14; font.bold: true }
-                        Frame {
-                            Layout.fillWidth: true
-                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
-                            RowLayout {
-                                anchors.fill: parent
-                                spacing: 24
-                                Label {
-                                    objectName: "configProfile"
-                                    Layout.fillWidth: true
-                                    wrapMode: Text.Wrap
-                                    font.pixelSize: 14
-                                    text: qsTr("Current profile: %1").arg(dialog.backend.settings.streamerMode ? qsTr("Hidden") : (dialog.backend.settings.currentProfile || qsTr("default")))
-                                }
-                                C.Button {
-                                    id: profile
-                                    objectName: "manageProfiles"
-                                    text: qsTr("Manage profiles")
-                                    Accessible.name: text
-                                    firstInFocusChain: true
-                                    font.pixelSize: 14
-                                    onClicked: dialog.navigation.showProfileDialog()
-                                    Material.roundedScale: Material.SmallScale
-                                }
-                            }
-                        }
-                        Label { text: qsTr("Settings files"); font.pixelSize: 14; font.bold: true }
-                        Frame {
-                            Layout.fillWidth: true
-                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
-                            RowLayout {
-                                anchors.fill: parent
-                                spacing: 12
-                                C.Button {
-                                    id: exportButton
-                                    objectName: "exportSettings"
-                                    Layout.fillWidth: true
-                                    text: qsTr("Export settings to file")
-                                    Accessible.name: text
-                                    font.pixelSize: 14
-                                    onClicked: dialog.backend.settings.exportSettings()
-                                    Material.roundedScale: Material.SmallScale
-                                }
-                                C.Button {
-                                    id: importButton
-                                    objectName: "importSettings"
-                                    Layout.fillWidth: true
-                                    text: qsTr("Import settings from file")
-                                    Accessible.name: text
-                                    font.pixelSize: 14
-                                    onClicked: dialog.backend.settings.importSettings()
-                                    Material.roundedScale: Material.SmallScale
-                                }
-                            }
-                        }
                         Label { text: qsTr("Diagnostics"); font.pixelSize: 14; font.bold: true }
                         Frame {
                             Layout.fillWidth: true
@@ -2071,6 +1997,8 @@ FocusScope {
                             ColumnLayout {
                                 anchors.fill: parent
                                 C.CheckBox {
+                                    id: logSanitizeBox
+                                    firstInFocusChain: true
                                     objectName: "logSanitize"
                                     text: qsTr("Sanitize logs · Default: On")
                                     Accessible.name: qsTr("Sanitize logs")
@@ -2189,37 +2117,6 @@ FocusScope {
             function onHeightChanged() { Qt.callLater(dialog.ensureActiveFocusVisible); }
         }
 
-        Item {
-            Timer {
-                id: openTimer
-                interval: 100
-                running: false
-                onTriggered: {
-                    if (!controllerMappingDialog.visible || !dialog.backend.controllerMappingInProgress) return;
-                    if(controllerMappingDialog.resetMapping)
-                    {
-                        if(!dialog.backend.controllerMappingDefaultMapping)
-                        {
-                            quitControllerMapping = false;
-                            dialog.backend.controllerMappingReset();
-                        }
-                        controllerMappingDialog.close();
-                    }
-                    else
-                    {
-                        controllerMappingChange.forceActiveFocus(Qt.TabFocusReason);
-                        const route = dialog.pendingMappingSearch;
-                        dialog.pendingMappingSearch = null;
-                        if (route) dialog.navigation.showControllerMappingDialog(route);
-                        else dialog.navigation.showControllerMappingDialog();
-                        quitControllerMapping = false;
-                        controllerMappingDialog.resetFocus = false;
-                        controllerMappingDialog.close();
-                    }
-                }
-            }
-        }
-
         ConfirmDialog {
             id: aboutDialog
             objectName: "aboutDialog"
@@ -2310,129 +2207,5 @@ FocusScope {
             }
         }
 
-        Dialog {
-            id: controllerMappingDialog
-            objectName: "controllerCapture"
-            width: 600
-            onAboutToHide: openTimer.stop()
-            property bool resetFocus: true
-            property bool resetMapping: false
-            parent: Overlay.overlay
-            x: Math.round((dialog.navigation.width - width) / 2)
-            y: Math.round((dialog.navigation.height - height) / 2)
-            title: qsTr("Controller Capture")
-            modal: true
-            standardButtons: Dialog.Close
-            closePolicy: Popup.CloseOnPressOutside
-            onOpened: {
-                controllerLabel.forceActiveFocus(Qt.TabFocusReason);
-                dialog.backend.beginControllerMapping(resetMapping);
-            }
-            onClosed: {
-                dialog.pendingMappingSearch = null;
-                if(resetFocus)
-                {
-                    if(resetMapping)
-                        controllerMappingReset.forceActiveFocus(Qt.TabFocusReason);
-                    else
-                        controllerMappingChange.forceActiveFocus(Qt.TabFocusReason);
-                    focus = false;
-                }
-                else
-                {
-                    resetFocus = true;
-                    focus = false;
-                }
-                if(quitControllerMapping)
-                    dialog.backend.controllerMappingQuit();
-                else
-                    quitControllerMapping = true;
-            }
-            Material.roundedScale: Material.MediumScale
-
-            function show(opts) {
-                resetMapping = opts.reset;
-                open();
-            }
-            contentItem: Label {
-                id: controllerLabel
-                wrapMode: Text.Wrap
-                text: qsTr("Choose the controller by pressing any button on the controller")
-                Keys.onPressed: event => {
-                    if (event.key === Qt.Key_Escape) controllerMappingDialog.close();
-                    event.accepted = true;
-                }
-                Keys.onReleased: event => event.accepted = true
-            }
-        }
-
-        Dialog {
-            id: steamControllerMappingDialog
-            objectName: "steamControllerNotice"
-            width: 600
-            property bool resetMapping: false
-            parent: Overlay.overlay
-            x: Math.round((dialog.navigation.width - width) / 2)
-            y: Math.round((dialog.navigation.height - height) / 2)
-            title: qsTr("Controller Managed by Steam")
-            modal: true
-            standardButtons: Dialog.Close
-            closePolicy: Popup.NoAutoClose
-            onOpened: {
-                steamLabel.forceActiveFocus(Qt.TabFocusReason);
-            }
-            onClosed: {
-                focus = false;
-                const opener = resetMapping ? controllerMappingReset : controllerMappingChange;
-                if (dialog.visible && opener.visible && opener.enabled) {
-                    opener.focus = false;
-                    opener.forceActiveFocus(Qt.TabFocusReason);
-                }
-            }
-            Material.roundedScale: Material.MediumScale
-
-            contentItem: Label {
-                id: steamLabel
-                wrapMode: TextEdit.Wrap
-                text: qsTr("This controller is managed by Steam.\nPlease use Steam to map controller or disable Steam Input for the controller before mapping here.")
-                Keys.onReturnPressed: steamControllerMappingDialog.close();
-                Keys.onEscapePressed: steamControllerMappingDialog.close();
-            }
-        }
-
-        Connections {
-            target: dialog.backend.settings
-            function onCurrentProfileChanged() {
-                dialog.pendingMappingSearch = null;
-                if (controllerMappingDialog.visible) controllerMappingDialog.close();
-                if (steamControllerMappingDialog.visible) steamControllerMappingDialog.close();
-            }
-        }
-
-        Connections {
-            target: dialog.backend
-
-            function onControllerMappingInProgressChanged()
-            {
-                if (dialog.backend.controllerMappingInProgress && controllerMappingDialog.visible)
-                    openTimer.start();
-                else
-                {
-                    openTimer.stop();
-                    dialog.pendingMappingSearch = null;
-                }
-            }
-
-            function onControllerMappingSteamControllerSelected()
-            {
-                if (!controllerMappingDialog.visible) return;
-                dialog.pendingMappingSearch = null;
-                controllerMappingDialog.resetFocus = false;
-                quitControllerMapping = false;
-                steamControllerMappingDialog.resetMapping = controllerMappingDialog.resetMapping;
-                controllerMappingDialog.close();
-                steamControllerMappingDialog.open();
-            }
-        }
     }
 }

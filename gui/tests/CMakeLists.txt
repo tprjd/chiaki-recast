@@ -38,6 +38,87 @@ endif()
 set_tests_properties(chiaki-console-screen PROPERTIES
     ENVIRONMENT "${screen_test_environment}")
 
+if(TARGET chiaki-gui)
+    add_executable(chiaki-embedded-setup-tests embeddedsetup.cpp)
+    target_link_libraries(chiaki-embedded-setup-tests PRIVATE chiaki-gui Qt6::Test)
+    target_compile_definitions(chiaki-embedded-setup-tests PRIVATE CHIAKI_TEST_PYTHON="${PYTHON_EXECUTABLE}")
+    add_test(NAME chiaki-embedded-setup COMMAND chiaki-embedded-setup-tests consoleLibrary)
+    set_tests_properties(chiaki-embedded-setup PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-setup-recovery COMMAND chiaki-embedded-setup-tests setupReload setupFileLifetime
+        -o ${CMAKE_CURRENT_BINARY_DIR}/setup-recovery.txt,txt)
+    set_tests_properties(chiaki-embedded-setup-recovery PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-native-session-recovery COMMAND chiaki-embedded-setup-tests nativeSessionRecovery
+        -o ${CMAKE_CURRENT_BINARY_DIR}/native-session-recovery.txt,txt)
+    set_tests_properties(chiaki-native-session-recovery PROPERTIES LABELS "desktop;gpu")
+    add_test(NAME chiaki-embedded-wake-auto-connect COMMAND chiaki-embedded-setup-tests
+        autoConnectTarget autoConnectCancellation wakeConsole wakeFailures
+        -o ${CMAKE_CURRENT_BINARY_DIR}/wake-auto-connect.txt,txt)
+    set_tests_properties(chiaki-embedded-wake-auto-connect PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-startup-native-connection COMMAND chiaki-embedded-setup-tests
+        startupNativeConnection -o ${CMAKE_CURRENT_BINARY_DIR}/startup-native-connection.txt,txt)
+    set_tests_properties(chiaki-startup-native-connection PROPERTIES LABELS desktop
+        ENVIRONMENT "QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-embedded-pairing COMMAND chiaki-embedded-setup-tests registrationForm registrationProgress
+        registrationLookup registrationLookupTimeout registrationAccountSources registrationNativeValidation registrationStaleTargets registrationAddressCorrection)
+    set_tests_properties(chiaki-embedded-pairing PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-registration-handoff COMMAND chiaki-embedded-setup-tests registrationHandoff)
+    set_tests_properties(chiaki-registration-handoff PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-reminders-steam COMMAND chiaki-embedded-setup-tests
+        setupReminders setupReminderOwnership setupReminderEligibility steamShortcutWorkflow steamShortcutGuards)
+    set_tests_properties(chiaki-embedded-reminders-steam PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-embedded-psn COMMAND chiaki-embedded-setup-tests psnAccountStatus psnSignIn psnRefreshCredentials psnEmbeddedIsolation psnAccountPresentation)
+    set_tests_properties(chiaki-embedded-psn PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-psn-remote COMMAND chiaki-embedded-setup-tests psnRemoteRefresh psnRemoteRefreshOwnership psnRemoteTokenConnection)
+    set_tests_properties(chiaki-embedded-psn-remote PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-remote-native-connection COMMAND chiaki-embedded-setup-tests remoteNativeConnection)
+    set_tests_properties(chiaki-remote-native-connection PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-profiles COMMAND chiaki-embedded-setup-tests profileImportValidation profileSettingsPage profileFiles profileSearch profileDefaultImport)
+    set_tests_properties(chiaki-embedded-profiles PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-embedded-automatic-registration COMMAND chiaki-embedded-setup-tests automaticRegistration)
+    set_tests_properties(chiaki-embedded-automatic-registration PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-settings COMMAND chiaki-embedded-setup-tests generalSettings settingsValidation settingsRestart)
+    set_tests_properties(chiaki-embedded-settings PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-video-audio COMMAND chiaki-embedded-setup-tests videoAudioSettings videoAudioState videoAudioRestart videoAudioDevices)
+    set_tests_properties(chiaki-embedded-video-audio PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-keyboard-mouse COMMAND chiaki-embedded-setup-tests keyboardMouseSettings keyboardMouseCapture keyboardMouseGuards keyboardMouseLegacyAndLifetime keyboardMousePresentation)
+    set_tests_properties(chiaki-embedded-keyboard-mouse PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-controllers COMMAND chiaki-embedded-setup-tests controllerSettings controllerMapping)
+    set_tests_properties(chiaki-embedded-controllers PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-embedded-color-mapping COMMAND chiaki-embedded-setup-tests colorMappingSettings colorMappingLayout)
+    set_tests_properties(chiaki-embedded-color-mapping PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-renderer COMMAND chiaki-embedded-setup-tests rendererSettings rendererFiles rendererLayout rendererRestartPolicy)
+    set_tests_properties(chiaki-embedded-renderer PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-graphics COMMAND chiaki-embedded-setup-tests graphicsCoexistence)
+    set_tests_properties(chiaki-embedded-graphics PROPERTIES LABELS "desktop;gpu")
+    add_test(NAME chiaki-embedded-console-management COMMAND chiaki-embedded-setup-tests
+        manualAddress manualAddressValidation consoleManagement consoleTargetGuards consoleManagementPrivacy)
+    set_tests_properties(chiaki-embedded-console-management PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-manual-handoff COMMAND chiaki-embedded-setup-tests manualHandoff)
+    set_tests_properties(chiaki-manual-handoff PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-local-handoff COMMAND chiaki-embedded-setup-tests localHandoff)
+    add_test(NAME chiaki-decoded-session-cleanup COMMAND chiaki-embedded-setup-tests decodedSessionCleanup)
+    set_tests_properties(chiaki-local-handoff chiaki-decoded-session-cleanup PROPERTIES LABELS "desktop;gpu")
+    if(WIN32)
+        add_test(NAME chiaki-suspend-sign-in COMMAND chiaki-embedded-setup-tests suspendClosesSignIn)
+        add_test(NAME chiaki-native-initialization-failure COMMAND chiaki-embedded-setup-tests nativeInitializationFailure)
+        set_tests_properties(chiaki-native-initialization-failure chiaki-suspend-sign-in PROPERTIES
+            ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    endif()
+
+    add_executable(chiaki-native-services-tests nativeservices.cpp)
+    target_link_libraries(chiaki-native-services-tests PRIVATE chiaki-gui Qt6::Test)
+    add_test(NAME chiaki-native-services COMMAND chiaki-native-services-tests)
+    set_tests_properties(chiaki-native-services PROPERTIES LABELS desktop)
+endif()
+
 if(TARGET chiaki-gui AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_executable(chiaki-mouse-response-tests mouseresponse.cpp)
     target_link_libraries(chiaki-mouse-response-tests PRIVATE chiaki-gui Qt6::Test)

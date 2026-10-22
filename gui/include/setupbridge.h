@@ -1,0 +1,134 @@
+#pragma once
+
+#include <QObject>
+#include <QHash>
+#include <QVariantMap>
+#include <QTimer>
+
+class QmlBackend;
+
+class SetupBridge : public QObject
+{
+    Q_OBJECT
+public:
+    explicit SetupBridge(QmlBackend *backend, QObject *parent = nullptr);
+    ~SetupBridge() override;
+    Q_INVOKABLE QVariantMap beginSteamShortcut(const QString &profile);
+    Q_INVOKABLE QVariantMap chooseSteamFolder(const QString &form, const QString &profile);
+    Q_INVOKABLE QVariantMap submitSteamShortcut(const QString &form, const QVariantMap &fields, const QString &profile);
+    Q_INVOKABLE QVariantMap endSteamShortcut(const QString &form, const QString &profile);
+    Q_INVOKABLE QVariantMap openSetupHelp(const QString &topic);
+    void invalidateSteamShortcut();
+    Q_INVOKABLE QVariantMap startReminders(const QString &profile);
+    Q_INVOKABLE QVariantMap reminderAction(const QString &id, const QString &action, const QString &profile);
+    Q_INVOKABLE QVariantMap snapshot() const { return state; }
+    Q_INVOKABLE QVariantMap saveViewState(const QString &route, const QString &search, const QString &category, const QString &settingsSearch, const QString &profile);
+    Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
+    Q_INVOKABLE QVariantMap selectConsole(const QString &key);
+    Q_INVOKABLE QVariantMap connectConsole(const QString &key);
+    Q_INVOKABLE QVariantMap wakeConsole(const QString &key);
+    Q_INVOKABLE QVariantMap setAutoConnectTarget(const QString &key, const QString &profile);
+    Q_INVOKABLE QVariantMap stopAutoConnect(const QString &attempt);
+    Q_INVOKABLE QVariantMap autoRegisterConsole(const QString &key, const QString &profile);
+    Q_INVOKABLE QVariantMap openRegistration(const QString &key, const QString &profile);
+    Q_INVOKABLE QVariantMap submitRegistration(const QString &context, const QVariantMap &fields);
+    Q_INVOKABLE QVariantMap connectRegistration(const QString &attempt);
+    Q_INVOKABLE QVariantMap beginRegistrationAccount(const QString &context, const QString &source);
+    Q_INVOKABLE QVariantMap lookupRegistrationAccount(const QString &context, const QString &route, const QString &username);
+    Q_INVOKABLE QVariantMap readRegistrationAccount(const QString &context, const QString &route, const QString &request);
+    Q_INVOKABLE QVariantMap endRegistrationAccount(const QString &context, const QString &route);
+    Q_INVOKABLE QVariantMap refreshPsnConsoles(const QString &profile);
+    Q_INVOKABLE QVariantMap cancelConnection(const QString &attempt);
+    Q_INVOKABLE QVariantMap retryConnection(const QString &attempt);
+    Q_INVOKABLE QVariantMap dismissConnection(const QString &attempt);
+    Q_INVOKABLE QVariantMap saveManualAddress(const QString &address, const QString &registrationKey, const QString &profile);
+    Q_INVOKABLE QVariantMap manageConsole(const QString &action, const QString &key, const QString &pin);
+    void setSuspended(bool suspended);
+    void invalidatePage();
+    void reportStreamError(const QString &title, const QString &text);
+    Q_INVOKABLE QVariantMap dismissStreamError(const QString &id);
+    Q_INVOKABLE QVariantMap openPsnSignIn(const QString &profile);
+    Q_INVOKABLE QVariantMap openPsnExternal(const QString &profile);
+    Q_INVOKABLE QVariantMap copyPsnSignInLink(const QString &profile);
+    Q_INVOKABLE QVariantMap submitPsnRedirect(const QString &profile, const QString &url);
+    Q_INVOKABLE QVariantMap profileAction(const QString &action, const QString &key, const QString &name, bool confirmed, const QString &profile);
+    Q_INVOKABLE QVariantMap settingsFileAction(const QString &action, const QString &profile);
+    Q_INVOKABLE QVariantMap setGeneralSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
+    Q_INVOKABLE QVariantMap setMediaSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
+    Q_INVOKABLE QVariantMap refreshAudioDevices();
+    Q_INVOKABLE QVariantMap setControllerSetting(const QString &name, const QVariant &value, const QString &profile);
+    Q_INVOKABLE QVariantMap beginControllerMapping(bool reset, const QString &profile);
+    Q_INVOKABLE QVariantMap controllerMappingAction(const QString &action, const QString &operation, const QString &profile);
+    Q_INVOKABLE QVariantMap captureControllerMapping(const QVariant &button, const QVariant &slot, const QString &operation, const QString &profile);
+    void invalidateControllerMapping(const QString &message = {});
+    Q_INVOKABLE QVariantMap beginKeyboardMouse(const QString &profile);
+    Q_INVOKABLE QVariantMap endKeyboardMouse(const QString &form);
+    Q_INVOKABLE QVariantMap setKeyboardMouseSetting(const QString &name, const QVariant &value, const QString &form, const QString &profile);
+    Q_INVOKABLE QVariantMap captureKeyboardMouse(const QVariant &action, const QVariant &slot, bool legacy, const QString &form, const QString &profile);
+    Q_INVOKABLE QVariantMap resetKeyboardMouse(const QString &form, const QString &profile);
+    Q_INVOKABLE QVariantMap resetKeyboardKeys(const QString &form, const QString &profile);
+    bool keyboardMouseFormValid(const QString &form, const QString &profile) const;
+    void setKeyboardMouseAvailable(bool available);
+    void invalidateKeyboardMouse();
+    Q_INVOKABLE QVariantMap setRendererSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
+    Q_INVOKABLE QVariantMap rendererAction(const QString &action, const QString &profileGeneration);
+    // Native callers resolve immediately before dispatch; no row index crosses WebChannel.
+    bool resolveConsole(const QString &key, int &index, QString &nickname) const;
+
+signals:
+    void stateChanged(const QVariantMap &state);
+    void psnSignInRequested();
+    void keyboardMouseClosed();
+    void keyboardMouseCaptureRequested(int action, int slot, bool legacy, const QString &form, const QString &profile);
+
+private:
+    void refresh();
+    void offerPsnReminder();
+    bool steamFormValid(const QString &form, const QString &profile) const;
+    QString steamForm, steamPhase, steamPath, steamName, steamOptions, steamDiagnostics;
+    quint64 steamProfile = 0;
+    bool steamFromReminder = false;
+    bool initialAsk = false;
+    QString reminderKind;
+    QString reminderId;
+    QString identity(const QVariantMap &host) const;
+    QmlBackend *backend;
+    QHash<QString, QString> keys;
+    QHash<QString, QString> profileKeys;
+    quint64 generation = 0;
+    quint64 revision = 0;
+    QString selectedKey;
+    QVariantMap viewState{{"route", "consoles"}, {"search", ""}, {"category", "General"}, {"settingsSearch", ""}};
+    quint64 pageGeneration = 0;
+    QVariantMap state;
+    bool suspended = false;
+    QVariantMap streamError;
+    quint64 streamErrorGeneration = 0;
+    QStringList decoders;
+    QTimer accountExpiry;
+    bool credentialsRejected = false;
+    bool keyboardMouseAvailable = false;
+    quint64 keyboardMouseWindowGeneration = 0;
+    QString keyboardMouseForm;
+    QString controllerOperation;
+    QString controllerPhase;
+    QString controllerMessage;
+    bool controllerReset = false;
+    int controllerButton = 0;
+    int controllerSlot = 0;
+    quint64 controllerNavigationGeneration = 0;
+    bool controllerOperationValid(const QString &operation, const QString &profile) const;
+    void controllerNavigation(bool enabled);
+    int startupRendererBackend = 0;
+    bool startupVSync = true;
+    bool currentProfile(const QString &profile) const;
+    QVariantMap registrationContext;
+    QString registrationContextId;
+    QString registrationAttemptContext;
+    QString registrationAddress;
+    QString accountRouteId;
+    QString accountSource;
+    QString accountRequest;
+    QString accountAuthBaseline;
+    bool registrationAccountCurrent(const QString &context, const QString &route) const;
+};

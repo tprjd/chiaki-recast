@@ -1,0 +1,309 @@
+********* Start testing of StreamInputNativeTest *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : StreamInputNativeTest::initTestCase()
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (API v360)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Spent 201.580 ms enumerating instance extensions (slow!)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Creating vulkan instance with extensions:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_surface
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_EXT_swapchain_colorspace
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_get_surface_capabilities2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_surface_maintenance1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_EXT_surface_maintenance1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_portability_enumeration
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_win32_surface
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_surface
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Spent 24.717 ms creating vulkan instance
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Probing for vulkan devices:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     GPU 0: NVIDIA GeForce RTX 5090 v1.4.351 (discrete)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]            uuid: 28:16:06:B7:CA:A5:B2:F9:6A:B5:98:0E:85:36:FF:E2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Vulkan device properties:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     Device Name: NVIDIA GeForce RTX 5090
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     Device ID: 10de:2b85
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     Device UUID: 28:16:06:B7:CA:A5:B2:F9:6A:B5:98:0E:85:36:FF:E2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     Driver version: 9a4a8000
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     API version: 1.4.351
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     Driver ID: VK_DRIVER_ID_NVIDIA_PROPRIETARY
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     Driver name: NVIDIA
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     Driver info: 617.42
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     Conformance version: 1.4.3.3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     Driver UUID: 8B:2E:D3:A7:D6:66:51:B8:AD:47:BB:85:41:6B:87:1B
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Using async transfer (queue 1)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Using async compute (queue 2)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Creating vulkan device with extensions:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_swapchain
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_external_memory_win32
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_EXT_external_memory_host
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_external_semaphore_win32
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_EXT_pci_bus_info
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_EXT_hdr_metadata
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_EXT_full_screen_exclusive
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_swapchain_maintenance1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_EXT_swapchain_maintenance1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_video_queue
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_video_decode_queue
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_video_decode_h264
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     VK_KHR_video_decode_h265
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Spent 358.230 ms creating vulkan device (slow!)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Memory heaps supported by device:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     0: flags 0x1 size   31G
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     1: flags 0x0 size   31G
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Memory summary:     0 used     0 res     0 alloc, efficiency 100.00%, utilization 100.00%, max page: 2011M
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] shaderc SPIR-V version 1.6 rev 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Initialized SPIR-V compiler 'shaderc'
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] GPU information:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     GLSL version: 450 (vulkan)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       subgroup_size:             32
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     Limits:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_buf_size:              34174062592
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_ssbo_size:             4294967295
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_vbo_size:              33750515712
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_mapped_size:           34174062592
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_buffer_texels:         268435456
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       align_host_ptr:            4096
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       blittable_1d_3d:           1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       align_tex_xfer_offset:     4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_variable_comps:        0
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_constants:             18446744073709551615
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_pushc_size:            256
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     External API interop:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       UUID: 28:16:06:B7:CA:A5:B2:F9:6A:B5:98:0E:85:36:FF:E2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       PCI: 0000:01:00:0
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       buf export caps: 0x16
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       buf import caps: 0x16
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       tex export caps: 0x16
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       tex import caps: 0x16
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       sync export caps: 0x6
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       sync import caps: 0x0
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: Using nvidia graphics card
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: StreamInputNativeTest::sessionAndFeedback() chiaki.gui: Current Profile:  ""
+QWARN  : StreamInputNativeTest::sessionAndFeedback() qrc:/StreamRoot.qml:401:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+QWARN  : StreamInputNativeTest::sessionAndFeedback() qrc:/StreamRoot.qml:371:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+QWARN  : StreamInputNativeTest::sessionAndFeedback() qrc:/StreamRoot.qml:341:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Available surface configurations:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     0: VK_FORMAT_B8G8R8A8_UNORM                 VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     1: VK_FORMAT_B8G8R8A8_SRGB                  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     2: VK_FORMAT_R8G8B8A8_UNORM                 VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     3: VK_FORMAT_R8G8B8A8_SRGB                  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     4: VK_FORMAT_R16G16B16A16_SFLOAT            VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     5: VK_FORMAT_A2B10G10R10_UNORM_PACK32       VK_COLOR_SPACE_HDR10_ST2084_EXT
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     6: VK_FORMAT_A2B10G10R10_UNORM_PACK32       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Picked surface configuration 6: VK_FORMAT_A2B10G10R10_UNORM_PACK32 + VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+PASS   : StreamInputNativeTest::sessionAndFeedback()
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (API v360)
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Spent 79.468 ms enumerating instance extensions
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Creating vulkan instance with extensions:
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_surface
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_EXT_swapchain_colorspace
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_get_surface_capabilities2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_surface_maintenance1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_EXT_surface_maintenance1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_portability_enumeration
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_win32_surface
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_surface
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Probing for vulkan devices:
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     GPU 0: NVIDIA GeForce RTX 5090 v1.4.351 (discrete)
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]            uuid: 28:16:06:B7:CA:A5:B2:F9:6A:B5:98:0E:85:36:FF:E2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Vulkan device properties:
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     Device Name: NVIDIA GeForce RTX 5090
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     Device ID: 10de:2b85
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     Device UUID: 28:16:06:B7:CA:A5:B2:F9:6A:B5:98:0E:85:36:FF:E2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     Driver version: 9a4a8000
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     API version: 1.4.351
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     Driver ID: VK_DRIVER_ID_NVIDIA_PROPRIETARY
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     Driver name: NVIDIA
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     Driver info: 617.42
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     Conformance version: 1.4.3.3
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     Driver UUID: 8B:2E:D3:A7:D6:66:51:B8:AD:47:BB:85:41:6B:87:1B
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Using async transfer (queue 1)
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Using async compute (queue 2)
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Creating vulkan device with extensions:
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_swapchain
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_external_memory_win32
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_EXT_external_memory_host
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_external_semaphore_win32
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_EXT_pci_bus_info
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_EXT_hdr_metadata
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_EXT_full_screen_exclusive
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_swapchain_maintenance1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_EXT_swapchain_maintenance1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_video_queue
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_video_decode_queue
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_video_decode_h264
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     VK_KHR_video_decode_h265
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Spent 323.105 ms creating vulkan device (slow!)
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Memory heaps supported by device:
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     0: flags 0x1 size   31G
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     1: flags 0x0 size   31G
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Memory summary:     0 used     0 res     0 alloc, efficiency 100.00%, utilization 100.00%, max page: 2011M
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] shaderc SPIR-V version 1.6 rev 1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Initialized SPIR-V compiler 'shaderc'
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] GPU information:
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     GLSL version: 450 (vulkan)
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       subgroup_size:             32
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     Limits:
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_buf_size:              34174062592
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_ssbo_size:             4294967295
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_vbo_size:              33750515712
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_mapped_size:           34174062592
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_buffer_texels:         268435456
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       align_host_ptr:            4096
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       blittable_1d_3d:           1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       align_tex_xfer_offset:     4
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_variable_comps:        0
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_constants:             18446744073709551615
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_pushc_size:            256
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     External API interop:
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       UUID: 28:16:06:B7:CA:A5:B2:F9:6A:B5:98:0E:85:36:FF:E2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       PCI: 0000:01:00:0
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       buf export caps: 0x16
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       buf import caps: 0x16
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       tex export caps: 0x16
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       tex import caps: 0x16
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       sync export caps: 0x6
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]       sync import caps: 0x0
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: Using nvidia graphics card
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: Current Profile:  ""
+QWARN  : StreamInputNativeTest::keyboardMouseSettingsRoute() qrc:/StreamRoot.qml:401:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+QWARN  : StreamInputNativeTest::keyboardMouseSettingsRoute() qrc:/StreamRoot.qml:371:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+QWARN  : StreamInputNativeTest::keyboardMouseSettingsRoute() qrc:/StreamRoot.qml:341:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Available surface configurations:
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     0: VK_FORMAT_B8G8R8A8_UNORM                 VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     1: VK_FORMAT_B8G8R8A8_SRGB                  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     2: VK_FORMAT_R8G8B8A8_UNORM                 VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     3: VK_FORMAT_R8G8B8A8_SRGB                  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     4: VK_FORMAT_R16G16B16A16_SFLOAT            VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     5: VK_FORMAT_A2B10G10R10_UNORM_PACK32       VK_COLOR_SPACE_HDR10_ST2084_EXT
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo]     6: VK_FORMAT_A2B10G10R10_UNORM_PACK32       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+QINFO  : StreamInputNativeTest::keyboardMouseSettingsRoute() chiaki.gui: [libplacebo] Picked surface configuration 6: VK_FORMAT_A2B10G10R10_UNORM_PACK32 + VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+PASS   : StreamInputNativeTest::keyboardMouseSettingsRoute()
+PASS   : StreamInputNativeTest::cleanupTestCase()
+Totals: 4 passed, 0 failed, 0 skipped, 0 blacklisted, 2371ms
+********* Finished testing of StreamInputNativeTest *********

@@ -1,0 +1,60 @@
+{
+  "sourceCommit": "0e2702b7ce333a5cb121c077dee17cde99b0f7e1",
+  "inputs": [
+    {
+      "path": ".",
+      "commit": "0e2702b7ce333a5cb121c077dee17cde99b0f7e1",
+      "archive": "source.tar",
+      "sha256": "54c8c1ba8600ebb63d975524e70e9eb7e3302770595d75aa2f640a21cb80b429"
+    },
+    {
+      "path": "test/munit",
+      "commit": "439de4a9b136bc3b5163e73d4caf37c590bef875",
+      "archive": "test__munit.tar",
+      "sha256": "e425413d55a6fe6475e6db93d9b5c918df2dbb30abc5732b026a54a8a542bcb7"
+    },
+    {
+      "path": "third-party/cpp-steam-tools",
+      "commit": "d36565f8eaca113efd454efe714126cd77a01512",
+      "archive": "third-party__cpp-steam-tools.tar",
+      "sha256": "39d883bff38181b8471fc4f4ce6587eba3ecf17fb5c6b9a6245225d6d2d95601"
+    },
+    {
+      "path": "third-party/curl",
+      "commit": "b1ef0e1a01c0bb6ee5367bd9c186a603bde3615a",
+      "archive": "third-party__curl.tar",
+      "sha256": "83b6c80391aea40695f5eba40657fc0d0cb12ec32815c675c08a3375c0c5622c"
+    },
+    {
+      "path": "third-party/gf-complete",
+      "commit": "fa54a4670a5705c84abf6c24b92b0cd479625478",
+      "archive": "third-party__gf-complete.tar",
+      "sha256": "8177242a6a89d00e5fcf0926c503f98718f4ecd9a0ee5212646536d90346e365"
+    },
+    {
+      "path": "third-party/jerasure",
+      "commit": "505ccb4bc69eee8d7ea40a6089a056b99671134f",
+      "archive": "third-party__jerasure.tar",
+      "sha256": "354e9297c5042691f938cccf669ab3577591c2ef77b99582fcb4c3edcc054406"
+    },
+    {
+      "path": "third-party/nanopb",
+      "commit": "cad3c18ef15a663e30e3e43e3a752b66378adec1",
+      "archive": "third-party__nanopb.tar",
+      "sha256": "9032523b64fa7a6701181a9a9d65a88f9b4fb60f5f938ec936c7e0b31101e991"
+    }
+  ],
+  "excluded": [
+    {
+      "path": "android/app/src/main/cpp/oboe",
+      "commit": "0ab5b12a5bc3630a3d6c83b20eed2a669ebf7a24",
+      "reason": "non-desktop platform, not configured"
+    },
+    {
+      "path": "switch/borealis",
+      "commit": "93c5d3b3bf26c8dc45d8d88b03f1b4238aad13dd",
+      "reason": "non-desktop platform, not configured"
+    }
+  ],
+  "method": "git archive of committed source and exact gitlink objects; no working-tree files or .git metadata"
+}

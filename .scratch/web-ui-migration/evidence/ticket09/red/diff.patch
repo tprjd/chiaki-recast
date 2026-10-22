@@ -1,0 +1,137 @@
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index f3e0585b..9171ffe3 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -514,6 +514,126 @@ private slots:
+         QCOMPARE(starts.load(), 0);
+     }
+ 
++    void automaticRegistration()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto removeSettings = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        settings.SetRemotePlayAsk(false);
++        settings.SetAddSteamShortcutAsk(false);
++        settings.SetHardwareDecoder({});
++        settings.SetRenderBackend(RenderBackend::OpenGL);
++        settings.SetPlaceboPreset(PlaceboPreset::Fast);
++        settings.SetWindowType(WindowType::AdjustableResolution);
++        const QRect geometry(70, 90, 1100, 720);
++        settings.SetStreamGeometry(geometry);
++        settings.SetPsnAuthToken("registration-access-secret");
++        settings.SetPsnRefreshToken("registration-refresh-secret");
++        settings.SetPsnAccountId("AQAAAAAAAAA=");
++        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(3600).toString(settings.GetTimeFormat()));
++        QList<QPointer<PsnReply>> requests;
++        std::atomic<int> connects = 0, starts = 0, producers = 0;
++        QSemaphore worker, completion;
++        struct Producer {
++            ChiakiSession *session = nullptr;
++            QSemaphore *completion;
++            std::atomic<int> *count;
++            ChiakiRegisteredHost host = {};
++            static void *run(void *opaque) {
++                auto *self = static_cast<Producer *>(opaque);
++                self->completion->acquire();
++                ChiakiEvent event = {};
++                event.type = CHIAKI_EVENT_REGIST;
++                event.host = self->host;
++                self->session->event_cb(&event, self->session->event_cb_user);
++                self->session->event_cb(&event, self->session->event_cb_user);
++                event = {};
++                event.type = CHIAKI_EVENT_QUIT;
++                event.quit.reason = CHIAKI_QUIT_REASON_STOPPED;
++                self->session->event_cb(&event, self->session->event_cb_user);
++                ++*self->count;
++                return nullptr;
++            }
++        } producer{nullptr, &completion, &producers};
++        producer.host.target = CHIAKI_TARGET_PS5_1;
++        memcpy(producer.host.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
++        strcpy(producer.host.server_nickname, "Office");
++        PsnRequests transport;
++        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
++        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
++            *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
++            *count = 1;
++            strcpy((*devices)[0].device_name, "Office");
++            memset((*devices)[0].device_uid, 0x12, sizeof((*devices)[0].device_uid));
++            (*devices)[0].remoteplay_enabled = true;
++            return CHIAKI_ERR_SUCCESS;
++        };
++        transport.connect = [&](StreamSession *, const QString &duid, bool ps5) {
++            if (duid != QStringLiteral("1212121212121212121212121212121212121212121212121212121212121212") || !ps5) return CHIAKI_ERR_INVALID_DATA;
++            ++connects;
++            worker.acquire();
++            return CHIAKI_ERR_SUCCESS;
++        };
++        transport.startSession = [&](ChiakiSession *session) {
++            ++starts;
++            if (!session->auto_regist) return CHIAKI_ERR_CANCELED;
++            producer.session = session;
++            return chiaki_thread_create(&session->session_thread, Producer::run, &producer);
++        };
++        QmlNativeServices services(&settings, transport, {}, {}, controlledDiscovery());
++        auto *backend = services.backend();
++        backend->stopAutoConnect();
++        ApplicationController controller(&services);
++        const auto unblock = qScopeGuard([&] { worker.release(100); completion.release(100); });
++        auto *setup = controller.setupWindow();
++        setup->resize(1200, 800);
++        setup->show();
++        DiscoveryHost host = {};
++        host.ps5 = true;
++        host.target = CHIAKI_TARGET_PS5_1;
++        host.host_name = "Office";
++        host.host_id = "001122334455";
++        host.host_addr = "192.0.2.10";
++        host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
++        discover(backend, {host});
++        QTRY_COMPARE(script(setup->view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
++        QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-automatic-register]')?.disabled === false").toBool());
++        QSignalSpy saved(&settings, &Settings::RegisteredHostsUpdated);
++        script(setup->view(), "document.querySelector('[data-automatic-register]').click();document.querySelector('[data-automatic-register]').click()");
++        QTRY_COMPARE(connects.load(), 1);
++        QPointer<QmlMainWindow> native = backend->qmlWindow();
++        QPointer<StreamSession> session = backend->qmlSession();
++        QVERIFY(native && session);
++        QVERIFY(!native->isVisible());
++        QVERIFY(setup->isVisible());
++        QVERIFY(backend->connectionAttempt().value("registrationOnly").toBool());
++        worker.release();
++        QTRY_COMPARE(starts.load(), 1);
++        QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-connection-cancel]')?.disabled === true").toBool());
++        completion.release();
++        QTRY_VERIFY(!session);
++        QTRY_VERIFY(!native);
++        QTRY_COMPARE(producers.load(), 1);
++        QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-psn-connection]')?.textContent.includes('Console registered')").toBool());
++        QCOMPARE(settings.GetRegisteredHosts().size(), 1);
++        QCOMPARE(settings.GetRegisteredHosts().first().GetServerNickname(), QStringLiteral("Office"));
++        QCOMPARE(saved.size(), 1);
++        Settings reopened(profile);
++        QCOMPARE(reopened.GetRegisteredHosts().size(), 1);
++        QCOMPARE(settings.GetStreamGeometry(), geometry);
++        QCOMPARE(requests.size(), 0);
++        QVERIFY(!backend->connectionAttempt().value("cleanupPending").toBool());
++        QVERIFY(setup->isVisible());
++        script(setup->view(), "document.querySelector('[data-connection-back]').click()");
++        QTRY_VERIFY(script(setup->view(), "!document.querySelector('[data-psn-connection]')").toBool());
++        QCOMPARE(connects.load(), 1);
++        QCOMPARE(starts.load(), 1);
++    }
++
+     void psnRemoteRefreshOwnership()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+diff --git a/third-party/gf-complete b/third-party/gf-complete
+--- a/third-party/gf-complete
++++ b/third-party/gf-complete
+@@ -1 +1 @@
+-Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478
++Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478-dirty

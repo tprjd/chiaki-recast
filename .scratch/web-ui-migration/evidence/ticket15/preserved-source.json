@@ -1,0 +1,347 @@
+[
+  {
+    "path": "gui/include/keyboardmousebindings.h",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "6bd830ea80ed01dd7220f0fc5c3ad9ba53f94f264baad84de43ba775f4770ddf",
+    "current_sha256": "6bd830ea80ed01dd7220f0fc5c3ad9ba53f94f264baad84de43ba775f4770ddf",
+    "equal": true
+  },
+  {
+    "path": "gui/src/keyboardmousebindings.cpp",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "22dd6257633200d4b6d42745db8867ede90876d14ee89685f78dd42cbf7f2727",
+    "current_sha256": "22dd6257633200d4b6d42745db8867ede90876d14ee89685f78dd42cbf7f2727",
+    "equal": true
+  },
+  {
+    "path": "gui/include/keyboardmousemapper.h",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "54f1f3d9e2c580b571192bced530376312f7c2cb8c3c6091ec9274e19998c70f",
+    "current_sha256": "54f1f3d9e2c580b571192bced530376312f7c2cb8c3c6091ec9274e19998c70f",
+    "equal": true
+  },
+  {
+    "path": "gui/src/keyboardmousemapper.cpp",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "6157e77bbad96ae829c1d29b39872ab4843cbf68aeb1bc52fcc65d9640469fa6",
+    "current_sha256": "6157e77bbad96ae829c1d29b39872ab4843cbf68aeb1bc52fcc65d9640469fa6",
+    "equal": true
+  },
+  {
+    "path": "gui/src/streaminputownership.cpp",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "632c9244d560e773f65306fc951de161cb16809f251c6079eea682cebfa9573b",
+    "current_sha256": "632c9244d560e773f65306fc951de161cb16809f251c6079eea682cebfa9573b",
+    "equal": true
+  },
+  {
+    "path": "gui/include/streaminputownership.h",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "e8580904b4691c5ca021d970a40ae31af449ac2248341e8d36aae66d4622ecf2",
+    "current_sha256": "e8580904b4691c5ca021d970a40ae31af449ac2248341e8d36aae66d4622ecf2",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qml/KeyboardMousePage.qml",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "2788f3ef1123f34648397c1cd313808327bbd1b62b13262cfe123a311484db0e",
+    "current_sha256": "2788f3ef1123f34648397c1cd313808327bbd1b62b13262cfe123a311484db0e",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qml/KeyboardMouseBindingsPane.qml",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "3050ec92d9aed1abd8c7ffa466c83d36a3d474a7ce111f78e9a73189dd22a8d0",
+    "current_sha256": "3050ec92d9aed1abd8c7ffa466c83d36a3d474a7ce111f78e9a73189dd22a8d0",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qml/MouseResponsePane.qml",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "57664abd665267429f0f69bca2a5575eb02cff027907e1d2183ef953f72b9fb0",
+    "current_sha256": "57664abd665267429f0f69bca2a5575eb02cff027907e1d2183ef953f72b9fb0",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qml/KeyboardMouseSettingsDialog.qml",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "7fce55edf43caf78974b4e3a6dce937c72b3faf7dd9fe5962e952840364fafcd",
+    "current_sha256": "7fce55edf43caf78974b4e3a6dce937c72b3faf7dd9fe5962e952840364fafcd",
+    "equal": true
+  },
+  {
+    "path": "gui/tests/mouseresponse.cpp",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "5b7590ffedf67d6a592199df1ebc0d70ab020e5d5cb7e6079a78e45727a479bd",
+    "current_sha256": "5b7590ffedf67d6a592199df1ebc0d70ab020e5d5cb7e6079a78e45727a479bd",
+    "equal": true
+  },
+  {
+    "path": "gui/tests/qml/tst_KeyboardMouseReset.qml",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "751859297c2d92e5e03dcad4a6a519912cec6ffdee3b729b207083df6383089f",
+    "current_sha256": "751859297c2d92e5e03dcad4a6a519912cec6ffdee3b729b207083df6383089f",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "symbol": "Settings::GetKeyboardMouseBindings",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "28ef8372994ed7d69c5e889c873ebd1d54dfb37cad706878a08d81422d2431dd",
+    "current_sha256": "28ef8372994ed7d69c5e889c873ebd1d54dfb37cad706878a08d81422d2431dd",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "symbol": "Settings::SetKeyboardMouseBindings",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "42b6da46b8650229c6236409b067f55cb63f42df7af593e2e8827ec877f95aed",
+    "current_sha256": "42b6da46b8650229c6236409b067f55cb63f42df7af593e2e8827ec877f95aed",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "symbol": "Settings::GetMouseCameraEnabled",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "9adc79a049b00f917df9fb54eef253cbe562f006dca5fe008aae4252d3f5c778",
+    "current_sha256": "9adc79a049b00f917df9fb54eef253cbe562f006dca5fe008aae4252d3f5c778",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "symbol": "Settings::SetMouseCameraEnabled",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "3f30b335bce44b5246a8f2566ce8772cea721de8114ec92c8368e7fe5194733f",
+    "current_sha256": "3f30b335bce44b5246a8f2566ce8772cea721de8114ec92c8368e7fe5194733f",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "symbol": "Settings::GetMouseResponse",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "e15b263724cd38cb987ac5f634bfb73fde9d14fc3b022494835462c6db765408",
+    "current_sha256": "e15b263724cd38cb987ac5f634bfb73fde9d14fc3b022494835462c6db765408",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "symbol": "Settings::SetMouseResponse",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "2f018babd56285e8247937c18b7e5d399d5d2d037802c8bda36a7eada0822d4a",
+    "current_sha256": "2f018babd56285e8247937c18b7e5d399d5d2d037802c8bda36a7eada0822d4a",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "symbol": "Settings::ResetKeyboardMouseDefaults",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "3b8555e4fe0871d6d4c4ab00f18cd51923854844bd5c495ca4470780904d7047",
+    "current_sha256": "3b8555e4fe0871d6d4c4ab00f18cd51923854844bd5c495ca4470780904d7047",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "symbol": "Settings::GetControllerMapping",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "3b45356ab63aaafe90dbbb5dd103d6b8daafc32778bc4781e133cdd590bebb62",
+    "current_sha256": "3b45356ab63aaafe90dbbb5dd103d6b8daafc32778bc4781e133cdd590bebb62",
+    "equal": true
+  },
+  {
+    "path": "gui/src/settings.cpp",
+    "symbol": "Settings::SetControllerButtonMapping",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "0a4f409b611ff0d63826a3d1db8b29cecafdebfcee4d9f5762f48019f1ae9eef",
+    "current_sha256": "0a4f409b611ff0d63826a3d1db8b29cecafdebfcee4d9f5762f48019f1ae9eef",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "symbol": "QmlSettings::resetKeyboardMouseDefaults",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "a35c3a4f734e699dc6fe4d36f66d358062ccbe9900716c56a5287ca114a43dc1",
+    "current_sha256": "a35c3a4f734e699dc6fe4d36f66d358062ccbe9900716c56a5287ca114a43dc1",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "symbol": "QmlSettings::setMouseCameraEnabled",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "fd0630e2e3c27c4f9907a343c01a2f539154d2e879cb5251b28de443ac2144a0",
+    "current_sha256": "fd0630e2e3c27c4f9907a343c01a2f539154d2e879cb5251b28de443ac2144a0",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "symbol": "QmlSettings::setMouseHorizontalSensitivity",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "c66733763f1e4028604f3e8885c87c815246ce706eebe6f3a3250d15b97c3126",
+    "current_sha256": "c66733763f1e4028604f3e8885c87c815246ce706eebe6f3a3250d15b97c3126",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "symbol": "QmlSettings::setMouseVerticalSensitivity",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "b2b8c577c15c5c0cdeb54b199f98038c7b124d31eca3a6dfa100aec7c745fecc",
+    "current_sha256": "b2b8c577c15c5c0cdeb54b199f98038c7b124d31eca3a6dfa100aec7c745fecc",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "symbol": "QmlSettings::setMouseDeadZoneCompensation",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "8ffc3ab90ad5e55052699b0580c984f180c0f680479526d8dde5c418dc813ddf",
+    "current_sha256": "8ffc3ab90ad5e55052699b0580c984f180c0f680479526d8dde5c418dc813ddf",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "symbol": "QmlSettings::setMouseInvertVertical",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "d1711f14083af9a87eac285d9f89e267eb2cc67a6467aef3e61aad0c3b0f9849",
+    "current_sha256": "d1711f14083af9a87eac285d9f89e267eb2cc67a6467aef3e61aad0c3b0f9849",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "symbol": "QmlSettings::setMouseResponseExponent",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "1c1e02047870555d55fd908a11b4862701106d9139928df079c580313815481a",
+    "current_sha256": "1c1e02047870555d55fd908a11b4862701106d9139928df079c580313815481a",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "symbol": "QmlSettings::keyboardMouseBindings",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "871eaa02f8159a26da72157e509f2265008d96177f42f77d1f6f78e85e98adf3",
+    "current_sha256": "871eaa02f8159a26da72157e509f2265008d96177f42f77d1f6f78e85e98adf3",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "symbol": "QmlSettings::changeKeyboardMouseBinding",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "d9bd7c2f6112f2627923602432cb1b8e5edd86e85fe885a5623f977c4c5940a9",
+    "current_sha256": "d9bd7c2f6112f2627923602432cb1b8e5edd86e85fe885a5623f977c4c5940a9",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlsettings.cpp",
+    "symbol": "QmlSettings::changeControllerKey",
+    "baseline": "d0e2f052cb076b7fda85c51f60dab1cc428951fb",
+    "baseline_sha256": "21df34ba8c3cb7b7fbbbf82c24224bc3a8ab3ed3a2e28a0d926350b1be1e7562",
+    "current_sha256": "21df34ba8c3cb7b7fbbbf82c24224bc3a8ab3ed3a2e28a0d926350b1be1e7562",
+    "equal": true
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "symbol": "SetupBridge::keyboardMouseFormValid",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "0dea37557fb40ea85c9822501d99e41c71635c52757f955b95514477ab777a4c",
+    "current_sha256": "0dea37557fb40ea85c9822501d99e41c71635c52757f955b95514477ab777a4c",
+    "equal": true
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "symbol": "SetupBridge::invalidateKeyboardMouse",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "9a39ec08c3f0b34e029e4a7d85d374b9a4085c81639c29c1c0f19d00efe6f8d4",
+    "current_sha256": "9a39ec08c3f0b34e029e4a7d85d374b9a4085c81639c29c1c0f19d00efe6f8d4",
+    "equal": true
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "symbol": "SetupBridge::setKeyboardMouseAvailable",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "170ecc40999dd8b93d641bd419b282cd000926a9b915930a6f565aa42aa064e3",
+    "current_sha256": "170ecc40999dd8b93d641bd419b282cd000926a9b915930a6f565aa42aa064e3",
+    "equal": true
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "symbol": "SetupBridge::beginKeyboardMouse",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "a727c1f86a15dc73f3c18f559bf75b3d0438e38e01c7a98740e4f478106b72b4",
+    "current_sha256": "a727c1f86a15dc73f3c18f559bf75b3d0438e38e01c7a98740e4f478106b72b4",
+    "equal": true
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "symbol": "SetupBridge::endKeyboardMouse",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "1af6627f43962b2cd6e3ac6e3b03317f6758084bc6d1fc6a0ae0d1cf429ade1a",
+    "current_sha256": "1af6627f43962b2cd6e3ac6e3b03317f6758084bc6d1fc6a0ae0d1cf429ade1a",
+    "equal": true
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "symbol": "SetupBridge::setKeyboardMouseSetting",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "5ead5c711e91535e779878bf886f00398b436e73988673f130b115e2376c3e80",
+    "current_sha256": "5ead5c711e91535e779878bf886f00398b436e73988673f130b115e2376c3e80",
+    "equal": true
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "symbol": "SetupBridge::captureKeyboardMouse",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "113c4b8bd13acb4f9f8201a755e02e4daf88080ad860ba02510e46939936fd94",
+    "current_sha256": "113c4b8bd13acb4f9f8201a755e02e4daf88080ad860ba02510e46939936fd94",
+    "equal": true
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "symbol": "SetupBridge::resetKeyboardMouse",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "e15c01f594cabf95a157f8ec3d314d7de44d79cf740f85c86ecdf55056aa9773",
+    "current_sha256": "e15c01f594cabf95a157f8ec3d314d7de44d79cf740f85c86ecdf55056aa9773",
+    "equal": true
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "symbol": "SetupBridge::resetKeyboardKeys",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "bb9a0cd2bd3d103dd9cc75fb0ed10849e8d92cd7551aa7fd80de2b025dfa06eb",
+    "current_sha256": "bb9a0cd2bd3d103dd9cc75fb0ed10849e8d92cd7551aa7fd80de2b025dfa06eb",
+    "equal": true
+  },
+  {
+    "path": "gui/src/setupwindow.cpp",
+    "symbol": "SetupWindow::showEvent",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "98c90e65dba844a1f5d2f37a11e83964d1bb89e5d8750af0a3b706d39ece2fee",
+    "current_sha256": "98c90e65dba844a1f5d2f37a11e83964d1bb89e5d8750af0a3b706d39ece2fee",
+    "equal": true
+  },
+  {
+    "path": "gui/src/setupwindow.cpp",
+    "symbol": "SetupWindow::hideEvent",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "9302f4c8d0357e82e5f35141ec4d697292b388a911696eead9c4cefed0c8180f",
+    "current_sha256": "9302f4c8d0357e82e5f35141ec4d697292b388a911696eead9c4cefed0c8180f",
+    "equal": true
+  },
+  {
+    "path": "gui/web/src/KeyboardMouse.svelte",
+    "baseline": "3eb0f7b8",
+    "baseline_sha256": "42f9b7236208d69da49ae914b6c26e4a55572735670c9489e13b3255058ca42a",
+    "current_sha256": "42f9b7236208d69da49ae914b6c26e4a55572735670c9489e13b3255058ca42a",
+    "equal": true
+  },
+  {
+    "path": "gui/src/qmlbackend.cpp",
+    "baseline": "22bb2934",
+    "baseline_sha256": "3c957b9e1cc13f0cddb7df9b6d4d19f6fce86880c1edfd22d2234cc40053b258",
+    "current_sha256": "3c957b9e1cc13f0cddb7df9b6d4d19f6fce86880c1edfd22d2234cc40053b258",
+    "equal": true
+  },
+  {
+    "path": "gui/include/qmlbackend.h",
+    "baseline": "22bb2934",
+    "baseline_sha256": "53dddca988c9d65c829be1c29ef4153df77c65b712b49e6f2a3751c5016591ac",
+    "current_sha256": "53dddca988c9d65c829be1c29ef4153df77c65b712b49e6f2a3751c5016591ac",
+    "equal": true
+  }
+]

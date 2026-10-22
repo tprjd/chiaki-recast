@@ -1,0 +1,60 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[0/2] Re-checking globbed directories...
+[1/6] Automatic MOC for target chiaki
+[2/6] Building CXX object gui\CMakeFiles\chiaki.dir\chiaki_autogen\mocs_compilation.cpp.obj
+[3/6] Building RC object gui\CMakeFiles\chiaki.dir\chiaking.rc.res
+[4/6] Building CXX object gui\CMakeFiles\chiaki.dir\src\main.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\src\main.cpp(95,13): warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+   95 |         wchar_t wc[cSize];
+      |                    ^~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\src\main.cpp(95,13): note: initializer of 'cSize' is not a constant expression
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\src\main.cpp(94,15): note: declared here
+   94 |         const size_t cSize = strlen(argv[0])+1;
+      |                      ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\src\main.cpp(96,2): warning: 'mbstowcs' is deprecated: This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+   96 |         mbstowcs (wc, argv[0], cSize);
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdlib.h(924,1): note: 'mbstowcs' has been explicitly marked deprecated here
+  924 | __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_SIZE(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(930,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_SIZE'
+  930 |     __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_SIZE_EX(_DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1, _TType2, _TArg2)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(2001,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_SIZE_EX'
+ 2001 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec size_t __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1, _TType2 _TArg2);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\src\main.cpp:16:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+4 warnings generated.
+[5/6] Linking CXX executable gui\chiaki.exe
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/chiaki.exe: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\SDL2.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\SDL2.dll done
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\SDL2.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libspeexdsp.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\libspeexdsp.dll done
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\libspeexdsp.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\json-c.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\json-c.dll done
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\json-c.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\miniupnpc.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\miniupnpc.dll done
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\miniupnpc.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\event_core.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\event_core.dll done
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\event_core.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\opus.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\opus.dll done
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\opus.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libcrypto-3-x64.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\libcrypto-3-x64.dll done
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\libcrypto-3-x64.dll: message: deploying dependencies

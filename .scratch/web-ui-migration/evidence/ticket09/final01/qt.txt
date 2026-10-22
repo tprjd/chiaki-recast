@@ -1,0 +1,1006 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: Using amd graphics card
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: Native Qt Quick QRhi: OpenGL device: "NVIDIA Corporation NVIDIA GeForce RTX 5090/PCIe/SSE2 4.6.0 NVIDIA 617.42" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: Current Profile:  ""
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: Checking sleep state: 
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: Using amd graphics card
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: Native Qt Quick QRhi: OpenGL device: "NVIDIA Corporation NVIDIA GeForce RTX 5090/PCIe/SSE2 4.6.0 NVIDIA 617.42" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::automaticRegistration(success) chiaki.gui: Current Profile:  ""
+PASS   : EmbeddedSetupTest::automaticRegistration(success)
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: Using amd graphics card
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: Native Qt Quick QRhi: OpenGL device: "NVIDIA Corporation NVIDIA GeForce RTX 5090/PCIe/SSE2 4.6.0 NVIDIA 617.42" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: Current Profile:  ""
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: Using amd graphics card
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: Native Qt Quick QRhi: OpenGL device: "NVIDIA Corporation NVIDIA GeForce RTX 5090/PCIe/SSE2 4.6.0 NVIDIA 617.42" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: Current Profile:  ""
+QINFO  : EmbeddedSetupTest::automaticRegistration(retry) chiaki.gui: Checking sleep state: 
+PASS   : EmbeddedSetupTest::automaticRegistration(retry)
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: Using amd graphics card
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: Native Qt Quick QRhi: OpenGL device: "NVIDIA Corporation NVIDIA GeForce RTX 5090/PCIe/SSE2 4.6.0 NVIDIA 617.42" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::automaticRegistration(cancel) chiaki.gui: Current Profile:  ""
+PASS   : EmbeddedSetupTest::automaticRegistration(cancel)
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: Using amd graphics card
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: Native Qt Quick QRhi: OpenGL device: "NVIDIA Corporation NVIDIA GeForce RTX 5090/PCIe/SSE2 4.6.0 NVIDIA 617.42" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::automaticRegistration(profile) chiaki.gui: Current Profile:  ""
+PASS   : EmbeddedSetupTest::automaticRegistration(profile)
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: Using amd graphics card
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: Native Qt Quick QRhi: OpenGL device: "NVIDIA Corporation NVIDIA GeForce RTX 5090/PCIe/SSE2 4.6.0 NVIDIA 617.42" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: Current Profile:  ""
+QINFO  : EmbeddedSetupTest::automaticRegistration(removed) chiaki.gui: Checking sleep state: 
+PASS   : EmbeddedSetupTest::automaticRegistration(removed)
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: Using amd graphics card
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: Native Qt Quick QRhi: OpenGL device: "NVIDIA Corporation NVIDIA GeForce RTX 5090/PCIe/SSE2 4.6.0 NVIDIA 617.42" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: Current Profile:  ""
+QINFO  : EmbeddedSetupTest::automaticRegistration(duid) chiaki.gui: Checking sleep state: 
+PASS   : EmbeddedSetupTest::automaticRegistration(duid)
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: Using amd graphics card
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: Native Qt Quick QRhi: OpenGL device: "NVIDIA Corporation NVIDIA GeForce RTX 5090/PCIe/SSE2 4.6.0 NVIDIA 617.42" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: Current Profile:  ""
+QINFO  : EmbeddedSetupTest::automaticRegistration(mac) chiaki.gui: Checking sleep state: 
+PASS   : EmbeddedSetupTest::automaticRegistration(mac)
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: Using amd graphics card
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: Native Qt Quick QRhi: OpenGL device: "NVIDIA Corporation NVIDIA GeForce RTX 5090/PCIe/SSE2 4.6.0 NVIDIA 617.42" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::automaticRegistration(ps4) chiaki.gui: Current Profile:  ""
+FAIL!  : EmbeddedSetupTest::automaticRegistration(ps4) Compared values are not the same
+   Actual   (connects.load()): 0
+   Expected (1)              : 1
+C:\Users\david\.codex\worktrees\web-ui-ticket-09\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(675) : failure location
+QINFO  : EmbeddedSetupTest::automaticRegistration(context) chiaki.gui: Updated PSN hosts
+FAIL!  : EmbeddedSetupTest::automaticRegistration(context) 'script(setup->view(), "document.querySelector('.pairing').textContent.includes('Registration did not start')").toBool()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\web-ui-ticket-09\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(637) : failure location
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: Using amd graphics card
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: Native Qt Quick QRhi: OpenGL device: "NVIDIA Corporation NVIDIA GeForce RTX 5090/PCIe/SSE2 4.6.0 NVIDIA 617.42" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: Current Profile:  ""
+QINFO  : EmbeddedSetupTest::automaticRegistration(concurrent) chiaki.gui: Checking sleep state: 
+PASS   : EmbeddedSetupTest::automaticRegistration(concurrent)
+PASS   : EmbeddedSetupTest::registrationForm()
+PASS   : EmbeddedSetupTest::registrationProgress()
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 12 passed, 2 failed, 0 skipped, 0 blacklisted, 52550ms
+********* Finished testing of EmbeddedSetupTest *********

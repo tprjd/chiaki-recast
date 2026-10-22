@@ -1,0 +1,62 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[0/2] Re-checking globbed directories...
+[1/6] Generating web/index.html, web/app.js, web/app.css
+
+added 46 packages in 1s
+
+> chiaki-recast-setup@1.0.0 build
+> vite build --outDir C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/web
+
+14:03:18 [vite-plugin-svelte] no Svelte config found at C:/Users/david/.codex/worktrees/web-ui-ticket-03/chiaki-ng-ui/gui/web - using default configuration.
+vite v8.3.5 building client environment for production...
+transforming...
+<script src="qrc:/qtwebchannel/qwebchannel.js"> in "/index.html" can't be bundled without type="module" attribute
+✓ 111 modules transformed.
+
+(!) outDir C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\web is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../../../../../../.cache/chiaki-msvc-native/ticket03-build/gui/web/index.html   0.63 kB │ gzip:  0.35 kB
+../../../../../../.cache/chiaki-msvc-native/ticket03-build/gui/web/app.css      2.41 kB │ gzip:  1.06 kB
+../../../../../../.cache/chiaki-msvc-native/ticket03-build/gui/web/app.js      43.06 kB │ gzip: 16.83 kB
+
+✓ built in 84ms
+[2/6] Automatic RCC for setup.qrc
+[3/6] Building CXX object gui\CMakeFiles\chiaki-gui.dir\chiaki-gui_autogen\EJRQKI7XPS\qrc_setup.cpp.obj
+[4/6] Linking CXX executable gui\chiaki.exe
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/chiaki.exe: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\SDL2.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\SDL2.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui\SDL2.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libspeexdsp.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\libspeexdsp.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui\libspeexdsp.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\json-c.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\json-c.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui\json-c.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\miniupnpc.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\miniupnpc.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui\miniupnpc.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\event_core.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\event_core.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui\event_core.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\opus.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\opus.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui\opus.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libcrypto-3-x64.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\libcrypto-3-x64.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui\libcrypto-3-x64.dll: message: deploying dependencies
+[5/6] Linking CXX executable gui\tests\chiaki-embedded-setup-tests.exe
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests/chiaki-embedded-setup-tests.exe: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\SDL2.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\SDL2.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\SDL2.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libspeexdsp.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\libspeexdsp.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\libspeexdsp.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\json-c.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\json-c.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\json-c.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\miniupnpc.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\miniupnpc.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\miniupnpc.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\event_core.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\event_core.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\event_core.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\opus.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\opus.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\opus.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libcrypto-3-x64.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\libcrypto-3-x64.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\libcrypto-3-x64.dll: message: deploying dependencies

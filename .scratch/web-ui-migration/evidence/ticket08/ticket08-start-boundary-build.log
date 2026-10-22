@@ -1,0 +1,717 @@
+[0/2] Re-checking globbed directories...
+[1/18] Automatic MOC for target chiaki-gui
+[2/18] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\qmlnativeservices.cpp.obj
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlnativeservices.cpp:1:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlnativeservices.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+2 warnings generated.
+[3/18] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\streamsession.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(185,2): warning: initializer order does not match the declaration order [-Wreorder-ctor]
+  179 |         ffmpeg_decoder(nullptr),
+      |         ~~~~~~~~~~~~~~~~~~~~~~~
+      |         haptics_handheld(0)
+  180 | #if CHIAKI_LIB_ENABLE_PI_DECODER
+  181 |         pi_decoder(nullptr),
+  182 | #endif
+  183 |         audio_out(0),
+      |         ~~~~~~~~~~~~
+      |         rumble_multiplier(1)
+  184 |         audio_in(0),
+      |         ~~~~~~~~~~~
+      |         ps5_rumble_intensity(0x00)
+  185 |         haptics_output(0),
+      |         ^~~~~~~~~~~~~~~~~
+      |         ps5_trigger_intensity(0x00)
+  186 |         haptics_handheld(0),
+      |         ~~~~~~~~~~~~~~~~~~~
+      |         rumble_haptics_connected(false)
+  187 |         session_started(false),
+      |         ~~~~~~~~~~~~~~~~~~~~~~
+      |         rumble_haptics_on(false)
+  188 | #if CHIAKI_GUI_ENABLE_STEAMDECK_NATIVE
+  189 |         sdeck_haptics_senderl(nullptr),
+  190 |         sdeck_haptics_senderr(nullptr),
+  191 |         sdeck(nullptr),
+  192 | #endif
+  193 | #if CHIAKI_GUI_ENABLE_SPEEX
+  194 |                 echo_resampler_buf(nullptr),
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                 session_started(false)
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(185,2): note: field 'haptics_output' will be initialized after field 'haptics_handheld'
+  185 |         haptics_output(0),
+      |         ^~~~~~~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(197,2): note: field 'haptics_resampler_buf' will be initialized after field 'holepunch_session'
+  197 |         haptics_resampler_buf(nullptr),
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(198,2): note: field 'holepunch_session' will be initialized after field 'rumble_multiplier'
+  198 |         holepunch_session(nullptr),
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(906,11): warning: enumeration value 'Unknown' not handled in switch [-Wswitch]
+  906 |                 switch (touchPoint.state())
+      |                         ^~~~~~~~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(963,24): warning: unused variable 'placeholder_touch_state' [-Wunused-variable]
+  963 |         ChiakiControllerState placeholder_touch_state;
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(1109,13): warning: unused variable 'trigger_intensity' [-Wunused-variable]
+ 1109 |                                 uint8_t trigger_intensity = (ps5_trigger_intensity < 0) ? 0xF0 : ps5_trigger_intensity;
+      |                                         ^~~~~~~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(1110,13): warning: unused variable 'rumble_intensity' [-Wunused-variable]
+ 1110 |                                 uint8_t rumble_intensity = (ps5_rumble_intensity < 0) ? 0x0F : ps5_rumble_intensity;
+      |                                         ^~~~~~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(1658,15): warning: unused variable 'cvt' [-Wunused-variable]
+ 1658 |         SDL_AudioCVT cvt;
+      |                      ^~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(1689,8): warning: unused variable 'changed' [-Wunused-variable]
+ 1689 |                 bool changed = false;
+      |                      ^~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(2184,12): warning: unused variable 'original_strength' [-Wunused-variable]
+ 2184 |                 uint16_t original_strength = (temp_left > temp_right) ? temp_left : temp_right;
+      |                          ^~~~~~~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(2675,21): warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+ 2675 |         uint8_t duid_bytes[duid_bytes_len];
+      |                            ^~~~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(2675,21): note: read of non-const variable 'duid_bytes_len' is not allowed in a constant expression
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp(2673,9): note: declared here
+ 2673 |         size_t duid_bytes_len = duid_len / 2;
+      |                ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\streamsession.cpp:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+11 warnings generated.
+[4/18] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\qmlmainwindow.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(159,20): warning: unused variable 'chiaki_level' [-Wunused-variable]
+  159 |     ChiakiLogLevel chiaki_level;
+      |                    ^~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(536,34): warning: 'fopen' is deprecated: This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  536 |     FILE *file = placebo_cache ? fopen(qPrintable(shader_cache_path()), "wb") : nullptr;
+      |                                  ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdio.h(212,20): note: 'fopen' has been explicitly marked deprecated here
+  212 |     _Check_return_ _CRT_INSECURE_DEPRECATE(fopen_s)
+      |                    ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1152,10): warning: variable 'stored' set but not used [-Wunused-but-set-variable]
+ 1152 |     bool stored = false;
+      |          ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1153,17): warning: variable 'reason' set but not used [-Wunused-but-set-variable]
+ 1153 |     const char *reason = "unknown";
+      |                 ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1492,12): warning: 'queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1492 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(123,5): note: 'queue_family_index' has been explicitly marked deprecated here
+  123 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1493,12): warning: 'nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1493 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(125,5): note: 'nb_graphics_queues' has been explicitly marked deprecated here
+  125 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1494,12): warning: 'queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1494 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(132,5): note: 'queue_family_tx_index' has been explicitly marked deprecated here
+  132 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1495,12): warning: 'nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1495 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(134,5): note: 'nb_tx_queues' has been explicitly marked deprecated here
+  134 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1496,12): warning: 'queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1496 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(141,5): note: 'queue_family_comp_index' has been explicitly marked deprecated here
+  141 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1497,12): warning: 'nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1497 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(143,5): note: 'nb_comp_queues' has been explicitly marked deprecated here
+  143 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1498,12): warning: 'queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1498 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(161,5): note: 'queue_family_decode_index' has been explicitly marked deprecated here
+  161 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1499,12): warning: 'nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1499 |     vkctx->nb_decode_queues = 1;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(163,5): note: 'nb_decode_queues' has been explicitly marked deprecated here
+  163 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1823,18): warning: 'fopen' is deprecated: This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 1823 |     FILE *file = fopen(qPrintable(shader_cache_path()), "rb");
+      |                  ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdio.h(212,20): note: 'fopen' has been explicitly marked deprecated here
+  212 |     _Check_return_ _CRT_INSECURE_DEPRECATE(fopen_s)
+      |                    ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp:1:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlmainwindow.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(290,20): warning: unused function 'render_params_path' [-Wunused-function]
+  290 | static const char *render_params_path()
+      |                    ^~~~~~~~~~~~~~~~~~
+16 warnings generated.
+[5/18] Building CXX object gui\CMakeFiles\chiaki-gui.dir\chiaki-gui_autogen\mocs_compilation.cpp.obj
+In file included from C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\chiaki-gui_autogen\mocs_compilation.cpp:4:
+In file included from C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\chiaki-gui_autogen\6YEA5652QU/moc_discoverymanager.cpp:9:
+In file included from C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\chiaki-gui_autogen\6YEA5652QU\../../../../../../.codex/worktrees/web-ui-ticket-08/chiaki-ng-ui/gui/include/discoverymanager.h:8:
+C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\chiaki-gui_autogen\6YEA5652QU\../../../../../../.codex/worktrees/web-ui-ticket-08/chiaki-ng-ui/gui/include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\chiaki-gui_autogen\6YEA5652QU\../../../../../../.codex/worktrees/web-ui-ticket-08/chiaki-ng-ui/gui/include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+2 warnings generated.
+[6/18] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\setupwindow.cpp.obj
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\setupwindow.cpp:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+2 warnings generated.
+[7/18] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\setupbridge.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\setupbridge.cpp(489,26): warning: lambda capture 'this' is not used [-Wunused-lambda-capture]
+  489 |     const auto reject = [this](const char *message) { return QVariantMap{{"accepted", false}, {"message", tr(message)}}; };
+      |                          ^~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\setupbridge.cpp(633,27): warning: lambda capture 'this' is not used [-Wunused-lambda-capture]
+  633 |     const auto invalid = [this] { return QVariantMap{{"accepted", false}, {"message", tr("Choose a valid setting value.")}}; };
+      |                           ^~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\setupbridge.cpp(701,26): warning: lambda capture 'this' is not used [-Wunused-lambda-capture]
+  701 |     const auto reject = [this](const char *message) { return QVariantMap{{"accepted", false}, {"message", tr(message)}}; };
+      |                          ^~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\setupbridge.cpp(872,26): warning: lambda capture 'this' is not used [-Wunused-lambda-capture]
+  872 |     const auto reject = [this](const char *text) { return QVariantMap{{"accepted", false}, {"message", tr(text)}}; };
+      |                          ^~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\setupbridge.cpp(901,31): warning: lambda capture 'this' is not used [-Wunused-lambda-capture]
+  901 |     const auto unavailable = [this] { return QVariantMap{{"accepted", false}, {"message", tr("Console unavailable. Close this screen and select the console again.")}}; };
+      |                               ^~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\setupbridge.cpp(949,26): warning: lambda capture 'this' is not used [-Wunused-lambda-capture]
+  949 |     const auto reject = [this] { return QVariantMap{{"accepted", false}, {"message", tr("Choose a valid renderer setting value.")}}; };
+      |                          ^~~~
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\setupbridge.cpp:2:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+8 warnings generated.
+[8/18] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\applicationcontroller.cpp.obj
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\applicationcontroller.cpp:2:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlnativeservices.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+2 warnings generated.
+[9/18] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\psnsigninwindow.cpp.obj
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\psnsigninwindow.cpp:2:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+2 warnings generated.
+[10/18] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\windowsWakeSleep.cpp.obj
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\windowsWakeSleep.cpp:2:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlmainwindow.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\windowsWakeSleep.cpp(65,44): warning: unused typedef 'PDEVICE_NOTIFY_SUBSCRIBE_PARAMETERS' [-Wunused-local-typedef]
+   65 |     } DEVICE_NOTIFY_SUBSCRIBE_PARAMETERS, *PDEVICE_NOTIFY_SUBSCRIBE_PARAMETERS;
+      |                                            ^
+3 warnings generated.
+[11/18] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\qmlbackend.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlbackend.cpp(695,18): warning: unused variable 'hidden' [-Wunused-variable]
+  695 |             bool hidden = false;
+      |                  ^~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlbackend.cpp(2119,15): warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+ 2119 |     char duid[duid_size];
+      |               ^~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlbackend.cpp(2119,15): note: read of non-const variable 'duid_size' is not allowed in a constant expression
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlbackend.cpp(2118,12): note: declared here
+ 2118 |     size_t duid_size = CHIAKI_DUID_STR_SIZE;
+      |            ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlbackend.cpp(2297,2): warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 2297 |         uint32_t stream_menu_shortcut1 = settings->GetStreamMenuShortcut1();
+      |         ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlbackend.cpp(2295,5): note: previous statement is here
+ 2295 |     if(!settings->GetStreamMenuEnabled())
+      |     ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlbackend.cpp(2418,2): warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 2418 |         QMap<int, QStringList> result =
+      |         ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlbackend.cpp(2416,5): note: previous statement is here
+ 2416 |     if(!controller_mapping_in_progress)
+      |     ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlbackend.cpp(3137,6): warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 3137 |             if(!found_hosts.contains(duid) && registered_names.contains(name))
+      |             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlbackend.cpp(3135,9): note: previous statement is here
+ 3135 |         if(!found_nicknames.contains(name))
+      |         ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\qmlbackend.cpp:1:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+6 warnings generated.
+[12/18] Automatic MOC for target chiaki-embedded-setup-tests
+[13/17] Building CXX object gui\CMakeFiles\chiaki.dir\src\main.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\main.cpp(95,13): warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+   95 |         wchar_t wc[cSize];
+      |                    ^~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\main.cpp(95,13): note: initializer of 'cSize' is not a constant expression
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\main.cpp(94,15): note: declared here
+   94 |         const size_t cSize = strlen(argv[0])+1;
+      |                      ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\main.cpp(96,2): warning: 'mbstowcs' is deprecated: This function or variable may be unsafe. Consider using mbstowcs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+   96 |         mbstowcs (wc, argv[0], cSize);
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdlib.h(924,1): note: 'mbstowcs' has been explicitly marked deprecated here
+  924 | __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_SIZE(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(930,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_SIZE'
+  930 |     __DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_SIZE_EX(_DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1, _TType2, _TArg2)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(2001,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_NFUNC_0_2_SIZE_EX'
+ 2001 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec size_t __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1, _TType2 _TArg2);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\src\main.cpp:16:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+4 warnings generated.
+[14/17] Linking CXX executable gui\chiaki.exe
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui/chiaki.exe: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\SDL2.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\SDL2.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui\SDL2.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libspeexdsp.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\libspeexdsp.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui\libspeexdsp.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\json-c.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\json-c.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui\json-c.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\miniupnpc.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\miniupnpc.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui\miniupnpc.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\event_core.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\event_core.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui\event_core.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\opus.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\opus.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui\opus.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libcrypto-3-x64.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\libcrypto-3-x64.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui\libcrypto-3-x64.dll: message: deploying dependencies
+[15/17] Building CXX object gui\tests\CMakeFiles\chiaki-embedded-setup-tests.dir\embeddedsetup.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(1834,108): warning: trigraph ignored [-Wtrigraphs]
+ 1834 |             "document.body.innerText + [...document.querySelectorAll('*')].map(e=>e.shadowRoot?.textContent??'').join('\\n')")
+      |                                                                                                            ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(355,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  355 |         strcpy(registered.server_nickname, "Remote office");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(371,13): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  371 |             strcpy((*devices)[0].device_name, "Remote office");
+      |             ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(482,13): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  482 |             strcpy(registered.server_nickname, i ? "Remote lounge" : "Remote office");
+      |             ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(500,17): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  500 |                 strcpy((*devices)[i].device_name, i == 0 ? "Remote office" : i == 1 ? "Remote lounge" : "Unregistered");
+      |                 ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(578,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  578 |         strcpy(registered.server_nickname, "Remote office");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(586,13): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  586 |             strcpy((*devices)[0].device_name, "Remote office");
+      |             ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(657,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  657 |         strcpy(registered.server_nickname, "Remote office");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(665,13): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  665 |             strcpy((*devices)[0].device_name, "Remote office");
+      |             ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(1204,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 1204 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(1339,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 1339 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(1386,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 1386 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(1444,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 1444 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(2847,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 2847 |         strcpy(registered.server_nickname, "PRIVATE.EXAMPLE");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(2903,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 2903 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(3082,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 3082 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(3105,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 3105 |         strcpy(other.server_nickname, "Other console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp:78:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlnativeservices.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+19 warnings generated.
+[16/17] Linking CXX executable gui\tests\chiaki-embedded-setup-tests.exe
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui/tests/chiaki-embedded-setup-tests.exe: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\SDL2.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\tests\SDL2.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui/tests\SDL2.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libspeexdsp.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\tests\libspeexdsp.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui/tests\libspeexdsp.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\json-c.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\tests\json-c.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui/tests\json-c.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\miniupnpc.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\tests\miniupnpc.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui/tests\miniupnpc.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\event_core.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\tests\event_core.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui/tests\event_core.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\opus.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\tests\opus.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui/tests\opus.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libcrypto-3-x64.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\tests\libcrypto-3-x64.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket08-build/gui/tests\libcrypto-3-x64.dll: message: deploying dependencies

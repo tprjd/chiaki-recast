@@ -1,0 +1,5 @@
+<RCC><qresource prefix="/setup">
+  <file alias="index.html">@CMAKE_CURRENT_BINARY_DIR@/web/index.html</file>
+  <file alias="app.js">@CMAKE_CURRENT_BINARY_DIR@/web/app.js</file>
+  <file alias="app.css">@CMAKE_CURRENT_BINARY_DIR@/web/app.css</file>
+</qresource></RCC>

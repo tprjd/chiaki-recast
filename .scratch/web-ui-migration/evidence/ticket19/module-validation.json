@@ -1,0 +1,56 @@
+[
+  {
+    "file": "normal-loaded-modules.json",
+    "processes": [
+      {
+        "pid": 42860,
+        "executable": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final\\chiaki.exe",
+        "relevantModules": 38,
+        "outsideStage": []
+      },
+      {
+        "pid": 30120,
+        "executable": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final\\QtWebEngineProcess.exe",
+        "relevantModules": 17,
+        "outsideStage": []
+      }
+    ],
+    "observationErrors": []
+  },
+  {
+    "file": "group-loaded-modules.json",
+    "processes": [
+      {
+        "pid": 38688,
+        "executable": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final\\QtWebEngineProcess.exe",
+        "relevantModules": 17,
+        "outsideStage": []
+      },
+      {
+        "pid": 34172,
+        "executable": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final\\QtWebEngineProcess.exe",
+        "relevantModules": 17,
+        "outsideStage": []
+      },
+      {
+        "pid": 44636,
+        "executable": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final\\chiaki-embedded-setup-tests.exe",
+        "relevantModules": 46,
+        "outsideStage": []
+      },
+      {
+        "pid": 42952,
+        "executable": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final\\QtWebEngineProcess.exe",
+        "relevantModules": 17,
+        "outsideStage": []
+      },
+      {
+        "pid": 39392,
+        "executable": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final\\QtWebEngineProcess.exe",
+        "relevantModules": 17,
+        "outsideStage": []
+      }
+    ],
+    "observationErrors": []
+  }
+]

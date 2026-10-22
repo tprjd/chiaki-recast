@@ -1,0 +1,30 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_15-40-25-397397.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Starting session request for PS5
+[I] Trying to request session from <redacted-ipv4>:9295
+[I] Connected to <redacted-ipv4>:9295
+[I] Sending session request
+[38;5;31m[E] [0mFailed to receive session request response
+[I] Session has quit
+[I] Starting session request for PS5
+[I] Trying to request session from <redacted-ipv4>:9295
+[I] Connected to <redacted-ipv4>:9295
+[I] Sending session request
+[38;5;31m[E] [0mFailed to receive session request response
+[I] Session has quit
+[I] Starting session request for PS5
+[I] Trying to request session from <redacted-ipv4>:9295
+[I] Connected to <redacted-ipv4>:9295
+[I] Sending session request
+[38;5;31m[E] [0mFailed to receive session request response
+[I] Session has quit
+[I] Starting session request for PS5
+[I] Trying to request session from <redacted-ipv4>:9295
+[I] Connected to <redacted-ipv4>:9295
+[I] Sending session request
+[I] Session has quit

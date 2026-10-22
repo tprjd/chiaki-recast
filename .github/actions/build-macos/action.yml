@@ -1,0 +1,57 @@
+name: Build the macOS web and native package
+description: Matching official Qt SDK, locked frontend, native deployment, and final signing
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '24.16.0'
+        cache: npm
+        cache-dependency-path: gui/web/package-lock.json
+    - name: Select locked npm
+      shell: bash
+      run: npm install --global npm@11.13.0
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.9.3'
+        host: mac
+        target: desktop
+        arch: clang_64
+        modules: qtwebchannel qtwebsockets qtpositioning qtserialport qtshadertools
+        cache: true
+        aqtversion: '==3.3.0'
+        py7zrversion: '==1.1.0'
+    - name: Install matching official WebEngine extension
+      shell: bash
+      run: |
+        curl --fail --location --retry 3 -o "$RUNNER_TEMP/qtwebengine.7z" 'https://download.qt.io/online/qtsdkrepository/mac_x64/extensions/qtwebengine/693/clang_64/extensions.qtwebengine.693.clang_64/6.9.3-0-202509261208qtwebengine-MacOS-MacOS_15-Clang-MacOS-MacOS_15-X86_64-ARM64.7z'
+        echo "95a1fc974e50936dfe15f74007748c11de030397f419ad5b4f09766374d1648d  $RUNNER_TEMP/qtwebengine.7z" | shasum --algorithm 256 --check
+        python -m pip install py7zr==1.1.0 'protobuf>=5,<6'
+        python -m py7zr x "$RUNNER_TEMP/qtwebengine.7z" "$QT_ROOT_DIR"
+    - name: Install native dependencies
+      shell: bash
+      run: |
+        brew install ffmpeg pkgconf opus openssl@3 cmake ninja nasm protobuf@29 speexdsp libplacebo wget python-setuptools json-c miniupnpc libevent
+        sudo INSTALL_PREFIX=/usr/local bash scripts/build-sdl2-compat.sh .
+        sudo cp /usr/local/lib/pkgconfig/sdl2-compat.pc /usr/local/lib/pkgconfig/sdl2.pc
+    - name: Build exact embedded frontend and native application
+      shell: bash
+      run: |
+        test "$(node --version)" = v24.16.0
+        test "$(npm --version)" = 11.13.0
+        test "$(uname -m)" = "$MACOS_ARCH"
+        for module in Widgets WebEngineWidgets WebChannel GuiPrivate; do
+          test -f "$QT_ROOT_DIR/lib/cmake/Qt6$module/Qt6${module}Config.cmake"
+        done
+        test "$("$QT_ROOT_DIR/bin/qtpaths" --qt-version)" = 6.9.3
+        export CPATH="$(brew --prefix)/opt/ffmpeg/include"
+        export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:$(brew --prefix)/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+        cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCHIAKI_ENABLE_CLI=OFF -DCHIAKI_ENABLE_STEAMDECK_NATIVE=OFF -DCMAKE_OSX_ARCHITECTURES="$MACOS_ARCH" -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR;/usr/local;$(brew --prefix)/opt/openssl@3;$(brew --prefix)/opt/protobuf@29;$(brew --prefix)"
+        cmake --build build --config Release --target chiaki
+        cmake --install build --prefix "$PWD/macos-install"
+    - name: Deploy, check, and sign the final bundle
+      shell: bash
+      run: bash scripts/deploy-macos.sh

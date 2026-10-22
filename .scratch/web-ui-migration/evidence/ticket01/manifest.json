@@ -1,0 +1,62 @@
+{
+  "baselineCommit": "547c608e3bd8441705af8696edbc11b74b5247db",
+  "branch": "codex/web-ui-ticket-01",
+  "baselineExecutable": "501F8B0DE1105C2273C94232EBFA92AC255FB5EF4D0900A2365F8BB7975E7242",
+  "productionExecutable": "03B726D7C4E9595822EC9362097B0ACC9A8F5537F1207FB07DEA23A62AC84964",
+  "nativeServicesExecutable": "825E54EDBE53DC5C5F4D9FBB6A7B9C0E90DD2115B0A107566298431E6A2BD3B8",
+  "nativeInputExecutable": "B3A51A96F1BB790BA2C79D6AD4A2A50C6CF3DA3427543BAE99CA10E682130594",
+  "source": [
+    {
+      "path": "gui/include/qmlnativeservices.h",
+      "sha256": "10A8C2A09EC07B47CE1939EB1991C3920E4CA0FA207ABB965368C58ACBC021BA"
+    },
+    {
+      "path": "gui/src/qmlnativeservices.cpp",
+      "sha256": "68546AA5F0EC2272275DBDC37FC578FAB8C3EF9DDA052736D65A607FFD9FA171"
+    },
+    {
+      "path": "gui/include/qmlbackend.h",
+      "sha256": "78A579D741269AFBB5C43DB9312761FE41B0C79CB78EBFEA67C82889B0FDE305"
+    },
+    {
+      "path": "gui/src/qmlbackend.cpp",
+      "sha256": "B70B60103430ED2467E439EA8F88F087467F6DE9072AC3EDA5EB0CFDF11827CA"
+    },
+    {
+      "path": "gui/include/qmlmainwindow.h",
+      "sha256": "EA4826D5A5D4492BAD0B8C59F42DEE5ACFE8CF6B1DBDF56285704A7A79E47824"
+    },
+    {
+      "path": "gui/src/qmlmainwindow.cpp",
+      "sha256": "71D719F094470FED9A2D5751013BFD430EE539306D66AD0355CF47683FF9B4D5"
+    },
+    {
+      "path": "gui/src/main.cpp",
+      "sha256": "5229FFA3A074135AC2340EA97A8B601AAD84EA33C241ED919010B28B905352DB"
+    },
+    {
+      "path": "gui/src/qml/Main.qml",
+      "sha256": "EA83B1FD2B2BE9B929251A1C7DC043A59D424C1C15CCBF813147657C3B15FBB7"
+    },
+    {
+      "path": "gui/src/streamsession.cpp",
+      "sha256": "D811E90E63BB339DF274F93042A4ACB818E288D7FD0202009FE2A445E3A83EBC"
+    },
+    {
+      "path": "gui/src/keyboardmousemapper.cpp",
+      "sha256": "BD2A450A403DC60CC1391A3A070C8E8C3103F2E8B72280BA2440EE2AB0A22015"
+    },
+    {
+      "path": "gui/src/streaminputownership.cpp",
+      "sha256": "58101083FFD9C03F4C230EF200372FB1CDC3F10F84E40E66B1FD1CD668C337D7"
+    },
+    {
+      "path": "gui/tests/nativeservices.cpp",
+      "sha256": "3ADB32CD8FFD9C5B20BAC1F93B570980785B216E5D2D353C341413397B73A63A"
+    },
+    {
+      "path": "gui/tests/streaminputnative.cpp",
+      "sha256": "7824145C39A491C560AE4487B72EB9569FC3580BD6FD7262F69CFD2502555E51"
+    }
+  ]
+}

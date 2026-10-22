@@ -26,15 +26,16 @@ jobs:
       - name: Setup Flatpak Builder Environment
         run: |
           flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          flatpak install org.kde.Sdk//6.9 -y
-          flatpak install org.kde.Platform//6.9 -y
-          flatpak install io.qt.qtwebengine.BaseApp//6.9 -y
-          flatpak update --appstream --assumeyes
+          flatpak install --user flathub org.kde.Sdk//6.11 -y
+          flatpak install --user flathub org.kde.Platform//6.11 -y
+          flatpak install --user flathub io.qt.qtwebengine.BaseApp//6.11 -y
+          flatpak update --user --appstream --assumeyes
 
       - name: Build Flatpak package
         working-directory: chiaki-ng
         run: |
-          flatpak-builder --repo=chiaki-ng --force-clean build-dir scripts/flatpak/io.github.streetpea.Chiaki4deck.yaml
+          flatpak-builder --user --repo=chiaki-ng --force-clean build-dir scripts/flatpak/io.github.streetpea.Chiaki4deck.yaml
+          flatpak build --runtime build-dir /app/bin/check-chiaki-package /app
 
       - name: Bundle Flatpak app
         working-directory: chiaki-ng

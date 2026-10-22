@@ -4,16 +4,64 @@
 
 **Blocked by:** 01: Preserve native playback with application-owned services.
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 **Source:** [Web setup UI specification](../spec.md). Stories 71, 73, 74, 75, 76, 77, 78, 79, 86, 87.
 
 **Verification:** Run focused checks for this ticket and affected callers. Reuse applicable passing evidence. Repeat or broaden checks only when relevant changes, failures, or unresolved concerns justify them.
 
-- [ ] The native stream root provides the navigation functions required by the menu, statistics, notices, errors, disconnect dialog, and live settings.
-- [ ] Display, renderer, color mapping, and keyboard and mouse settings remain native during playback. Their current native behavior is retained.
-- [ ] The console login PIN prompt and renderer fallback dialog work without a setup root.
-- [ ] ADR 0001 input ownership remains intact for overlap, duplicate opens, obsolete closes, owner destruction, focus return, and session handoff. Passive notices remain passive.
-- [ ] Native video, HDR metadata, audio, microphone input, touch, haptics, and gameplay input retain their existing pipeline.
-- [ ] The direct stream command preserves its profile, fullscreen, zoom, stretch, and exit behavior without creating a WebEngine setup page.
-- [ ] Existing native stream QML and input tests exercise the extracted production root and its observable behavior.
+- [x] The native stream root provides the navigation functions required by the menu, statistics, notices, errors, disconnect dialog, and live settings.
+- [x] Display, renderer, color mapping, and keyboard and mouse settings remain native during playback. Their current native behavior is retained.
+- [x] The console login PIN prompt and renderer fallback dialog work without a setup root.
+- [x] ADR 0001 input ownership remains intact for overlap, duplicate opens, obsolete closes, owner destruction, focus return, and session handoff. Passive notices remain passive.
+- [x] Native video, HDR metadata, audio, microphone input, touch, haptics, and gameplay input retain their existing pipeline.
+- [x] The direct stream command preserves its profile, fullscreen, zoom, stretch, and exit behavior without creating a WebEngine setup page.
+- [x] Existing native stream QML and input tests exercise the extracted production root and its observable behavior.
+
+## Comments
+
+### Integration review, 2026-10-22
+
+The checked criteria describe the delivered native code and focused production
+checks. Source inspection confirms that the media and device pipelines did not
+change. It does not establish hardware acceptance. The direct-stream profile,
+fullscreen, zoom, and stretch paths remain in native code. Recorded controlled
+checks cover saved geometry, profile state, and direct-stream exit.
+
+Ticket [04](04-local-native-stream-handoff.md) owns the real-console handoff,
+decoded-media playback, and cleanup before window destruction and setup return.
+Ticket [23](23-complete-web-only-acceptance.md) retains live baseline and
+performance comparisons, HDR output, microphone, physical controller, touch,
+haptics, latency, and package acceptance. Accelerated WebEngine and native
+coexistence remains required in tickets
+[03](03-accelerated-web-console-library.md) and
+[04](04-local-native-stream-handoff.md). These acceptance checks remain unverified.
+
+## Answer
+
+The native stream root is extracted and its production window checks pass.
+`StreamRoot.qml` retains native progress, overlays, PIN, errors, disconnect,
+and live settings. `Main.qml` is removed. Native hosts use saved stream
+geometry and do not write or restore setup geometry.
+
+`streamViewDismissed` reports a presentation request. Ticket 04 must wait for
+native session and frame cleanup before it destroys the stream window or
+restores setup. The existing direct-stream exit path remains in native code.
+
+[Verification](../evidence/ticket02/verification.md) records the red and green
+checks, actual OpenGL and Vulkan results, retained ticket 01 evidence, and
+the Windows hidden-startup test correction. The pipeline checkbox records
+unchanged production paths. It does not claim physical media or input acceptance.
+Live console, native/browser GPU coexistence, HDR, latency, performance, and
+package acceptance remain with tickets 03, 04, and 23.
+
+Integration merge `d893e46ff525fd06d50037c99b3acbd303cf1a6b` merged ticket branch
+`d5826be0`, including source and evidence commit `15bc0f9c`, without conflicts.
+The merged `gui` tree equals the ticket tree. No build or test was repeated.
+The final OpenGL and Vulkan root logs each report 3 passed, 0 failed, and
+0 skipped. The input logs report 5 passed on OpenGL and 4 passed on Vulkan,
+with no failures or skips. The earlier mixed Vulkan run supplies only its
+passing `windowRecreation` case, not a passing full run.
+
+The source-only whitespace check passes. The full-range check reports trailing
+spaces in verbatim tool logs. Those raw logs remain unchanged.

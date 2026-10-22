@@ -43,6 +43,7 @@ class QmlBackend;
 class QOffscreenSurface;
 class QOpenGLContext;
 class QOpenGLFramebufferObject;
+class QRhi;
 #ifdef Q_OS_WIN
 class WindowsMouseCapture;
 #endif
@@ -82,9 +83,10 @@ public:
     };
     Q_ENUM(VideoPreset);
 
-    QmlMainWindow(Settings *settings,  bool exit_app_on_stream_exit = false);
-    QmlMainWindow(const StreamSessionConnectInfo &connect_info);
+    QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, bool exit_app_on_stream_exit = false);
+    QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, const StreamSessionConnectInfo &connect_info);
     ~QmlMainWindow();
+    QString initializationError() const { return initialization_error; }
     void updateWindowType(WindowType type);
     void setSettings(Settings *new_settings);
 
@@ -94,6 +96,7 @@ public:
 
     bool directStream() const;
     int runtimeRendererBackend() const { return static_cast<int>(render_backend); }
+    QSGRendererInterface::GraphicsApi nativeGraphicsApi() const;
 
     bool keepVideo() const;
     void setKeepVideo(bool keep);
@@ -136,6 +139,7 @@ public slots:
     void updatePlacebo();
     void updateVSync();
     void show();
+    void dismissStreamView() { emit streamViewDismissed(); }
     void presentFrame(ChiakiFfmpegFrame frame, int32_t frames_lost);
 
     AVBufferRef *vulkanHwDeviceCtx();
@@ -149,6 +153,9 @@ signals:
     void zoomFactorChanged();
     void videoPresetChanged();
     void menuRequested();
+    void streamViewDismissed();
+    void streamWindowReady();
+    void initializationFailed(const QString &reason);
     void directStreamChanged();
     void queueDepthAverageChanged();
     void pendingFrameAgeChanged();
@@ -161,6 +168,7 @@ private:
     void doneOpenGLContextCurrent();
 
     void init(Settings *settings, bool exit_app_on_stream_exit = false);
+    void reportInitializationFailure(const QString &reason);
     pl_gpu placeboGpu() const;
     void update();
     void scheduleUpdate();
@@ -297,6 +305,7 @@ private:
     QQmlEngine *qml_engine = {};
     QQuickWindow *quick_window = {};
     QQuickRenderControl *quick_render = {};
+    QRhi *native_rhi = {};
     QQuickItem *quick_item = {};
     pl_tex quick_tex = {};
     QOpenGLFramebufferObject *quick_fbo = {};
@@ -307,6 +316,9 @@ private:
     QAtomicInteger<int> quick_need_sync = 0;
     QAtomicInteger<int> quick_need_render = 0;
     QString pending_renderer_fallback_reason;
+    QString initialization_error;
+    QAtomicInteger<int> graphics_failed = 0;
+    bool stream_ready = false;
     pl_options renderparams_opts = {};
     bool renderparams_changed = false;
     const struct pl_hook *fsr_hook = nullptr;

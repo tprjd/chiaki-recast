@@ -20,22 +20,18 @@ jobs:
           submodules: 'recursive'
           path: 'chiaki-ng'
 
-      - name: Add QmlWebEngine Import
-        working-directory: chiaki-ng
-        run: |
-          cp scripts/qtwebengine_import.qml gui/src/qml/
-  
       - name: Run build script
         working-directory: chiaki-ng
         run: |
           set -xe
+          podman build -t chiaki-appimage -f scripts/Dockerfile.qt6 scripts
           podman run --rm \
             -v "`pwd`:/build/chiaki" \
             -w "/build/chiaki" \
             --device /dev/fuse \
             --cap-add SYS_ADMIN \
-            -t docker.io/streetpea/chiaki-ng-builder:qt6.9 \
-            /bin/bash -c "sudo -E scripts/build-appimage.sh /build/appdir"
+            -t chiaki-appimage \
+            /bin/bash -c 'sudo -E env PATH="$PATH" scripts/build-appimage.sh /build/appdir'
           
 
       - name: Upload chiaki-ng Artifact

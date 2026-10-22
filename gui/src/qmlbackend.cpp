@@ -1,4 +1,5 @@
 #include "qmlbackend.h"
+#include <QHostAddress>
 #include "qmlsettings.h"
 #include "qmlmainwindow.h"
 #include "streamsession.h"
@@ -16,10 +17,10 @@
 #include "steamtools.h"
 #endif
 
-#ifdef CHIAKI_HAVE_WEBENGINE
 #if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
 #include <QWebEngineClientHints>
 #endif
+#ifdef CHIAKI_HAVE_WEBENGINE
 #include <QWebEngineCookieStore>
 #endif
 #include <QUrlQuery>
@@ -33,6 +34,7 @@
 #include <QDesktopServices>
 #include <QtConcurrent>
 #include <memory>
+#include <utility>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -104,15 +106,25 @@ static void msg_handler(QtMsgType type, const QMessageLogContext &context, const
     chiaki_log(chiaki_log_ctx, chiaki_level, "%s", qPrintable(msg));
 }
 
-QmlRegist::QmlRegist(uint32_t log_mask, QObject *parent)
-    : QObject(parent)
+QmlRegist::QmlRegist(uint32_t log_mask, QObject *parent, RegistrationRequests requests)
+    : QObject(parent), requests(std::move(requests))
 {
     chiaki_log_init(&chiaki_log, log_mask, &QmlRegist::log_cb, this);
 }
 
 ChiakiErrorCode QmlRegist::start(const ChiakiRegistInfo &regist_info)
 {
-    return chiaki_regist_start(&chiaki_regist, &chiaki_log, &regist_info, &QmlRegist::regist_cb, this);
+    const auto result = requests.start(&chiaki_regist, &chiaki_log, &regist_info, &QmlRegist::regist_cb, this);
+    started = result == CHIAKI_ERR_SUCCESS;
+    return result;
+}
+
+QmlRegist::~QmlRegist()
+{
+    if (started) {
+        requests.stop(&chiaki_regist);
+        requests.fini(&chiaki_regist);
+    }
 }
 
 void QmlRegist::log_cb(ChiakiLogLevel level, const char *msg, void *user)
@@ -130,6 +142,7 @@ void QmlRegist::regist_cb(ChiakiRegistEvent *event, void *user)
         QMetaObject::invokeMethod(r, std::bind(&QmlRegist::success, r, *event->registered_host), Qt::QueuedConnection);
         QMetaObject::invokeMethod(r, &QObject::deleteLater, Qt::QueuedConnection);
         break;
+    case CHIAKI_REGIST_EVENT_TYPE_FINISHED_CANCELED:
     case CHIAKI_REGIST_EVENT_TYPE_FINISHED_FAILED:
         QMetaObject::invokeMethod(r, &QmlRegist::failed, Qt::QueuedConnection);
         QMetaObject::invokeMethod(r, &QObject::deleteLater, Qt::QueuedConnection);
@@ -139,11 +152,13 @@ void QmlRegist::regist_cb(ChiakiRegistEvent *event, void *user)
     }
 }
 
-QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
-    : QObject(window)
+QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests, QmlSettings::ProcessLauncher launcher, RegistrationRequests registration, DiscoveryRequests discovery)
+    : QObject(parent)
     , settings(settings)
-    , settings_qml(new QmlSettings(settings, this))
-    , window(window)
+    , settings_qml(new QmlSettings(settings, this, std::move(launcher)))
+    , discovery_manager(nullptr, std::move(discovery))
+    , registration_requests(std::move(registration))
+    , psn_requests(std::move(requests))
 {
     qt_msg_handler = qInstallMessageHandler(msg_handler);
 
@@ -153,13 +168,15 @@ QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
     qmlRegisterUncreatableType<QmlSettings>(uri, 1, 0, "ChiakiSettings", {});
     qmlRegisterUncreatableType<StreamSession>(uri, 1, 0, "ChiakiSession", {});
 
-    QObject *frame_obj = new QObject();
-    frame_thread = new QThread(frame_obj);
+    frame_worker = new QObject();
+    frame_thread = new QThread(this);
     frame_thread->setObjectName("frame");
     frame_thread->start();
-    frame_obj->moveToThread(frame_thread);
+    frame_worker->moveToThread(frame_thread);
+    connect(frame_thread, &QThread::finished, frame_worker, &QObject::deleteLater);
 
-    PsnConnectionWorker *worker = new PsnConnectionWorker;
+    PsnConnectionWorker *worker = new PsnConnectionWorker(psn_requests.connect);
+    psn_connection_worker = worker;
     worker->moveToThread(&psn_connection_thread);
     connect(&psn_connection_thread, &QThread::finished, worker, &QObject::deleteLater);
     connect(this, &QmlBackend::psnConnect, worker, &PsnConnectionWorker::ConnectPsnConnection);
@@ -171,21 +188,24 @@ QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
             finishPsnCleanup();
             return;
         }
+        if (connection_attempt.value("phase") == "failure" || !connectionTargetValid()) {
+            failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
+            finishPsnCleanup();
+            return;
+        }
         checkPsnConnection(err);
     });
     connect(&psn_hosts_watcher, &QFutureWatcher<void>::finished, [this] {
         updating_psn_hosts = false;
         if (psn_hosts_refresh_pending) {
             psn_hosts_refresh_pending = false;
-            updatePsnHosts();
+            refreshPsnToken();
         }
     });
     psn_connection_thread.start();
 
     setConnectState(PsnConnectState::NotStarted);
     connect(settings_qml, &QmlSettings::audioVolumeChanged, this, &QmlBackend::updateAudioVolume);
-    connect(settings_qml, &QmlSettings::placeboChanged, window, &QmlMainWindow::updatePlacebo);
-    connect(settings_qml, &QmlSettings::vSyncEnabledChanged, window, &QmlMainWindow::updateVSync);
     connect(settings_qml, &QmlSettings::streamMenuEnabledChanged, this, &QmlBackend::updateStreamShortcut);
     connect(settings_qml, &QmlSettings::streamMenuShortcut1Changed, this, &QmlBackend::updateStreamShortcut);
     connect(settings_qml, &QmlSettings::streamMenuShortcut2Changed, this, &QmlBackend::updateStreamShortcut);
@@ -196,28 +216,23 @@ QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
     connect(settings, &Settings::ManualHostsUpdated, this, &QmlBackend::hostsChanged);
     connect(settings, &Settings::CurrentProfileChanged, this, &QmlBackend::profileChanged);
     connect(this, &QmlBackend::hostsChanged, this, [this] {
-        if (connection_target.value("kind") == "auto" && connection_attempt.value("phase") == "waiting"
+        if (connection_attempt.value("waitingForWake").toBool()
                 && !connection_cancelled && !connection_dismissed && !connectionTargetValid()) {
             clearWakeWait();
             failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
         }
         emit connectionAttemptChanged();
     });
-    connect(window, &QmlMainWindow::hasVideoChanged, this, [this] {
-        if (session && session->IsConnected() && this->window->hasVideo() && !connection_cancelled && !connection_dismissed
-                && connection_profile_generation == profile_generation
-                && (connection_attempt.value("phase") == "connecting" || connection_attempt.value("phase") == "video"))
-            setConnectionPhase(QStringLiteral("ready"));
-    });
+    connect(this, &QmlBackend::hiddenHostsChanged, this, &QmlBackend::hostsChanged);
     connect(&discovery_manager, &DiscoveryManager::HostsUpdated, this, &QmlBackend::updateDiscoveryHosts);
     discovery_manager.SetSettings(settings);
     setDiscoveryEnabled(true);
     connect(ControllerManager::GetInstance(), &ControllerManager::AvailableControllersUpdated, this, &QmlBackend::updateControllers);
     connect(settings_qml, &QmlSettings::allowJoystickBackgroundEventsChanged, this, &QmlBackend::setAllowJoystickBackgroundEvents);
-    connect(window, &QmlMainWindow::activeChanged, this, &QmlBackend::setIsAppActive);
+    connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, &QmlBackend::setIsAppActive);
+    connect(qGuiApp, &QGuiApplication::focusWindowChanged, this, &QmlBackend::setIsAppActive);
     setAllowJoystickBackgroundEvents();
     setIsAppActive();
-    ControllerManager::GetInstance()->SetIsAppActive(window->isActive());
     updateControllers();
     updateControllerMappings();
     connect(settings, &Settings::ControllerMappingsUpdated, this, &QmlBackend::updateControllerMappings);
@@ -236,12 +251,11 @@ QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
     connect(psn_reconnect_timer, &QTimer::timeout, this, &QmlBackend::reconnectPsn);
     connect(wakeup_start_timer, &QTimer::timeout, this, [this]
     {
-        if (!wakeup_start || connection_cancelled || connection_dismissed
+        if (wakeup_nickname.isEmpty() || connection_cancelled || connection_dismissed
                 || connection_profile_generation != profile_generation || connection_attempt.value("phase") != "waking")
             return;
         clearWakeWait();
         failConnection(tr("Console did not respond"), tr("Timed out waiting for the console to wake. Check its power and network settings."));
-        emit wakeupStartFailed();
     });
     sleep_inhibit = new SystemdInhibit(QGuiApplication::applicationName(), tr("Remote Play session"), "sleep", "delay", this);
     connect(sleep_inhibit, &SystemdInhibit::sleep, this, &QmlBackend::goToSleep);
@@ -315,26 +329,101 @@ bool QmlBackend::prepareFrameForPresentation(ChiakiFfmpegFrame &frame, bool use_
 
 QmlBackend::~QmlBackend()
 {
+    qDeleteAll(findChildren<QmlRegist *>());
     psn_hosts_future.waitForFinished();
-    if (session && psn_worker_pending)
-        session->CancelPsnConnection(true);
-    if(session)
-    {
-        chiaki_log_mutex.lock();
-        chiaki_log_ctx = nullptr;
-        chiaki_log_mutex.unlock();
-        session->deleteLater();
-        session = nullptr;
-    }
-#ifdef CHIAKI_HAVE_WEBENGINE
-    if(request_interceptor)
-        request_interceptor->deleteLater();
-#endif
+    releaseSession();
+    qInstallMessageHandler(qt_msg_handler);
     frame_thread->quit();
     frame_thread->wait();
-    frame_thread->parent()->deleteLater();
     psn_connection_thread.quit();
     psn_connection_thread.wait();
+}
+
+void QmlBackend::releaseSession()
+{
+    if (!session)
+        return;
+    if (window) {
+        window->releaseGameplayCapture();
+        window->session = nullptr;
+    }
+    auto *old_session = std::exchange(session, nullptr);
+    {
+        QMutexLocker locker(&chiaki_log_mutex);
+        chiaki_log_ctx = nullptr;
+    }
+    disconnect(old_session, nullptr, this, nullptr);
+    disconnect(old_session, nullptr, frame_worker, nullptr);
+    old_session->Stop();
+    if (psn_worker_pending) {
+        old_session->CancelPsnConnection(true);
+        QMetaObject::invokeMethod(psn_connection_worker, [] {}, Qt::BlockingQueuedConnection);
+        psn_worker_pending = false;
+    }
+    old_session->WaitForStop();
+    QMetaObject::invokeMethod(frame_worker, [] {}, Qt::BlockingQueuedConnection);
+    // Destroy posted frame callbacks before the window releases its GPU.
+    delete frame_delivery;
+    frame_delivery = nullptr;
+    delete old_session;
+    session_info.hw_device_ctx = nullptr;
+}
+
+void QmlBackend::attachWindow(QmlMainWindow *native_window)
+{
+    Q_ASSERT(native_window && !window && !session);
+    window = native_window;
+    window->setSettings(settings);
+    window_connections.append(connect(settings_qml, &QmlSettings::placeboChanged, window, &QmlMainWindow::updatePlacebo));
+    window_connections.append(connect(settings_qml, &QmlSettings::vSyncEnabledChanged, window, &QmlMainWindow::updateVSync));
+    window_connections.append(connect(window, &QmlMainWindow::hasVideoChanged, this, [this] {
+        if (session && window && session->IsConnected() && window->hasVideo() && !connection_cancelled && !connection_dismissed
+                && connection_profile_generation == profile_generation
+                && (connection_attempt.value("phase") == "connecting" || connection_attempt.value("phase") == "video"))
+            setConnectionPhase(QStringLiteral("ready"));
+    }));
+    for (auto *controller : std::as_const(controllers))
+        controller->setTarget(window);
+    emit windowChanged();
+}
+
+void QmlBackend::setSetupNavigationTarget(QObject *target)
+{
+    setup_navigation_target = target;
+    if (!window)
+        for (auto *controller : std::as_const(controllers)) controller->setTarget(target);
+}
+
+void QmlBackend::setControllerNavigationEnabled(bool enabled)
+{
+    controller_navigation_enabled = enabled;
+    for (auto *controller : std::as_const(controllers)) controller->setNavigationEnabled(enabled);
+}
+
+void QmlBackend::detachWindow(QmlMainWindow *native_window)
+{
+    if (window != native_window)
+        return;
+    const bool had_session = session != nullptr;
+    releaseSession();
+    if (had_session) {
+        connection_attempt["cleanupPending"] = false;
+        connection_attempt["phase"] = "cancelled";
+        connection_cancelled = true;
+        session_pin_request.clear();
+        emit sessionPinRequestChanged();
+        emit sessionChanged(nullptr);
+        emit connectionAttemptChanged();
+        sleep_inhibit->release();
+        setDiscoveryEnabled(true);
+    }
+    for (const auto &connection : std::as_const(window_connections))
+        disconnect(connection);
+    window_connections.clear();
+    for (auto *controller : std::as_const(controllers))
+        controller->setTarget(setup_navigation_target);
+    window = nullptr;
+    emit windowChanged();
 }
 
 QmlMainWindow *QmlBackend::qmlWindow() const
@@ -380,6 +469,10 @@ void QmlBackend::resumeFromSleep()
     }
     windows_wake_sleep->setWakeState(WindowsWakeState::Awake);
 #endif
+    if (resume_session && connection_profile_generation != profile_generation) {
+        resume_session = false;
+        return;
+    }
     if (resume_session) {
         qCInfo(chiakiGui) << "Resuming session...";
         resume_session = false;
@@ -398,7 +491,7 @@ void QmlBackend::resumeFromSleep()
                 session_info.fullscreen,
                 session_info.zoom,
                 session_info.stretch,
-            });
+            }, connection_target);
         }
         else
         {
@@ -438,7 +531,7 @@ void QmlBackend::reconnectPsn()
         setConnectState(PsnConnectState::ConnectFailed);
         return;
     }
-    PSNToken *psnToken = new PSNToken(this->settings, this);
+    PSNToken *psnToken = new PSNToken(this->settings, this, psn_requests.networkManager);
     watchConnectionToken(psnToken);
     connect(psnToken, &PSNToken::PSNTokenError, this, [this, owned](const QString &error) {
         if (!owned()) return;
@@ -470,7 +563,15 @@ void QmlBackend::reconnectPsn()
 
 void QmlBackend::profileChanged()
 {
+    resume_session = false;
+    cancelAccountLookup(account_lookup_attempt.value("id").toString());
     ++profile_generation;
+    if (!registration_attempt.isEmpty()) {
+        registration_attempt["phase"] = "failure";
+        registration_attempt["profileValid"] = false;
+        registration_attempt["message"] = tr("The profile changed. The registration was not saved.");
+        emit registrationAttemptChanged();
+    }
     for (auto *request : findChildren<PSNAccountID *>())
         request->Invalidate();
     if (!psn_auth_attempt.isEmpty()) {
@@ -483,6 +584,8 @@ void QmlBackend::profileChanged()
     // Stop replies before the old profile's Settings object can be removed.
     for (auto *token : findChildren<PSNToken *>())
         delete token;
+    psn_refresh.clear();
+    emit psnRefreshChanged();
     psn_hosts.clear();
     psn_nickname_hosts.clear();
     waking_sleeping_nicknames.clear();
@@ -498,7 +601,8 @@ void QmlBackend::profileChanged()
     session_pin_request.clear();
     emit sessionPinRequestChanged();
     QString profile = settings->GetCurrentProfile();
-    Settings *settings_copy = new Settings(profile);
+    Settings *settings_copy = new Settings(profile, this);
+    disconnect(settings, nullptr, this, nullptr);
     if(settings_allocd)
         settings->deleteLater();
     settings_allocd = true;
@@ -512,7 +616,8 @@ void QmlBackend::profileChanged()
     connect(settings, &Settings::ControllerMappingsUpdated, this, &QmlBackend::updateControllerMappings);
     settings_qml->setSettings(settings);
     discovery_manager.SetSettings(settings);
-    window->setSettings(settings);
+    if (window)
+        window->setSettings(settings);
     setDiscoveryEnabled(true);
 
     auto_connect_mac = settings->GetAutoConnectHost().GetServerMAC();
@@ -614,16 +719,6 @@ void QmlBackend::setConnectState(PsnConnectState connect_state)
         if (!phase.isEmpty()) connection_attempt["phase"] = phase;
         emit connectionAttemptChanged();
     }
-    if(connect_state == PsnConnectState::ConnectFailed)
-    {
-        if(!this->settings->GetGeometry().isEmpty())
-        {
-            window->setGeometry(this->settings->GetGeometry());
-            window->normalTime();
-        }
-        else
-            window->showMaximized();
-    }
     emit connectStateChanged();
 }
 
@@ -697,6 +792,7 @@ QVariantList QmlBackend::hosts() const
         m["name"] = host.GetHost();
         m["duid"] = "";
         m["address"] = host.GetHost();
+        m["manualId"] = host.GetID();
         m["state"] = "unknown";
         m["registered"] = false;
         m["display"] = discovered_manual_hosts.contains(host) ? false : true;
@@ -771,9 +867,7 @@ void QmlBackend::finishPsnCleanup()
     chiaki_log_mutex.lock();
     chiaki_log_ctx = nullptr;
     chiaki_log_mutex.unlock();
-    if (session)
-        session->deleteLater();
-    session = nullptr;
+    releaseSession();
     psn_session_started = false;
     connection_attempt["cleanupPending"] = false;
     if (connection_cancelled)
@@ -834,6 +928,9 @@ int QmlBackend::resolveConnectionTarget() const
         const auto host = listed.at(i).toMap();
         if (!host.value("display").toBool()
                 || (!connection_attempt.value("registrationOnly").toBool() && !host.value("registered").toBool())
+                || (connection_attempt.value("registrationOnly").toBool()
+                    && (host.value("duid").toString() != session_info.duid
+                        || host.value("ps5").toBool() != chiaki_target_is_ps5(session_info.target)))
                 || connectionTargetKey(host) != connection_target)
             continue;
         if (found != -1)
@@ -846,6 +943,18 @@ int QmlBackend::resolveConnectionTarget() const
 bool QmlBackend::connectionTargetValid() const
 {
     if (connection_profile_generation != profile_generation)
+        return false;
+    if (connection_attempt.value("context") == "startup") {
+        const auto mac = connection_attempt.value("automaticMac").toString();
+        bool registered = false;
+        for (const auto &host : settings->GetRegisteredHosts())
+            if (host.GetServerMAC().ToString() == mac && !settings->GetHiddenHostHidden(host.GetServerMAC())
+                    && host.GetServerNickname() == connection_attempt.value("automaticNickname").toString())
+                registered = true;
+        if (!registered) return false;
+    }
+    const auto mac = QByteArray::fromHex(connection_target.value("mac").toString().toLatin1());
+    if (mac.size() == 6 && settings->GetHiddenHostHidden(HostMAC(reinterpret_cast<const uint8_t *>(mac.constData()))))
         return false;
     if (connection_target.value("kind") == "auto") {
         for (const auto &host : settings->GetRegisteredHosts())
@@ -887,6 +996,7 @@ void QmlBackend::setConnectionPhase(const QString &phase)
 
 void QmlBackend::beginConnection(const StreamSessionConnectInfo &info, const QVariantMap &target, const QString &context)
 {
+    resume_session = false;
     session_pin_request.clear();
     session_pin_auto_submitted = false;
     session_pin_accepted = false;
@@ -906,6 +1016,10 @@ void QmlBackend::beginConnection(const StreamSessionConnectInfo &info, const QVa
         {"ps5", chiaki_target_is_ps5(info.target)}, {"cleanupPending", context != "startup"}, {"cancelable", true},
         {"waitingForWake", waiting}, {"context", context.isEmpty() && waiting ? QStringLiteral("wake") : context},
         {"registrationOnly", info.auto_regist}, {"errorTitle", ""}, {"errorText", ""}};
+    if (context == "startup") {
+        connection_attempt["automaticMac"] = target.value("mac");
+        connection_attempt["automaticNickname"] = info.nickname;
+    }
     const int index = resolveConnectionTarget();
     if (index >= 0)
         connection_attempt["name"] = hosts().at(index).toMap().value("name");
@@ -958,7 +1072,7 @@ void QmlBackend::startPsnConnection(const StreamSessionConnectInfo &info, const 
         createSession(info, target, true);
         return;
     }
-    auto *token = new PSNToken(settings, this);
+    auto *token = new PSNToken(settings, this, psn_requests.networkManager);
     watchConnectionToken(token);
     connect(token, &PSNToken::PSNTokenError, this, [this, owned](const QString &error) {
         if (owned()) failConnection(tr("Could not reach PlayStation Network"), error);
@@ -994,6 +1108,7 @@ void QmlBackend::watchConnectionToken(PSNToken *token)
         }
     });
     connect(token, &PSNToken::Finished, token, &QObject::deleteLater);
+    emit connectionAttemptChanged();
 }
 
 void QmlBackend::failConnection(const QString &title, const QString &text)
@@ -1011,7 +1126,8 @@ void QmlBackend::failConnection(const QString &title, const QString &text)
 
 bool QmlBackend::retryConnection(const QString &attempt_id)
 {
-    if (attempt_id != connection_attempt.value("id").toString() || connection_dismissed || session
+    if (attempt_id != connection_attempt.value("id").toString() || connection_dismissed || session || registration_active
+            || (connection_attempt.value("registrationOnly").toBool() && window)
             || connection_attempt.value("cleanupPending").toBool() || connection_attempt.value("phase") != "failure"
             || !connectionTargetValid())
         return false;
@@ -1027,7 +1143,9 @@ bool QmlBackend::retryConnection(const QString &attempt_id)
     const int index = resolveConnectionTarget();
     if (!connection_target.isEmpty()) {
         const auto host = hosts().at(index).toMap();
-        if (connection_attempt.value("registrationOnly").toBool()) {
+        if (connection_attempt.value("context") == "wakeOnly")
+            return wakeUpHost(index, host.value("name").toString());
+        else if (connection_attempt.value("registrationOnly").toBool()) {
             auto info = session_info;
             info.settings = settings;
             startPsnConnection(info, connection_target);
@@ -1053,6 +1171,7 @@ bool QmlBackend::cancelConnection(const QString &attempt_id)
         return false;
     if (!pin_pending && !connection_attempt.value("cancelable", true).toBool())
         return false;
+    resume_session = false;
     connection_cancelled = true;
     if (connection_token)
         delete connection_token;
@@ -1130,6 +1249,13 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
         return;
     if (!target.isEmpty() && !connectionTargetValid()) {
         failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
+        return;
+    }
+    if (!window)
+        emit streamWindowRequested();
+    if (!window || !window->initializationError().isEmpty()) {
+        failConnection(tr("Stream window is unavailable"), window ? window->initializationError()
+            : tr("Prepare the native stream window before connecting."));
         return;
     }
     connection_attempt["cleanupPending"] = true;
@@ -1289,7 +1415,7 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
     }
 
     try {
-        session = new StreamSession(session_info, this);
+        session = new StreamSession(session_info, this, psn_requests.startSession);
     } catch (const Exception &e) {
         failConnection(tr("Stream failed"), tr("Failed to initialize Stream Session: %1").arg(e.what()));
         emit error(tr("Stream failed"), tr("Failed to initialize Stream Session: %1").arg(e.what()));
@@ -1299,7 +1425,11 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
     const QPointer<StreamSession> owned_session(session);
     const auto attempt_id = connection_generation;
 
-    connect(session, &StreamSession::FfmpegFrameAvailable, frame_thread->parent(), [this, use_opengl_renderer, owned_session, attempt_id]() {
+    if (!frame_delivery)
+        frame_delivery = new QObject(this);
+    auto *delivery = frame_delivery;
+    const QPointer<QmlMainWindow> render_window(window);
+    connect(session, &StreamSession::FfmpegFrameAvailable, frame_worker, [this, use_opengl_renderer, owned_session, attempt_id, delivery, render_window]() {
         if (!owned_session)
             return;
         ChiakiFfmpegDecoder *decoder = owned_session->GetFfmpegDecoder();
@@ -1324,13 +1454,18 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
             frame.recovered = true;
         }
 
-        QMetaObject::invokeMethod(window, [this, owned_session, attempt_id, frame, frames_lost]() mutable {
-            if (owned_session && session == owned_session && connection_generation == attempt_id && !connection_cancelled
+        auto queued_frame = std::unique_ptr<AVFrame, void (*)(AVFrame *)>(frame.frame, [](AVFrame *value) {
+            av_frame_free(&value);
+        });
+        QMetaObject::invokeMethod(delivery, [this, owned_session, attempt_id, frame,
+                queued_frame = std::move(queued_frame), frames_lost, render_window]() mutable {
+            if (render_window && window == render_window && owned_session && session == owned_session
+                    && connection_generation == attempt_id && !connection_cancelled
                     && !connection_dismissed && connection_profile_generation == profile_generation
-                    && connection_attempt.value("phase") != "failure")
-                window->presentFrame(frame, frames_lost);
-            else
-                av_frame_free(&frame.frame);
+                    && connection_attempt.value("phase") != "failure") {
+                frame.frame = queued_frame.release();
+                render_window->presentFrame(frame, frames_lost);
+            }
         });
     });
 
@@ -1356,8 +1491,7 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
             logged_hw_transfer_failures.clear();
         }
 
-        session->deleteLater();
-        session = nullptr;
+        releaseSession();
         connection_attempt["cleanupPending"] = false;
         if (connection_cancelled)
             connection_attempt["phase"] = "cancelled";
@@ -1454,13 +1588,12 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
                 connection_attempt["waitingForWake"] = false;
             }
             connection_attempt["cancelable"] = true;
-            setConnectionPhase((session_info.audio_video_disabled & CHIAKI_VIDEO_DISABLED) || window->hasVideo()
+            setConnectionPhase((session_info.audio_video_disabled & CHIAKI_VIDEO_DISABLED) || (window && window->hasVideo())
                 ? QStringLiteral("ready") : QStringLiteral("video"));
             if (!session_info.duid.isEmpty())
                 emit sessionChanged(session);
         }
     });
-    QmlMainWindow *window_ptr = window;
     chiaki_log_mutex.lock();
     chiaki_log_ctx = session->GetChiakiLog();
     chiaki_log_mutex.unlock();
@@ -1473,7 +1606,6 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
             if (!sendWakeup(connect_info.host, connect_info.regist_key, chiaki_target_is_ps5(connect_info.target)))
                 return;
             wakeup_start_timer->start(WAKEUP_WAIT_SECONDS * 1000);
-            emit wakeupStartInitiated();
             updateDiscoveryHosts();
         }
         else
@@ -1484,8 +1616,7 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
                 chiaki_log_mutex.lock();
                 chiaki_log_ctx = nullptr;
                 chiaki_log_mutex.unlock();
-                session->deleteLater();
-                session = nullptr;
+                releaseSession();
                 failConnection(tr("Stream failed"), tr("Failed to start Stream Session: %1").arg(e.what()));
                 emit error(tr("Stream failed"), tr("Failed to start Stream Session: %1").arg(e.what()));
                 return;
@@ -1497,13 +1628,13 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
     }
     else
     {
-        setDiscoveryEnabled(false);
+        if (!connect_info.auto_regist) setDiscoveryEnabled(false);
         emit showPsnView();
         setConnectState(PsnConnectState::InitiatingConnection);
         psn_worker_pending = true;
         emit psnConnect(session, session_info.duid, chiaki_target_is_ps5(session_info.target), connection_generation);
     }
-    if (window->windowState() != Qt::WindowFullScreen)
+    if (window && !connect_info.auto_regist && window->windowState() != Qt::WindowFullScreen)
     {
         if(settings->GetWindowType() == WindowType::CustomResolution)
         {
@@ -1565,11 +1696,26 @@ void QmlBackend::deleteHost(int index)
     settings->RemoveManualHost(id);
 }
 
-void QmlBackend::wakeUpHost(int index, QString nickname)
+bool QmlBackend::wakeUpHost(int index, QString nickname)
 {
-    auto server = displayServerAt(index);
-    if (!server.valid)
-        return;
+    const auto server = displayServerAt(index);
+    const auto listed = hosts();
+    if (session || connection_token || !server.valid || !server.registered || !server.duid.isEmpty()
+            || index < 0 || index >= listed.size() || !listed.at(index).toMap().value("display").toBool())
+        return false;
+    if (nickname.isEmpty()) nickname = server.registered_host.GetServerNickname();
+    wakeup_nickname = nickname;
+    session_info = StreamSessionConnectInfo(settings, server.registered_host.GetTarget(), server.GetHostAddr(), nickname,
+        server.registered_host.GetRPRegistKey(), server.registered_host.GetRPKey(), {}, {}, false, false, false, false);
+    beginConnection(session_info, connectionTargetKey(listed.at(index).toMap()), QStringLiteral("wakeOnly"));
+    connection_attempt["cleanupPending"] = false;
+    if (!connectionTargetValid()) {
+        clearWakeWait();
+        failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
+        return false;
+    }
+    if (!sendWakeup(server)) return false;
+    wakeup_start_timer->start(WAKEUP_WAIT_SECONDS * 1000);
     if (!nickname.isEmpty())
     {
         waking_sleeping_nicknames.append(nickname);
@@ -1580,7 +1726,8 @@ void QmlBackend::wakeUpHost(int index, QString nickname)
             emit hostsChanged();
         });
     }
-    sendWakeup(server);
+    emit connectionAttemptChanged();
+    return true;
 }
 
 bool QmlBackend::setConsolePin(int index, QString console_pin)
@@ -1650,113 +1797,167 @@ QVariantList QmlBackend::hiddenHosts() const
 }
 
 
-QVariantMap QmlBackend::createRegistrationContext() const
+QVariantMap QmlBackend::createRegistrationContext(int index) const
 {
-    return {{"profileGeneration", QVariant::fromValue(profile_generation)},
+    QVariantMap context{{"profileGeneration", QString::number(profile_generation)},
         {"discovered", false}, {"manualId", -1}, {"manualAddress", QString()}};
+    if (index < 0) return context;
+    const auto server = displayServerAt(index);
+    if (!server.valid || (!server.discovered && !server.duid.isEmpty())) return {};
+    context["address"] = server.GetHostAddr();
+    context["ps5"] = server.IsPS5();
+    context["discovered"] = server.discovered;
+    if (server.discovered)
+        context["mac"] = server.discovery_host.GetHostMAC().ToString();
+    else {
+        context["manualId"] = server.manual_host.GetID();
+        context["manualAddress"] = server.manual_host.GetHost();
+        context["manualMac"] = server.manual_host.GetMAC().ToString();
+        context["manualRegistered"] = server.manual_host.GetRegistered();
+    }
+    return context;
 }
 
-bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QJSValue &callback, const QVariantMap &context)
+bool QmlBackend::registrationContextCurrent(const QVariantMap &context, const QString &address) const
 {
-    if(!context.contains("profileGeneration") || context.value("profileGeneration").toULongLong() != profile_generation)
-    {
-        emit error(tr("Profile changed"), tr("Close this screen and open registration again for the current profile."));
+    if (!context.contains("profileGeneration") || context.value("profileGeneration").toULongLong() != profile_generation)
         return false;
+    if (context.value("discovered").toBool()) {
+        int found = 0;
+        for (const auto &value : hosts()) {
+            const auto host = value.toMap();
+            if (host.value("discovered").toBool() && host.value("display").toBool()
+                && host.value("mac") == context.value("mac") && host.value("address").toString() == address) ++found;
+        }
+        return found == 1 && address == context.value("address").toString();
     }
-    if(registration_active)
-    {
-        emit error(tr("Registration in progress"), tr("Wait for the current registration to finish before starting another request."));
-        return false;
+    const int manual_id = context.value("manualId", -1).toInt();
+    if (manual_id < 0) return true;
+    if (!settings->GetManualHostExists(manual_id)) return false;
+    const auto host = settings->GetManualHost(manual_id);
+    return address == context.value("manualAddress").toString() && host.GetHost() == address
+        && host.GetMAC().ToString() == context.value("manualMac").toString()
+        && host.GetRegistered() == context.value("manualRegistered").toBool();
+}
+
+bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QVariantMap &original_context)
+{
+    if (registration_active || session || window || connection_token || connection_attempt.value("cleanupPending").toBool()) return false;
+    QVariantMap context = original_context;
+    // An entered address can use an existing manual entry, but must never guess between duplicates.
+    if (!context.value("discovered").toBool() && context.value("manualId", -1).toInt() < 0) {
+        int matches = 0;
+        for (const auto &manual : settings->GetManualHosts()) {
+            if (manual.GetHost() != host) continue;
+            ++matches;
+            context["manualId"] = manual.GetID();
+            context["manualAddress"] = manual.GetHost();
+            context["manualMac"] = manual.GetMAC().ToString();
+            context["manualRegistered"] = manual.GetRegistered();
+        }
+        if (matches > 1) return false;
     }
+    const QByteArray account = psn_id.toLatin1();
+    const auto decoded = QByteArray::fromBase64Encoding(account, QByteArray::AbortOnBase64DecodingErrors);
+    const bool legacy = target == CHIAKI_TARGET_PS4_8;
+    static const QRegularExpression hostname(QStringLiteral("^(?=.{1,253}$)(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.)*[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.?$"));
+    static const QRegularExpression numeric(QStringLiteral("^[0-9.]+$"));
+    QHostAddress ip;
+    const bool validAddress = ip.setAddress(host) || (hostname.match(host).hasMatch() && !numeric.match(host).hasMatch());
+    if (!registrationContextCurrent(context, host) || !validAddress || host != host.trimmed()
+        || (target != CHIAKI_TARGET_PS5_1 && target != CHIAKI_TARGET_PS4_8 && target != CHIAKI_TARGET_PS4_9 && target != CHIAKI_TARGET_PS4_10)
+        || !QRegularExpression("^[0-9]{8}$").match(pin).hasMatch()
+        || !QRegularExpression("^$|^[0-9]{4}$").match(cpin).hasMatch()
+        || (legacy ? psn_id.trimmed().isEmpty() || psn_id.size() > 128
+            : !decoded || decoded.decoded.size() != CHIAKI_PSN_ACCOUNT_ID_SIZE || decoded.decoded.toBase64() != account)
+        || broadcast != (host == "255.255.255.255")) return false;
+
     ChiakiRegistInfo info = {};
-    QByteArray hostb = host.toUtf8();
-    info.host = hostb.constData();
+    const auto host_bytes = host.toUtf8();
+    const auto online_id = psn_id.toUtf8();
+    info.host = host_bytes.constData();
     info.target = static_cast<ChiakiTarget>(target);
     info.broadcast = broadcast;
-    info.pin = (uint32_t)pin.toULong();
-    info.console_pin = (uint32_t)cpin.toULong();
-    info.holepunch_info = nullptr;
-    info.rudp = nullptr;
-    QByteArray psn_idb;
-    if (target == CHIAKI_TARGET_PS4_8) {
-        psn_idb = psn_id.toUtf8();
-        info.psn_online_id = psn_idb.constData();
-    } else {
-        QByteArray account_id = QByteArray::fromBase64(psn_id.toUtf8());
-        if (account_id.size() != CHIAKI_PSN_ACCOUNT_ID_SIZE) {
-            emit error(tr("Invalid Account-ID"), tr("The PSN Account-ID must be exactly %1 bytes encoded as base64.").arg(CHIAKI_PSN_ACCOUNT_ID_SIZE));
-            return false;
-        }
-        info.psn_online_id = nullptr;
-        memcpy(info.psn_account_id, account_id.constData(), CHIAKI_PSN_ACCOUNT_ID_SIZE);
-    }
-    auto regist = new QmlRegist(settings->GetLogLevelMask(), this);
-    auto completed = std::make_shared<bool>(false);
+    info.pin = pin.toUInt();
+    info.console_pin = cpin.toUInt();
+    if (legacy) info.psn_online_id = online_id.constData();
+    else memcpy(info.psn_account_id, decoded.decoded.constData(), CHIAKI_PSN_ACCOUNT_ID_SIZE);
+
+    const auto id = QString::number(++registration_generation);
     const auto generation = profile_generation;
     registration_active = true;
-    connect(regist, &QmlRegist::log, this, [callback, completed](ChiakiLogLevel level, QString msg) {
-        if(*completed)
-            return;
-        QJSValue cb = callback;
-        if (cb.isCallable())
-            cb.call({QString("[%1] %2").arg(chiaki_log_level_char(level)).arg(msg), true, false});
+    registration_attempt = {{"id", id}, {"phase", "progress"}, {"profileValid", true}, {"diagnostics", QString()}};
+    auto *regist = new QmlRegist(settings->GetLogLevelMask(), this, registration_requests);
+    auto completed = std::make_shared<bool>(false);
+    connect(regist, &QmlRegist::log, this, [this, completed, generation](ChiakiLogLevel level, const QString &message) {
+        if (*completed || generation != profile_generation || level == CHIAKI_LOG_VERBOSE || level == CHIAKI_LOG_DEBUG) return;
+        // Raw payload dumps and server-defined keys must not enter the web page.
+        if ((!message.startsWith("Regist ") && !message.startsWith("REGIST - ")) || message.contains("unknown key")) return;
+        registration_attempt["diagnostics"] = (registration_attempt.value("diagnostics").toString()
+            + QString("[%1] %2\n").arg(chiaki_log_level_char(level)).arg(message)).right(16384);
+        emit registrationAttemptChanged();
     });
-    connect(regist, &QmlRegist::failed, this, [this, callback, completed, generation]() {
-        if(*completed)
-            return;
+    const auto finish = [this, completed, generation](const QString &message, bool success) {
+        if (*completed) return;
         *completed = true;
         registration_active = false;
-        QJSValue cb = callback;
-        if (cb.isCallable())
-            cb.call({generation == profile_generation ? QString() : tr("The profile changed. The registration was not saved."), false, true});
+        registration_attempt["phase"] = success ? "success" : "failure";
+        registration_attempt["message"] = generation == profile_generation ? message : tr("The profile changed. The registration was not saved.");
+        registration_attempt["profileValid"] = generation == profile_generation;
+        emit registrationAttemptChanged();
+    };
+    connect(regist, &QmlRegist::failed, this, [this, finish] {
+        finish(tr("The console could not be registered. Check your details and try again. Open diagnostics for available information."), false);
     });
-    connect(regist, &QmlRegist::success, this, [this, host, callback, context, generation, completed](const RegisteredHost &rhost) {
-        if(*completed)
+    connect(regist, &QmlRegist::success, this, [this, context, host, cpin, completed, generation, finish](const RegisteredHost &result) {
+        if (*completed) return;
+        if (generation != profile_generation || !registrationContextCurrent(context, host)) {
+            finish(tr("The profile or original console address changed. The registration was not saved. Open registration again."), false);
             return;
-        *completed = true;
-        QString completion_error;
-        if(generation != profile_generation)
-            completion_error = tr("The profile changed. The registration was not saved.");
-        const int manual_id = context.value("manualId").toInt();
-        const QString address = context.value("manualAddress").toString();
-        const auto manual_target_valid = [this, manual_id, address] {
-            return manual_id < 0 || (settings->GetManualHostExists(manual_id)
-                && settings->GetManualHost(manual_id).GetHost() == address);
-        };
-        if(completion_error.isEmpty() && !context.value("discovered").toBool() && !manual_target_valid())
-            completion_error = tr("The original console address changed or was removed. Open registration again.");
-        if(completion_error.isEmpty())
-        {
-            settings->AddRegisteredHost(rhost);
-            if(generation != profile_generation)
-                completion_error = tr("The profile changed during the update. Check the original profile before trying again.");
-            else if(!context.value("discovered").toBool())
-            {
-                if(!manual_target_valid())
-                    completion_error = tr("The console address changed during the update. Check registration before trying again.");
-                else
-                {
-                    ManualHost manual_host(manual_id, address.isEmpty() ? host : address, false, {});
-                    manual_host.Register(rhost);
-                    settings->SetManualHost(manual_host);
-                }
-            }
         }
-        registration_active = false;
-        QJSValue cb = callback;
-        if(cb.isCallable())
-            cb.call({completion_error, completion_error.isEmpty(), true});
+        RegisteredHost registered(result);
+        registered.SetConsolePin(registered, cpin);
+        settings->AddRegisteredHost(registered);
+        if (generation != profile_generation) {
+            finish(tr("The profile changed during the update. Check the original profile before trying again."), false);
+            return;
+        }
+        if (!context.value("discovered").toBool()) {
+            if (!registrationContextCurrent(context, host)) {
+                finish(tr("The console address changed during the update. Check registration before trying again."), false);
+                return;
+            }
+            ManualHost manual(context.value("manualId", -1).toInt(), host, false, {});
+            manual.Register(registered);
+            settings->SetManualHost(manual);
+        }
+        registration_attempt["resultMac"] = registered.GetServerMAC().ToString();
+        registration_attempt["resultAddress"] = host;
+        finish({}, true);
     });
-    const auto err = regist->start(info);
-    if(err != CHIAKI_ERR_SUCCESS)
-    {
-        *completed = true;
-        registration_active = false;
+    emit registrationAttemptChanged();
+    const auto result = regist->start(info);
+    if (result != CHIAKI_ERR_SUCCESS) {
         regist->deleteLater();
-        emit error(tr("Registration did not start"), QString::fromUtf8(chiaki_error_string(err)));
+        finish(tr("Registration did not start. Check the console address and try again.") + " " + QString::fromUtf8(chiaki_error_string(result)), false);
         return false;
     }
     return true;
+}
+
+bool QmlBackend::autoRegisterHost(int index)
+{
+    if (registration_active || session || window || connection_token || connection_attempt.value("cleanupPending").toBool())
+        return false;
+    const auto server = displayServerAt(index);
+    if (!server.valid || server.registered || !server.discovered || server.duid.isEmpty()) return false;
+    regist_dialog_server = server;
+    regist_dialog_generation = profile_generation;
+    auto context = createRegistrationContext(index);
+    context["automaticRequest"] = QVariant::fromValue(++automatic_registration_request);
+    const auto attempt = connection_generation;
+    autoRegister(context);
+    return connection_generation != attempt;
 }
 
 void QmlBackend::autoRegister(const QVariantMap &context)
@@ -1790,9 +1991,19 @@ void QmlBackend::autoRegister(const QVariantMap &context)
 void QmlBackend::finishAutoRegister(const ChiakiRegisteredHost &host)
 {
     if (!session || !connection_attempt.value("registrationOnly").toBool()
-            || connection_attempt.value("phase") == "registered" || connection_attempt.value("phase") == "failure"
-            || !connectionTargetValid())
+            || connection_attempt.value("phase") == "registered" || connection_attempt.value("phase") == "failure")
         return;
+    if (!connectionTargetValid()) {
+        failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
+        session->Stop();
+        return;
+    }
+    if (RegisteredHost(host).GetServerMAC() != regist_dialog_server.discovery_host.GetHostMAC()
+            || chiaki_target_is_ps5(host.target) != regist_dialog_server.discovery_host.ps5) {
+        failConnection(tr("Registration failed"), tr("The registration result does not match the selected console."));
+        session->Stop();
+        return;
+    }
     QString nickname(host.server_nickname);
     if(!regist_dialog_server.discovery_host.ps5 && regist_dialog_server.discovery_host.host_name != nickname)
     {
@@ -1815,8 +2026,10 @@ void QmlBackend::clearCookies(QQuickWebEngineProfile *profile)
     auto cookieStore = profile->cookieStore();
     cookieStore->deleteAllCookies();
 }
+#endif
 
-void QmlBackend::setWebEngineHints(QQuickWebEngineProfile *profile)
+template<class Profile>
+static void applyWebEngineHints(Profile *profile)
 {
     QDate starting_release_date(2025, 02, 18);
     QDate today = QDate::currentDate();
@@ -1845,34 +2058,23 @@ void QmlBackend::setWebEngineHints(QQuickWebEngineProfile *profile)
     fullVersionList.insert("Chromium", QString("%1.0.0.0").arg(chrome_version));
     hints->setFullVersionList(fullVersionList);
 #endif
-    request_interceptor = new SecUaRequestInterceptor(chrome_version);
-    profile->setUrlRequestInterceptor(request_interceptor);
+    profile->setUrlRequestInterceptor(new SecUaRequestInterceptor(chrome_version, profile));
 }
+
+#ifdef CHIAKI_HAVE_WEBENGINE
+void QmlBackend::setWebEngineHints(QQuickWebEngineProfile *profile) { applyWebEngineHints(profile); }
 #endif
+void QmlBackend::setWebEngineHints(QWebEngineProfile *profile) { applyWebEngineHints(profile); }
 
 void QmlBackend::connectToHost(int index, QString nickname)
 {
-    if (session)
+    if (registration_active || session || connection_token || connection_attempt.value("cleanupPending").toBool())
         return;
-    window->setWindowAdjustable(false);
+    if (window)
+        window->setWindowAdjustable(false);
     auto server = displayServerAt(index);
-    if (!server.valid)
+    if (!server.valid || !server.registered)
         return;
-
-    if (!server.registered) {
-        regist_dialog_server = server;
-        regist_dialog_generation = profile_generation;
-        auto context = createRegistrationContext();
-        context["automaticRequest"] = QVariant::fromValue(++automatic_registration_request);
-        context["discovered"] = server.discovered;
-        if(!server.discovered)
-        {
-            context["manualId"] = server.manual_host.GetID();
-            context["manualAddress"] = server.manual_host.GetHost();
-        }
-        emit registDialogRequested(server.GetHostAddr(), server.IsPS5(), server.duid, context);
-        return;
-    }
 
     const auto listed = hosts();
     if (index < 0 || index >= listed.size() || !listed.at(index).toMap().value("display").toBool())
@@ -1881,6 +2083,8 @@ void QmlBackend::connectToHost(int index, QString nickname)
     const bool continue_attempt = connection_attempt.value("phase") == "waiting"
         && connection_attempt.value("waitingForWake").toBool() && !connection_cancelled && !connection_dismissed
         && connection_profile_generation == profile_generation && connectionTargetValid();
+    if (continue_attempt && connection_attempt.value("context") == "startup" && !server.duid.isEmpty())
+        server.registered_host = settings->GetRegisteredHost(auto_connect_mac);
     if (continue_attempt) {
         const auto attempt_id = connection_generation;
         setConnectionPhase(QStringLiteral("found"));
@@ -2050,26 +2254,6 @@ QUrl QmlBackend::psnLoginUrl() const
     return QUrl(PSNAuth::LOGIN_URL + "duid=" + QString(duid) + "&");
 }
 
-bool QmlBackend::handlePsnLoginRedirect(const QUrl &url)
-{
-    const auto id = startPsnAuth(url);
-    if (id.isEmpty() || psn_auth_attempt.value("phase") == "failure") {
-        emit psnLoginAccountIdError(id.isEmpty() ? tr("PSN sign-in is already in progress.") : psn_auth_attempt.value("message").toString());
-        return false;
-    }
-    const auto generation = profile_generation;
-    auto connection = std::make_shared<QMetaObject::Connection>();
-    *connection = connect(this, &QmlBackend::psnAuthAttemptChanged, this, [this, id, generation, connection] {
-        if (psn_auth_attempt.value("id") != id || generation != profile_generation) { disconnect(*connection); return; }
-        const auto phase = psn_auth_attempt.value("phase").toString();
-        if (phase != "success" && phase != "failure") return;
-        disconnect(*connection);
-        if (phase == "success") emit psnLoginAccountIdDone(psn_auth_attempt.value("accountId").toString());
-        else emit psnLoginAccountIdError(psn_auth_attempt.value("message").toString());
-    });
-    return true;
-}
-
 void QmlBackend::clearWakeWait()
 {
     const bool allocated = wakeup_start;
@@ -2079,21 +2263,22 @@ void QmlBackend::clearWakeWait()
     psn_auto_connect_timer->stop();
     auto_connect_mac = {};
     if (allocated && session) {
-        QMutexLocker locker(&chiaki_log_mutex);
-        chiaki_log_ctx = nullptr;
-        session->deleteLater();
-        session = nullptr;
+        releaseSession();
         connection_attempt["cleanupPending"] = false;
     }
     emit autoConnectChanged();
 }
 
-void QmlBackend::stopAutoConnect()
+bool QmlBackend::stopAutoConnect(const QString &attempt_id)
 {
-    if (connection_attempt.value("waitingForWake").toBool())
-        cancelConnection(connection_attempt.value("id").toString());
-    else
+    if (attempt_id.isEmpty() && autoConnect() && connection_attempt.isEmpty()) {
         clearWakeWait();
+        return true;
+    }
+    const auto current = connection_attempt.value("id").toString();
+    if (connection_attempt.value("context") != "startup" || (!attempt_id.isEmpty() && attempt_id != current))
+        return false;
+    return cancelConnection(current);
 }
 
 void QmlBackend::beginAutoConnect(const HostMAC &mac)
@@ -2128,11 +2313,18 @@ void QmlBackend::autoConnectPsn()
     if (settings->GetPsnAuthTokenExpiry().isEmpty() || settings->GetPsnRefreshToken().isEmpty())
         return;
     const auto listed = hosts();
+    const auto selected = settings->GetRegisteredHost(auto_connect_mac);
+    const bool ps5 = chiaki_target_is_ps5(selected.GetTarget());
+    int ps4_registrations = 0;
+    for (const auto &host : settings->GetRegisteredHosts())
+        if (!chiaki_target_is_ps5(host.GetTarget()) && !settings->GetHiddenHostHidden(host.GetServerMAC()))
+            ++ps4_registrations;
     int found = -1;
     for (int i = 0; i < listed.size(); ++i) {
         const auto host = listed.at(i).toMap();
         if (!host.value("discovered").toBool() && !host.value("duid").toString().isEmpty()
-                && host.value("name").toString() == auto_connect_nickname && host.value("display").toBool()) {
+                && host.value("ps5").toBool() == ps5 && host.value("display").toBool()
+                && (ps5 ? host.value("name").toString() == auto_connect_nickname : ps4_registrations == 1)) {
             if (found != -1) return;
             found = i;
         }
@@ -2223,7 +2415,7 @@ bool QmlBackend::sendWakeup(const QString &host, const QByteArray &regist_key, b
     } catch (const Exception &e) {
         const auto title = tr("Wake-up failed");
         const auto text = tr("Failed to send wake-up packet:\n%1").arg(e.what());
-        if (wakeup_start) {
+        if (connection_attempt.value("waitingForWake").toBool()) {
             clearWakeWait();
             failConnection(title, text);
         } else
@@ -2239,7 +2431,7 @@ void QmlBackend::setAllowJoystickBackgroundEvents()
 
 void QmlBackend::setIsAppActive()
 {
-    ControllerManager::GetInstance()->SetIsAppActive(window->isActive());
+    ControllerManager::GetInstance()->SetIsAppActive(QGuiApplication::applicationState() == Qt::ApplicationActive);
 }
 
 uint32_t QmlBackend::getStreamShortcut() const
@@ -2297,7 +2489,8 @@ void QmlBackend::updateControllers()
         auto controller = ControllerManager::GetInstance()->OpenController(id);
         if (!controller)
             continue;
-        controllers[id] = new QmlController(controller, stream_shortcut ,window, this);
+        controllers[id] = new QmlController(controller, stream_shortcut, window ? static_cast<QObject *>(window) : setup_navigation_target.data(), this);
+        controllers[id]->setNavigationEnabled(controller_navigation_enabled);
         QString vidpid = controller->GetVIDPIDString();
         QString guid = controller->GetGUIDString();
         QStringList existing_vidpid;
@@ -2716,7 +2909,7 @@ void QmlBackend::controllerMappingApply()
 
 void QmlBackend::updateDiscoveryHosts()
 {
-    if (session && !connection_cancelled && !connection_dismissed && connection_profile_generation == profile_generation
+    if ((session || connection_attempt.value("context") == "wakeOnly") && !connection_cancelled && !connection_dismissed && connection_profile_generation == profile_generation
             && connection_attempt.value("phase") != "failure") {
         // Only the current profile and selected console can finish this wake wait.
         for (const auto &host : discovery_manager.GetHosts()) {
@@ -2731,6 +2924,13 @@ void QmlBackend::updateDiscoveryHosts()
             if (registered.GetRPRegistKey() != session_info.regist_key)
                 continue;
             if (!wakeup_nickname.isEmpty() && host.host_name == wakeup_nickname && host.state == CHIAKI_DISCOVERY_HOST_STATE_READY) {
+                if (connection_attempt.value("context") == "wakeOnly") {
+                    if (!connectionTargetValid()) break;
+                    clearWakeWait();
+                    connection_attempt["waitingForWake"] = false;
+                    setConnectionPhase(QStringLiteral("woken"));
+                    break;
+                }
                 const QPointer<StreamSession> owned_session(session);
                 const auto attempt_id = connection_generation;
                 const bool start_session = wakeup_start;
@@ -2751,8 +2951,7 @@ void QmlBackend::updateDiscoveryHosts()
                         QMutexLocker locker(&chiaki_log_mutex);
                         chiaki_log_ctx = nullptr;
                     }
-                    session->deleteLater();
-                    session = nullptr;
+                    releaseSession();
                     failConnection(tr("Stream failed"), tr("Failed to start Stream Session: %1").arg(e.what()));
                     break;
                 }
@@ -2814,13 +3013,12 @@ QString QmlBackend::getExecutable() {
     return QCoreApplication::applicationFilePath();
 }
 
-void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions, const QJSValue &callback, QString steamDir)
+void QmlBackend::createSteamShortcut(const QString &operation, QString shortcutName, QString launchOptions, QString steamDir)
 {
-    QJSValue cb = callback;
     shortcutName = shortcutName.trimmed();
     if (shortcutName.isEmpty())
     {
-        if (cb.isCallable()) cb.call({QString("Enter a name for the Steam game."), false, true});
+        emit steamShortcutMessage(operation, QString("Enter a name for the Steam game."), false, true);
         return;
     }
     QString failure;
@@ -2840,24 +3038,19 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
     artwork.insert("icon", &icon);
     artwork.insert("logo", &logo);
     
-    auto infoLambda = [callback](const QString &infoMessage) {
-        QJSValue icb = callback;
-        if (icb.isCallable())
-            icb.call({infoMessage, true, false});
+    auto infoLambda = [this, operation](const QString &infoMessage) {
+        emit steamShortcutMessage(operation, infoMessage, true, false);
     };
 
-    auto errorLambda = [callback, &failure](const QString &errorMessage) {
+    auto errorLambda = [this, operation, &failure](const QString &errorMessage) {
         failure += errorMessage + "\n";
-        QJSValue icb = callback;
-        if (icb.isCallable())
-            icb.call({errorMessage, false, false});
+        emit steamShortcutMessage(operation, errorMessage, false, false);
     };
     SteamTools* steam_tools = new SteamTools(infoLambda, errorLambda, steamDir);
     bool steamExists = steam_tools->steamExists();
     if(!steamExists || !failure.isEmpty())
     {
-        if (cb.isCallable())
-            cb.call({failure.isEmpty() ? QString("[E] Steam does not exist, cannot create Steam Shortcut") : failure, false, true});
+        emit steamShortcutMessage(operation, failure.isEmpty() ? QString("[E] Steam does not exist, cannot create Steam Shortcut") : failure, false, true);
         delete steam_tools;
         return;
     }
@@ -2874,7 +3067,7 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
     QVector<SteamShortcutEntry> shortcuts = steam_tools->parseShortcuts();
     if (!failure.isEmpty())
     {
-        if (cb.isCallable()) cb.call({failure, false, true});
+        emit steamShortcutMessage(operation, failure, false, true);
         delete steam_tools;
         return;
     }
@@ -2883,8 +3076,7 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
         if (map.getExe() == newShortcut.getExe() && map.getLaunchOptions() == newShortcut.getLaunchOptions()) {
             // Replace the entire map with the new one
             
-            if (cb.isCallable())
-                cb.call({QString("[I] Updating Steam entry"), true, false});
+            emit steamShortcutMessage(operation, QString("[I] Updating Steam entry"), true, false);
             map = newShortcut;
             found = true;
             break;  // Stop iterating once a match is found
@@ -2893,8 +3085,7 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
 
    //If we didn't find it to update, let's add it to the end
     if (!found) {
-        if (cb.isCallable())
-            cb.call({QString("[I] Adding Steam entry ") + QString(newShortcut.getAppName().toStdString().c_str()), true, false});
+        emit steamShortcutMessage(operation, QString("[I] Adding Steam entry ") + QString(newShortcut.getAppName().toStdString().c_str()), true, false);
         shortcuts.append(newShortcut);
     }
     steam_tools->updateShortcuts(std::move(shortcuts));
@@ -2902,17 +3093,15 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
         steam_tools->updateControllerConfig(newShortcut.getAppName(), std::move(controller_layout_workshop_id));
     if (!failure.isEmpty())
     {
-        if (cb.isCallable()) cb.call({failure, false, true});
+        emit steamShortcutMessage(operation, failure, false, true);
     }
     else if (!found)
     {
-        if (cb.isCallable())
-            cb.call({QString("[I] Added Steam entry: ") + QString(newShortcut.getAppName().toStdString().c_str()), true, true});
+        emit steamShortcutMessage(operation, QString("[I] Added Steam entry: ") + QString(newShortcut.getAppName().toStdString().c_str()), true, true);
     }
     else
     {
-        if (cb.isCallable())
-            cb.call({QString("[I] Updated Steam entry: ") + QString(newShortcut.getAppName().toStdString().c_str()), true, true});
+        emit steamShortcutMessage(operation, QString("[I] Updated Steam entry: ") + QString(newShortcut.getAppName().toStdString().c_str()), true, true);
     }
     delete steam_tools;
 }
@@ -2929,7 +3118,6 @@ QString QmlBackend::openPlaceboOptionsLink()
 {
     QUrl url = QUrl("https://libplacebo.org/options/");
     QDesktopServices::openUrl(url);
-    url = psnLoginUrl();
     return QString(url.toEncoded());
 }
 
@@ -2956,7 +3144,7 @@ QString QmlBackend::startPsnAuth(const QUrl &url)
     psn_auth_pending = true;
     const auto generation = profile_generation;
     auto owned = [this, id, generation] { return psn_auth_pending && profile_generation == generation && psn_auth_attempt.value("id") == id; };
-    auto *request = new PSNAccountID(settings, this);
+    auto *request = new PSNAccountID(settings, this, psn_requests.networkManager);
     connect(request, &PSNAccountID::Progress, this, [this, owned] {
         if (!owned()) return;
         psn_auth_attempt["phase"] = "account";
@@ -2996,40 +3184,109 @@ QString QmlBackend::startPsnAuth(const QUrl &url)
     return id;
 }
 
-void QmlBackend::initPsnAuth(const QUrl &url, const QJSValue &callback)
+QString QmlBackend::startAccountLookup(const QString &username)
 {
-    const auto id = startPsnAuth(url);
-    if (!callback.isCallable()) return;
-    if (id.isEmpty() || psn_auth_attempt.value("phase") == "failure") {
-        callback.call({id.isEmpty() ? tr("PSN sign-in is already in progress.") : psn_auth_attempt.value("message").toString(), false, true});
-        return;
-    }
+    cancelAccountLookup(account_lookup_attempt.value("id").toString());
+    const auto id = QString::number(++account_lookup_generation);
     const auto generation = profile_generation;
-    auto connection = std::make_shared<QMetaObject::Connection>();
-    *connection = connect(this, &QmlBackend::psnAuthAttemptChanged, this, [this, id, generation, callback, connection] {
-        if (psn_auth_attempt.value("id") != id || generation != profile_generation) { disconnect(*connection); return; }
-        const auto phase = psn_auth_attempt.value("phase").toString();
-        if (phase != "success" && phase != "failure") return;
-        disconnect(*connection);
-        callback.call({phase == "success" ? tr("PSN remote access is ready.") : psn_auth_attempt.value("message").toString(), phase == "success", true});
+    account_lookup_attempt = {{"id", id}, {"phase", "pending"}};
+    if (username.trimmed().isEmpty() || username.size() > 128 || username.contains(QRegularExpression("[\\x00-\\x1f]"))) {
+        account_lookup_attempt["phase"] = "failure";
+        account_lookup_attempt["message"] = tr("Enter your PSN username.");
+        emit accountLookupChanged();
+        return id;
+    }
+    auto *operation = new QObject(this);
+    auto *manager = psn_requests.networkManager ? psn_requests.networkManager(operation) : new QNetworkAccessManager(operation);
+    QNetworkRequest request(QUrl("https://psn.flipscreen.games/search.php?username="
+        + QString::fromLatin1(QUrl::toPercentEncoding(username.trimmed()))));
+    auto *reply = manager->get(request);
+    account_lookup_reply = reply;
+    auto owned = [this, id, generation] {
+        return generation == profile_generation && account_lookup_attempt.value("id") == id && account_lookup_attempt.value("phase") == "pending";
+    };
+    auto *timer = new QTimer(operation);
+    timer->setSingleShot(true);
+    connect(timer, &QTimer::timeout, this, [this, owned, reply] {
+        if (!owned()) return;
+        account_lookup_attempt["phase"] = "failure";
+        account_lookup_attempt["message"] = tr("The lookup timed out. Check your connection and try again.");
+        emit accountLookupChanged();
+        reply->abort();
     });
+    connect(reply, &QNetworkReply::finished, this, [this, operation, owned, reply, timer] {
+        timer->stop();
+        operation->deleteLater();
+        if (!owned()) return;
+        QString message;
+        QString account;
+        if (reply->error() == QNetworkReply::TimeoutError)
+            message = tr("The lookup timed out. Check your connection and try again.");
+        else if (reply->error() != QNetworkReply::NoError || reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200)
+            message = tr("The lookup service could not be reached. Check your connection and try again.");
+        else {
+            QJsonParseError error;
+            const auto data = reply->read(65537);
+            const auto document = QJsonDocument::fromJson(data, &error);
+            if (error.error != QJsonParseError::NoError || data.size() > 65536 || !document.isObject())
+                message = tr("The lookup service returned an unreadable response. Try again.");
+            else {
+                account = document.object().value("encoded_id").toString();
+                const auto bytes = account.toLatin1();
+                const auto decoded = QByteArray::fromBase64Encoding(bytes, QByteArray::AbortOnBase64DecodingErrors);
+                if (!decoded || decoded.decoded.size() != CHIAKI_PSN_ACCOUNT_ID_SIZE || decoded.decoded.toBase64() != bytes)
+                    message = tr("No valid Account ID was found. Check your username and allow anyone to find you in PSN search, then try again.");
+            }
+        }
+        account_lookup_attempt["phase"] = message.isEmpty() ? "success" : "failure";
+        if (message.isEmpty()) account_lookup_attempt["accountId"] = account;
+        else account_lookup_attempt["message"] = message;
+        account_lookup_reply = nullptr;
+        emit accountLookupChanged();
+    });
+    timer->start(30000);
+    emit accountLookupChanged();
+    return id;
+}
+
+bool QmlBackend::cancelAccountLookup(const QString &id)
+{
+    if (id.isEmpty() || account_lookup_attempt.value("id") != id) return false;
+    account_lookup_attempt = {{"id", id}, {"phase", "cancelled"}};
+    if (account_lookup_reply) account_lookup_reply->abort();
+    account_lookup_reply = nullptr;
+    emit accountLookupChanged();
+    return true;
 }
 
 void QmlBackend::refreshAuth()
 {
+    if (refresh_token) return;
     const auto generation = profile_generation;
-    PSNToken *psnToken = new PSNToken(settings, this);
-    connect(psnToken, &PSNToken::PSNTokenError, this, [this](const QString &error) {
+    PSNToken *psnToken = new PSNToken(settings, this, psn_requests.networkManager);
+    refresh_token = psnToken;
+    psn_refresh = {{"phase", "refreshing"}};
+    connect(psnToken, &PSNToken::PSNTokenError, this, [this, generation](const QString &error) {
+        if (generation != profile_generation) return;
         qCWarning(chiakiGui) << "Could not refresh token. Automatic PSN Connection Unavailable!" << error;
+        psn_refresh = {{"phase", "failure"}, {"message", error}};
+        emit psnRefreshChanged();
     });
     connect(psnToken, &PSNToken::UnauthorizedError, this, [this, generation] { if (generation == profile_generation) emit psnCredsExpired(); });
     connect(psnToken, &PSNToken::PSNTokenSuccess, this, []() {
         qCWarning(chiakiGui) << "PSN Remote Connection Tokens Refreshed.";
     });
-    connect(psnToken, &PSNToken::PSNTokenSuccess, this, [this, generation] { if (generation == profile_generation) updatePsnHosts(); });
+    connect(psnToken, &PSNToken::PSNTokenSuccess, this, [this, generation] {
+        if (generation != profile_generation) return;
+        emit psnTokenChanged();
+        if (generation == profile_generation) updatePsnHosts();
+    });
     connect(psnToken, &PSNToken::Finished, psnToken, &QObject::deleteLater);
-    QString refresh_token = settings->GetPsnRefreshToken();
-    psnToken->RefreshPsnToken(std::move(refresh_token));
+    connect(psnToken, &PSNToken::Finished, this, [this, psnToken] { if (refresh_token == psnToken) refresh_token.clear(); });
+    const auto refresh = settings->GetPsnRefreshToken();
+    emit psnRefreshChanged();
+    if (generation == profile_generation && refresh_token == psnToken)
+        psnToken->RefreshPsnToken(refresh);
 }
 
 void QmlBackend::updatePsnHosts()
@@ -3046,6 +3303,8 @@ void QmlBackend::updatePsnHosts()
         settings->GetPsnAuthToken(), settings->GetLogLevelMask(), names, settings->GetPS4RegisteredHostsRegistered(), profile_generation);
     psn_hosts_watcher.setFuture(psn_hosts_future);
     updating_psn_hosts = true;
+    psn_refresh = {{"phase", "listing"}};
+    emit psnRefreshChanged();
 }
 
 void QmlBackend::updatePsnHostsThread(QString psn_token, uint32_t log_mask, QStringList registered_names, int ps4_count, quint64 generation)
@@ -3059,9 +3318,11 @@ void QmlBackend::updatePsnHostsThread(QString psn_token, uint32_t log_mask, QStr
     size_t num_devices_ps5 = 0;
     ChiakiLog backend_log;
     chiaki_log_init(&backend_log, log_mask, chiaki_log_cb_print, nullptr);
+    ChiakiErrorCode result = CHIAKI_ERR_UNKNOWN;
     for(int i = 0; i < PSN_DEVICES_TRIES; i++)
     {
-        ChiakiErrorCode err = chiaki_holepunch_list_devices(psn_token.toUtf8().constData(), CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &backend_log);
+        ChiakiErrorCode err = psn_requests.listDevices(psn_token.toUtf8().constData(), CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &backend_log);
+        result = err;
         if (err != CHIAKI_ERR_SUCCESS)
         {
             if(PSN_DEVICES_TRIES - i > 1)
@@ -3103,11 +3364,19 @@ void QmlBackend::updatePsnHostsThread(QString psn_token, uint32_t log_mask, QStr
     if(!found_hosts.contains(duid) && (ps4_count > 0))
         found_hosts.insert(duid, psn_host);
 
-    QMetaObject::invokeMethod(this, [this, generation, found_hosts, found_nicknames] {
+    QMetaObject::invokeMethod(this, [this, generation, found_hosts, found_nicknames, result] {
         if (generation != profile_generation) return;
+        if (result != CHIAKI_ERR_SUCCESS) {
+            psn_refresh = {{"phase", "failure"}, {"message", tr("Could not refresh remote consoles. Check your connection and try again.")}};
+            emit psnRefreshChanged();
+            return;
+        }
         psn_hosts = found_hosts;
         psn_nickname_hosts = found_nicknames;
+        psn_refresh = {{"phase", "success"}, {"message", tr("Remote consoles updated")}};
         emit hostsChanged();
+        if (generation == profile_generation && !psn_auto_connect_timer->isActive()) autoConnectPsn();
+        if (generation == profile_generation) emit psnRefreshChanged();
     }, Qt::QueuedConnection);
     qCInfo(chiakiGui) << "Updated PSN hosts";
     if(device_info_ps5)
@@ -3116,14 +3385,24 @@ void QmlBackend::updatePsnHostsThread(QString psn_token, uint32_t log_mask, QStr
 
 void QmlBackend::refreshPsnToken()
 {
+    if (refresh_token) return;
+    if (updating_psn_hosts) {
+        psn_hosts_refresh_pending = true;
+        psn_refresh = {{"phase", "listing"}};
+        emit psnRefreshChanged();
+        return;
+    }
     QString expiry_s = settings->GetPsnAuthTokenExpiry();
     QString refresh = settings->GetPsnRefreshToken();
-    if(expiry_s.isEmpty() || refresh.isEmpty())
+    if(expiry_s.isEmpty() || refresh.isEmpty()) {
+        psn_refresh = {{"phase", "failure"}, {"message", tr("Sign in to PSN before refreshing remote consoles.")}};
+        emit psnRefreshChanged();
         return;
+    }
     QDateTime expiry = QDateTime::fromString(expiry_s, settings->GetTimeFormat());
     // give 1 minute buffer
     QDateTime now = QDateTime::currentDateTime().addSecs(60);
-    if (now >= expiry)
+    if (!expiry.isValid() || now >= expiry)
         refreshAuth();
     else
         updatePsnHosts();
@@ -3131,6 +3410,6 @@ void QmlBackend::refreshPsnToken()
 
 void PsnConnectionWorker::ConnectPsnConnection(StreamSession *session, const QString &duid, const bool &ps5, quint64 attempt_id)
 {
-    ChiakiErrorCode result = session->ConnectPsnConnection(duid, ps5);
+    ChiakiErrorCode result = request ? request(session, duid, ps5) : session->ConnectPsnConnection(duid, ps5);
     emit resultReady(session, attempt_id, result);
 }

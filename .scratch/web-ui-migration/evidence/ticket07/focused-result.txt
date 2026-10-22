@@ -1,0 +1,30 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QDEBUG : EmbeddedSetupTest::registrationForm() FT_New_Face failed with index 0 : 2
+FAIL!  : EmbeddedSetupTest::registrationForm() 'script(setup.view(), "document.activeElement.hasAttribute('data-register-new')").toBool()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(1280) : failure location
+PASS   : EmbeddedSetupTest::registrationProgress()
+PASS   : EmbeddedSetupTest::registrationLookup()
+PASS   : EmbeddedSetupTest::registrationLookupTimeout()
+QINFO  : EmbeddedSetupTest::registrationAccountSources() chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::registrationAccountSources() chiaki.gui: Updated PSN hosts
+PASS   : EmbeddedSetupTest::registrationAccountSources()
+PASS   : EmbeddedSetupTest::registrationNativeValidation()
+PASS   : EmbeddedSetupTest::registrationStaleTargets(manualAddress)
+PASS   : EmbeddedSetupTest::registrationStaleTargets(manualRemoved)
+PASS   : EmbeddedSetupTest::registrationStaleTargets(discoveryAddress)
+PASS   : EmbeddedSetupTest::registrationStaleTargets(discoveryDuplicate)
+PASS   : EmbeddedSetupTest::registrationStaleTargets(profile)
+FAIL!  : EmbeddedSetupTest::registrationAddressCorrection() Compared values are not the same
+   Actual   (registration.requests.size()): 1
+   Expected (2)                           : 2
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(1603) : failure location
+QINFO  : EmbeddedSetupTest::psnSignIn() chiaki.gui: Updated PSN hosts
+PASS   : EmbeddedSetupTest::psnSignIn()
+QWARN  : EmbeddedSetupTest::consoleTargetGuards() js: Unhandled signal: setup::4
+QWARN  : EmbeddedSetupTest::consoleTargetGuards() js: Unhandled signal: setup::4
+PASS   : EmbeddedSetupTest::consoleTargetGuards()
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 14 passed, 2 failed, 0 skipped, 0 blacklisted, 86117ms
+********* Finished testing of EmbeddedSetupTest *********

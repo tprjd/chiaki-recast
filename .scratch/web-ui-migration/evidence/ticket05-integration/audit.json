@@ -1,0 +1,211 @@
+{
+  "head": "ef14d52fc2e8ca9638babbc0e3e2bb934b542111",
+  "previousIntegration": "24f57a8c3dcd3341117edd1e72270ada63be9342",
+  "worker": "c3bf624c1068820aad4c8f333cab8bad2354cd44",
+  "testedSource": "823cf551b72002b9f0b39cc7ae5dd0705e101ed4",
+  "sourceCount": 19,
+  "artifactCount": 4,
+  "evidenceCount": 51,
+  "identitySha256": "3240991dad23b424895198201f46201275746fbd75066cec7059c1cb878c7571",
+  "preservedSourceComparisons": [
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/setupbridge.cpp",
+      "method": "saveManualAddress",
+      "matches": true,
+      "independentSha256": "596989648de2c10bdd987aaec03de1eeedd08e3fa7099b3bd88ccf4d391a0db2"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/setupbridge.cpp",
+      "method": "manageConsole",
+      "matches": true,
+      "independentSha256": "20f7dcf247c552c97337639a8e81a03dbca41d0e0bf4e3f23c89a51ce4476921"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/setupbridge.cpp",
+      "method": "connectConsole",
+      "matches": true,
+      "independentSha256": "9a01735b08850dcb1b91873940f2771c473b5458d30e4c22b4a06788215d8a4d"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/setupbridge.cpp",
+      "method": "identity",
+      "matches": true,
+      "independentSha256": "bf902afff3d677a6e10ab0b6f9416844669d83dc070711c00615a0ef0acd971f"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/setupbridge.cpp",
+      "method": "resolveConsole",
+      "matches": true,
+      "independentSha256": "658f8d90e2ced3e206b12c6442dadfb0ecaad77052e5dd110278c3ea1eb83756"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "hosts",
+      "matches": true,
+      "independentSha256": "3d172296fb86f3884403a90212e1307aefda788311dee81e47156e5c1155f05f"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "connectToHost",
+      "matches": true,
+      "independentSha256": "9c44558e951e783f7f79b9e790d3046dac05428ae833af4c067c3267151021aa"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "connectionTargetKey",
+      "matches": true,
+      "independentSha256": "ea3f72908aec75719d371916fb78a8d1e3bdaa72d9b411e5d6d1d171bcb254bb"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "resolveConnectionTarget",
+      "matches": true,
+      "independentSha256": "6c0ebf735515bbe2977004cd6626663d3096f7ecf2aadbf06bd8e58017e30531"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "connectionTargetValid",
+      "matches": true,
+      "independentSha256": "73278ee4dacb513e180ce539c56c5fea04c9a7047dbe461bf7213a774a992255"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "createSession",
+      "matches": true,
+      "independentSha256": "39a98c966d5e29ed93de200d2b411f499fc56c7b645a26ae15168d69369df718"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "releaseSession",
+      "matches": true,
+      "independentSha256": "020592ccf1cb056163d0541df4541cd5cb3255e8c6eb3d8eb3a9fcb3b0e00d36"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/web/src/App.svelte",
+      "matches": true,
+      "note": null,
+      "independentSha256": "e726daa483024c65ed137de5c0508c202cdb4425b04a4a4346077aa9a0ffa491"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/web/src/ConsoleManagement.svelte",
+      "matches": true,
+      "note": "Excludes the tested saved-PIN result focus addition.",
+      "independentSha256": "7a0534af680002d8bcece285daac376631ad1b12f4eafdda1d032f0555d8d5dc"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/web/src/Dialog.svelte",
+      "matches": true,
+      "note": null,
+      "independentSha256": "3c40057ef075f95fffeaf976ea8d27f954f7c3fbe91a99f9454ac8ee6b7443fc"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/web/src/ConnectAction.svelte",
+      "matches": true,
+      "note": null,
+      "independentSha256": "3ab4d931caa2a785e21c0cb0d42833686277aa5a9c126f616bb488e452c776db"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/applicationcontroller.cpp",
+      "matches": true,
+      "note": null,
+      "independentSha256": "c9e5aa6a29ff0ec1eca5021e1f8fb75aec95a9d2dcbfa0c0f60bdca1a630002e"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qml/StreamRoot.qml",
+      "matches": true,
+      "note": null,
+      "independentSha256": "0230636dda942df8a61bf47c31db10af5fbcaa5eb49428db442f4d6df2678f03"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qml/ConsolePinContent.qml",
+      "matches": true,
+      "note": null,
+      "independentSha256": "9efd0e0561becfa70a36123ddcb2f1e1024381298f092f782985c80323bc54db"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qml/LiveConsolePinContent.qml",
+      "matches": true,
+      "note": null,
+      "independentSha256": "5283815a8904058dee1a98795e400cd97310c1634c3a8333b34491df2636b44e"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qml/LiveConsolePinHost.qml",
+      "matches": true,
+      "note": null,
+      "independentSha256": "4b8f486d59953984c54f89a12adadfff4fbd0d4eecce32e16066735d54eb59ff"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "manualAddress",
+      "matches": true,
+      "note": null,
+      "independentSha256": "ed545896c3515f373453acbe44445f5c9875aef1926cd156db0dbd4f5b58dc84"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "manualAddressValidation",
+      "matches": true,
+      "note": null,
+      "independentSha256": "17e537ce55aef1e5e7c69e2162d1ae02e73ffde6ab8c4a3ef22040ffa297c7cc"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "consoleManagement",
+      "matches": true,
+      "note": "Excludes the added saved-PIN result focus assertion.",
+      "independentSha256": "72df09e0ebc167a4b21119a0973991f971b08e639bd97d7956219df1b9c4e0f2"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "consoleTargetGuards",
+      "matches": true,
+      "note": null,
+      "independentSha256": "76a9dd4426bbf5a17338c01dd563a99042b2fd1652433742eb8114ef63e299ef"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "manualHandoff",
+      "matches": true,
+      "note": null,
+      "independentSha256": "53ae649d25ced4431a52d1d8e65a92175246a92003e739a3dc094501a8631486"
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "consoleLibrary",
+      "matches": true,
+      "note": null,
+      "independentSha256": "f512dd22066d63d97eb9ca4eec1b74f031018ff4c3d529aa2b3c8b4a81fe1091"
+    }
+  ],
+  "cssDeclarationsPreserved": true,
+  "guiMatchesTestedSource": true,
+  "guiMatchesWorker": true,
+  "vendorGitlinksUnchanged": true
+}

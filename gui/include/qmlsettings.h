@@ -1,6 +1,7 @@
 #pragma once
 
 #include "settings.h"
+#include <functional>
 
 class QmlSettings : public QObject
 {
@@ -69,7 +70,6 @@ class QmlSettings : public QObject
     Q_PROPERTY(QStringList availableAudioInDevices READ availableAudioInDevices NOTIFY audioDevicesChanged)
     Q_PROPERTY(QStringList availableAudioOutDevices READ availableAudioOutDevices NOTIFY audioDevicesChanged)
     Q_PROPERTY(QVariantList registeredHosts READ registeredHosts NOTIFY registeredHostsChanged)
-    Q_PROPERTY(QStringList profiles READ profiles NOTIFY profilesChanged)
     Q_PROPERTY(QString currentProfile READ currentProfile WRITE setCurrentProfile NOTIFY currentProfileChanged)
     Q_PROPERTY(QVariantList controllerMapping READ controllerMapping NOTIFY controllerMappingChanged)
     Q_PROPERTY(uint wifiDroppedNotif READ wifiDroppedNotif WRITE setWifiDroppedNotif NOTIFY wifiDroppedNotifChanged)
@@ -171,7 +171,8 @@ class QmlSettings : public QObject
     Q_PROPERTY(float placeboToneMappingContrastSmoothness READ placeboToneMappingContrastSmoothness WRITE setPlaceboToneMappingContrastSmoothness NOTIFY placeboToneMappingContrastSmoothnessChanged)
 
 public:
-    QmlSettings(Settings *settings, QObject *parent = nullptr);
+    using ProcessLauncher = std::function<bool(const QString &, const QStringList &)>;
+    QmlSettings(Settings *settings, QObject *parent = nullptr, ProcessLauncher launcher = {});
 
     int resolutionLocalPS4() const;
     void setResolutionLocalPS4(int resolution);
@@ -326,7 +327,7 @@ public:
 
     int rendererBackend() const;
     void setRendererBackend(int backend);
-    Q_INVOKABLE void restartApplication();
+    Q_INVOKABLE QVariantMap restartApplication();
 
     QString autoConnectMac() const;
     void setAutoConnectMac(const QString &mac);
@@ -612,18 +613,20 @@ public:
     Q_INVOKABLE int normalizeKeyboardMouseKey(int input) const { return NormalizeKeyboardMouseKey(input); }
     Q_INVOKABLE QVariantMap changeKeyboardMouseBinding(int action, int slot, int input, bool move = false);
     Q_INVOKABLE void resetKeyboardMouseDefaults();
-    QStringList profiles() const;
 
     Q_INVOKABLE void deleteRegisteredHost(int index);
     Q_INVOKABLE void refreshAudioDevices();
     Q_INVOKABLE QString changeControllerKey(int button, int key);
     Q_INVOKABLE void clearKeyMapping();
-    Q_INVOKABLE void exportSettings();
-    Q_INVOKABLE QString chooseSteamBasePath();
-    Q_INVOKABLE void exportPlaceboSettings();
-    Q_INVOKABLE void importSettings();
-    Q_INVOKABLE void importPlaceboSettings();
-    Q_INVOKABLE void deleteProfile(QString profile);
+    Q_INVOKABLE QVariantMap exportSettings() { return exportSettings({}); }
+    QVariantMap exportSettings(std::function<bool()> current);
+    QString chooseSteamBasePath();
+    Q_INVOKABLE QVariantMap exportPlaceboSettings() { return exportPlaceboSettings({}); }
+    QVariantMap exportPlaceboSettings(std::function<bool()> current);
+    Q_INVOKABLE QVariantMap importSettings() { return importSettings({}); }
+    QVariantMap importSettings(std::function<bool()> current);
+    Q_INVOKABLE QVariantMap importPlaceboSettings() { return importPlaceboSettings({}); }
+    QVariantMap importPlaceboSettings(std::function<bool()> current);
     Q_INVOKABLE QString stringForDpadShortcut() const;
     Q_INVOKABLE QString stringForStreamMenuShortcut() const;
 
@@ -782,7 +785,10 @@ signals:
     void placeboChanged();
 
 private:
+    ProcessLauncher processLauncher;
     Settings *settings = {};
+    quint64 settingsGeneration = 0;
+    bool rendererFilePending = false;
     QStringList audio_in_devices;
     QStringList audio_out_devices;
 };

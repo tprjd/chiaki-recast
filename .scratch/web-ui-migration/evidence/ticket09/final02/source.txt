@@ -1,0 +1,16 @@
+70e45ce6f40b7ae0ae13ca8b85f13ceaead990aa
+ M gui/include/qmlbackend.h
+ M gui/include/setupbridge.h
+ M gui/src/applicationcontroller.cpp
+ D gui/src/qml/RegistrationMethodDialog.qml
+ M gui/src/qml/qml.qrc
+ M gui/src/qmlbackend.cpp
+ M gui/src/setupbridge.cpp
+ M gui/tests/CMakeLists.txt
+ M gui/tests/README.md
+ M gui/tests/embeddedsetup.cpp
+ D gui/tests/qml/tst_RegistrationMethod.qml
+ M gui/web/src/ConnectAction.svelte
+ M gui/web/src/Pairing.svelte
+ M gui/web/src/bridge.ts
+ m third-party/gf-complete

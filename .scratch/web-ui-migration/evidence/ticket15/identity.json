@@ -1,0 +1,39 @@
+{
+  "sourceCommit": "0916ee6486b57df98006a1d8ae0e12a5795ce4cc",
+  "checkedMergeSource": "280989cf124919d74f0bb0dde8406d20e6acb376",
+  "integratedTip": "691342dfac10d6e5857190ba40808247a2e8a879",
+  "sourceHashes": {
+    "gui/include/setupbridge.h": "72a73cc2fdd9971c2c21eceb0d0d0b01343da6e6d88a7e08b0f379c37eb63028",
+    "gui/include/setupwindow.h": "95dcc8f3ee01dea5fb2f4bd02a863248af2a4ec623b4f59f0e7725c6baf54db7",
+    "gui/src/setupbridge.cpp": "e0792b98b997ec2ebcb06e768d44331f5cd7cdb3342bb6b3a882b2f976dae978",
+    "gui/src/setupwindow.cpp": "1e9fea20bf7e25540caf6ad03db12d69d184544a57bc1aaa2be3f0a13eb84fe5",
+    "gui/src/qmlsettings.cpp": "fc6c4eb5365cf07d715d93d1d571590516e911b8e5924191b8fbda2cef7cc820",
+    "gui/tests/embeddedsetup.cpp": "3c04807c545749216da1dfc8e8ebd118b16994445df1964038b7c2bcfe95642b",
+    "gui/tests/CMakeLists.txt": "50299ce0c77ab8800262d1d14839abdc78038cb1756d0f073261127c076b6b09",
+    "gui/web/src/KeyboardMouse.svelte": "42f9b7236208d69da49ae914b6c26e4a55572735670c9489e13b3255058ca42a",
+    "gui/web/src/Settings.svelte": "3c88d3fdfeb7cfad2ec39679e685f589488dd78d63b134bcdca7f17c48ab6106",
+    "gui/web/src/SettingField.svelte": "129068ea1e56dfcd8d791dffcf3b352bdc4e620875874053a8c1e5644b25347d",
+    "gui/web/src/bridge.ts": "f6c6488f5090c9d6252ff6c29b21da35f746503de124c64dcf56583a933914ea",
+    "gui/web/src/settings.ts": "65f8785aefc8d829f70d9928115b823d8b9967d0e98b572622090645071b2daf",
+    "gui/web/src/style.css": "575f13372423b44a3dec2a7bbde5bd6697f544450425321a1912081c4223e858",
+    "gui/web/package-lock.json": "337af3ce297ac50327b7714ceabeb1141ac2cc3b30df52bf043270ce247a6358"
+  },
+  "artifactHashes": {
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket15-build\\gui\\chiaki.exe": "43227d8a1964f9fddeaedda100a2b5a8ed4aedb00b772d892addfea5f09bc303",
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket15-build\\gui\\tests\\chiaki-embedded-setup-tests.exe": "331e01d4d5f3381b755a74632e13a56c8b5ed3629f3f2df9e5a8b5193c024f88",
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket15-build\\gui\\web\\index.html": "83231c8155e6809612b2b808259e4aec880059a7d985710e3ed6aae40f07bf0c",
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket15-build\\gui\\web\\app.js": "5774b4559132d96b743c9ebe91e0bf9e8eb43736196699a3bb1958281cf8dc76",
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket15-build\\gui\\web\\app.css": "7e0028619cefa998eccccc72f39770ef16ffc6fa4253296fedb2272bdf12c768",
+    ".scratch\\web-ui-migration\\evidence\\ticket15\\layout\\bindings-200-percent.png": "04435cfdb500d55bbaccda62336e2c7c7a9e1012b885f3c9885f60ceed670f21",
+    ".scratch\\web-ui-migration\\evidence\\ticket15\\layout\\bindings-390.png": "b5fb8a8e4b7332909a914347a1bb237f0557b9a92d0fcb31d1b6e305ac460434",
+    ".scratch\\web-ui-migration\\evidence\\ticket15\\layout\\native-capture-390.png": "204bd2ce042d0dfdcf76b50202767c451ec96c84cb513e719c89bb85dce8420f",
+    ".scratch\\web-ui-migration\\evidence\\ticket15\\layout\\reset-390.png": "5256a970b460118edc29e420e2db52474beed6ce0be240ad4cd052c1e9faa26e",
+    ".scratch\\web-ui-migration\\evidence\\ticket15\\layout\\response-1280.png": "90ae5b95625f6f75df5c5c9a433aa879c5ab4d28826ebc400efc336a85ca6ea0",
+    ".scratch\\web-ui-migration\\evidence\\ticket15\\layout\\response-200-percent.png": "5157b8409d5761e20847fb569929d6b4ad575eb1ce27fab8a9a173af4cc1fe27"
+  },
+  "localVendorPatchExcluded": true,
+  "vendorPatchSha256": "9ed4f490f718ecdb5f49177738036503b894b015d33cc2f993925894dc53554e",
+  "finalSourceCommit": "b0cb579e836c3b52ffad04dc03c6fdb3daa9f947",
+  "finalIntegrationTip": "5555c00a5b952e3aa0c28dfb0d51d0796bbd1c5b",
+  "sourceIdenticalAcrossFinalDocsMerges": true
+}

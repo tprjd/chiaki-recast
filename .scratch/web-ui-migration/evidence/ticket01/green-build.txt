@@ -1,0 +1,375 @@
+[0/1] Re-running CMake...
+-- Speex DSP found echo cancelling and noise suppression enabled
+CMake Warning (policy) at CMakeLists.txt:114 (find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+This warning is for project developers.  Use -Wno-author or -Wno-policy to
+suppress it.
+
+-- Could NOT find nanopb (missing: nanopb_DIR)
+-- Python install dir: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/python3.14/site-packages
+-- Using CMake version 4.4.4
+-- curl version=[8.11.0-DEV]
+-- CMake platform flags: WIN32 GCC MINGW
+-- Performing Test HAVE_WIN32_WINNT
+-- Performing Test HAVE_WIN32_WINNT - Success
+-- Found _WIN32_WINNT=0xa00
+-- Picky compiler options: -Werror-implicit-function-declaration -W -Wall -pedantic -Wbad-function-cast -Wconversion -Winline -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-format-nonliteral -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wsign-conversion -Wno-error=sign-conversion -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wclobbered -Wmissing-parameter-type -Wold-style-declaration -Wstrict-aliasing=3 -Wtrampolines -Wno-pedantic-ms-format -Wformat=2 -Warray-bounds=2 -ftree-vrp -Wduplicated-cond -Wnull-dereference -fdelete-null-pointer-checks -Wshift-negative-value -Wshift-overflow=2 -Walloc-zero -Wduplicated-branches -Wformat-truncation=2 -Wimplicit-fallthrough -Wrestrict -Warith-conversion -Wdouble-promotion -Wenum-conversion -Wpragmas -Wunused-const-variable
+-- Could NOT find Perl (missing: PERL_EXECUTABLE) 
+CMake Warning at third-party/curl/CMakeLists.txt:444 (message):
+  Perl not found.  Will not build manuals.
+
+
+-- Protocols: http https scp sftp ws wss
+-- Features: alt-svc AsynchDNS HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL SSPI threadsafe UnixSockets
+-- Enabled SSL backends: Schannel
+-- Steam shortcut enabled
+-- FFMPEG Decoder enabled
+-- Could NOT find ILClient (missing: ILClient_libbcm_host_LIBRARY ILClient_libvcilcs_LIBRARY ILClient_libvchiq_arm_LIBRARY ILClient_libvcos_LIBRARY ILClient_INCLUDE_DIR ILClient_SOURCE_DIR) 
+-- Pi Decoder disabled
+-- Steamdeck native gyro and hatpics disabled
+-- SDL version 2.32.10 is >= 2.0.14, disabling Setsu
+-- Setsu disabled
+CMake Warning at C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:339 (message):
+  This project is using headers of the GuiPrivate module and will therefore
+  be tied to this specific Qt module build version.  Running this project
+  against other versions of the Qt modules may crash at any arbitrary point.
+  This is not a bug, but a result of using Qt internals.  You have been
+  warned!
+
+  You can disable this warning by setting QT_NO_PRIVATE_MODULE_WARNING to ON.
+Call Stack (most recent call first):
+  C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6GuiPrivate/Qt6GuiPrivateConfig.cmake:48 (_qt_internal_show_private_module_warning)
+  C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/Qt6Config.cmake:257 (find_package)
+  gui/CMakeLists.txt:12 (find_package)
+
+
+-- Could NOT find Qt6WebEngineQuick (missing: Qt6WebEngineQuick_DIR)
+CMake Warning at gui/CMakeLists.txt:15 (find_package):
+  Found package configuration file:
+
+    C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/Qt6Config.cmake
+
+  but it set Qt6_FOUND to FALSE so package "Qt6" is considered to be NOT
+  FOUND.  Reason given by package:
+
+  Failed to find required Qt component "WebEngineQuick".
+
+  Expected Config file at
+  "C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6WebEngineQuick/Qt6WebEngineQuickConfig.cmake"
+  does NOT exist
+
+
+
+  Configuring with --debug-find-pkg=Qt6WebEngineQuick might reveal details
+  why the package was not found.
+
+  Configuring with -DQT_DEBUG_FIND_PACKAGE=ON will print the values of some
+  of the path variables that find_package uses to try and find the package.
+
+
+
+CMake Warning (author) at gui/CMakeLists.txt:162 (install):
+  Target chiaki has RESOURCE files but no RESOURCE DESTINATION.
+This warning is for project developers.  Use -Wno-author to suppress it.
+
+-- Configuring done (1.8s)
+-- Generating done (0.4s)
+-- Build files have been written to: C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services
+[1/19] Automatic MOC for target placebo-libav-impl
+[2/17] Automatic MOC and UIC for target cpp-steam-tools
+[3/16] Building CXX object third-party/steam-tools/CMakeFiles/cpp-steam-tools.dir/src/steamtools.cpp.obj
+In file included from C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/third-party/cpp-steam-tools-patched/src/steamtools.cpp:10:
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/third-party/cpp-steam-tools-patched/include/vdf_parser.hpp: In function 'std::string tyti::vdf::detail::string_converter(const std::wstring&)':
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/third-party/cpp-steam-tools-patched/include/vdf_parser.hpp:127:10: warning: 'template<class _Codecvt, class _Elem, class _Wide_alloc, class _Byte_alloc> class std::__cxx11::wstring_convert' is deprecated [-Wdeprecated-declarations]
+  127 |     std::wstring_convert<
+      |          ^~~~~~~~~~~~~~~
+In file included from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/locale:47,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/bits/fs_path.h:36,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/filesystem:55,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfiledevice.h:12,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfile.h:9,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfileinfo.h:9,
+                 from C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/third-party/cpp-steam-tools-patched/src/steamtools.cpp:4:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/c++/16.2.0/bits/locale_conv.h:265:33: note: declared here
+  265 |     class _GLIBCXX17_DEPRECATED wstring_convert
+      |                                 ^~~~~~~~~~~~~~~
+[4/16] Linking CXX shared library third-party\steam-tools\libcpp-steam-tools.dll
+[5/16] Automatic MOC for target chiaki-gui
+[6/16] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlcontroller.cpp.obj
+FAILED: [code=1] gui/CMakeFiles/chiaki-gui.dir/src/qmlcontroller.cpp.obj 
+C:\Users\david\.cache\chiaki-ui-native\msys64\ucrt64\bin\c++.exe -DCHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER -DCHIAKI_GUI_ENABLE_SPEEX -DCHIAKI_GUI_ENABLE_STEAM_SHORTCUT -DCHIAKI_VERSION=\"1.10.0\" -DCHIAKI_VERSION_MAJOR=1 -DCHIAKI_VERSION_MINOR=10 -DCHIAKI_VERSION_PATCH=0 -DCURL_STATICLIB -DMINGW_HAS_SECURE_API=1 -DPB_C99_STATIC_ASSERT -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_QMLINTEGRATION_LIB -DQT_QML_LIB -DQT_QUICK_LIB -DQT_SVG_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN32_LEAN_AND_MEAN -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/gui -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/gui/chiaki-gui_autogen/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/lib/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/lib/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/third-party/curl/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/third-party/nanopb -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/third-party/jerasure/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/third-party/gf-complete/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/third-party/cpp-steam-tools-patched/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/third-party/cpp-steam-tools-patched/src -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/spirv_cross -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/json-c -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6 -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/share/qt6/mkspecs/win32-g++ -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtGui -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtGui/6.11.2 -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtGui/6.11.2/QtGui -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/6.11.2 -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/6.11.2/QtCore -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtConcurrent -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtSvg -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtQml -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtQmlIntegration -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtNetwork -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtQuick -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtOpenGL -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtWidgets -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/SDL2 -O3 -DNDEBUG -std=gnu++17 -Dmain=SDL_main -MD -MT gui/CMakeFiles/chiaki-gui.dir/src/qmlcontroller.cpp.obj -MF gui\CMakeFiles\chiaki-gui.dir\src\qmlcontroller.cpp.obj.d -o gui/CMakeFiles/chiaki-gui.dir/src/qmlcontroller.cpp.obj -c C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlcontroller.cpp
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlcontroller.cpp: In member function 'void QmlController::sendKey(Qt::Key, Qt::KeyboardModifiers)':
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlcontroller.cpp:124:32: error: conditional expression between distinct pointer types 'QObject*' and 'QWindow*' lacks a cast
+  124 |     QObject *receiver = target ? target.data() : QGuiApplication::focusWindow();
+      |                         ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[7/16] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/windowsWakeSleep.cpp.obj
+[8/16] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlnativeservices.cpp.obj
+[9/16] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlmainwindow.cpp.obj
+FAILED: [code=1] gui/CMakeFiles/chiaki-gui.dir/src/qmlmainwindow.cpp.obj 
+C:\Users\david\.cache\chiaki-ui-native\msys64\ucrt64\bin\c++.exe -DCHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER -DCHIAKI_GUI_ENABLE_SPEEX -DCHIAKI_GUI_ENABLE_STEAM_SHORTCUT -DCHIAKI_VERSION=\"1.10.0\" -DCHIAKI_VERSION_MAJOR=1 -DCHIAKI_VERSION_MINOR=10 -DCHIAKI_VERSION_PATCH=0 -DCURL_STATICLIB -DMINGW_HAS_SECURE_API=1 -DPB_C99_STATIC_ASSERT -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_OPENGL_LIB -DQT_QMLINTEGRATION_LIB -DQT_QML_LIB -DQT_QUICK_LIB -DQT_SVG_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN32_LEAN_AND_MEAN -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64 -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/gui -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/gui/chiaki-gui_autogen/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/lib/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/lib/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/third-party/curl/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/third-party/nanopb -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/third-party/jerasure/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/third-party/gf-complete/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/third-party/cpp-steam-tools-patched/include -IC:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services/third-party/cpp-steam-tools-patched/src -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/spirv_cross -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/json-c -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6 -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/share/qt6/mkspecs/win32-g++ -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtGui -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtGui/6.11.2 -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtGui/6.11.2/QtGui -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/6.11.2 -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/6.11.2/QtCore -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtConcurrent -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtSvg -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtQml -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtQmlIntegration -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtNetwork -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtQuick -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtOpenGL -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtWidgets -isystem C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/SDL2 -O3 -DNDEBUG -std=gnu++17 -Dmain=SDL_main -MD -MT gui/CMakeFiles/chiaki-gui.dir/src/qmlmainwindow.cpp.obj -MF gui\CMakeFiles\chiaki-gui.dir\src\qmlmainwindow.cpp.obj.d -o gui/CMakeFiles/chiaki-gui.dir/src/qmlmainwindow.cpp.obj -c C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp: In destructor 'virtual QmlMainWindow::~QmlMainWindow()':
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:436:34: error: no matching function for call to 'QMetaObject::invokeMethod(QQuickRenderControl*&, void (QmlMainWindow::*)(), Qt::ConnectionType)'
+  436 |         QMetaObject::invokeMethod(quick_render, &QmlMainWindow::destroySwapchain, Qt::BlockingQueuedConnection);
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  • there are 14 candidates
+In file included from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobject.h:11,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qiodevice.h:11,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qfiledevice.h:8,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qdirlisting.h:10,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qdir.h:10,
+                 from C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/QDir:1,
+                 from C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/include/sessionlog.h:9,
+                 from C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/include/streamsession.h:31,
+                 from C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/include/qmlmainwindow.h:3,
+                 from C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1:
+    • candidate 1: 'template<class ReturnArg, class ... Args> static QtPrivate::Invoke::IfNotOldStyleArgs<bool, Args ...> QMetaObject::invokeMethod(QObject*, const char*, Qt::ConnectionType, QTemplatedMetaMethodReturnArgument<T>, Args&& ...)'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:395:5:
+        395 |     invokeMethod(QObject *obj, const char *member, Qt::ConnectionType c,
+            |     ^~~~~~~~~~~~
+      • candidate expects at least 4 arguments, 3 provided
+    • candidate 2: 'template<class ... Args> static QtPrivate::Invoke::IfNotOldStyleArgs<bool, Args ...> QMetaObject::invokeMethod(QObject*, const char*, Qt::ConnectionType, Args&& ...)'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:409:5:
+        409 |     invokeMethod(QObject *obj, const char *member, Qt::ConnectionType c, Args &&... arguments)
+            |     ^~~~~~~~~~~~
+      • template argument deduction/substitution failed:
+        •   cannot convert '&QmlMainWindow::destroySwapchain' (type 'void (QmlMainWindow::*)()') to type 'const char*'
+          C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:436:49:
+            436 |         QMetaObject::invokeMethod(quick_render, &QmlMainWindow::destroySwapchain, Qt::BlockingQueuedConnection);
+                |                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    • candidate 3: 'template<class ReturnArg, class ... Args> static QtPrivate::Invoke::IfNotOldStyleArgs<bool, Args ...> QMetaObject::invokeMethod(QObject*, const char*, QTemplatedMetaMethodReturnArgument<T>, Args&& ...)'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:421:5:
+        421 |     invokeMethod(QObject *obj, const char *member, QTemplatedMetaMethodReturnArgument<ReturnArg> r,
+            |     ^~~~~~~~~~~~
+      • template argument deduction/substitution failed:
+        •   mismatched types 'QTemplatedMetaMethodReturnArgument<T>' and 'Qt::ConnectionType'
+          C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:436:34:
+            436 |         QMetaObject::invokeMethod(quick_render, &QmlMainWindow::destroySwapchain, Qt::BlockingQueuedConnection);
+                |         ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    • candidate 4: 'template<class ... Args> static QtPrivate::Invoke::IfNotOldStyleArgs<bool, Args ...> QMetaObject::invokeMethod(QObject*, const char*, Args&& ...)'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:433:5:
+        433 |     invokeMethod(QObject *obj, const char *member, Args &&... arguments)
+            |     ^~~~~~~~~~~~
+      • template argument deduction/substitution failed:
+        •   cannot convert '&QmlMainWindow::destroySwapchain' (type 'void (QmlMainWindow::*)()') to type 'const char*'
+          C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:436:49:
+            436 |         QMetaObject::invokeMethod(quick_render, &QmlMainWindow::destroySwapchain, Qt::BlockingQueuedConnection);
+                |                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    • candidate 5: 'template<class Func> static std::enable_if_t<((bool)(! disjunction_v<std::is_convertible<Prototype, const char*>, std::disjunction<std::is_base_of<QGenericArgument, Func> > >)), bool> QMetaObject::invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType*, Func&&, Qt::ConnectionType, typename QtPrivate::Callable<Func>::ReturnType*)'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:458:5:
+        458 |     invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+            |     ^~~~~~~~~~~~
+      • candidate expects 4 arguments, 3 provided
+    • candidate 6: 'static std::enable_if_t<((bool)(! disjunction_v<std::is_convertible<Prototype, const char*>, std::disjunction<std::is_base_of<QGenericArgument, Func> > >)), bool> QMetaObject::invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType*, Func&&, typename QtPrivate::Callable<Func>::ReturnType*) [with Func = void (QmlMainWindow::*)(); std::enable_if_t<((bool)(! disjunction_v<std::is_convertible<Prototype, const char*>, std::disjunction<std::is_base_of<QGenericArgument, Func> > >)), bool> = bool; typename QtPrivate::ContextTypeForFunctor<Func>::ContextType = QmlMainWindow; typename QtPrivate::Callable<Func>::ReturnType = void]'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:475:5:
+        475 |     invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+            |     ^~~~~~~~~~~~
+      • no known conversion for argument 1 from 'QQuickRenderControl*' to 'QtPrivate::ContextTypeForFunctor<void (QmlMainWindow::*)(), void>::ContextType*' {aka 'QmlMainWindow*'}
+        C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:475:80:
+          475 |     invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+              |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+    • candidate 7: 'template<class Func, class ... Args> static std::enable_if_t<((bool)(! disjunction_v<std::is_convertible<Prototype, const char*>, std::disjunction<std::is_base_of<QGenericArgument, Args>...> >)), bool> QMetaObject::invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType*, Func&&, Qt::ConnectionType, QTemplatedMetaMethodReturnArgument<typename QtPrivate::Callable<Func, Args ...>::ReturnType>, Args&& ...)'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:485:5:
+        485 |     invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+            |     ^~~~~~~~~~~~
+      • candidate expects at least 4 arguments, 3 provided
+    • candidate 8: 'static std::enable_if_t<((bool)(! disjunction_v<std::is_convertible<Prototype, const char*>, std::disjunction<std::is_base_of<QGenericArgument, Args>...> >)), bool> QMetaObject::invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType*, Func&&, Qt::ConnectionType, Args&& ...) [with Func = void (QmlMainWindow::*)(); Args = {}; std::enable_if_t<((bool)(! disjunction_v<std::is_convertible<Prototype, const char*>, std::disjunction<std::is_base_of<QGenericArgument, Args>...> >)), bool> = bool; typename QtPrivate::ContextTypeForFunctor<Func>::ContextType = QmlMainWindow]'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:500:5:
+        500 |     invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+            |     ^~~~~~~~~~~~
+      • no known conversion for argument 1 from 'QQuickRenderControl*' to 'QtPrivate::ContextTypeForFunctor<void (QmlMainWindow::*)(), void>::ContextType*' {aka 'QmlMainWindow*'}
+        C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:500:80:
+          500 |     invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+              |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+    • candidate 9: 'static std::enable_if_t<((bool)(! disjunction_v<std::is_convertible<Prototype, const char*>, std::disjunction<std::is_base_of<QGenericArgument, Args>...> >)), bool> QMetaObject::invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType*, Func&&, QTemplatedMetaMethodReturnArgument<typename QtPrivate::Callable<Func, Args ...>::ReturnType>, Args&& ...) [with Func = void (QmlMainWindow::*)(); Args = {}; std::enable_if_t<((bool)(! disjunction_v<std::is_convertible<Prototype, const char*>, std::disjunction<std::is_base_of<QGenericArgument, Args>...> >)), bool> = bool; typename QtPrivate::ContextTypeForFunctor<Func>::ContextType = QmlMainWindow; typename QtPrivate::Callable<Func, Args ...>::ReturnType = void]'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:514:5:
+        514 |     invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+            |     ^~~~~~~~~~~~
+      • no known conversion for argument 1 from 'QQuickRenderControl*' to 'QtPrivate::ContextTypeForFunctor<void (QmlMainWindow::*)(), void>::ContextType*' {aka 'QmlMainWindow*'}
+        C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:514:80:
+          514 |     invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+              |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+    • candidate 10: 'static std::enable_if_t<((bool)(! disjunction_v<std::is_convertible<Prototype, const char*>, std::disjunction<std::is_base_of<QGenericArgument, Args>...> >)), bool> QMetaObject::invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType*, Func&&, Args&& ...) [with Func = void (QmlMainWindow::*)(); Args = {Qt::ConnectionType}; std::enable_if_t<((bool)(! disjunction_v<std::is_convertible<Prototype, const char*>, std::disjunction<std::is_base_of<QGenericArgument, Args>...> >)), bool> = bool; typename QtPrivate::ContextTypeForFunctor<Func>::ContextType = QmlMainWindow]'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:529:5:
+        529 |     invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+            |     ^~~~~~~~~~~~
+      • no known conversion for argument 1 from 'QQuickRenderControl*' to 'QtPrivate::ContextTypeForFunctor<void (QmlMainWindow::*)(), void>::ContextType*' {aka 'QmlMainWindow*'}
+        C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:529:80:
+          529 |     invokeMethod(typename QtPrivate::ContextTypeForFunctor<Func>::ContextType *object,
+              |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+    • candidate 11: 'static bool QMetaObject::invokeMethod(QObject*, const char*, Qt::ConnectionType, QGenericReturnArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument)'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:324:17:
+        324 |     static bool invokeMethod(QObject *obj, const char *member,
+            |                 ^~~~~~~~~~~~
+      • candidate expects 14 arguments, 3 provided
+    • candidate 12: 'static bool QMetaObject::invokeMethod(QObject*, const char*, QGenericReturnArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument)'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:338:24:
+        338 |     static inline bool invokeMethod(QObject *obj, const char *member,
+            |                        ^~~~~~~~~~~~
+      • no known conversion for argument 2 from 'void (QmlMainWindow::*)()' to 'const char*'
+        C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:338:63:
+          338 |     static inline bool invokeMethod(QObject *obj, const char *member,
+              |                                                   ~~~~~~~~~~~~^~~~~~
+    • candidate 13: 'static bool QMetaObject::invokeMethod(QObject*, const char*, Qt::ConnectionType, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument)'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:355:24:
+        355 |     static inline bool invokeMethod(QObject *obj, const char *member,
+            |                        ^~~~~~~~~~~~
+      • candidate expects 13 arguments, 3 provided
+    • candidate 14: 'static bool QMetaObject::invokeMethod(QObject*, const char*, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument, QGenericArgument)'
+      C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:372:24:
+        372 |     static inline bool invokeMethod(QObject *obj, const char *member,
+            |                        ^~~~~~~~~~~~
+      • no known conversion for argument 2 from 'void (QmlMainWindow::*)()' to 'const char*'
+        C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/qt6/QtCore/qobjectdefs.h:372:63:
+          372 |     static inline bool invokeMethod(QObject *obj, const char *member,
+              |                                                   ~~~~~~~~~~~~^~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp: In member function 'AVBufferRef* QmlMainWindow::vulkanHwDeviceCtx()':
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1461:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1461 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+In file included from C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/include/qmlmainwindow.h:16:
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1461:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1461 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1461:12: warning: 'AVVulkanDeviceContext::queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1461 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1462:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1462 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1462:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1462 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1462:12: warning: 'AVVulkanDeviceContext::nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1462 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1463:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1463 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1463:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1463 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1463:12: warning: 'AVVulkanDeviceContext::queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1463 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1464:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1464 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1464:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1464 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1464:12: warning: 'AVVulkanDeviceContext::nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1464 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1465:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1465 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1465:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1465 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1465:12: warning: 'AVVulkanDeviceContext::queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1465 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1466:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1466 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1466:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1466 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1466:12: warning: 'AVVulkanDeviceContext::nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1466 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1467:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1467 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1467:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1467 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1467:12: warning: 'AVVulkanDeviceContext::queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1467 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1468:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1468 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1468:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1468 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/gui/src/qmlmainwindow.cpp:1468:12: warning: 'AVVulkanDeviceContext::nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1468 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+[10/16] Building CXX object gui/CMakeFiles/chiaki-gui.dir/chiaki-gui_autogen/mocs_compilation.cpp.obj
+[11/16] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlbackend.cpp.obj
+ninja: build stopped: subcommand failed.

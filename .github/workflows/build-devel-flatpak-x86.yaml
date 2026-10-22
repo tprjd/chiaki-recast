@@ -26,21 +26,22 @@ jobs:
       - name: Setup Flatpak Builder Environment
         run: |
           flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          flatpak install org.kde.Sdk//6.9 -y
-          flatpak install org.kde.Platform//6.9 -y
-          flatpak install io.qt.qtwebengine.BaseApp//6.9 -y
-          flatpak update --appstream --assumeyes
+          flatpak install --user flathub org.kde.Sdk//6.11 -y
+          flatpak install --user flathub org.kde.Platform//6.11 -y
+          flatpak install --user flathub io.qt.qtwebengine.BaseApp//6.11 -y
+          flatpak update --user --appstream --assumeyes
 
       - name: Build Flatpak package
         working-directory: chiaki-ng
         run: |
-          flatpak-builder --repo=chiaki-ng-devel --force-clean build-dir scripts/flatpak/chiaki4deck-devel.yaml
+          flatpak-builder --user --repo=chiaki-ng-devel --force-clean build-dir scripts/flatpak/chiaki4deck-devel.yaml
+          flatpak build --runtime build-dir /app/bin/check-chiaki-package /app
 
       - name: Bundle Flatpak app
         working-directory: chiaki-ng
         run: |
           flatpak build-bundle chiaki-ng-devel chiaki-ng-devel-x64.flatpak io.github.streetpea.Chiaki4deck-devel --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
-          flatpak build-bundle chiaki-ng-devel --runtime chiaki-ng-devel-x64-debug.flatpak io.github.streetpea.Chiaki4deck_devel.Debug --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
+          flatpak build-bundle chiaki-ng-devel --runtime chiaki-ng-devel-x64-debug.flatpak io.github.streetpea.Chiaki4deck-devel.Debug --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
       - name: Upload chiaki-ng Artifact
         uses: actions/upload-artifact@v4
         with:

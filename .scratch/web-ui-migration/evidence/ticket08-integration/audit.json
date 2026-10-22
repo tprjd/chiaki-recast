@@ -1,0 +1,249 @@
+{
+  "worker": "b7866044a9ae0251048a76f823d37b888d3f419d",
+  "integration": "9f37be02842da423aa5911c6cf3f428ccc07aee8",
+  "testedSource": "bf4c7e01251168b12a5ddcf26f1d63ea96902bf4",
+  "sourceCount": 28,
+  "artifactCount": 4,
+  "artifacts": {
+    "gui/chiaki.exe": "9f9cdebcf97e29f3931c696d4e0a25a7a020f763efea2712f9b3558cbb889fec",
+    "gui/tests/chiaki-embedded-setup-tests.exe": "fcd205eeb9ba9eeaee4978d9d5bc3a35063017824bbb4e9864fe3e5e19c085e4",
+    "gui/web/app.js": "f196dad97e962e59c51715a2b25118ad1436d370a39b1738025c7d6056f52618",
+    "gui/web/app.css": "d239f952e525958d386b8416eb6f07dae578f1b43aa288188f012ca8609f791c"
+  },
+  "preserved": [
+    {
+      "path": "gui/src/qmlmainwindow.cpp",
+      "equal": true,
+      "sha256": "3ebee06e2ebb95f8bc7344f536ffada8a04942415a903b5b06c782956ab45d66"
+    },
+    {
+      "path": "gui/src/applicationcontroller.cpp",
+      "equal": true,
+      "sha256": "c9e5aa6a29ff0ec1eca5021e1f8fb75aec95a9d2dcbfa0c0f60bdca1a630002e"
+    },
+    {
+      "path": "gui/src/streaminputownership.cpp",
+      "equal": true,
+      "sha256": "632c9244d560e773f65306fc951de161cb16809f251c6079eea682cebfa9573b"
+    },
+    {
+      "path": "gui/src/qml/ConnectionView.qml",
+      "equal": true,
+      "sha256": "526327167c56ae9460da23ad79bbf873f7702e5a70a9cb1da881d4ddcb7413dd"
+    },
+    {
+      "path": "gui/src/qml/StreamRoot.qml",
+      "equal": true,
+      "sha256": "0230636dda942df8a61bf47c31db10af5fbcaa5eb49428db442f4d6df2678f03"
+    },
+    {
+      "path": "gui/src/qml/StreamView.qml",
+      "equal": true,
+      "sha256": "99813186f57611e186bbd1bd055517095ad5b4df0b3f3ce90bff83f2704de602"
+    },
+    {
+      "path": "gui/src/qml/LiveConsolePinHost.qml",
+      "equal": true,
+      "sha256": "4b8f486d59953984c54f89a12adadfff4fbd0d4eecce32e16066735d54eb59ff"
+    },
+    {
+      "path": "gui/src/qml/LiveConsolePinContent.qml",
+      "equal": true,
+      "sha256": "5283815a8904058dee1a98795e400cd97310c1634c3a8333b34491df2636b44e"
+    },
+    {
+      "path": "gui/src/streamsession.cpp",
+      "equal": true,
+      "sha256": "56f9ae77a54ba88b83b37d050a675454a8f0960129edcecf8a5bb4d27e53c074",
+      "allowedTransportSubstitutions": [
+        [
+          "StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObject *parent,\n\tstd::function<ChiakiErrorCode(ChiakiSession *)> start_request)",
+          "StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObject *parent)"
+        ],
+        [
+          "\n\tstart_request(std::move(start_request)),",
+          ""
+        ],
+        [
+          "ChiakiErrorCode err = start_request(&session);",
+          "ChiakiErrorCode err = chiaki_session_start(&session);"
+        ]
+      ]
+    },
+    {
+      "function": "startPsnConnection",
+      "equal": true,
+      "sha256": "d64902239c0c61f94186b86f0fdb00c529cf0bc1010e77b8636d37b363aff5c4",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "retryConnection",
+      "equal": true,
+      "sha256": "a4127b43a3177df2e02ac5d15e9c3a8dc1827c0e249c35f5a24bf8028fc53340",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "cancelConnection",
+      "equal": true,
+      "sha256": "3af1a7ab1a3340bfec380e45acb336fc4e6043a3ed791b0d0d6124c7a6317bf2",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "dismissConnection",
+      "equal": true,
+      "sha256": "b22b7336e18d985b82239ac54d3ad2ca4e6429a330bf7ed67523862d2bdd6321",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "finishPsnCleanup",
+      "equal": true,
+      "sha256": "fd676a86ef781cc55108f3378388d8d372fd2f8c01fe5a38e9bb31ef2e866c13",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "checkPsnConnection",
+      "equal": true,
+      "sha256": "756cfd18f69fd41149f2b0f66ceecd03e0489dde25a45f371a8ad6815e6e5f39",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "setConnectState",
+      "equal": true,
+      "sha256": "c139c42d793b00c48c8a33c3be9029bd20a3197091069007e2c47bdca64c0e52",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "releaseSession",
+      "equal": true,
+      "sha256": "ca0af3de8ff979d13be4c476ba004464717213a79dcc2d90014ec745e6f31403",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "createSession",
+      "equal": true,
+      "sha256": "e072dd3454d9e75b30f2f736042efc627423ada748f398895e00d1e8dc1c2733",
+      "allowedTransportSubstitution": true
+    }
+  ],
+  "runtimeSourceComparisons": [
+    {
+      "group": "native",
+      "test": "remoteNativeConnection",
+      "sha256": "a58c80c0811ab29d24a273290b6b0ecb4b2c000eab849298ca43ec962415deac",
+      "discoveryArgumentNormalized": false
+    },
+    {
+      "group": "refresh-final",
+      "test": "psnRemoteRefresh",
+      "sha256": "b008984f818e798311a343cddbb40852536aa9df90da4c0de28177e7cade1826",
+      "discoveryArgumentNormalized": false
+    },
+    {
+      "group": "isolated",
+      "test": "psnRemoteRefreshOwnership",
+      "sha256": "bcdea8e8d7204a34e112010d1b7c5e78fd0c5d25a80c017700f409438fb0b3f3",
+      "discoveryArgumentNormalized": false
+    },
+    {
+      "group": "isolated",
+      "test": "psnRemoteTokenConnection",
+      "sha256": "3323c0b94050160db46788b70b5747a04c26d5416d07fc13ea211a35d4eb146c",
+      "discoveryArgumentNormalized": false
+    },
+    {
+      "group": "green",
+      "test": "psnRefreshCredentials",
+      "sha256": "38d61ca2a95ca154550a319f813560c0d66b4ff87ce750050b7c65f6a6ca7dc4",
+      "discoveryArgumentNormalized": false
+    },
+    {
+      "group": "green",
+      "test": "psnSignIn",
+      "sha256": "c39797c3f1b512183454772051d97d5a5e89e7d61541de3c99a063ebc0b8147a",
+      "discoveryArgumentNormalized": false
+    },
+    {
+      "group": "expanded",
+      "test": "psnRefreshCredentials",
+      "sha256": "38d61ca2a95ca154550a319f813560c0d66b4ff87ce750050b7c65f6a6ca7dc4",
+      "discoveryArgumentNormalized": false
+    },
+    {
+      "group": "expanded",
+      "test": "consoleLibrary",
+      "sha256": "725aa8edace9f294abb32883df7a8017aa84df922a90406222da049f725122e0",
+      "discoveryArgumentNormalized": true
+    },
+    {
+      "group": "expanded",
+      "method": "refreshAuth",
+      "sha256": "35e6bcbe3367c213dd1fa38f64db3453df169ed095a07fe75fba2460e2b57b5f"
+    },
+    {
+      "group": "expanded",
+      "method": "updatePsnHosts",
+      "sha256": "2ae5a9bf891e09fa0320bff1fe3cb5278101817a35d44f1cab11d28902ca1cbc"
+    },
+    {
+      "group": "expanded",
+      "method": "updatePsnHostsThread",
+      "sha256": "5772dc703377dff2242f295ece1afbfd6a2c2e56aa29ead22218cb711d7092b9"
+    },
+    {
+      "group": "expanded",
+      "method": "refreshPsnToken",
+      "sha256": "98497ed6c5aa201c2437e674c83278aa0103035f80ac4bfe71b44b565c933897"
+    },
+    {
+      "group": "expanded",
+      "method": "watchConnectionToken",
+      "sha256": "e5ff64df77303bd32180514ce3d1f336ed0e8cf8bb547e7c8869f038022dcdfe"
+    }
+  ],
+  "evidence": {
+    ".gitattributes": "e97602ab9cac70102245345c5ab0fc9830df8b17f1072b188265a662a3a547ae",
+    "application-build.log": "861136ef9e518be84b3d28c5f2dddc881c3f7ab0e0dbb1549d9aadec913e78a7",
+    "expanded-executable.txt": "605e405bd7971a01d7bcfe300c2708216c6786990999380bbd55452486eb940b",
+    "expanded-source.txt": "df78a37f06698d41fd60b7498e383aff8a71ecc1390c31c46b41b484debcd49f",
+    "expanded.diff": "3f1beea36f29f5b1df861e0c3c4eaf6e410ae42030a4aeac19d7839d541db2d4",
+    "expanded.txt": "236e0f3df966d95ab8ab5c907a0a574f2107ec5002238ec613130311ddcc38b6",
+    "frontend-check.txt": "8fe19aae8ea86ec2909645562868b55a246124702e4fab0a5698e20ce26b2f56",
+    "green-executable.txt": "62bc82cd296a7626a5a0f8c606f2bfa2c6caa3c0bf829d9581a6443d4e2997ab",
+    "green-source.txt": "df78a37f06698d41fd60b7498e383aff8a71ecc1390c31c46b41b484debcd49f",
+    "green.diff": "41fcaddc30950916cef9c346d8d7a75f06b1517034d4c76ce0d5bb58e024e30d",
+    "green.txt": "0f31b62acd8bbe7d84f8b09e01a8318e4a5ea4053d88e22504a10c954af64a83",
+    "identity.json": "dda3765dafb0b66f053c0fd78bbb21f8133b1eee3c0624d221fd7aa426b3c214",
+    "isolated-executable.txt": "89fab0785f68109aeb465d5cbe871713227ec9fe00cbd5949fb9b540cee952f5",
+    "isolated-source.txt": "f53991700245b592c19b0938a624f7ca46ef93d790c6b0eaa60bb4e0d16442a8",
+    "isolated.diff": "a9be87188f900d9d5c2f650d1c21fecb46e1dd6c9c0ef9a983cef3739631a9a5",
+    "isolated.txt": "9d4e08c307668af3f82b7ba19c6157cc09953ab7cd006f202ac3d20ad18bc5c7",
+    "native-executable.txt": "633a1265b420e4eaf9fc966c85ebee68d6b27d5407b65420fd50f0969f34bd04",
+    "native-seams.md": "28bdb0ecdcbaebf299a864e26a7edec0cde55acd5ec77303caad786fbb2c600d",
+    "native-source.txt": "5ab11b7ce44dbba08fe8cee36fce5468236fb775696db5c0330cf58abc3bb525",
+    "native-status.txt": "ec86469c1af365b58d204ba56def09147d511ec588829370f1a8bbd40beff0b4",
+    "native.diff": "ba5a90666ea281c27611bdbc4645beca04c5ae8cfecf8b0c9bb48af1ac1f4921",
+    "native.txt": "effa57dccf02e6d2ee3842a913b57bcbbb1a37305c81e171021b1e036e688000",
+    "record-identity.py": "7ff52c1315df22cf88b48893110030b4004af89356e6b157a45b540562095fb1",
+    "red-executable.txt": "23e9c281870afb522a793ea7ea9f0503a7241dd22559c8eccd2ec66a57409360",
+    "red-source.txt": "df78a37f06698d41fd60b7498e383aff8a71ecc1390c31c46b41b484debcd49f",
+    "red.diff": "41e6c390d10feeb6a73680456c56dd6df481ecaa9214e2b3a1c42820c62f47ca",
+    "red.txt": "ea357f9bfa1997511a2c01eb6ebb1d0fc6b6e273449a396afce675ffd7fee1a7",
+    "refresh-final-executable.txt": "9f821f794c8b5427f398392fe014daf0fde4e46b91811f46cd93c604bde249ba",
+    "refresh-final-source.txt": "eff87d7546919ad6a6991c8a6a82ab44a3aeee9b28da74768bc0608e3d9cd9b2",
+    "refresh-final.diff": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "refresh-final.txt": "e7cdbfd13704c2fdcabb5e211f54f06ffcbe85c399fb456819c3b8246bb1777a",
+    "remote-connection-error-390.png": "95e214fc49f44fa4b4196c9c736000516842f70687fc93c2cb6daac3a20e69a4",
+    "remote-refresh-800.png": "cf681c49165452428a41cb4d085d652b8c90dbbcfb17762ad098a59f6535d734",
+    "run-expanded.cmd": "f828e41826d6cd7a02f8eca5666fadab484b1ad5f1b384eba6b170e7fbb4df65",
+    "run-green.cmd": "68b1e4fe88772385af9074d56fbe1f991bd119bbba97464318eaa968aba4497d",
+    "run-isolated.cmd": "9903c64c86b9f76c9120c2f24af3a64499cc69f5aefce01ffbef9c1fec2b3de4",
+    "run-native.cmd": "04b666a4a8ea62805cf1d9f3e828a8f1b754db197c751568d5b22dab23db38b6",
+    "run-red.cmd": "51779a272eda03609d6f44cd3ff7f642e99115f18cf098911cc8655095eafa48",
+    "run-refresh-final.cmd": "9824aad8c12134a38a26be1ada0fdc035dbfedf1b61356bfc5a40444eb24e5c6",
+    "ticket08-merged-build.log": "623e359ba93c33fe0fc1f5ed0aea87c474b4faeeeb42e8cd6c29e66dcc0c9bc2",
+    "ticket08-start-boundary-build.log": "8ea14b06a5e585caf329a88d04c5e53d8c48493fc5ffa17402ba9289c90f5803",
+    "ticket08-style-build.log": "81215c2dfdd3b48e026bf09b04202efa820f3a1f67c4e8230f1699fde0cb90d2",
+    "verification.md": "e0d82d3fd663743ce72b5479eff07aa6fb6fd910d47474fa1615011403fd59ab"
+  },
+  "limits": "No builds or test runs. Earlier discovery traffic and capture zoom remain unproved. Live PSN, physical focus/input, GPU, HighQuality, and platform acceptance remain open."
+}

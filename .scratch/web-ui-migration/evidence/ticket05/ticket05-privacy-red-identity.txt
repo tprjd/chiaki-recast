@@ -1,0 +1,11 @@
+
+Algorithm : SHA256
+Hash      : ECE87E797645B2AD7C35D50B24A481D80C572F162F1363F7ACC162B21C3E4116
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket05-build\gui\tests\chiaki-embedded-setup-tests.exe
+
+
+Algorithm : SHA256
+Hash      : D477DF1C52D3A14ECC3B1FD47553D862424906036C43AD85D243DDCA4B650C64
+Path      : C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\ticket05-privacy-red-source.patch
+
+4cfc374f977538238d86010928b3d3d5a48aa07d

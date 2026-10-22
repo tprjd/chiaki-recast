@@ -36,7 +36,7 @@ HostMAC DiscoveryHost::GetHostMAC() const
 static void DiscoveryServiceHostsCallback(ChiakiDiscoveryHost *hosts, size_t hosts_count, void *user);
 static void DiscoveryServiceHostsManualCallback(ChiakiDiscoveryHost *hosts, size_t hosts_count, void *user);
 
-DiscoveryManager::DiscoveryManager(QObject *parent) : QObject(parent)
+DiscoveryManager::DiscoveryManager(QObject *parent, DiscoveryRequests requests) : QObject(parent), requests(std::move(requests))
 {
 	chiaki_log_init(&log, CHIAKI_LOG_ALL & ~CHIAKI_LOG_VERBOSE, chiaki_log_cb_print, nullptr);
 
@@ -47,9 +47,9 @@ DiscoveryManager::DiscoveryManager(QObject *parent) : QObject(parent)
 DiscoveryManager::~DiscoveryManager()
 {
 	if(service_active)
-		chiaki_discovery_service_fini(&service);
+		requests.fini(&service);
 	if(service_active_ipv6)
-		chiaki_discovery_service_fini(&service_ipv6);
+		requests.fini(&service_ipv6);
 	qDeleteAll(manual_services);
 }
 
@@ -200,7 +200,7 @@ void DiscoveryManager::SetActive(bool active)
 			}
 			else
 				CHIAKI_LOGW(&log, "No external broadcast addresses found!");
-			ChiakiErrorCode err = chiaki_discovery_service_init(&service, &options, &log);
+			ChiakiErrorCode err = requests.init(&service, &options, &log);
 			if(options.broadcast_addrs)
 				free(options.broadcast_addrs);
 			if(err != CHIAKI_ERR_SUCCESS)
@@ -229,7 +229,7 @@ void DiscoveryManager::SetActive(bool active)
 			options_ipv6.send_addr_size = sizeof(in_addr_ipv6);
 			options_ipv6.send_host = nullptr;
 
-			ChiakiErrorCode err = chiaki_discovery_service_init(&service_ipv6, &options_ipv6, &log);
+			ChiakiErrorCode err = requests.init(&service_ipv6, &options_ipv6, &log);
 			if(err != CHIAKI_ERR_SUCCESS)
 			{
 				service_active_ipv6 = false;
@@ -245,12 +245,12 @@ void DiscoveryManager::SetActive(bool active)
 	{
 		if(service_active)
 		{
-			chiaki_discovery_service_fini(&service);
+			requests.fini(&service);
 			service_active = false;
 		}
 		if(service_active_ipv6)
 		{
-			chiaki_discovery_service_fini(&service_ipv6);
+			requests.fini(&service_ipv6);
 			service_active_ipv6 = false;
 		}
 		qDeleteAll(manual_services);
@@ -293,9 +293,9 @@ void DiscoveryManager::SendWakeup(const QString &host, const QByteArray &regist_
 	char *ipv6 = strchr(host.toUtf8().data(), ':');
 	ChiakiErrorCode err;
 	if(ipv6)
-		err = chiaki_discovery_wakeup(&log, service_active_ipv6 ? &service_ipv6.discovery : nullptr, host.toUtf8().constData(), credential, ps5);
+		err = requests.wakeup(&log, service_active_ipv6 ? &service_ipv6.discovery : nullptr, host.toUtf8().constData(), credential, ps5);
 	else
-		err = chiaki_discovery_wakeup(&log, service_active ? &service.discovery : nullptr, host.toUtf8().constData(), credential, ps5);
+		err = requests.wakeup(&log, service_active ? &service.discovery : nullptr, host.toUtf8().constData(), credential, ps5);
 
 	if(err != CHIAKI_ERR_SUCCESS)
 		throw Exception(QString("Failed to send Packet: %1").arg(chiaki_error_string(err)));
@@ -340,6 +340,7 @@ void DiscoveryManager::UpdateManualServices()
 			continue;
 
 		ManualService *s = new ManualService;
+		s->requests = requests;
 		s->manager = this;
 		manual_services[host] = s;
 
@@ -367,7 +368,7 @@ void DiscoveryManager::UpdateManualServices()
 			options.send_addr = &addr;
 			options.send_addr_size = sizeof(struct sockaddr_in);
 		}
-		ChiakiErrorCode err = chiaki_discovery_service_init(&s->service, &options, &log);
+		ChiakiErrorCode err = requests.init(&s->service, &options, &log);
 		if(err != CHIAKI_ERR_SUCCESS)
 		{
 			CHIAKI_LOGE(&log, "DiscoveryManager failed to init manual discovery service for host: %s with error %s", qPrintable(host), chiaki_error_string(err));

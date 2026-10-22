@@ -1,0 +1,67 @@
+{
+  "validatedArtifacts": [
+    {
+      "path": "C:/Users/david/.cache/chiaki-msvc-native/ticket11-build/gui/tests/chiaki-embedded-setup-tests.exe",
+      "sha256": "B83790CE26E6058A74C9C9C5CCFBCB168D962EF43C408B0DA2B833B72A3632B6"
+    },
+    {
+      "path": "C:/Users/david/.cache/chiaki-msvc-native/ticket11-build/gui/web/app.js",
+      "sha256": "55695C2EF48D49D8B2C026A55C04C2884DE5539C75A7AC6D9B9A6F32BA577946"
+    },
+    {
+      "path": "C:/Users/david/.cache/chiaki-msvc-native/ticket11-build/gui/web/app.css",
+      "sha256": "E42669B2F6CACE81E55A758066BB366CD3ECFAC09339C717BA6010CF2B00FD84"
+    }
+  ],
+  "vendorGfCpuSha256": "0911FD3B219F0F53D29EAF71CE157657C2375B9131E997E8C8FF64DE2DE53904",
+  "basicSaveReloadArtifactSha256": "3D9E521E8158DF34EA57D3B8DE438CD4871985E473D83F4D5E34643B0035789A",
+  "base": "b90c7f27d4f8c36c5272502fe764058fc9664fcf",
+  "testedSource": [
+    {
+      "path": "gui/include/setupbridge.h",
+      "sha256": "39CDDA608C4CD8046AF13DEE2D3B897AE80EB8BFCAFAD286911C1E948A7E4FF4"
+    },
+    {
+      "path": "gui/src/setupbridge.cpp",
+      "sha256": "9E2B8B19ED5B6E1F56625E7A16F6ECB53C1A506C2344AD9F04BFAEEC8FCC66A8"
+    },
+    {
+      "path": "gui/tests/CMakeLists.txt",
+      "sha256": "DB8B25F1D38FC3B7B1D6A2F13F5B19B6C2F6DF93CABC57E5A189F71D24E167C2"
+    },
+    {
+      "path": "gui/tests/embeddedsetup.cpp",
+      "sha256": "36AD244C2C04B1E2A916BE54626BDDA54A50C830A6A603807869EF5687065B1B"
+    },
+    {
+      "path": "gui/web/src/App.svelte",
+      "sha256": "1BED56AC75EBED59A6BB44495F598104B14A701D2E7C04CED14D577782E8FA3C"
+    },
+    {
+      "path": "gui/web/src/bridge.ts",
+      "sha256": "41F2CD4AE4CF71732077D504086BD73C07228A644DEA5F6CF879ECA31855135A"
+    },
+    {
+      "path": "gui/web/src/style.css",
+      "sha256": "B678A9EE3CA4DC1427F081A2359419602B5BB6F7A52B817ACB7CCA274754A18A"
+    },
+    {
+      "path": "gui/web/src/SettingField.svelte",
+      "sha256": "786042FC28BDAA52BFDDDB9CA5C4C82F319B7426DA90A97DF70D5C6A2DDE736A"
+    },
+    {
+      "path": "gui/web/src/Settings.svelte",
+      "sha256": "43375409A51A3054AF7621FF9C166136CF739C999848B97654517D6ED820CE73"
+    },
+    {
+      "path": "gui/web/src/settings.ts",
+      "sha256": "4FA792797857DD6FEA735047A4CB5A4C6FC1AE484C052047DCF91107DBEE05D3"
+    },
+    {
+      "path": "gui/web/package-lock.json",
+      "sha256": "59E9BBE871EA16981EA1FD5BEB0913760E66D684DE0E3DE8C15F2FED0A6B31E6"
+    }
+  ],
+  "redArtifactSha256": "48AFDF8E17784EB42BBD5FF5FF7A0793A77E064234B00BF3519DD09174F6ACBE",
+  "integrationTip": "b90c7f27d4f8c36c5272502fe764058fc9664fcf"
+}

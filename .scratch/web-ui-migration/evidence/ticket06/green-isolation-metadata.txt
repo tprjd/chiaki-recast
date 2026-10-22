@@ -1,0 +1,12 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QWARN  : EmbeddedSetupTest::psnEmbeddedIsolation() QFontDatabase: Cannot find font directory C:/Users/david/.cache/chiaki-native-qt/6.9.3/msvc2022_64/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+QINFO  : EmbeddedSetupTest::psnEmbeddedIsolation() Owned PSN cookie profile "C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/QtWebEngine/psn-token" fixture name "54f4b722-9766-4cbc-b907-37aa72b265c3" before success QMap(("count", QVariant(qlonglong, 0))("future", QVariant(bool, false))("persistent", QVariant(qlonglong, 0)))
+QINFO  : EmbeddedSetupTest::psnEmbeddedIsolation() chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::psnEmbeddedIsolation() Owned PSN cookie after success and profile destruction QMap(("count", QVariant(qlonglong, 1))("future", QVariant(bool, true))("persistent", QVariant(qlonglong, 1)))
+PASS   : EmbeddedSetupTest::psnEmbeddedIsolation()
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 1080ms
+********* Finished testing of EmbeddedSetupTest *********

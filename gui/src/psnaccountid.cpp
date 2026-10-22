@@ -4,8 +4,8 @@
 #include <QtEndian>
 #include <QRegularExpression>
 
-PSNAccountID::PSNAccountID(Settings *settings, QObject *parent)
-    : QObject(parent), settings(settings)
+PSNAccountID::PSNAccountID(Settings *settings, QObject *parent, JsonRequester::ManagerFactory factory)
+    : QObject(parent), network_factory(std::move(factory)), settings(settings)
 {
     basicAuthHeader = JsonRequester::generateBasicAuthHeader(PSNAuth::CLIENT_ID, PSNAuth::CLIENT_SECRET);
 }
@@ -14,7 +14,7 @@ void PSNAccountID::GetPsnAccountId(QString redirectCode)
 {
     if (finished || !settings) return;
     QString body = QString("grant_type=authorization_code&code=%1&scope=psn:clientapp referenceDataService:countryConfig.read pushNotification:webSocket.desktop.connect sessionManager:remotePlaySession.system.update&redirect_uri=https://remoteplay.dl.playstation.net/remoteplay/redirect&").arg(QString::fromLatin1(QUrl::toPercentEncoding(redirectCode)));
-    auto *requester = new JsonRequester(this);
+    auto *requester = new JsonRequester(this, network_factory);
     connect(requester, &JsonRequester::requestFinished, this, &PSNAccountID::handleAccessTokenResponse);
     connect(requester, &JsonRequester::requestError, this, &PSNAccountID::handleErrorResponse);
     requester->makePostRequest(PSNAuth::TOKEN_URL, basicAuthHeader, "application/x-www-form-urlencoded", body);
@@ -27,7 +27,7 @@ void PSNAccountID::handleAccessTokenResponse(const QString &, const QJsonDocumen
     const auto access = object.value("access_token").toString();
     const auto refresh = object.value("refresh_token").toString();
     const auto seconds = object.value("expires_in").toInt();
-    if (access.isEmpty() || refresh.isEmpty() || seconds <= 0) {
+    if (access.trimmed().isEmpty() || refresh.trimmed().isEmpty() || seconds <= 0) {
         fail(tr("PSN returned incomplete credentials. Start a fresh sign-in."));
         return;
     }
@@ -36,7 +36,7 @@ void PSNAccountID::handleAccessTokenResponse(const QString &, const QJsonDocumen
     access_token_expiry = QDateTime::currentDateTime().addSecs(seconds).toString(settings->GetTimeFormat());
     emit Progress();
     if (finished) return;
-    auto *requester = new JsonRequester(this);
+    auto *requester = new JsonRequester(this, network_factory);
     connect(requester, &JsonRequester::requestFinished, this, &PSNAccountID::handUserIDResponse);
     connect(requester, &JsonRequester::requestError, this, &PSNAccountID::handleErrorResponse);
     requester->makeGetRequest(PSNAuth::TOKEN_URL + "/" + QString::fromLatin1(QUrl::toPercentEncoding(access_token)), basicAuthHeader, "application/json");

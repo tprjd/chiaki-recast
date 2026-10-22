@@ -19,6 +19,15 @@ TestCase {
         search.forceActiveFocus(Qt.TabFocusReason);
         keyClick(Qt.Key_Return);
     }
+    function test_migratedProfileMetadataRemoved() {
+        const h = createTemporaryObject(harnessComponent, testCase);
+        const search = findChild(h, "settingsSearch");
+        search.text = "Config";
+        const targets = h.screen.searchResults.map(row => row.target);
+        for (const removed of ["manageProfiles", "profileSelection", "profileAction", "newProfileName", "deleteProfile", "importSettings", "exportSettings"])
+            verify(targets.indexOf(removed) < 0);
+        for (const retained of ["logSanitize", "logVerbose", "aboutSettings"]) verify(targets.indexOf(retained) >= 0);
+    }
     function test_captureModeSearch() {
         const h = createTemporaryObject(harnessComponent, testCase);
         searchFor(h, "F8 gameplay capture");
@@ -50,23 +59,6 @@ TestCase {
         tryCompare(h.pages, "depth", 1);
         tryCompare(findChild(h.pages.currentItem, "customRendererSettings"), "activeFocus", true);
         compare(h.settings.changeCount, 0);
-    }
-    function test_controllerSearchRetainsSelectionAndDoesNotCaptureTarget() {
-        const h = createTemporaryObject(linkedHarnessComponent, testCase);
-        searchFor(h, "MIC alternate input");
-        const capture = findChild(h, "controllerCapture");
-        tryCompare(capture, "opened", true);
-        compare(h.pages.depth, 1);
-        compare(h.actions.filter(action => action.name === "beginMapping").length, 1);
-        h.backend.currentControllerMapping = [{buttonValue: 1073741824, buttonName: "MIC", physicalButton: ["PRIVATE_INPUT", "PRIVATE_ALT"]}];
-        h.backend.controllerMappingInProgress = true;
-        tryCompare(h.pages, "depth", 2);
-        tryCompare(findChild(h.pages.currentItem, "controllerMap1073741824Slot1"), "activeFocus", true);
-        verify(!findChild(h.pages.currentItem, "controllerButtonCapture").visible);
-        compare(h.actions.filter(action => action.name === "selectButton").length, 0);
-        keyClick(Qt.Key_Escape);
-        tryCompare(h.pages, "depth", 1);
-        tryCompare(findChild(h.pages.currentItem, "controllerMappingChange"), "activeFocus", true);
     }
     function test_keyboardEmptyClearAndCategorySelection() {
         const h = createTemporaryObject(harnessComponent, testCase);
@@ -149,8 +141,8 @@ TestCase {
             "decoder", "useZeroCopy", "windowType", "customResolutionWidth", "customResolutionHeight", "fullscreenDoubleClick", "hideCursor", "vSyncEnabled", "videoPreset", "queueDepthLimit", "rendererBackend", "customRendererSettings", "displaySettings", "consoleSelection",
             "audioOutDevice", "audioInDevice", "audioBufferSize", "audioVolume", "startMicUnmuted", "speechProcessing", "noiseSuppressLevel", "echoSuppressLevel", "wifiDroppedNotif", "packetLossReportedMax", "iDROnFECFailureEnabled", "showStreamStats",
             "registerConsole", "registeredConsoleInfo0", "autoConnectConsole0", "deleteRegisteredConsole0", "hiddenConsoleInfo0", "unhideConsole0", "mouseCameraEnabled", "keyboardEnabled", "mouseTouchEnabled", "resetAllKeys",
-            "controllerMappingChange", "controllerMappingReset", "allowJoystickBackgroundEvents", "buttonsByPosition", "dpadTouchEnabled", "dpadTouchIncrement", "dpadTouchShortcut1", "dpadTouchShortcut2", "dpadTouchShortcut3", "dpadTouchShortcut4", "rumbleHapticsIntensity", "hapticOverride",
-            "openPsnLogin", "portGuessingEnabled", "portGuessCount", "portGuessSocketCount", "manageProfiles", "exportSettings", "importSettings", "logSanitize", "logVerbose", "aboutSettings"
+            "allowJoystickBackgroundEvents", "buttonsByPosition", "dpadTouchEnabled", "dpadTouchIncrement", "dpadTouchShortcut1", "dpadTouchShortcut2", "dpadTouchShortcut3", "dpadTouchShortcut4", "rumbleHapticsIntensity", "hapticOverride",
+            "openPsnLogin", "portGuessingEnabled", "portGuessCount", "portGuessSocketCount", "logSanitize", "logVerbose", "aboutSettings"
         ];
         for (const console of ["PS4", "PS5"]) for (const route of ["Local", "Remote"])
             for (const name of console === "PS5" ? ["resolution", "fps", "bitrate", "codec"] : ["resolution", "fps", "bitrate"])
@@ -212,7 +204,6 @@ TestCase {
         h.settings.psnAuthTokenExpiry = "UNIQUE_PRIVATE_EXPIRY";
         h.settings.psnAccountId = "UNIQUE_PRIVATE_ACCOUNT";
         h.settings.controllerMapping = [{buttonName: "Cross", buttonValue: 1, keyName: "UNIQUE_PRIVATE_KEY"}];
-        h.backend.currentControllerMapping = [{buttonName: "Cross", buttonValue: 1, physicalButton: ["UNIQUE_PRIVATE_INPUT", "UNIQUE_PRIVATE_ALT"]}];
         for (const mode of [false, true]) {
             h.settings.streamerMode = mode;
             h.settings.changeCount = 0;
@@ -279,14 +270,7 @@ TestCase {
             compare(h.settings.changeCount, 0, target + " search does not write");
             while (h.pages.depth > 1) { keyClick(Qt.Key_Escape); tryVerify(() => !h.pages.busy); }
         }
-        for (const target of ["profileSelection", "newProfileName", "deleteProfile", "profileAction"]) {
-            selectTarget(h, "Config", target);
-            tryCompare(h.pages, "depth", 2);
-            tryCompare(findChild(h.pages.currentItem, "profileSelection"), "activeFocus", true);
-            keyClick(Qt.Key_Escape);
-            tryCompare(h.pages, "depth", 1);
-            tryCompare(findChild(h.pages.currentItem, "manageProfiles"), "activeFocus", true);
-        }
+
         compare(h.actions.length, 0);
     }
     function test_linkedPrerequisitesAndProfileChanges() {
@@ -331,15 +315,7 @@ TestCase {
         keyClick(Qt.Key_Return);
         tryCompare(findChild(h.pages.currentItem, "keyMapping2"), "activeFocus", true);
     }
-    function test_profileRoutes() {
-        const h = createTemporaryObject(linkedHarnessComponent, testCase, {width: 900, height: 600});
-        for (const target of ["profileSelection", "newProfileName", "deleteProfile", "profileAction"]) {
-            selectTarget(h, "Config", target);
-            tryCompare(h.pages, "depth", 2);
-            keyClick(Qt.Key_Escape);
-            tryCompare(h.pages, "depth", 1);
-        }
-    }
+
     function test_searchExplainsOuterPrerequisitesAndNativeNames() {
         const h = createTemporaryObject(harnessComponent, testCase);
         const search = findChild(h, "settingsSearch");
@@ -350,7 +326,7 @@ TestCase {
         h.backend.window.videoPreset = 5;
         h.settings.placeboColorMappingEnabled = false;
         verify(h.screen.searchResults[0].description.indexOf("Color mapping enabled") >= 0);
-        for (const query of ["Audio/Video", "Use zero copy", "Start mic unmuted", "Request IDR frame on FEC failure", "Login to PSN", "Force STUN port guessing", "Export settings to file"]) {
+        for (const query of ["Audio/Video", "Use zero copy", "Start mic unmuted", "Request IDR frame on FEC failure", "Login to PSN", "Force STUN port guessing"]) {
             search.text = query;
             verify(h.screen.searchResults.length > 0, query + " uses the native setting name");
         }
@@ -366,59 +342,6 @@ TestCase {
         keyClick(Qt.Key_Tab);
         tryCompare(findChild(h, "clearSettingsSearch"), "activeFocus", true);
     }
-    function test_allControllerPrimaryAndAlternateRoutes() {
-        const h = createTemporaryObject(linkedHarnessComponent, testCase, {width: 900, height: 600});
-        const mapping = [];
-        const nativeIds = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072,
-            67108864, 134217728, 268435456, 536870912, 1073741824];
-        for (let i = 0; i < nativeIds.length; ++i)
-            mapping.push({buttonValue: nativeIds[i], buttonName: "Target " + i, physicalButton: ["PRIVATE_PHYSICAL", "PRIVATE_ALTERNATE"]});
-        h.backend.currentControllerMapping = mapping;
-        h.settings.changeCount = 0;
-        for (const row of mapping) for (let slot = 0; slot < 2; ++slot) {
-            const target = "controllerMap" + row.buttonValue + "Slot" + slot;
-            selectTarget(h, "Controllers", target);
-            tryCompare(findChild(h, "controllerCapture"), "opened", true);
-            h.backend.controllerMappingInProgress = true;
-            tryCompare(h.pages, "depth", 2);
-            tryCompare(findChild(h.pages.currentItem, target), "activeFocus", true);
-            assertInViewport(h, findChild(h.pages.currentItem, target));
-            verify(!findChild(h.pages.currentItem, "controllerButtonCapture").visible);
-            compare(h.actions.filter(action => action.name === "selectButton").length, 0);
-            keyClick(Qt.Key_Escape);
-            tryCompare(h.pages, "depth", 1);
-        }
-        compare(h.settings.changeCount, 0);
-        compare(h.actions.filter(action => action.name === "updateButton" || action.name === "applyMapping").length, 0);
-    }
-    function test_mappingCancelSteamProfileAndDelayedModel() {
-        const h = createTemporaryObject(linkedHarnessComponent, testCase);
-        for (const cancel of ["cancel", "steam", "profile"]) {
-            searchFor(h, "MIC alternate input");
-            tryCompare(findChild(h, "controllerCapture"), "opened", true);
-            if (cancel === "steam") {
-                h.backend.controllerMappingSteamControllerSelected();
-                tryCompare(findChild(h, "steamControllerNotice"), "opened", true);
-                keyClick(Qt.Key_Escape);
-            } else if (cancel === "profile") h.settings.currentProfile = "Other profile";
-            else keyClick(Qt.Key_Escape);
-            tryCompare(findChild(h, "controllerCapture"), "visible", false);
-            compare(h.pages.depth, 1);
-            tryCompare(findChild(h.pages.currentItem, "controllerMappingChange"), "activeFocus", true);
-        }
-        searchFor(h, "Cross primary input");
-        tryCompare(findChild(h, "controllerCapture"), "opened", true);
-        h.backend.controllerMappingInProgress = true;
-        tryCompare(h.pages, "depth", 2);
-        h.backend.currentControllerMapping = [{buttonValue: 1, buttonName: "Cross", physicalButton: ["A", "B"]}];
-        tryCompare(findChild(h.pages.currentItem, "controllerMap1Slot0"), "activeFocus", true);
-        keyClick(Qt.Key_Return);
-        tryCompare(findChild(h.pages.currentItem, "controllerButtonCapture"), "opened", true);
-        h.backend.controllerMappingButtonSelected("new input");
-        tryCompare(findChild(h.pages.currentItem, "controllerButtonCapture"), "visible", false);
-        compare(h.actions.filter(action => action.name === "updateButton").length, 1);
-        compare(h.actions.filter(action => action.name === "updateButton")[0].args[0], 1);
-    }
     function test_searchPreservesNativeActionsAndEdits() {
         const h = createTemporaryObject(harnessComponent, testCase);
         searchFor(h, "Audio volume");
@@ -431,10 +354,6 @@ TestCase {
         compare(h.settings.bitrateLocalPS5, 0);
         compare(h.settings.bitrateRemotePS4, 0);
         h.settings.actions = [];
-        searchFor(h, "Export settings to file");
-        compare(h.settings.actions.length, 0);
-        keyClick(Qt.Key_Return);
-        compare(h.settings.actions[0].name, "exportSettings");
         searchFor(h, "Registered console information");
         tryCompare(findChild(h, "registeredConsolesEmpty"), "activeFocus", true);
         searchFor(h, "Unhide console");
@@ -467,27 +386,6 @@ TestCase {
         keyClick(Qt.Key_Escape);
         compare(search.text, "");
         compare(h.actions.filter(action => action.name === "close").length, 0);
-    }
-    function test_mappingControlsAndMissingTarget() {
-        const h = createTemporaryObject(linkedHarnessComponent, testCase);
-        h.backend.currentControllerMapping = [{buttonValue: 2, buttonName: "Moon", physicalButton: ["A", "B"]}];
-        for (const row of [
-                ["Analog stick and L2/R2 mapping", "enableAnalogStickMapping", false],
-                ["Apply controller mapping", "controllerMappingApply", true],
-                ["Cancel controller mapping", "controllerMappingCancel", false],
-                ["Cross primary input", "enableAnalogStickMapping", false],
-                ["Apply controller mapping", "enableAnalogStickMapping", false]]) {
-            tryVerify(() => !h.pages.busy);
-            h.backend.controllerMappingAltered = row[2];
-            searchFor(h, row[0]);
-            tryCompare(findChild(h, "controllerCapture"), "opened", true);
-            h.backend.controllerMappingInProgress = true;
-            tryCompare(h.pages, "depth", 2);
-            tryCompare(findChild(h.pages.currentItem, row[1]), "activeFocus", true);
-            compare(h.actions.filter(action => action.name === "selectButton" || action.name === "applyMapping").length, 0);
-            keyClick(Qt.Key_Escape);
-            tryCompare(h.pages, "depth", 1);
-        }
     }
     function test_consoleActionUsesFirstCurrentEligibleNativeControl() {
         const h = createTemporaryObject(harnessComponent, testCase);

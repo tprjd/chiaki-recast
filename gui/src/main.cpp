@@ -19,6 +19,8 @@ int main(int argc, char *argv[]) { return real_main(argc, argv); }
 #include <controllermanager.h>
 #include <discoverymanager.h>
 #include <qmlmainwindow.h>
+#include <qmlnativeservices.h>
+#include <applicationcontroller.h>
 #include <QApplication>
 #include <QtTypes>
 
@@ -40,6 +42,7 @@ int main(int argc, char *argv[]) { return real_main(argc, argv); }
 #include <QCommandLineParser>
 #include <QMap>
 #include <QSurfaceFormat>
+#include <QFile>
 
 Q_DECLARE_METATYPE(ChiakiLogLevel)
 Q_DECLARE_METATYPE(ChiakiRegistEventType)
@@ -66,6 +69,31 @@ int RunMain(QGuiApplication &app, Settings *settings, bool exit_app_on_stream_ex
 
 int real_main(int argc, char *argv[])
 {
+	// Check release resources without starting audio, discovery, settings, or Chromium.
+	if(argc == 2 && strcmp(argv[1], "--check-package") == 0)
+	{
+		QCoreApplication app(argc, argv);
+		for(const auto *path : {":/setup/index.html", ":/setup/app.js", ":/setup/app.css", ":/qtwebchannel/qwebchannel.js"})
+		{
+			QFile file(QString::fromUtf8(path));
+			if(!file.open(QIODevice::ReadOnly) || file.size() == 0)
+			{
+				fprintf(stderr, "Missing embedded package asset: %s\n", path);
+				return 1;
+			}
+			if(strcmp(path, ":/setup/index.html") == 0)
+			{
+				const auto html = file.readAll();
+				if(!html.contains("src=\"./app.js\"") || !html.contains("href=\"./app.css\"")
+					|| !html.contains("qrc:/qtwebchannel/qwebchannel.js"))
+				{
+					fprintf(stderr, "Embedded setup must reference its packaged script, style, and WebChannel.\n");
+					return 1;
+				}
+			}
+		}
+		return 0;
+	}
 	qRegisterMetaType<DiscoveryHost>();
 	qRegisterMetaType<RegisteredHost>();
 	qRegisterMetaType<HostMAC>();
@@ -88,7 +116,6 @@ int real_main(int argc, char *argv[])
 #endif
 		QGuiApplication::setDesktopFileName("chiaki-ng");
 
-	qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-gpu");
 #if defined(Q_OS_WIN)
 	const size_t cSize = strlen(argv[0])+1;
 	wchar_t wc[cSize];
@@ -318,14 +345,22 @@ int real_main(int argc, char *argv[])
 
 int RunMain(QGuiApplication &app, Settings *settings, bool exit_app_on_stream_exit)
 {
-	QmlMainWindow main_window(settings, exit_app_on_stream_exit);
-	main_window.show();
+	QmlNativeServices services(settings);
+	QApplication::setQuitOnLastWindowClosed(false);
+	ApplicationController controller(&services, exit_app_on_stream_exit);
+	controller.setupWindow()->show();
 	return app.exec();
 }
 
 int RunStream(QGuiApplication &app, const StreamSessionConnectInfo &connect_info)
 {
-	QmlMainWindow main_window(connect_info);
+	QmlNativeServices services(connect_info.settings);
+	QmlMainWindow main_window(services.backend(), services.engine(), connect_info);
+	if (!main_window.initializationError().isEmpty()) {
+		qCritical() << main_window.initializationError();
+		return 1;
+	}
+	QObject::connect(&main_window, &QmlMainWindow::initializationFailed, &app, [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);
 	main_window.show();
 	return app.exec();
 }

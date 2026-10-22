@@ -1,0 +1,176 @@
+diff --git a/gui/src/settings.cpp b/gui/src/settings.cpp
+index cbdbf63b..10dd1425 100644
+--- a/gui/src/settings.cpp
++++ b/gui/src/settings.cpp
+@@ -358,8 +358,8 @@ bool Settings::ImportSettings(QString filepath)
+ 		replace(destination, previous);
+ 		return false;
+ 	}
+-	if(!profile.isEmpty() && !profiles.contains(profile)) profiles.append(profile);
+-	// Keep the local profile catalog while replacing the selected profile's values.
++	if(profile.isEmpty()) LoadProfiles();
++	else if(!profiles.contains(profile)) profiles.append(profile);
+ 	SaveProfiles();
+ 	default_settings.setValue("settings/current_profile", profile);
+ 	default_settings.sync();
+diff --git a/gui/src/setupbridge.cpp b/gui/src/setupbridge.cpp
+index 518d987f..b19ae4ff 100644
+--- a/gui/src/setupbridge.cpp
++++ b/gui/src/setupbridge.cpp
+@@ -2019,7 +2019,7 @@ QVariantMap SetupBridge::profileAction(const QString &action, const QString &key
+     if(action != "create" && action != "switch") return {{"accepted", false}};
+     const bool saved = backend->nativeSettings()->SetCurrentProfile(target);
+     refresh();
+-    return {{"accepted", saved}, {"message", saved ? tr("Profile selected.") : tr("The profile could not be selected.")}};
++    return {{"accepted", saved}, {"profileGeneration", QString::number(backend->profileGeneration())}, {"message", saved ? tr("Profile selected.") : tr("The profile could not be selected.")}};
+ }
+ 
+ QVariantMap SetupBridge::settingsFileAction(const QString &action, const QString &profile)
+diff --git a/gui/tests/CMakeLists.txt b/gui/tests/CMakeLists.txt
+index 024110c5..f7485407 100644
+--- a/gui/tests/CMakeLists.txt
++++ b/gui/tests/CMakeLists.txt
+@@ -57,7 +57,7 @@ if(TARGET chiaki-gui)
+         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+     add_test(NAME chiaki-remote-native-connection COMMAND chiaki-embedded-setup-tests remoteNativeConnection)
+     set_tests_properties(chiaki-remote-native-connection PROPERTIES LABELS desktop)
+-    add_test(NAME chiaki-embedded-profiles COMMAND chiaki-embedded-setup-tests profileImportValidation profileSettingsPage profileFiles)
++    add_test(NAME chiaki-embedded-profiles COMMAND chiaki-embedded-setup-tests profileImportValidation profileSettingsPage profileFiles profileSearch profileDefaultImport)
+     set_tests_properties(chiaki-embedded-profiles PROPERTIES
+         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+     add_test(NAME chiaki-embedded-automatic-registration COMMAND chiaki-embedded-setup-tests automaticRegistration)
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 74d47e81..5a13b7ff 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -697,6 +697,72 @@ private slots:
+         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-active-profile]')?.textContent.includes('Hidden')").toBool());
+     }
+ 
++    void profileSearch()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto cleanup = qScopeGuard([&] {
++            for(const auto &name : {profile, profile + "-new"}) QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        QVERIFY(settings.SetCurrentProfile(profile));
++        settings.SetDiscoveryEnabled(false);
++        QList<QPointer<PsnReply>> network;
++        RegistrationTransport registration;
++        QmlNativeServices services(&settings, controlledProfileRequests(network), {}, registration.boundary(), controlledDiscovery());
++        SetupWindow setup(services.backend());
++        setup.resize(1280, 900);
++        setup.show();
++        QVERIFY(click(setup.view(), ".open-settings"));
++        QVERIFY(fill(setup.view(), ".settings-search input", "New profile name"));
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-results button')?.textContent.includes('New profile name')").toBool());
++        QVERIFY(click(setup.view(), ".settings-results button"));
++        QTRY_VERIFY(script(setup.view(), "document.activeElement?.id==='profileSelection'").toBool());
++        script(setup.view(), "{const select=document.querySelector('#profileSelection');select.value='create';select.dispatchEvent(new Event('change',{bubbles:true}));}");
++        QVERIFY(fill(setup.view(), "#newProfileName", profile + "-new"));
++        services.backend()->qmlSettings()->setLogVerbose(true);
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('#newProfileName')?.value").toString(), profile + "-new");
++        QVERIFY(click(setup.view(), "#profileAction"));
++        QTRY_COMPARE(services.backend()->qmlSettings()->currentProfile(), profile + "-new");
++        QTRY_VERIFY(script(setup.view(), "document.activeElement?.id==='profileSelection'").toBool());
++        QVERIFY(fill(setup.view(), ".settings-search input", "Delete selected profile"));
++        QVERIFY(click(setup.view(), ".settings-results button"));
++        QTRY_VERIFY(script(setup.view(), "document.activeElement?.id==='profileSelection'").toBool());
++        setup.resize(2560, 1800);
++        setup.view()->setZoomFactor(2);
++        QTRY_VERIFY(script(setup.view(), "innerWidth>=1024 && document.documentElement.scrollWidth<=innerWidth && !!document.querySelector('#profileSelection')").toBool());
++    }
++
++    void profileDefaultImport()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto cleanup = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        QVERIFY(settings.SetCurrentProfile(profile));
++        settings.SetAudioVolume(37);
++        QTemporaryDir files;
++        const auto input = files.filePath("default.ini");
++        {
++            QSettings file(input, QSettings::IniFormat);
++            file.setValue("version", 2);
++            file.setValue("settings/audio_volume", 21);
++            file.beginWriteArray("profiles", 1);
++            file.setArrayIndex(0);
++            file.setValue("settings/profile_name", "Imported profile");
++            file.endArray();
++        }
++        QVERIFY(settings.ImportSettings(input));
++        Settings restored(QString{});
++        QCOMPARE(restored.GetAudioVolume(), 21);
++        QCOMPARE(restored.GetCurrentProfile(), QString{});
++        QCOMPARE(restored.GetProfiles(), QList<QString>{"Imported profile"});
++        Settings named(profile);
++        QCOMPARE(named.GetAudioVolume(), 37);
++    }
++
+     void profileRestartRead()
+     {
+         const auto profile = qEnvironmentVariable("CHIAKI_PROFILE_RESTART");
+diff --git a/gui/web/src/Profiles.svelte b/gui/web/src/Profiles.svelte
+index 9de4b019..ef428b9f 100644
+--- a/gui/web/src/Profiles.svelte
++++ b/gui/web/src/Profiles.svelte
+@@ -1,5 +1,5 @@
+ <script lang="ts">
+-  import { untrack } from 'svelte';
++  import { tick, untrack } from 'svelte';
+   import type { State, connectSetup } from './bridge';
+   let { current, connection, t }: { current: State; connection: Awaited<ReturnType<typeof connectSetup>>; t: (text: string) => string } = $props();
+   let selected = $state('');
+@@ -10,10 +10,12 @@
+   let generation = '';
+   const item = $derived(current.profiles.items.find(item => item.key === selected));
+   const creating = $derived(selected === 'create');
++  const profileGeneration = $derived(current.profileGeneration);
++  const catalog = $derived(current.profiles.items.map(item => item.key).join(','));
+   $effect(() => {
+-    generation = current.profileGeneration;
+-    const active = current.profiles.items.find(item => item.active)?.key ?? '';
+-    untrack(() => { selected = active; name = ''; deleting = false; message = ''; });
++    generation = profileGeneration;
++    void catalog;
++    untrack(() => { selected = current.profiles.items.find(item => item.active)?.key ?? ''; name = ''; deleting = false; message = ''; });
+   });
+   async function apply() {
+     if (pending) return;
+@@ -21,7 +23,13 @@
+     const owner = generation;
+     try {
+       const result = await connection.profileAction(creating ? 'create' : deleting ? 'delete' : 'switch', selected, name, deleting, owner);
+-      if (owner === current.profileGeneration || result.accepted) message = result.message ?? '';
++      if (owner !== current.profileGeneration && result.profileGeneration !== current.profileGeneration) return;
++      message = result.message ?? '';
++      if (result.accepted) {
++        pending = false;
++        await tick();
++        document.getElementById('profileSelection')?.focus();
++      }
+     } finally { pending = false; }
+   }
+ </script>
+diff --git a/gui/web/src/Settings.svelte b/gui/web/src/Settings.svelte
+index fa3a3b9d..90707d6e 100644
+--- a/gui/web/src/Settings.svelte
++++ b/gui/web/src/Settings.svelte
+@@ -54,8 +54,9 @@
+     if (category === 'Audio/Wifi') connection.refreshAudioDevices();
+     await tick();
+     const target = document.getElementById(unmet ? unmet.key : requires && !values[requires] ? requires : field?.requiresValue && values[field.requiresValue.key] !== field.requiresValue.value ? field.requiresValue.key : key);
+-    target?.focus();
+-    target?.scrollIntoView({ block: 'nearest' });
++    const available = target ?? (category === 'Profiles' ? document.getElementById('profileSelection') : null);
++    available?.focus();
++    available?.scrollIntoView({ block: 'nearest' });
+   }
+   async function change(key: string, value: boolean | number | string, generation = current.profileGeneration) {
+     if (key === 'openPlaceboColorMapping') { await reveal('placeboGamutMappingFunction'); return; }

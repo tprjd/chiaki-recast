@@ -1,0 +1,12 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QWARN  : EmbeddedSetupTest::videoAudioState() QFontDatabase: Cannot find font directory C:/Users/david/.cache/chiaki-native-qt/6.9.3/msvc2022_64/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+FAIL!  : EmbeddedSetupTest::videoAudioState() Compared values are not the same
+   Actual   (script(setup.view(), "document.querySelector('#audioVolume')?.value").toString()): "42"
+   Expected ((QString(QtPrivate::qMakeStringPrivate(u"" "128"))))                             : "128"
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(442) : failure location
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 2 passed, 1 failed, 0 skipped, 0 blacklisted, 22749ms
+********* Finished testing of EmbeddedSetupTest *********

@@ -1,0 +1,11 @@
+[10428:40964:1022/180659.977:ERROR:gpu_channel_manager.cc(956)] Failed to create GLES3 context, fallback to GLES2.
+[10428:40964:1022/180659.977:ERROR:gpu_channel_manager.cc(967)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-07-00-301301.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Updated PSN hosts
+[I] Updated PSN hosts
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-07-01-258258.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Updated PSN hosts

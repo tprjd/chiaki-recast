@@ -1,0 +1,418 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[0/2] Re-checking globbed directories...
+-- GLOB mismatch!
+[1/2] Re-running CMake...
+-- Speex DSP found echo cancelling and noise suppression enabled
+CMake Warning (dev) at C:/Users/david/.cache/chiaki-msvc-native/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  CMakeLists.txt:114 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Could NOT find nanopb (missing: nanopb_DIR)
+-- Python install dir: C:/Program Files/WindowsApps/PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0/Lib/site-packages
+-- Checking for module 'libidn2'
+--   Package 'libidn2', required by 'virtual:world', not found
+-- Using CMake version 3.31.6-msvc6
+-- curl version=[8.11.0-DEV]
+-- CMake platform flags: WIN32 MSVC VCPKG
+-- Performing Test HAVE_WIN32_WINNT
+-- Performing Test HAVE_WIN32_WINNT - Success
+-- Found _WIN32_WINNT=0x0a00
+-- Picky compiler options: /clang:-Werror-implicit-function-declaration /clang:-Wextra /clang:-Wall /clang:-pedantic /clang:-Wbad-function-cast /clang:-Wconversion /clang:-Winline /clang:-Wmissing-declarations /clang:-Wmissing-prototypes /clang:-Wnested-externs /clang:-Wno-long-long /clang:-Wno-multichar /clang:-Wpointer-arith /clang:-Wshadow /clang:-Wsign-compare /clang:-Wundef /clang:-Wunused /clang:-Wwrite-strings /clang:-Waddress /clang:-Wattributes /clang:-Wcast-align /clang:-Wdeclaration-after-statement /clang:-Wdiv-by-zero /clang:-Wempty-body /clang:-Wendif-labels /clang:-Wfloat-equal /clang:-Wformat-security /clang:-Wignored-qualifiers /clang:-Wmissing-field-initializers /clang:-Wmissing-noreturn /clang:-Wno-format-nonliteral /clang:-Wno-system-headers /clang:-Wold-style-definition /clang:-Wredundant-decls /clang:-Wsign-conversion /clang:-Wno-error=sign-conversion /clang:-Wstrict-prototypes /clang:-Wtype-limits /clang:-Wunreachable-code /clang:-Wunused-parameter /clang:-Wvla /clang:-Wshift-sign-overflow /clang:-Wshorten-64-to-32 /clang:-Wformat=2 /clang:-Wdouble-promotion /clang:-Wenum-conversion /clang:-Wpragmas /clang:-Wunused-const-variable /clang:-Wheader-guard /clang:-Wsometimes-uninitialized /clang:-Wcomma /clang:-Wmissing-variable-declarations /clang:-Wassign-enum /clang:-Wextra-semi-stmt /clang:-Wimplicit-fallthrough
+-- Could NOT find Perl (missing: PERL_EXECUTABLE) 
+CMake Warning at third-party/curl/CMakeLists.txt:444 (message):
+  Perl not found.  Will not build manuals.
+
+
+-- Could NOT find ZLIB (missing: ZLIB_LIBRARY ZLIB_INCLUDE_DIR) 
+-- Checking for module 'libnghttp2'
+--   Package 'libnghttp2', required by 'virtual:world', not found
+-- Could NOT find NGHTTP2 (missing: NGHTTP2_INCLUDE_DIR NGHTTP2_LIBRARY) 
+-- Could NOT find Libidn2 (missing: LIBIDN2_INCLUDE_DIR LIBIDN2_LIBRARY) 
+-- Checking for module 'libpsl'
+--   Package 'libpsl', required by 'virtual:world', not found
+-- Could NOT find Libpsl (missing: LIBPSL_INCLUDE_DIR LIBPSL_LIBRARY) 
+CMake Warning at third-party/curl/CMakeLists.txt:1135 (message):
+  libpsl is enabled, but not found.
+
+
+-- Checking for module 'libssh2'
+--   Package 'libssh2', required by 'virtual:world', not found
+-- Could NOT find Libssh2 (missing: LIBSSH2_INCLUDE_DIR LIBSSH2_LIBRARY) 
+-- Protocols: http https ws wss
+-- Features: alt-svc AsynchDNS HSTS HTTPS-proxy IPv6 Kerberos Largefile NTLM SPNEGO SSL SSPI threadsafe UnixSockets
+-- Enabled SSL backends: Schannel
+-- Steam shortcut enabled
+-- FFMPEG Decoder enabled
+-- Could NOT find ILClient (missing: ILClient_libbcm_host_LIBRARY ILClient_libvcilcs_LIBRARY ILClient_libvchiq_arm_LIBRARY ILClient_libvcos_LIBRARY ILClient_INCLUDE_DIR ILClient_SOURCE_DIR) 
+-- Pi Decoder disabled
+-- Steamdeck native gyro and hatpics disabled
+-- SDL version 2.30.0 is >= 2.0.14, disabling Setsu
+-- Setsu disabled
+CMake Warning at C:/Users/david/.cache/chiaki-native-qt/6.9.3/msvc2022_64/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:335 (message):
+  This project is using headers of the GuiPrivate module and will therefore
+  be tied to this specific Qt module build version.  Running this project
+  against other versions of the Qt modules may crash at any arbitrary point.
+  This is not a bug, but a result of using Qt internals.  You have been
+  warned!
+
+  You can disable this warning by setting QT_NO_PRIVATE_MODULE_WARNING to ON.
+Call Stack (most recent call first):
+  C:/Users/david/.cache/chiaki-native-qt/6.9.3/msvc2022_64/lib/cmake/Qt6/Qt6Config.cmake:230 (_qt_internal_show_private_module_warning)
+  C:/Users/david/.cache/chiaki-msvc-native/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  gui/CMakeLists.txt:23 (find_package)
+
+
+CMake Warning (dev) at gui/CMakeLists.txt:181 (install):
+  Target chiaki has RESOURCE files but no RESOURCE DESTINATION.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Configuring done (3.9s)
+-- Generating done (0.5s)
+-- Build files have been written to: C:/Users/david/.cache/chiaki-msvc-native/ticket12-build
+[0/4] Re-checking globbed directories...
+[1/28] Automatic MOC and UIC for target cpp-steam-tools
+[2/27] Automatic MOC for target placebo-libav-impl
+[3/25] Building CXX object third-party\steam-tools\CMakeFiles\cpp-steam-tools.dir\src\steamtools.cpp.obj
+In file included from C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\third-party\cpp-steam-tools-patched\src\steamtools.cpp:10:
+C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\third-party\cpp-steam-tools-patched\src\../include/vdf_parser.hpp(127,10): warning: 'wstring_convert<tyti::vdf::detail::deletable_facet<std::codecvt<wchar_t, char, mbstate_t>>>' is deprecated: warning STL4017: std::wbuffer_convert, std::wstring_convert, and the <codecvt> header (containing std::codecvt_mode, std::codecvt_utf8, std::codecvt_utf16, and std::codecvt_utf8_utf16) are deprecated in C++17. (The std::codecvt class template is NOT deprecated.) The C++ Standard doesn't provide equivalent non-deprecated functionality; consider using MultiByteToWideChar() and WideCharToMultiByte() from <Windows.h> instead. You can define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING or _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS to suppress this warning. [-Wdeprecated-declarations]
+  127 |     std::wstring_convert<
+      |          ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\xlocbuf(303,7): note: 'wstring_convert<tyti::vdf::detail::deletable_facet<std::codecvt<wchar_t, char, mbstate_t>>>' has been explicitly marked deprecated here
+  303 | class _CXX17_DEPRECATE_CODECVT_HEADER wstring_convert { // converts between _Elem (wide) and char (byte) strings
+      |       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\yvals_core.h(1224,7): note: expanded from macro '_CXX17_DEPRECATE_CODECVT_HEADER'
+ 1224 |     [[deprecated(                                                                                              \
+      |       ^
+C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\third-party\cpp-steam-tools-patched\src\steamtools.cpp(17,5): warning: field 'errorFunction' will be initialized after field 'steamBaseDir' [-Wreorder-ctor]
+   16 | SteamTools::SteamTools(const std::function<void(const QString&)>& infoFunction, const std::function<void(const QString&)>& errorFunction, const QString& steamDir): infoFunction(infoFunction),
+      |                                                                                                                                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                                                                                                                     steamBaseDir(steamDir)
+   17 |     errorFunction(errorFunction), steamBaseDir(steamDir) {
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~  ~~~~~~~~~~~~~~~~~~~~~~
+      |     infoFunction(infoFunction)    errorFunction(errorFunction)
+C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\third-party\cpp-steam-tools-patched\src\steamtools.cpp(265,10): warning: variable 'entryID' set but not used [-Wunused-but-set-variable]
+  265 |     auto entryID = countStringOccurrencesInFile(errorFunction, shortcutFile, "appid");
+      |          ^
+C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\third-party\cpp-steam-tools-patched\src\steamtools.cpp(447,22): warning: unused variable 'shortcutId' [-Wunused-variable]
+  447 |             uint32_t shortcutId = shortcut.getAppid().toUInt();
+      |                      ^~~~~~~~~~
+4 warnings generated.
+[4/25] Linking CXX shared library third-party\steam-tools\cpp-steam-tools.dll
+C:/Users/david/.cache/chiaki-msvc-native/ticket12-build/third-party/steam-tools/cpp-steam-tools.dll: message: deploying dependencies
+[5/25] Generating web/index.html, web/app.js, web/app.css
+
+added 46 packages in 1s
+
+> chiaki-recast-setup@1.0.0 build
+> vite build --outDir C:/Users/david/.cache/chiaki-msvc-native/ticket12-build/gui/web
+
+15:51:21 [vite-plugin-svelte] no Svelte config found at C:/Users/david/.codex/worktrees/web-ui-ticket-12/chiaki-ng-ui/gui/web - using default configuration.
+vite v8.3.5 building client environment for production...
+transforming...
+<script src="qrc:/qtwebchannel/qwebchannel.js"> in "/index.html" can't be bundled without type="module" attribute
+✓ 116 modules transformed.
+
+(!) outDir C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\web is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../../../../../../.cache/chiaki-msvc-native/ticket12-build/gui/web/index.html   0.64 kB │ gzip:  0.35 kB
+../../../../../../.cache/chiaki-msvc-native/ticket12-build/gui/web/app.css      5.20 kB │ gzip:  1.66 kB
+../../../../../../.cache/chiaki-msvc-native/ticket12-build/gui/web/app.js      65.32 kB │ gzip: 23.90 kB
+
+✓ built in 118ms
+[6/25] Automatic MOC for target chiaki-gui
+[7/25] Automatic RCC for setup.qrc
+[8/25] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\jsonrequester.cpp.obj
+[9/25] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\psntoken.cpp.obj
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\psntoken.cpp:1:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\psntoken.h:4:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+2 warnings generated.
+[10/25] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\psnaccountid.cpp.obj
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\psnaccountid.cpp:1:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\psnaccountid.h:8:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+2 warnings generated.
+[11/25] Building CXX object gui\CMakeFiles\chiaki-gui.dir\chiaki-gui_autogen\EJRQKI7XPS\qrc_setup.cpp.obj
+[12/25] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\qmlnativeservices.cpp.obj
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlnativeservices.cpp:1:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\qmlnativeservices.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+2 warnings generated.
+[13/25] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\setupwindow.cpp.obj
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\setupwindow.cpp:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+2 warnings generated.
+[14/25] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\setupbridge.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\setupbridge.cpp(300,26): warning: lambda capture 'this' is not used [-Wunused-lambda-capture]
+  300 |     const auto reject = [this](const char *message) { return QVariantMap{{"accepted", false}, {"message", tr(message)}}; };
+      |                          ^~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\setupbridge.cpp(349,26): warning: lambda capture 'this' is not used [-Wunused-lambda-capture]
+  349 |     const auto reject = [this](const char *message) { return QVariantMap{{"accepted", false}, {"message", tr(message)}}; };
+      |                          ^~~~
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\setupbridge.cpp:2:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+4 warnings generated.
+[15/25] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\qmlmainwindow.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(159,20): warning: unused variable 'chiaki_level' [-Wunused-variable]
+  159 |     ChiakiLogLevel chiaki_level;
+      |                    ^~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(526,18): warning: 'fopen' is deprecated: This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  526 |     FILE *file = fopen(qPrintable(shader_cache_path()), "wb");
+      |                  ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdio.h(212,20): note: 'fopen' has been explicitly marked deprecated here
+  212 |     _Check_return_ _CRT_INSECURE_DEPRECATE(fopen_s)
+      |                    ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1132,10): warning: variable 'stored' set but not used [-Wunused-but-set-variable]
+ 1132 |     bool stored = false;
+      |          ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1133,17): warning: variable 'reason' set but not used [-Wunused-but-set-variable]
+ 1133 |     const char *reason = "unknown";
+      |                 ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1472,12): warning: 'queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1472 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(123,5): note: 'queue_family_index' has been explicitly marked deprecated here
+  123 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1473,12): warning: 'nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1473 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(125,5): note: 'nb_graphics_queues' has been explicitly marked deprecated here
+  125 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1474,12): warning: 'queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1474 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(132,5): note: 'queue_family_tx_index' has been explicitly marked deprecated here
+  132 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1475,12): warning: 'nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1475 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(134,5): note: 'nb_tx_queues' has been explicitly marked deprecated here
+  134 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1476,12): warning: 'queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1476 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(141,5): note: 'queue_family_comp_index' has been explicitly marked deprecated here
+  141 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1477,12): warning: 'nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1477 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(143,5): note: 'nb_comp_queues' has been explicitly marked deprecated here
+  143 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1478,12): warning: 'queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1478 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(161,5): note: 'queue_family_decode_index' has been explicitly marked deprecated here
+  161 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1479,12): warning: 'nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1479 |     vkctx->nb_decode_queues = 1;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(163,5): note: 'nb_decode_queues' has been explicitly marked deprecated here
+  163 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1803,18): warning: 'fopen' is deprecated: This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 1803 |     FILE *file = fopen(qPrintable(shader_cache_path()), "rb");
+      |                  ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdio.h(212,20): note: 'fopen' has been explicitly marked deprecated here
+  212 |     _Check_return_ _CRT_INSECURE_DEPRECATE(fopen_s)
+      |                    ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp:1:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\qmlmainwindow.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(290,20): warning: unused function 'render_params_path' [-Wunused-function]
+  290 | static const char *render_params_path()
+      |                    ^~~~~~~~~~~~~~~~~~
+16 warnings generated.
+[16/25] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\psnsigninwindow.cpp.obj
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\psnsigninwindow.cpp:2:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+2 warnings generated.
+[17/25] Building CXX object gui\CMakeFiles\chiaki-gui.dir\chiaki-gui_autogen\mocs_compilation.cpp.obj
+In file included from C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\chiaki-gui_autogen\mocs_compilation.cpp:3:
+In file included from C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\chiaki-gui_autogen\6YEA5652QU/moc_discoverymanager.cpp:9:
+In file included from C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\chiaki-gui_autogen\6YEA5652QU\../../../../../../.codex/worktrees/web-ui-ticket-12/chiaki-ng-ui/gui/include/discoverymanager.h:8:
+C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\chiaki-gui_autogen\6YEA5652QU\../../../../../../.codex/worktrees/web-ui-ticket-12/chiaki-ng-ui/gui/include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\chiaki-gui_autogen\6YEA5652QU\../../../../../../.codex/worktrees/web-ui-ticket-12/chiaki-ng-ui/gui/include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+2 warnings generated.
+[18/25] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\qmlbackend.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp(691,18): warning: unused variable 'hidden' [-Wunused-variable]
+  691 |             bool hidden = false;
+      |                  ^~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp(2110,15): warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+ 2110 |     char duid[duid_size];
+      |               ^~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp(2110,15): note: read of non-const variable 'duid_size' is not allowed in a constant expression
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp(2109,12): note: declared here
+ 2109 |     size_t duid_size = CHIAKI_DUID_STR_SIZE;
+      |            ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp(2288,2): warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 2288 |         uint32_t stream_menu_shortcut1 = settings->GetStreamMenuShortcut1();
+      |         ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp(2286,5): note: previous statement is here
+ 2286 |     if(!settings->GetStreamMenuEnabled())
+      |     ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp(2409,2): warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 2409 |         QMap<int, QStringList> result =
+      |         ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp(2407,5): note: previous statement is here
+ 2407 |     if(!controller_mapping_in_progress)
+      |     ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp(3041,56): warning: lambda capture 'this' is not used [-Wunused-lambda-capture]
+ 3041 |     connect(psnToken, &PSNToken::PSNTokenError, this, [this](const QString &error) {
+      |                                                        ^~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp(3116,6): warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 3116 |             if(!found_hosts.contains(duid) && registered_names.contains(name))
+      |             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp(3114,9): note: previous statement is here
+ 3114 |         if(!found_nicknames.contains(name))
+      |         ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\src\qmlbackend.cpp:1:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+7 warnings generated.
+[19/25] Automatic MOC for target chiaki-embedded-setup-tests
+[20/25] Building CXX object gui\tests\CMakeFiles\chiaki-embedded-setup-tests.dir\chiaki-embedded-setup-tests_autogen\mocs_compilation.cpp.obj
+[21/25] Building CXX object gui\tests\CMakeFiles\chiaki-embedded-setup-tests.dir\embeddedsetup.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(559,108): warning: trigraph ignored [-Wtrigraphs]
+  559 |             "document.body.innerText + [...document.querySelectorAll('*')].map(e=>e.shadowRoot?.textContent??'').join('\\n')")
+      |                                                                                                            ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\tests\embeddedsetup.cpp:69:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\qmlnativeservices.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-12\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+3 warnings generated.
+[22/25] Linking CXX executable gui\tests\chiaki-embedded-setup-tests.exe
+C:/Users/david/.cache/chiaki-msvc-native/ticket12-build/gui/tests/chiaki-embedded-setup-tests.exe: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\SDL2.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\tests\SDL2.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket12-build/gui/tests\SDL2.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libspeexdsp.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\tests\libspeexdsp.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket12-build/gui/tests\libspeexdsp.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\json-c.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\tests\json-c.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket12-build/gui/tests\json-c.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\miniupnpc.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\tests\miniupnpc.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket12-build/gui/tests\miniupnpc.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\event_core.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\tests\event_core.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket12-build/gui/tests\event_core.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\opus.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\tests\opus.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket12-build/gui/tests\opus.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libcrypto-3-x64.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket12-build\gui\tests\libcrypto-3-x64.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket12-build/gui/tests\libcrypto-3-x64.dll: message: deploying dependencies

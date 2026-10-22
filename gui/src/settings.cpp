@@ -4,10 +4,17 @@
 #include <SDL.h>
 #include <QFile>
 #include <QFileInfo>
+#include <QTemporaryDir>
+#include <QSaveFile>
+#include <QScopeGuard>
+extern "C" {
+#include <libplacebo/options.h>
+}
 #include <QUrl>
 #include <QKeySequence>
 #include <QCoreApplication>
 #include <cmath>
+#include <limits>
 
 #include <chiaki/config.h>
 
@@ -193,47 +200,53 @@ Settings::Settings(const QString &conf, QObject *parent) : QObject(parent),
 	InitializePlaceboSettings(&placebo_settings);
 }
 
-void Settings::ExportSettings(QString filepath)
+bool Settings::ExportSettings(QString filepath)
 {
-	// append ini if not already added
-	QFileInfo info(filepath);
-	if(info.suffix().isEmpty())
-		filepath += ".ini";
-	QFile file(filepath);
-	file.open(QIODevice::ReadWrite);
-	file.close();
-	QSettings settings_backup(filepath, QSettings::IniFormat);
-	SaveRegisteredHosts(&settings_backup);
-	SaveHiddenHosts(&settings_backup);
-	SaveManualHosts(&settings_backup);
-	SaveControllerMappings(&settings_backup);
-    QStringList keys = settings.allKeys();
-    for( QStringList::iterator i = keys.begin(); i != keys.end(); i++ )
-    {
-        settings_backup.setValue( *i, settings.value( *i ) );
-    }
-	// set hw decoder to auto since it's recommended and a platform specific decoder could cause a crash if imported on another platform
-	settings_backup.setValue("settings/hw_decoder", "auto");
-	settings_backup.setValue("settings/this_profile", GetCurrentProfile());
+	if(QFileInfo(filepath).suffix().isEmpty()) filepath += ".ini";
+	QTemporaryDir temporary(QFileInfo(filepath).absolutePath() + "/.chiaki-settings-XXXXXX");
+	if(!temporary.isValid()) return false;
+	const auto temporaryPath = temporary.filePath("settings.ini");
+	{
+		QSettings backup(temporaryPath, QSettings::IniFormat);
+		for(const auto &key : settings.allKeys()) backup.setValue(key, settings.value(key));
+		for(const auto &array : {"registered_hosts", "hidden_hosts", "manual_hosts", "controller_mappings"}) backup.remove(array);
+		SaveRegisteredHosts(&backup);
+		SaveHiddenHosts(&backup);
+		SaveManualHosts(&backup);
+		SaveControllerMappings(&backup);
+		// A platform-specific decoder can fail on another computer.
+		backup.setValue("settings/hw_decoder", "auto");
+		backup.setValue("settings/this_profile", GetCurrentProfile());
+		backup.sync();
+		if(backup.status() != QSettings::NoError) return false;
+	}
+	QFile source(temporaryPath);
+	if(!source.open(QIODevice::ReadOnly)) return false;
+	const auto bytes = source.readAll();
+	if(source.error() != QFileDevice::NoError) return false;
+	QSaveFile output(filepath);
+	return output.open(QIODevice::WriteOnly) && output.write(bytes) == bytes.size() && output.commit();
 }
 
-
-void Settings::ExportPlaceboSettings(QString filepath)
+bool Settings::ExportPlaceboSettings(QString filepath)
 {
-	// append ini if not already added
-	QFileInfo info(filepath);
-	if(info.suffix().isEmpty())
-		filepath += ".ini";
-	// create file if it doesn't exist
-	QFile file(filepath);
-	file.open(QIODevice::ReadWrite);
-	file.close();
-	QSettings settings_backup(filepath, QSettings::IniFormat);
-    QStringList keys = placebo_settings.allKeys();
-    for( QStringList::iterator i = keys.begin(); i != keys.end(); i++ )
-    {
-        settings_backup.setValue( *i, placebo_settings.value( *i ) );
-    }
+	if(QFileInfo(filepath).suffix().isEmpty()) filepath += ".ini";
+	QTemporaryDir temporary(QFileInfo(filepath).absolutePath() + "/.chiaki-renderer-XXXXXX");
+	if(!temporary.isValid()) return false;
+	const auto temporaryPath = temporary.filePath("renderer.ini");
+	{
+		QSettings backup(temporaryPath, QSettings::IniFormat);
+		for(const auto &key : placebo_settings.allKeys())
+			backup.setValue(key, placebo_settings.value(key));
+		backup.sync();
+		if(backup.status() != QSettings::NoError) return false;
+	}
+	QFile source(temporaryPath);
+	if(!source.open(QIODevice::ReadOnly)) return false;
+	const auto bytes = source.readAll();
+	if(source.error() != QFileDevice::NoError) return false;
+	QSaveFile output(filepath);
+	return output.open(QIODevice::WriteOnly) && output.write(bytes) == bytes.size() && output.commit();
 }
 
 QMap<QString, QString> Settings::GetPlaceboValues()
@@ -250,54 +263,153 @@ QMap<QString, QString> Settings::GetPlaceboValues()
 	return placeboMap;
 }
 
-void Settings::ImportSettings(QString filepath)
+static bool ValidateSettingsImport(QSettings &backup)
 {
-	QSettings settings_backup(filepath, QSettings::IniFormat);
-	LoadRegisteredHosts(&settings_backup);
-	LoadHiddenHosts(&settings_backup);
-	LoadManualHosts(&settings_backup);
-	LoadControllerMappings(&settings_backup);
-	QString profile = settings_backup.value("settings/this_profile").toString();
-	if(profile.isEmpty())
-	{
-		settings.clear();
-		SaveRegisteredHosts();
-		SaveHiddenHosts();
-		SaveManualHosts();
-		SaveControllerMappings();
-		QStringList keys = settings_backup.allKeys();
-		for( QStringList::iterator i = keys.begin(); i != keys.end(); i++ )
-		{
-			settings.setValue( *i, settings_backup.value( *i ) );
+	bool valid = false;
+	const int version = backup.value("version").toInt(&valid);
+	if(!valid || version < 1 || version > SETTINGS_VERSION) return false;
+	// Inspect the original arrays before migration can normalize malformed entries.
+	for(const auto &array : {QStringLiteral("registered_hosts"), QStringLiteral("hidden_hosts"),
+		QStringLiteral("manual_hosts"), QStringLiteral("controller_mappings"), QStringLiteral("profiles")}) {
+		backup.beginGroup(array);
+		const auto end = qScopeGuard([&] { backup.endGroup(); });
+		const auto keys = backup.allKeys();
+		if(keys.isEmpty()) continue;
+		const int count = backup.value("size").toInt(&valid);
+		if(!valid || count < 0) return false;
+		for(const auto &key : keys) {
+			if(key == "size") continue;
+			const auto index = key.section('/', 0, 0).toInt(&valid);
+			// Older QSettings writers retain inactive entries above size.
+			if(!valid || index < 1 || !key.contains('/')) return false;
 		}
-		SetCurrentProfile(std::move(profile));
-	}
-	else
-	{
-		QSettings profile_settings(QCoreApplication::organizationName(), QStringLiteral("%1-%2").arg(QCoreApplication::applicationName(), profile));
-		profile_settings.clear();
-		SaveRegisteredHosts(&profile_settings);
-		SaveHiddenHosts(&profile_settings);
-		SaveManualHosts(&profile_settings);
-		SaveControllerMappings(&profile_settings);
-		QStringList keys = settings_backup.allKeys();
-		for( QStringList::iterator i = keys.begin(); i != keys.end(); i++ )
-		{
-			profile_settings.setValue( *i, settings_backup.value( *i ) );
+		// Each array entry must exist; count is limited by its actual keys.
+		if(count > keys.size()) return false;
+		for(int i = 1; i <= count; ++i) {
+			backup.beginGroup(QString::number(i));
+			const auto entryEnd = qScopeGuard([&] { backup.endGroup(); });
+			if(backup.allKeys().isEmpty()) return false;
+			if(array == "registered_hosts" || array == "hidden_hosts") {
+				const auto mac = backup.value(version == 1 && array == "registered_hosts" ? "ps4_mac" : "server_mac").toByteArray();
+				if(mac.size() != 6) return false;
+				if(array == "registered_hosts") {
+					if(backup.value("rp_regist_key").toByteArray().size() != CHIAKI_SESSION_AUTH_SIZE
+						|| backup.value("rp_key").toByteArray().size() != 16) return false;
+					if(version > 1) {
+						const int target = backup.value("target").toInt(&valid);
+						if(!valid || (target != CHIAKI_TARGET_PS4_UNKNOWN && target != CHIAKI_TARGET_PS4_8
+							&& target != CHIAKI_TARGET_PS4_9 && target != CHIAKI_TARGET_PS4_10
+							&& target != CHIAKI_TARGET_PS5_UNKNOWN && target != CHIAKI_TARGET_PS5_1)) return false;
+					}
+				}
+			} else if(array == "manual_hosts") {
+				const int id = backup.value("id").toInt(&valid);
+				if(!valid || id < 0 || id == std::numeric_limits<int>::max() || backup.value("host").toString().trimmed().isEmpty()) return false;
+				if(backup.value("registered").toBool() && backup.value("registered_mac").toByteArray().size() != 6) return false;
+			} else if(array == "controller_mappings") {
+				if(backup.value("vidpid", backup.value("guid")).toString().isEmpty()
+					|| backup.value("controller_mapping").toString().isEmpty()) return false;
+			} else if(backup.value("settings/profile_name").toString().isEmpty()) return false;
 		}
-		SetCurrentProfile(std::move(profile));
 	}
+	return backup.status() == QSettings::NoError;
 }
 
-void Settings::ImportPlaceboSettings(QString filepath)
+bool Settings::ImportSettings(QString filepath)
 {
-	QSettings settings_backup(filepath, QSettings::IniFormat);
-	placebo_settings.clear();
-	QStringList keys = settings_backup.allKeys();
-	for( QStringList::iterator i = keys.begin(); i != keys.end(); i++ )
+	QFile source(filepath);
+	if(!source.open(QIODevice::ReadOnly)) return false;
+	const auto bytes = source.readAll();
+	if(source.error() != QFileDevice::NoError || bytes.isEmpty()) return false;
+	QTemporaryDir temporary;
+	if(!temporary.isValid()) return false;
+	const auto temporaryPath = temporary.filePath("settings.ini");
 	{
-		placebo_settings.setValue( *i, settings_backup.value( *i ) );
+		QFile staging(temporaryPath);
+		if(!staging.open(QIODevice::WriteOnly) || staging.write(bytes) != bytes.size() || !staging.flush()) return false;
 	}
+	QSettings backup(temporaryPath, QSettings::IniFormat);
+	backup.setFallbacksEnabled(false);
+	if(!ValidateSettingsImport(backup)) return false;
+	MigrateSettings(&backup);
+	MigrateVideoProfile(&backup);
+	MigrateControllerMappings(&backup);
+	backup.setValue("version", SETTINGS_VERSION);
+	const auto profile = backup.value("settings/this_profile").toString();
+	QSettings destination(QCoreApplication::organizationName(), profile.isEmpty() ? QCoreApplication::applicationName()
+		: QStringLiteral("%1-%2").arg(QCoreApplication::applicationName(), profile));
+	destination.setFallbacksEnabled(false);
+	const auto values = [](QSettings &store) {
+		QVariantMap result;
+		for(const auto &key : store.allKeys()) result.insert(key, store.value(key));
+		return result;
+	};
+	const auto replace = [](QSettings &store, const QVariantMap &map) {
+		store.clear();
+		for(auto it = map.cbegin(); it != map.cend(); ++it) store.setValue(it.key(), it.value());
+		store.sync();
+		return store.status() == QSettings::NoError;
+	};
+	const auto previous = values(destination);
+	const auto previousDefault = values(default_settings);
+	const auto previousProfiles = profiles;
+	if(destination.status() != QSettings::NoError || default_settings.status() != QSettings::NoError || !destination.isWritable()) return false;
+	if(!replace(destination, values(backup))) {
+		replace(destination, previous);
+		return false;
+	}
+	if(profile.isEmpty()) LoadProfiles();
+	else if(!profiles.contains(profile)) profiles.append(profile);
+	SaveProfiles();
+	default_settings.setValue("settings/current_profile", profile);
+	default_settings.sync();
+	if(default_settings.status() != QSettings::NoError) {
+		replace(destination, previous);
+		replace(default_settings, previousDefault);
+		profiles = previousProfiles;
+		return false;
+	}
+	if(profiles != previousProfiles) emit ProfilesUpdated();
+	emit CurrentProfileChanged();
+	return true;
+}
+
+bool Settings::ImportPlaceboSettings(QString filepath)
+{
+	QFile source(filepath);
+	if(!source.open(QIODevice::ReadOnly)) return false;
+	QSettings backup(filepath, QSettings::IniFormat);
+	backup.setFallbacksEnabled(false);
+	const auto keys = backup.allKeys();
+	if(backup.status() != QSettings::NoError || keys.isEmpty()
+		|| backup.value("placebo_settings/version").toString() != "0") return false;
+	pl_options options = pl_options_alloc(nullptr);
+	if(!options) return false;
+	const auto freeOptions = qScopeGuard([&] { pl_options_free(&options); });
+	QVariantMap imported;
+	for(const auto &key : keys) {
+		if(!key.startsWith("placebo_settings/")) return false;
+		const auto name = key.mid(17);
+		const auto value = backup.value(key);
+		if(name != "version") {
+			const auto text = value.toString();
+			const bool customUpscaler = (name == "upscaler" || name == "plane_upscaler")
+				&& (text == "fsr" || text == "fsrcnnx_x2_8_0_4_1" || text == "fsrcnnx_x2_16_0_4_1");
+			if(!customUpscaler && !pl_options_set_str(options, name.toUtf8().constData(), text.toUtf8().constData())) return false;
+		}
+		imported.insert(key, value);
+	}
+	if(backup.status() != QSettings::NoError) return false;
+	QVariantMap previous;
+	for(const auto &key : placebo_settings.allKeys()) previous.insert(key, placebo_settings.value(key));
+	placebo_settings.clear();
+	for(auto it = imported.cbegin(); it != imported.cend(); ++it) placebo_settings.setValue(it.key(), it.value());
+	placebo_settings.sync();
+	if(placebo_settings.status() == QSettings::NoError) return true;
+	placebo_settings.clear();
+	for(auto it = previous.cbegin(); it != previous.cend(); ++it) placebo_settings.setValue(it.key(), it.value());
+	placebo_settings.sync();
+	return false;
 }
 
 uint32_t Settings::GetLogLevelMask()
@@ -882,16 +994,24 @@ QString Settings::GetCurrentProfile() const
 	return default_settings.value("settings/current_profile").toString();
 }
 
-void Settings::SetCurrentProfile(QString profile)
+bool Settings::SetCurrentProfile(QString profile)
 {
-	if(!profile.isEmpty() && !profiles.contains(profile))
-	{
-		profiles.append(profile);
-		SaveProfiles();
-		emit ProfilesUpdated();
-	}
+	const auto previous = GetCurrentProfile();
+	const auto previousProfiles = profiles;
+	if(!profile.isEmpty() && !profiles.contains(profile)) profiles.append(profile);
+	SaveProfiles();
 	default_settings.setValue("settings/current_profile", profile);
+	default_settings.sync();
+	if(default_settings.status() != QSettings::NoError) {
+		profiles = previousProfiles;
+		SaveProfiles();
+		default_settings.setValue("settings/current_profile", previous);
+		default_settings.sync();
+		return false;
+	}
+	if(profiles != previousProfiles) emit ProfilesUpdated();
 	emit CurrentProfileChanged();
+	return true;
 }
 
 bool Settings::GetKeyboardEnabled() const
@@ -2086,24 +2206,32 @@ void Settings::SaveProfiles()
 	default_settings.endArray();
 }
 
-void Settings::DeleteProfile(QString profile)
+bool Settings::DeleteProfile(QString profile)
 {
-	QSettings delete_profile(QCoreApplication::organizationName(), QStringLiteral("%1-%2").arg(QCoreApplication::applicationName(), profile));
-	registered_hosts.clear();
-	manual_hosts.clear();
-	controller_mappings.clear();
-	SaveRegisteredHosts(&delete_profile);
-	SaveHiddenHosts(&delete_profile);
-	SaveManualHosts(&delete_profile);
-	SaveControllerMappings(&delete_profile);
-	delete_profile.remove("settings");
-	profiles.removeOne(profile);
+	if(profile.isEmpty() || profile == GetCurrentProfile() || !profiles.contains(profile)) return false;
+	QSettings destination(QCoreApplication::organizationName(), QStringLiteral("%1-%2").arg(QCoreApplication::applicationName(), profile));
+	destination.setFallbacksEnabled(false);
+	if(!destination.isWritable()) return false;
+	QVariantMap previous;
+	for(const auto &key : destination.allKeys()) previous.insert(key, destination.value(key));
+	const auto previousProfiles = profiles;
+	destination.clear();
+	destination.sync();
+	if(destination.status() == QSettings::NoError) {
+		profiles.removeOne(profile);
+		SaveProfiles();
+		default_settings.sync();
+		if(default_settings.status() == QSettings::NoError) {
+			emit ProfilesUpdated();
+			return true;
+		}
+	}
+	for(auto it = previous.cbegin(); it != previous.cend(); ++it) destination.setValue(it.key(), it.value());
+	destination.sync();
+	profiles = previousProfiles;
 	SaveProfiles();
-	emit ProfilesUpdated();
-	LoadRegisteredHosts();
-	LoadHiddenHosts();
-	LoadManualHosts();
-	LoadControllerMappings();
+	default_settings.sync();
+	return false;
 }
 
 void Settings::LoadRegisteredHosts(QSettings *qsettings)

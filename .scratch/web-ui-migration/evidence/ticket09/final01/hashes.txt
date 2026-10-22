@@ -1,0 +1,13 @@
+
+Algorithm : SHA256
+Hash      : 05AF40AA1E6427593CE242BB144CD082DF8ED367574911FBA15CD4C637D8AB49
+Path      : C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\ticket09-final01\diff.patch
+
+Algorithm : SHA256
+Hash      : C465873917F234B26A6881F2274E2864BD2715072BA1B9F4443359D1089DAEA0
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket09-build\gui\tests\chiaki-embedded-setup-tests.exe
+
+Algorithm : SHA256
+Hash      : A8F55E1AFB5034979C3DE7CD307BFC9DA63B2DFF6E2B71CB3E901826E518B8D5
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket09-build\gui\chiaki.exe
+

@@ -171,9 +171,11 @@ static void SessionSDeckCb(SDeckEvent *event, void *user);
 #endif
 static void FfmpegFrameCb(ChiakiFfmpegDecoder *decoder, void *user);
 
-StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObject *parent)
+StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObject *parent,
+	std::function<ChiakiErrorCode(ChiakiSession *)> start_request)
 	: QObject(parent),
 		log(this, connect_info.log_level_mask, connect_info.log_file, connect_info.log_sanitize),
+	start_request(std::move(start_request)),
 	ffmpeg_decoder(nullptr),
 #if CHIAKI_LIB_ENABLE_PI_DECODER
 	pi_decoder(nullptr),
@@ -534,8 +536,7 @@ StreamSession::~StreamSession()
 	// This prevents crashes from log callbacks during shutdown
 	log.PrepareShutdown();
 
-	if(session_started)
-		chiaki_session_join(&session);
+	WaitForStop();
 	chiaki_session_fini(&session);
 	chiaki_opus_decoder_fini(&opus_decoder);
 	chiaki_opus_encoder_fini(&opus_encoder);
@@ -627,7 +628,7 @@ void StreamSession::Start()
 {
 	if(!connect_timer.isValid())
 		connect_timer.start();
-	ChiakiErrorCode err = chiaki_session_start(&session);
+	ChiakiErrorCode err = start_request(&session);
 	if(err != CHIAKI_ERR_SUCCESS)
 	{
 		throw ChiakiException("Chiaki Session Start failed");
@@ -639,6 +640,15 @@ void StreamSession::Stop()
 {
 	mic_active.storeRelaxed(false);
 	chiaki_session_stop(&session);
+}
+
+void StreamSession::WaitForStop()
+{
+	Q_ASSERT(QThread::currentThread() == thread());
+	if(!session_started)
+		return;
+	chiaki_session_join(&session);
+	session_started = false;
 }
 
 void StreamSession::GoToBed()

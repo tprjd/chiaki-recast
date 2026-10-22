@@ -9,6 +9,7 @@
 #include <qpa/qwindowsysteminterface.h>
 #include "qmlmainwindow.h"
 #include "qmlbackend.h"
+#include "qmlnativeservices.h"
 #include "qmlsettings.h"
 #include "streamsession.h"
 #ifdef Q_OS_WIN
@@ -34,8 +35,8 @@ struct TestSettingsProfile {
 class InputTestWindow : public QmlMainWindow
 {
 public:
-    InputTestWindow(Settings *settings, bool controlledForeground)
-        : QmlMainWindow(settings), controlled_foreground(controlledForeground) {}
+    InputTestWindow(QmlNativeServices &services, bool controlledForeground)
+        : QmlMainWindow(services.backend(), services.engine()), controlled_foreground(controlledForeground) {}
 protected:
     bool gameplayForeground() const override
     {
@@ -60,7 +61,8 @@ private:
         settings.SetRenderBackend(qEnvironmentVariable("CHIAKI_INPUT_TEST_RENDERER") == "vulkan" ? RenderBackend::Vulkan : RenderBackend::OpenGL);
         settings.SetHardwareDecoder({});
         settings.SetKeyboardEnabled(true);
-        InputTestWindow window(&settings, platformKeys);
+        QmlNativeServices services(&settings);
+        InputTestWindow window(services, platformKeys);
         auto *backend = window.getBackend();
         backend->stopAutoConnect();
         StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
@@ -96,8 +98,13 @@ private:
         QVERIFY(QMetaObject::invokeMethod(root, "openDisplaySettings"));
         QVERIFY(input->blocked());
         QVERIFY(root->property("streamSettingsOpen").toBool());
+        QVERIFY(QMetaObject::invokeMethod(root, "showRendererFallbackDialog", Q_ARG(QVariant, "Test fallback")));
+        auto *fallback = root->findChild<QObject *>("rendererInformationDialog");
+        QVERIFY(fallback && fallback->property("visible").toBool());
         QVERIFY(QMetaObject::invokeMethod(root, "closeDialog"));
-        QVERIFY(!input->blocked());
+        QVERIFY(input->blocked());
+        QVERIFY(QMetaObject::invokeMethod(fallback, "choose", Q_ARG(QVariant, "cancel")));
+        QTRY_VERIFY(!input->blocked());
         QVERIFY(settingsOpener.hasFocus());
         QVERIFY(QMetaObject::invokeMethod(root, "openPlaceboSettings"));
         QVERIFY(QMetaObject::invokeMethod(root, "showPlaceboColorMappingDialog", Q_ARG(QVariant, QVariant())));
@@ -310,7 +317,8 @@ private:
         settings.SetHardwareDecoder({});
         settings.SetMouseCameraEnabled(true);
         settings.SetHideCursor(true);
-        InputTestWindow window(&settings, !nativeInput);
+        QmlNativeServices services(&settings);
+        InputTestWindow window(services, !nativeInput);
         auto *backend = window.getBackend();
         backend->stopAutoConnect();
         StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
@@ -508,7 +516,8 @@ private slots:
         auto bindings = settings.GetKeyboardMouseBindings();
         bindings[4] = {Qt::Key_J, -int(Qt::MiddleButton)};
         QVERIFY(settings.SetKeyboardMouseBindings(bindings));
-        QmlMainWindow window(&settings);
+        QmlNativeServices services(&settings);
+        QmlMainWindow window(services.backend(), services.engine());
         auto *backend = window.getBackend();
         backend->stopAutoConnect();
         StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
@@ -607,7 +616,8 @@ private slots:
         settings.SetMouseCameraEnabled(true);
         settings.SetRenderBackend(qEnvironmentVariable("CHIAKI_INPUT_TEST_RENDERER") == "vulkan" ? RenderBackend::Vulkan : RenderBackend::OpenGL);
         settings.SetHardwareDecoder({});
-        QmlMainWindow window(&settings);
+        QmlNativeServices services(&settings);
+        QmlMainWindow window(services.backend(), services.engine());
         auto *backend = window.getBackend();
         backend->stopAutoConnect();
         StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
@@ -718,7 +728,8 @@ private slots:
         settings.SetHardwareDecoder({});
         settings.SetRenderBackend(RenderBackend::OpenGL);
         settings.SetMouseCameraEnabled(true);
-        InputTestWindow window(&settings, true);
+        QmlNativeServices services(&settings);
+        InputTestWindow window(services, true);
         auto *backend = window.getBackend();
         backend->stopAutoConnect();
         StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",

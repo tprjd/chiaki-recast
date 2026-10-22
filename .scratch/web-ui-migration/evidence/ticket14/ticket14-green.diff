@@ -1,0 +1,654 @@
+diff --git a/gui/src/setupbridge.cpp b/gui/src/setupbridge.cpp
+index bbb35047..ff8e1009 100644
+--- a/gui/src/setupbridge.cpp
++++ b/gui/src/setupbridge.cpp
+@@ -201,6 +201,85 @@ void SetupBridge::refresh()
+         }
+     }
+     QVariantMap strings;
++    const char *colorParentTexts[] = {
++        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping Enabled:"),
++        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping"),
++        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Checked"),
++        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping Preset:"),
++        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Custom"),
++        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Default"),
++        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "High Quality"),
++        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping Settings:")};
++    for(const auto *text : colorParentTexts) {
++        auto key = QString::fromUtf8(text);
++        if(key.endsWith(':')) key.chop(1);
++        strings.insert(key, QCoreApplication::translate("PlaceboSettingsDialog", text));
++    }
++    const char *colorDetailTexts[] = {
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Mapping Function:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Mapping 1"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Clip"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Perceptual"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Soft Clip"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Relative"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Saturation"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Absolute"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Desaturate"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Darken"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Highlight"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Linear"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Perceptual Deadzone:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Perceptual Strength:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Colorimetric Gamma:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Soft Clip Knee:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Soft Clip Desaturation:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Size I:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Mapping 2"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Size C:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Size h:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Tricubic Enabled:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Unchecked"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Expansion Enabled:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping Function:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping 1"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Spline"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "St2094-40"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "St-2094-10"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Bt2390"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Bt2446a"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Reinhard"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Mobius"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Hable"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamma"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Linear Light"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Adaptation:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Minimum:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Maximum:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Default:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Offset:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Slope Tuning:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping 2"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Slope Offset:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Spline Contrast:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Reinhard Contrast:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Linear Knee:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Exposure:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Inverse Tone-mapping Enabled:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping 3"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping Metadata:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Any"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "None"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "HDR10"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "HDR10 Plus"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Cie_y"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone LUT Size:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Contrast Recovery:"),
++        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Contrast Smoothness:")};
++    for(const auto *text : colorDetailTexts) {
++        auto key = QString::fromUtf8(text);
++        if(key.endsWith(':')) key.chop(1);
++        strings.insert(key, QCoreApplication::translate("PlaceboColorMappingDialog", text));
++    }
+     const char *texts[] = {QT_TR_NOOP("Consoles"), QT_TR_NOOP("Search consoles"), QT_TR_NOOP("Discovery"), QT_TR_NOOP("Discovery is on"), QT_TR_NOOP("Discovery is off"),
+         QT_TR_NOOP("No consoles found"), QT_TR_NOOP("No matching consoles"), QT_TR_NOOP("Turn on discovery to find consoles on your local network."),
+         QT_TR_NOOP("Online"), QT_TR_NOOP("In standby"), QT_TR_NOOP("Status unknown"), QT_TR_NOOP("Not registered"), QT_TR_NOOP("Local network"), QT_TR_NOOP("Manual address"),
+@@ -385,7 +464,37 @@ void SetupBridge::refresh()
+         {"placeboPeakDetectionSceneThresholdHigh", settings->placeboPeakDetectionSceneThresholdHigh()},
+         {"placeboPeakDetectionPeakPercentile", settings->placeboPeakDetectionPeakPercentile()},
+         {"placeboPeakDetectionBlackCutoff", settings->placeboPeakDetectionBlackCutoff()},
+-        {"placeboPeakDetectionAllowDelayedPeak", settings->placeboPeakDetectionAllowDelayedPeak()}};
++        {"placeboPeakDetectionAllowDelayedPeak", settings->placeboPeakDetectionAllowDelayedPeak()},
++        {"placeboColorMappingEnabled", settings->placeboColorMappingEnabled()},
++        {"placeboColorMappingPreset", settings->placeboColorMappingPreset()},
++        {"placeboGamutMappingFunction", settings->placeboGamutMappingFunction()},
++        {"placeboGamutMappingPerceptualDeadzone", settings->placeboGamutMappingPerceptualDeadzone()},
++        {"placeboGamutMappingPerceptualStrength", settings->placeboGamutMappingPerceptualStrength()},
++        {"placeboGamutMappingColorimetricGamma", settings->placeboGamutMappingColorimetricGamma()},
++        {"placeboGamutMappingSoftClipKnee", settings->placeboGamutMappingSoftClipKnee()},
++        {"placeboGamutMappingSoftClipDesat", settings->placeboGamutMappingSoftClipDesat()},
++        {"placeboGamutMappingLut3dSizeI", settings->placeboGamutMappingLut3dSizeI()},
++        {"placeboGamutMappingLut3dSizeC", settings->placeboGamutMappingLut3dSizeC()},
++        {"placeboGamutMappingLut3dSizeH", settings->placeboGamutMappingLut3dSizeH()},
++        {"placeboGamutMappingLut3dTricubicEnabled", settings->placeboGamutMappingLut3dTricubicEnabled()},
++        {"placeboGamutMappingGamutExpansionEnabled", settings->placeboGamutMappingGamutExpansionEnabled()},
++        {"placeboToneMappingFunction", settings->placeboToneMappingFunction()},
++        {"placeboToneMappingKneeAdaptation", settings->placeboToneMappingKneeAdaptation()},
++        {"placeboToneMappingKneeMinimum", settings->placeboToneMappingKneeMinimum()},
++        {"placeboToneMappingKneeMaximum", settings->placeboToneMappingKneeMaximum()},
++        {"placeboToneMappingKneeDefault", settings->placeboToneMappingKneeDefault()},
++        {"placeboToneMappingKneeOffset", settings->placeboToneMappingKneeOffset()},
++        {"placeboToneMappingSlopeTuning", settings->placeboToneMappingSlopeTuning()},
++        {"placeboToneMappingSlopeOffset", settings->placeboToneMappingSlopeOffset()},
++        {"placeboToneMappingSplineContrast", settings->placeboToneMappingSplineContrast()},
++        {"placeboToneMappingReinhardContrast", settings->placeboToneMappingReinhardContrast()},
++        {"placeboToneMappingLinearKnee", settings->placeboToneMappingLinearKnee()},
++        {"placeboToneMappingExposure", settings->placeboToneMappingExposure()},
++        {"placeboToneMappingInverseToneMappingEnabled", settings->placeboToneMappingInverseToneMappingEnabled()},
++        {"placeboToneMappingMetadata", settings->placeboToneMappingMetadata()},
++        {"placeboToneMappingToneLutSize", settings->placeboToneMappingToneLutSize()},
++        {"placeboToneMappingContrastRecovery", settings->placeboToneMappingContrastRecovery()},
++        {"placeboToneMappingContrastSmoothness", settings->placeboToneMappingContrastSmoothness()}};
+     renderer.insert("targetPeakChoice", settings->displayTargetPeak() == 0 ? 0 : 1);
+     renderer.insert("targetContrastChoice", settings->displayTargetContrast() == 0 ? 0 : settings->displayTargetContrast() == -1 ? 1 : 2);
+     const auto *window = backend->qmlWindow();
+@@ -913,6 +1022,186 @@ QVariantMap SetupBridge::setRendererSetting(const QString &name, const QVariant
+     const auto type = value.metaType().id();
+     const bool numeric = type == QMetaType::Double || type == QMetaType::Int || type == QMetaType::UInt || type == QMetaType::LongLong;
+     const auto number = value.toDouble();
++    if(name == "placeboColorMappingEnabled") {
++        if(!(settings->videoPreset() == 5)) return reject();
++        if(type != QMetaType::Bool) return reject();
++        settings->setPlaceboColorMappingEnabled(value.toBool());
++        return {{"accepted", true}};
++    }
++    if(name == "placeboColorMappingPreset") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true)) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0 || number > 2 || std::floor(number) != number) return reject();
++        settings->setPlaceboColorMappingPreset(int(number));
++        return {{"accepted", true}};
++    }
++    if(name == "placeboGamutMappingFunction") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0 || number > 9 || std::floor(number) != number) return reject();
++        settings->setPlaceboGamutMappingFunction(int(number));
++        return {{"accepted", true}};
++    }
++    if(name == "placeboGamutMappingPerceptualDeadzone") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 1))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
++        settings->setPlaceboGamutMappingPerceptualDeadzone(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboGamutMappingPerceptualStrength") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 1))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
++        settings->setPlaceboGamutMappingPerceptualStrength(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboGamutMappingColorimetricGamma") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 3 || settings->placeboGamutMappingFunction() == 5 || settings->placeboGamutMappingFunction() == 7))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 10.0) return reject();
++        settings->setPlaceboGamutMappingColorimetricGamma(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboGamutMappingSoftClipKnee") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 1 || settings->placeboGamutMappingFunction() == 2))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
++        settings->setPlaceboGamutMappingSoftClipKnee(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboGamutMappingSoftClipDesat") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 2))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
++        settings->setPlaceboGamutMappingSoftClipDesat(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboGamutMappingLut3dSizeI") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1024.0 || std::floor(number) != number) return reject();
++        settings->setPlaceboGamutMappingLut3dSizeI(int(number));
++        return {{"accepted", true}};
++    }
++    if(name == "placeboGamutMappingLut3dSizeC") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1024.0 || std::floor(number) != number) return reject();
++        settings->setPlaceboGamutMappingLut3dSizeC(int(number));
++        return {{"accepted", true}};
++    }
++    if(name == "placeboGamutMappingLut3dSizeH") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1024.0 || std::floor(number) != number) return reject();
++        settings->setPlaceboGamutMappingLut3dSizeH(int(number));
++        return {{"accepted", true}};
++    }
++    if(name == "placeboGamutMappingLut3dTricubicEnabled") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(type != QMetaType::Bool) return reject();
++        settings->setPlaceboGamutMappingLut3dTricubicEnabled(value.toBool());
++        return {{"accepted", true}};
++    }
++    if(name == "placeboGamutMappingGamutExpansionEnabled") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(type != QMetaType::Bool) return reject();
++        settings->setPlaceboGamutMappingGamutExpansionEnabled(value.toBool());
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingFunction") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0 || number > 11 || std::floor(number) != number) return reject();
++        settings->setPlaceboToneMappingFunction(int(number));
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingKneeAdaptation") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1 || settings->placeboToneMappingFunction() == 2 || settings->placeboToneMappingFunction() == 3))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
++        settings->setPlaceboToneMappingKneeAdaptation(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingKneeMinimum") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1 || settings->placeboToneMappingFunction() == 2 || settings->placeboToneMappingFunction() == 3))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 0.5) return reject();
++        settings->setPlaceboToneMappingKneeMinimum(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingKneeMaximum") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1 || settings->placeboToneMappingFunction() == 2 || settings->placeboToneMappingFunction() == 3))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.5 || number > 1.0) return reject();
++        settings->setPlaceboToneMappingKneeMaximum(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingKneeDefault") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
++        settings->setPlaceboToneMappingKneeDefault(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingKneeOffset") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 4))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.5 || number > 2.0) return reject();
++        settings->setPlaceboToneMappingKneeOffset(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingSlopeTuning") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 10.0) return reject();
++        settings->setPlaceboToneMappingSlopeTuning(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingSlopeOffset") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
++        settings->setPlaceboToneMappingSlopeOffset(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingSplineContrast") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.5) return reject();
++        settings->setPlaceboToneMappingSplineContrast(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingReinhardContrast") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 6))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
++        settings->setPlaceboToneMappingReinhardContrast(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingLinearKnee") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 7 || settings->placeboToneMappingFunction() == 9))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
++        settings->setPlaceboToneMappingLinearKnee(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingExposure") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 10 || settings->placeboToneMappingFunction() == 11))) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 10.0) return reject();
++        settings->setPlaceboToneMappingExposure(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingInverseToneMappingEnabled") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(type != QMetaType::Bool) return reject();
++        settings->setPlaceboToneMappingInverseToneMappingEnabled(value.toBool());
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingMetadata") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0 || number > 4 || std::floor(number) != number) return reject();
++        settings->setPlaceboToneMappingMetadata(int(number));
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingToneLutSize") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 4096.0 || std::floor(number) != number) return reject();
++        settings->setPlaceboToneMappingToneLutSize(int(number));
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingContrastRecovery") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 2.0) return reject();
++        settings->setPlaceboToneMappingContrastRecovery(number);
++        return {{"accepted", true}};
++    }
++    if(name == "placeboToneMappingContrastSmoothness") {
++        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
++        if(!numeric || !std::isfinite(number) || number < 1.0 || number > 32.0) return reject();
++        settings->setPlaceboToneMappingContrastSmoothness(number);
++        return {{"accepted", true}};
++    }
+     if(name == "targetPeakChoice") {
+         if(!numeric || (number != 0 && number != 1)) return reject();
+         settings->setDisplayTargetPeak(number == 0 ? 0 : 1000);
+diff --git a/gui/tests/CMakeLists.txt b/gui/tests/CMakeLists.txt
+index 9ee5bdbf..31e25ab2 100644
+--- a/gui/tests/CMakeLists.txt
++++ b/gui/tests/CMakeLists.txt
+@@ -52,6 +52,8 @@ if(TARGET chiaki-gui)
+     set_tests_properties(chiaki-embedded-video-audio PROPERTIES LABELS desktop)
+     add_test(NAME chiaki-embedded-keyboard-mouse COMMAND chiaki-embedded-setup-tests keyboardMouseSettings keyboardMouseCapture keyboardMouseGuards keyboardMouseLegacyAndLifetime keyboardMousePresentation)
+     set_tests_properties(chiaki-embedded-keyboard-mouse PROPERTIES LABELS desktop)
++    add_test(NAME chiaki-embedded-color-mapping COMMAND chiaki-embedded-setup-tests colorMappingSettings)
++    set_tests_properties(chiaki-embedded-color-mapping PROPERTIES LABELS desktop)
+     add_test(NAME chiaki-embedded-renderer COMMAND chiaki-embedded-setup-tests rendererSettings rendererFiles rendererLayout rendererRestartPolicy)
+     set_tests_properties(chiaki-embedded-renderer PROPERTIES LABELS desktop)
+     add_test(NAME chiaki-embedded-graphics COMMAND chiaki-embedded-setup-tests graphicsCoexistence)
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 096e18ed..85098018 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -1958,6 +1958,181 @@ private slots:
+         capture("Audio/Wifi", 800, 600, 2, "audio-200-percent.png");
+     }
+ 
++    void colorMappingSettings()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto removeSettings = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++            QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
++        });
++        QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        QmlNativeServices services(&settings);
++        auto *backend = services.backend();
++        backend->stopAutoConnect();
++        backend->setDiscoveryEnabled(false);
++        SetupWindow setup(backend);
++        setup.show();
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
++        script(setup.view(), "document.querySelector('.open-settings').click()");
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav')!==null").toBool());
++        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='Renderer').click()");
++        const auto change = [&](const QString &key, double value) {
++            QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled===false").arg(key)).toBool());
++            script(setup.view(), QString("{const field=document.getElementById('%1');field.value='%2';field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(key).arg(value));
++        };
++        change("videoPreset", 5);
++        QTRY_COMPARE(int(settings.GetPlaceboPreset()), 5);
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('#placeboColorMappingEnabled')!==null").toBool());
++        QCOMPARE(script(setup.view(), "document.querySelector('#placeboColorMappingEnabled').checked").toBool(), true);
++        change("placeboColorMappingPreset", 0);
++        QTRY_COMPARE(int(settings.GetPlaceboColorMappingPreset()), 0);
++        script(setup.view(), "document.querySelector('#openPlaceboColorMapping').click()");
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboGamutMappingFunction')?.options.length").toInt(), 10);
++        QSignalSpy changed(backend->qmlSettings(), &QmlSettings::placeboChanged);
++        change("placeboGamutMappingPerceptualDeadzone", 0.42);
++        QTRY_VERIFY(qAbs(settings.GetPlaceboGamutMappingPerceptualDeadzone() - 0.42f) < 0.001f);
++        QVERIFY(changed.count() > 0);
++        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
++        change("placeboGamutMappingFunction", 2);
++        QTRY_VERIFY(script(setup.view(), "!document.querySelector('#placeboGamutMappingPerceptualDeadzone') && !!document.querySelector('#placeboGamutMappingSoftClipDesat')").toBool());
++        change("placeboGamutMappingSoftClipDesat", 0.55);
++        QTRY_VERIFY(qAbs(settings.GetPlaceboGamutMappingSoftClipDesat() - 0.55f) < 0.001f);
++        change("placeboGamutMappingFunction", 3);
++        change("placeboGamutMappingColorimetricGamma", 2.25);
++        QTRY_VERIFY(qAbs(settings.GetPlaceboGamutMappingColorimetricGamma() - 2.25f) < 0.001f);
++        change("placeboGamutMappingLut3dSizeI", 64);
++        QTRY_COMPARE(settings.GetPlaceboGamutMappingLut3dSizeI(), 64);
++        QCOMPARE(script(setup.view(), "document.querySelector('#placeboToneMappingFunction').options.length").toInt(), 12);
++        change("placeboToneMappingKneeMinimum", 0.23);
++        QTRY_VERIFY(qAbs(settings.GetPlaceboToneMappingKneeMinimum() - 0.23f) < 0.001f);
++        change("placeboToneMappingFunction", 4);
++        QTRY_VERIFY(script(setup.view(), "!document.querySelector('#placeboToneMappingKneeMinimum') && !!document.querySelector('#placeboToneMappingKneeDefault') && !!document.querySelector('#placeboToneMappingKneeOffset')").toBool());
++        change("placeboToneMappingKneeOffset", 1.25);
++        QTRY_VERIFY(qAbs(settings.GetPlaceboToneMappingKneeOffset() - 1.25f) < 0.001f);
++        change("placeboToneMappingFunction", 6);
++        change("placeboToneMappingReinhardContrast", 0.65);
++        QTRY_VERIFY(qAbs(settings.GetPlaceboToneMappingReinhardContrast() - 0.65f) < 0.001f);
++        change("placeboToneMappingFunction", 7);
++        change("placeboToneMappingLinearKnee", 0.45);
++        QTRY_VERIFY(qAbs(settings.GetPlaceboToneMappingLinearKnee() - 0.45f) < 0.001f);
++        change("placeboToneMappingFunction", 10);
++        change("placeboToneMappingExposure", 2.5);
++        QTRY_VERIFY(qAbs(settings.GetPlaceboToneMappingExposure() - 2.5f) < 0.001f);
++        change("placeboToneMappingMetadata", 4);
++        QTRY_COMPARE(int(settings.GetPlaceboToneMappingMetadata()), 4);
++        change("placeboToneMappingToneLutSize", 512);
++        QTRY_COMPARE(settings.GetPlaceboToneMappingToneLutSize(), 512);
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('#placeboGamutMappingGamutExpansionEnabled')?.disabled===false").toBool());
++        script(setup.view(), "document.querySelector('#placeboGamutMappingGamutExpansionEnabled').click()");
++        QTRY_VERIFY(settings.GetPlaceboGamutMappingGamutExpansionEnabled());
++        const auto previous = settings.GetPlaceboValues();
++        for(const auto &input : QList<QPair<QString, QVariant>>{{"placeboColorMappingEnabled", 1}, {"placeboColorMappingPreset", 3},
++            {"placeboGamutMappingFunction", 10}, {"placeboGamutMappingFunction", QStringLiteral("1")},
++            {"placeboGamutMappingPerceptualDeadzone", 0.5}, {"placeboGamutMappingSoftClipDesat", 0.5},
++            {"placeboGamutMappingColorimetricGamma", 10.01}, {"placeboGamutMappingLut3dSizeI", 1025}, {"placeboGamutMappingLut3dSizeC", 0.5},
++            {"placeboGamutMappingLut3dTricubicEnabled", 1}, {"placeboToneMappingFunction", 12},
++            {"placeboToneMappingKneeMinimum", 0.2}, {"placeboToneMappingReinhardContrast", 0.4},
++            {"placeboToneMappingExposure", -0.1}, {"placeboToneMappingMetadata", 5}, {"placeboToneMappingToneLutSize", 4097},
++            {"placeboToneMappingContrastRecovery", 2.01}, {"placeboToneMappingContrastSmoothness", 0.9}}) {
++            QVERIFY(!settingRequest(setup.view(), input.first, input.second, generation, "setRendererSetting").value("accepted").toBool());
++        }
++        QVERIFY(!settingRequest(setup.view(), "placeboToneMappingExposure", 3, generation + "-old", "setRendererSetting").value("accepted").toBool());
++        QCOMPARE(settings.GetPlaceboValues(), previous);
++        backend->qmlSettings()->setPlaceboToneMappingContrastRecovery(0.57);
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboToneMappingContrastRecovery')?.value").toString(), QStringLiteral("0.57"));
++        const auto search = [&](const QString &query) {
++            script(setup.view(), QString("{const field=document.querySelector('.settings-search input');field.value='%1';field.dispatchEvent(new Event('input',{bubbles:true}));}").arg(query));
++            QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 1);
++            script(setup.view(), "document.querySelector('.settings-results button').click()");
++        };
++        search("perceptual deadzone");
++        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("placeboGamutMappingFunction"));
++        change("placeboGamutMappingFunction", 1);
++        QTRY_COMPARE(int(settings.GetPlaceboGamutMappingFunction()), 1);
++        search("perceptual deadzone");
++        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("placeboGamutMappingPerceptualDeadzone"));
++        script(setup.view(), "document.querySelector('#backRenderer').click()");
++        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("openPlaceboColorMapping"));
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('#placeboColorMappingEnabled')?.disabled===false").toBool());
++        script(setup.view(), "document.querySelector('#placeboColorMappingEnabled').click()");
++        QTRY_VERIFY(!settings.GetPlaceboColorMappingEnabled());
++        QVERIFY(!settingRequest(setup.view(), "placeboColorMappingPreset", 1, generation, "setRendererSetting").value("accepted").toBool());
++        QVERIFY(!settingRequest(setup.view(), "placeboGamutMappingFunction", 2, generation, "setRendererSetting").value("accepted").toBool());
++        search("perceptual deadzone");
++        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("placeboColorMappingEnabled"));
++        script(setup.view(), "document.querySelector('#placeboColorMappingEnabled').click()");
++        QTRY_VERIFY(settings.GetPlaceboColorMappingEnabled());
++        change("placeboColorMappingPreset", 2);
++        QTRY_COMPARE(int(settings.GetPlaceboColorMappingPreset()), 2);
++        search("perceptual deadzone");
++        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("placeboColorMappingPreset"));
++        change("placeboColorMappingPreset", 0);
++        QTRY_COMPARE(int(settings.GetPlaceboColorMappingPreset()), 0);
++        change("videoPreset", 2);
++        QTRY_COMPARE(int(settings.GetPlaceboPreset()), 2);
++        QVERIFY(!settingRequest(setup.view(), "placeboColorMappingEnabled", false, generation, "setRendererSetting").value("accepted").toBool());
++        search("perceptual deadzone");
++        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("videoPreset"));
++        change("videoPreset", 5);
++        QTRY_COMPARE(int(settings.GetPlaceboPreset()), 5);
++        search("perceptual deadzone");
++        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("placeboGamutMappingPerceptualDeadzone"));
++        script(setup.view(), "window.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
++        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("openPlaceboColorMapping"));
++        setup.view()->reload();
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
++        script(setup.view(), "document.querySelector('.open-settings').click()");
++        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.settings-search input')").toBool());
++        search("perceptual deadzone");
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboGamutMappingPerceptualDeadzone')?.value").toString(), QStringLiteral("0.42"));
++        const auto capture = [&](int width, int height, double zoom, const QString &name) {
++            setup.resize(width, height);
++            setup.view()->setZoomFactor(zoom);
++            QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth<=innerWidth && [...document.querySelectorAll('.settings-content input,.settings-content select,.settings-content button')].every(e=>{const r=e.getBoundingClientRect();return r.left>=0 && r.right<=innerWidth})").toBool());
++            setup.view()->grab().save(qEnvironmentVariable("CHIAKI_EMBEDDED_LAYOUT_DIR", QDir::tempPath()) + "/" + name);
++        };
++        capture(900, 600, 1, "color-900.png");
++        capture(800, 900, 2, "color-200-percent.png");
++        capture(390, 720, 1, "color-390.png");
++        QSettings(QCoreApplication::organizationName(), "pl_render_params").sync();
++        QProcess restarted;
++        auto environment = QProcessEnvironment::systemEnvironment();
++        environment.insert("CHIAKI_COLOR_RESTART_PROFILE", profile);
++        restarted.setProcessEnvironment(environment);
++        restarted.start(QCoreApplication::applicationFilePath(), {"colorMappingRestartRead", "-o",
++            qEnvironmentVariable("CHIAKI_EMBEDDED_LAYOUT_DIR", QDir::tempPath()) + "/color-restart.txt,txt"});
++        QVERIFY(restarted.waitForStarted());
++        QTRY_COMPARE_WITH_TIMEOUT(restarted.state(), QProcess::NotRunning, 20000);
++        QCOMPARE(restarted.exitStatus(), QProcess::NormalExit);
++        QCOMPARE(restarted.exitCode(), 0);
++    }
++
++    void colorMappingRestartRead()
++    {
++        const auto profile = qEnvironmentVariable("CHIAKI_COLOR_RESTART_PROFILE");
++        if(profile.isEmpty()) QSKIP("Launched only by colorMappingSettings with isolated saved settings");
++        Settings settings(profile);
++        QCOMPARE(settings.GetPlaceboGamutMappingLut3dSizeI(), 64);
++        QCOMPARE(settings.GetPlaceboToneMappingToneLutSize(), 512);
++        QVERIFY(qAbs(settings.GetPlaceboToneMappingExposure() - 2.5f) < 0.001f);
++        QmlNativeServices services(&settings);
++        services.backend()->stopAutoConnect();
++        services.backend()->setDiscoveryEnabled(false);
++        SetupWindow setup(services.backend());
++        setup.show();
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
++        script(setup.view(), "document.querySelector('.open-settings').click()");
++        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.settings-search input')").toBool());
++        script(setup.view(), "{const field=document.querySelector('.settings-search input');field.value='perceptual deadzone';field.dispatchEvent(new Event('input',{bubbles:true}));}");
++        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 1);
++        script(setup.view(), "document.querySelector('.settings-results button').click()");
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboGamutMappingPerceptualDeadzone')?.value").toString(), QStringLiteral("0.42"));
++        QCOMPARE(script(setup.view(), "document.querySelector('#placeboToneMappingExposure').value").toString(), QStringLiteral("2.5"));
++    }
++
+     void rendererSettings()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+diff --git a/gui/web/src/Settings.svelte b/gui/web/src/Settings.svelte
+index 5aac1094..85da545b 100644
+--- a/gui/web/src/Settings.svelte
++++ b/gui/web/src/Settings.svelte
+@@ -1,7 +1,7 @@
+ <script lang="ts">
+   import { tick, onMount } from 'svelte';
+   import KeyboardMouse from './KeyboardMouse.svelte';
+-  import { generalSettings, mediaSettings, rendererSettings, keyboardMouseSettings } from './settings';
++  import { generalSettings, mediaSettings, rendererSettings, colorMappingSettings, settingConditionMet, keyboardMouseSettings } from './settings';
+   import SettingField from './SettingField.svelte';
+   import type { State, connectSetup } from './bridge';
+   let { current, connection, close, t }: {
+@@ -15,7 +15,7 @@
+   let keyboardMouseTarget = $state('');
+   let search: HTMLInputElement;
+   const values = $derived({ ...current.generalSettings, ...current.mediaSettings, ...current.rendererSettings, ...current.keyboardMouse.values });
+-  const fields = $derived([...generalSettings, ...mediaSettings, ...rendererSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
++  const fields = $derived([...generalSettings, ...mediaSettings, ...rendererSettings, ...colorMappingSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
+     const choices = current.mediaChoices[field.key];
+     if (field.key.startsWith('bitrate')) return { ...field, automatic: [0, 2, 6, 10, 15][Number(values[`resolution${field.key.slice(7)}`])] };
+     return choices ? { ...field, options: choices.map(choice => choice.label), optionValues: choices.map(choice => choice.value) } : field;
+@@ -34,18 +34,20 @@
+ 
+   async function reveal(key: string, requires?: string) {
+     query = '';
+-    category = searchFields.find(field => field.key === key)?.category ?? 'General';
++    const field = fields.find(field => field.key === key);
++    const unmet = field?.when?.find(condition => !settingConditionMet(condition, values));
++    const focusKey = unmet?.key ?? key;
++    category = searchFields.find(field => field.key === focusKey)?.category ?? 'General';
+     keyboardMouseTarget = requires && !values[requires] ? requires
+       : category === 'Keyboard and mouse' && values.mouseCameraEnabled && (key.startsWith('keyMapping') || ['keyboardEnabled', 'mouseTouchEnabled', 'resetAllKeys'].includes(key)) ? 'mouseCameraEnabled' : key;
+     if (category === 'Audio/Wifi') connection.refreshAudioDevices();
+     await tick();
+-    const field = fields.find(field => field.key === key);
+-    const unmet = field?.when?.find(condition => values[condition.key] !== condition.value);
+     const target = document.getElementById(unmet ? unmet.key : requires && !values[requires] ? requires : field?.requiresValue && values[field.requiresValue.key] !== field.requiresValue.value ? field.requiresValue.key : key);
+     target?.focus();
+     target?.scrollIntoView({ block: 'nearest' });
+   }
+   async function change(key: string, value: boolean | number | string, generation = current.profileGeneration) {
++    if (key === 'openPlaceboColorMapping') { await reveal('placeboGamutMappingFunction'); return; }
+     if (pending) return;
+     pending = true;
+     try {
+@@ -61,7 +63,7 @@
+     if (document.querySelector('dialog[open]')) return;
+     if (event.key === 'Escape') {
+       event.preventDefault();
+-      if (query) { query = ''; search.focus(); } else close();
++      if (query) { query = ''; search.focus(); } else if (category === 'Color mapping') reveal('openPlaceboColorMapping'); else close();
+     } else if (event.key === 'PageUp') {
+       event.preventDefault(); search.focus();
+     } else if (event.key === 'PageDown' && event.target === search) {
+@@ -99,6 +101,13 @@
+     {:else}
+       <h2>{t(category)}</h2>
+       <p class="settings-note">{t('Changes are saved automatically.')}</p>
++      {#if category === 'Color mapping'}
++        <button id="backRenderer" onclick={() => reveal('openPlaceboColorMapping')}>{t('Back to Renderer')}</button>
++        {#if values.videoPreset !== 5 || !values.placeboColorMappingEnabled || values.placeboColorMappingPreset !== 0}
++          <p>{t('Requires the Custom render preset, Color Mapping Enabled, and the Custom color mapping preset in Renderer.')}</p>
++          <button onclick={() => reveal('openPlaceboColorMapping')}>{t('Configure color mapping in Renderer')}</button>
++        {/if}
++      {/if}
+       {#if ['Video', 'Stream', 'Audio/Wifi'].includes(category)}<p class="settings-note">{t('Stream settings apply to the next session. Audio volume also changes the current session.')}</p>{/if}
+       {#if category === 'Renderer'}
+         <p data-renderer-runtime>{current.rendererStatus.runtimeBackend === undefined ? t('No native stream window is active.') : `${t('Active native renderer')}: ${current.rendererStatus.runtimeBackend === 0 ? 'Vulkan' : 'OpenGL'}`}</p>
+@@ -117,7 +126,7 @@
+           <h3>{t(group)}</h3>
+           <div class="setting-rows">
+             {#each visibleFields.filter(field => field.group === group) as field (field.key)}
+-              {#if (!field.requires || values[field.requires]) && (!field.requiresValue || values[field.requiresValue.key] === field.requiresValue.value) && (!field.when || field.when.every(condition => values[condition.key] === condition.value))}
++              {#if (!field.requires || values[field.requires]) && (!field.requiresValue || values[field.requiresValue.key] === field.requiresValue.value) && (!field.when || field.when.every(condition => settingConditionMet(condition, values)))}
+                 <SettingField {field} value={values[field.key] ?? false} disabled={pending}
+                   generation={current.profileGeneration} change={(value, generation) => change(field.key, value, generation)} {t} />
+               {/if}
+diff --git a/gui/web/src/settings.ts b/gui/web/src/settings.ts
+index 4c4efa6a..00e592da 100644
+--- a/gui/web/src/settings.ts
++++ b/gui/web/src/settings.ts
+@@ -8,7 +8,7 @@ export interface Setting {
+   requires?: string;
+   category?: string;
+   action?: boolean;
+-  when?: { key: string; value: boolean | number }[];
++  when?: { key: string; value: boolean | number | number[] }[];
+   optionValues?: (string | number)[];
+   min?: number; max?: number; step?: number; factor?: number; unit?: string; automatic?: number;
+   requiresValue?: { key: string; value: number };
+@@ -124,3 +124,41 @@ export const rendererSettings: Setting[] = [
+   {"key": "targetContrastChoice", "label": "Target contrast", "description": "Use automatic detection, infinite contrast, or a numeric contrast.", "defaultLabel": "Auto", "options": ["Auto", "Infinity", "Numeric Value"], "category": "Display", "group": "Display target"},
+   {"key": "displayTargetContrast", "label": "Target contrast value", "description": "Set the display contrast.", "defaultLabel": "1000", "min": 10, "max": 1000000, "step": 1000, "when": [{"key": "targetContrastChoice", "value": 2}], "category": "Display", "group": "Display target"}
+ ];
++
++export function settingConditionMet(condition: NonNullable<Setting["when"]>[number], values: Record<string, boolean | number | string>) {
++  return Array.isArray(condition.value) ? condition.value.includes(Number(values[condition.key])) : values[condition.key] === condition.value;
++}
++
++export const colorMappingSettings: Setting[] = [
++  {"key": "placeboColorMappingEnabled", "label": "Color Mapping Enabled", "group": "Color Mapping", "description": "Use Color Mapping Settings", "defaultLabel": "Checked", "category": "Renderer", "when": [{"key": "videoPreset", "value": 5}]},
++  {"key": "placeboColorMappingPreset", "label": "Color Mapping Preset", "group": "Color Mapping", "description": "Choose color mapping quality.", "defaultLabel": "High Quality", "category": "Renderer", "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}], "options": ["Custom", "Default", "High Quality"]},
++  {"key": "openPlaceboColorMapping", "label": "Color Mapping Settings", "group": "Color Mapping", "description": "Open gamut and tone mapping. Requires Color mapping enabled and Custom preset.", "defaultLabel": "", "category": "Renderer", "action": true, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboGamutMappingFunction", "label": "Gamut Mapping Function", "group": "Gamut Mapping 1", "description": "Choose how out-of-gamut colors are mapped.", "defaultLabel": "Perceptual", "category": "Color mapping", "options": ["Clip", "Perceptual", "Soft Clip", "Relative", "Saturation", "Absolute", "Desaturate", "Darken", "Highlight", "Linear"], "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboGamutMappingPerceptualDeadzone", "label": "Perceptual Deadzone", "group": "Gamut Mapping 1", "description": "Set the deadzone. Requires the Perceptual gamut function.", "defaultLabel": "0.30", "category": "Color mapping", "min": 0.0, "max": 1.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboGamutMappingFunction", "value": [1]}]},
++  {"key": "placeboGamutMappingPerceptualStrength", "label": "Perceptual Strength", "group": "Gamut Mapping 1", "description": "Set mapping strength. Requires the Perceptual gamut function.", "defaultLabel": "0.80", "category": "Color mapping", "min": 0.0, "max": 1.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboGamutMappingFunction", "value": [1]}]},
++  {"key": "placeboGamutMappingColorimetricGamma", "label": "Colorimetric Gamma", "group": "Gamut Mapping 1", "description": "Set gamma. Requires Relative, Absolute or Darken gamut mapping.", "defaultLabel": "1.80", "category": "Color mapping", "min": 0.0, "max": 10.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboGamutMappingFunction", "value": [3, 5, 7]}]},
++  {"key": "placeboGamutMappingSoftClipKnee", "label": "Soft Clip Knee", "group": "Gamut Mapping 1", "description": "Set the knee. Requires Perceptual or Soft Clip gamut mapping.", "defaultLabel": "0.70", "category": "Color mapping", "min": 0.0, "max": 1.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboGamutMappingFunction", "value": [1, 2]}]},
++  {"key": "placeboGamutMappingSoftClipDesat", "label": "Soft Clip Desaturation", "group": "Gamut Mapping 1", "description": "Set desaturation. Requires Soft Clip gamut mapping.", "defaultLabel": "0.35", "category": "Color mapping", "min": 0.0, "max": 1.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboGamutMappingFunction", "value": [2]}]},
++  {"key": "placeboGamutMappingLut3dSizeI", "label": "LUT 3D Size I", "group": "Gamut Mapping 2", "description": "Set the intensity dimension of the gamut lookup table.", "defaultLabel": "48", "category": "Color mapping", "min": 0.0, "max": 1024.0, "step": 1.0, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboGamutMappingLut3dSizeC", "label": "LUT 3D Size C", "group": "Gamut Mapping 2", "description": "Set the chroma dimension of the gamut lookup table.", "defaultLabel": "32", "category": "Color mapping", "min": 0.0, "max": 1024.0, "step": 1.0, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboGamutMappingLut3dSizeH", "label": "LUT 3D Size h", "group": "Gamut Mapping 2", "description": "Set the hue dimension of the gamut lookup table.", "defaultLabel": "256", "category": "Color mapping", "min": 0.0, "max": 1024.0, "step": 1.0, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboGamutMappingLut3dTricubicEnabled", "label": "LUT 3D Tricubic Enabled", "group": "Gamut Mapping 2", "description": "Use tricubic gamut lookup interpolation.", "defaultLabel": "Unchecked", "category": "Color mapping", "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboGamutMappingGamutExpansionEnabled", "label": "Gamut Expansion Enabled", "group": "Gamut Mapping 2", "description": "Allow the output color gamut to expand.", "defaultLabel": "Unchecked", "category": "Color mapping", "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboToneMappingFunction", "label": "Tone-mapping Function", "group": "Tone-mapping 1", "description": "Choose the algorithm for mapping display brightness.", "defaultLabel": "Spline", "category": "Color mapping", "options": ["Clip", "Spline", "St2094-40", "St-2094-10", "Bt2390", "Bt2446a", "Reinhard", "Mobius", "Hable", "Gamma", "Linear", "Linear Light"], "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboToneMappingKneeAdaptation", "label": "Knee Adaptation", "group": "Tone-mapping 1", "description": "Set knee adaptation. Requires Spline or ST 2094 tone mapping.", "defaultLabel": "0.40", "category": "Color mapping", "min": 0.0, "max": 1.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboToneMappingFunction", "value": [1, 2, 3]}]},
++  {"key": "placeboToneMappingKneeMinimum", "label": "Knee Minimum", "group": "Tone-mapping 1", "description": "Set the minimum knee. Requires Spline or ST 2094 tone mapping.", "defaultLabel": "0.10", "category": "Color mapping", "min": 0.0, "max": 0.5, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboToneMappingFunction", "value": [1, 2, 3]}]},
++  {"key": "placeboToneMappingKneeMaximum", "label": "Knee Maximum", "group": "Tone-mapping 1", "description": "Set the maximum knee. Requires Spline or ST 2094 tone mapping.", "defaultLabel": "0.80", "category": "Color mapping", "min": 0.5, "max": 1.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboToneMappingFunction", "value": [1, 2, 3]}]},
++  {"key": "placeboToneMappingKneeDefault", "label": "Knee Default", "group": "Tone-mapping 1", "description": "Set the default knee.", "defaultLabel": "0.40", "category": "Color mapping", "min": 0.0, "max": 1.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboToneMappingKneeOffset", "label": "Knee Offset", "group": "Tone-mapping 1", "description": "Set knee offset. Requires BT.2390 tone mapping.", "defaultLabel": "1.00", "category": "Color mapping", "min": 0.5, "max": 2.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboToneMappingFunction", "value": [4]}]},
++  {"key": "placeboToneMappingSlopeTuning", "label": "Slope Tuning", "group": "Tone-mapping 2", "description": "Tune the slope. Requires Spline tone mapping.", "defaultLabel": "1.5", "category": "Color mapping", "min": 0.0, "max": 10.0, "step": 0.1, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboToneMappingFunction", "value": [1]}]},
++  {"key": "placeboToneMappingSlopeOffset", "label": "Slope Offset", "group": "Tone-mapping 2", "description": "Set slope offset. Requires Spline tone mapping.", "defaultLabel": "0.20", "category": "Color mapping", "min": 0.0, "max": 1.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboToneMappingFunction", "value": [1]}]},
++  {"key": "placeboToneMappingSplineContrast", "label": "Spline Contrast", "group": "Tone-mapping 2", "description": "Set spline contrast. Requires Spline tone mapping.", "defaultLabel": "0.50", "category": "Color mapping", "min": 0.0, "max": 1.5, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboToneMappingFunction", "value": [1]}]},
++  {"key": "placeboToneMappingReinhardContrast", "label": "Reinhard Contrast", "group": "Tone-mapping 2", "description": "Set contrast. Requires Reinhard tone mapping.", "defaultLabel": "0.50", "category": "Color mapping", "min": 0.0, "max": 1.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboToneMappingFunction", "value": [6]}]},
++  {"key": "placeboToneMappingLinearKnee", "label": "Linear Knee", "group": "Tone-mapping 2", "description": "Set the linear knee. Requires Mobius or Gamma tone mapping.", "defaultLabel": "0.3", "category": "Color mapping", "min": 0.0, "max": 1.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboToneMappingFunction", "value": [7, 9]}]},
++  {"key": "placeboToneMappingExposure", "label": "Exposure", "group": "Tone-mapping 2", "description": "Set exposure. Requires Linear or Linear Light tone mapping.", "defaultLabel": "1.0", "category": "Color mapping", "min": 0.0, "max": 10.0, "step": 0.1, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}, {"key": "placeboToneMappingFunction", "value": [10, 11]}]},
++  {"key": "placeboToneMappingInverseToneMappingEnabled", "label": "Inverse Tone-mapping Enabled", "group": "Tone-mapping 3", "description": "Expand SDR brightness to HDR.", "defaultLabel": "Unchecked", "category": "Color mapping", "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboToneMappingMetadata", "label": "Tone-mapping Metadata", "group": "Tone-mapping 3", "description": "Choose the HDR metadata source.", "defaultLabel": "Any", "category": "Color mapping", "options": ["Any", "None", "HDR10", "HDR10 Plus", "Cie_y"], "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboToneMappingToneLutSize", "label": "Tone LUT Size", "group": "Tone-mapping 3", "description": "Set tone mapping lookup table precision.", "defaultLabel": "256", "category": "Color mapping", "min": 0.0, "max": 4096.0, "step": 1.0, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboToneMappingContrastRecovery", "label": "Contrast Recovery", "group": "Tone-mapping 3", "description": "Recover contrast after tone mapping.", "defaultLabel": "0.30", "category": "Color mapping", "min": 0.0, "max": 2.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
++  {"key": "placeboToneMappingContrastSmoothness", "label": "Contrast Smoothness", "group": "Tone-mapping 3", "description": "Set contrast recovery smoothing.", "defaultLabel": "3.5", "category": "Color mapping", "min": 1.0, "max": 32.0, "step": 0.1, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]}
++];
+diff --git a/third-party/gf-complete b/third-party/gf-complete
+--- a/third-party/gf-complete
++++ b/third-party/gf-complete
+@@ -1 +1 @@
+-Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478
++Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478-dirty

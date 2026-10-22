@@ -86,39 +86,30 @@
 
 ## Building the Flatpak
 
-### Get Flatpak Dependencies
+### Prepare the checkout and build inputs
 
-1. Install the necessary [flatpak runtime](https://docs.flatpak.org/en/latest/basic-concepts.html#runtimes){target="_blank" rel="noopener"}, associated [sdk](https://docs.flatpak.org/en/latest/building-introduction.html#software-development-kits-sdks){target="_blank" rel="noopener"}, and base app.
-
-    ```bash
-    flatpak install -y flathub org.kde.Platform//6.9 flathub org.kde.Sdk//6.9
-    ```
-
-2. Create a directory for your build files and switch into it
+1. Install the matching runtime, SDK, and WebEngine base.
 
     ```bash
-    mkdir -p ~/build-chiaki-ng-flatpak && cd ~/build-chiaki-ng-flatpak
+    flatpak install --user -y flathub org.kde.Platform//6.11 org.kde.Sdk//6.11 io.qt.qtwebengine.BaseApp//6.11
     ```
 
-3. Get the [flatpak manifest file](https://docs.flatpak.org/en/latest/manifests.html){target="_blank" rel="noopener"} for `chiaki-ng`
+2. Clone the source and its submodules. Select the revision that you intend to package.
 
+    ```bash
+    git clone --recurse-submodules https://github.com/streetpea/chiaki-ng.git
+    cd chiaki-ng
     ```
-    curl -Lo chiaki-ng.yaml https://raw.githubusercontent.com/streetpea/chiaki-ng/main/scripts/flatpak/chiaki4deck.yaml
+
+    The manifests use this checkout. A separately downloaded manifest cannot supply the application source or the included offline frontend inputs.
+
+3. Download the locked build inputs before the offline build.
+
+    ```bash
+    flatpak-builder --user --download-only --force-clean build scripts/flatpak/io.github.streetpea.Chiaki4deck.yaml
     ```
 
-4. Get the patch files
-
-    1. 0001-Vulkan-Don-t-try-to-reuse-old-swapchain.patch
-
-        ```
-        curl -LO https://raw.githubusercontent.com/streetpea/chiaki-ng/main/scripts/flatpak/0001-Vulkan-Don-t-try-to-reuse-old-swapchain.patch
-        ```
-
-    2. 0001-vulkan-ignore-frames-without-hw-context.patch
-
-        ```
-        curl -LO https://raw.githubusercontent.com/streetpea/chiaki-ng/main/scripts/flatpak/0001-vulkan-ignore-frames-without-hw-context.patch
-        ```
+    The manifest supplies Node 24.16.0 and npm 11.13.0 for the build. The mandatory CMake frontend target uses the locked npm cache without network access. The runtime package contains the embedded frontend and its notices. It does not contain Node or a web server.
 
 ### Create `gpg` Key for Signing your Builds and Repositories
 
@@ -139,7 +130,8 @@
 4. Build the flatpak for `chiaki-ng`
 
     ``` bash
-    flatpak-builder --repo=chiaki-ng-diy --force-clean build chiaki-ng.yaml --gpg-sign chiaki-ng-diy
+    flatpak-builder --user --disable-download --repo=chiaki-ng-diy --force-clean build scripts/flatpak/io.github.streetpea.Chiaki4deck.yaml --gpg-sign chiaki-ng-diy
+    flatpak build --runtime build /app/bin/check-chiaki-package /app
     ```
 
     !!! Question "How long :clock: will this take?"
@@ -158,7 +150,7 @@
 1. Add the repository you built as a local remote repository
 
     ``` bash
-    flatpak --user remote-add --gpg-import chiaki-ng-diy.gpg chiaki-ng-diy ~/build-chiaki-ng-flatpak/chiaki-ng-diy
+    flatpak --user remote-add --gpg-import chiaki-ng-diy.gpg chiaki-ng-diy $PWD/chiaki-ng-diy
     ```
 
 2. Install your self-built `chiaki-ng` flatpak from your new remote

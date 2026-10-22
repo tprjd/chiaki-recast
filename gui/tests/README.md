@@ -1,5 +1,58 @@
 # Console screen tests
 
+## Embedded setup application
+
+The full application build requires Qt 6.9.3 or later with WebEngineWidgets,
+WebChannel, and matching GuiPrivate headers. The frontend build uses Node
+24.16.0 and npm 11.13.0. Its lock file fixes Svelte 5 and the build tools.
+The compiled page and artwork are Qt resources. The installed application
+does not need Node or a web server.
+
+`chiaki-embedded-setup-tests` uses the production Svelte page, QWebEngineView,
+WebChannel, SetupBridge, and native services. `consoleLibrary` supplies replies
+at the native discovery completion boundary and observes the page and native
+state. It checks discovery commands, console selection, profile changes,
+privacy, navigation, keyboard events, and layout.
+
+Run only the required case:
+
+```text
+ctest --test-dir build -R "^chiaki-embedded-setup$" --output-on-failure
+ctest --test-dir build -R "^chiaki-embedded-graphics$" --output-on-failure
+```
+
+The first case has the `desktop` label. The graphics case has `desktop` and
+`gpu` labels. Tests are enabled by default. Use explicit names or exclude
+these labels in a headless run. A software or generic test pass does not
+establish GPU acceptance.
+
+`graphicsCoexistence` is a separate QtTest case in the same application harness.
+It reads `chrome://gpu`, checks imported native OpenGL and Vulkan devices,
+renders controlled native frames and the production overlay, recreates native
+windows, and checks setup restoration. It requires an unobstructed hardware
+desktop. Set `CHIAKI_EMBEDDED_EVIDENCE` to an existing directory to save its
+GPU report and images. A protected OS dialog invalidates screen and focus
+observations. Controlled frames do not prove live console decode or latency.
+The fixture selects the existing native Fast preset through Settings.
+Production defaults stay unchanged. The Windows HighQuality processing issue
+recorded in ticket 03 evidence remains acceptance work for tickets 04 and 23.
+
+The standalone QML checks below retain coverage for setup flows that have not
+yet moved to the web page and for shared native components.
+
+`chiaki-embedded-psn-remote` checks remote refresh, expired credentials,
+token-wait cancellation, retry, and profile ownership through the production
+page and native bridge. It uses offscreen WebEngine with a test-only
+`--disable-gpu` flag. Its HTTP, device-list, and discovery transports are
+controlled before native services start.
+
+`chiaki-remote-native-connection` needs a Windows native window. It checks
+remote target dispatch, unreachable-console recovery, retry, late worker
+success after cancellation, and profile changes during cleanup. The fixture
+selects the existing Fast preset and controls native discovery, PSN requests,
+and the raw session-start boundary. It cannot establish live PSN playback,
+actual focus, hardware acceleration, or physical input behavior.
+
 The `chiaki-console-screen-tests` target loads the complete production
 `ConsoleLibrary.qml` with supplied host records. It uses the production
 controls, Material configuration, console artwork, and C++ SVG image provider.
@@ -101,16 +154,29 @@ or `cancel()` when dismissed. PIN requires exactly four ASCII digits and keeps
 leading zeroes. Invalid PIN input leaves the request open. Cancellation,
 repeated acceptance, and callbacks from older requests cannot send a command.
 
-`MainView` supplies `savePin(sourceIndex, pin)` with the native boolean save
-outcome. A PIN acceptance returns true only when this callback confirms the
-save. `ConsolePinDialog` then shows the saved result. It uses the production
-`ConsolePinContent` for validation, masked entry, explicit reveal, privacy,
-focus, and the guided workspace. The live PIN route can use this same content.
-`ConsolePinHarness` composes the library and saved PIN dialog with a supplied
-save outcome. `ConsolePin` tests both the form and its guarded library callbacks,
-including target changes and return focus. Test assertions do not print PINs.
+The embedded setup tests cover saved console login PIN edits and manual
+addresses through compiled Svelte, real WebChannel, and native services.
+`manualAddress` checks save and reload. `manualAddressValidation` checks
+address validation, current registration association, duplicate activation,
+and stale profiles. `consoleManagement` checks PIN validation and leading
+zeroes, secret-free replies, focus return, cancelled confirmations, and the
+distinction between manual address and registration deletion.
+`consoleTargetGuards` checks discovery reorder, ambiguous or removed targets,
+changed manual addresses, privacy masking, and narrow or zoomed forms.
+`consoleManagementPrivacy` checks address aliases with different letter case,
+masked details, confirmations, registration choices, PIN entry, and errors.
+`manualHandoff` uses the application controller to connect a registered manual
+address, hide and freeze setup, wait for native cleanup, and restore setup.
+The handoff case does not prove real console playback, physical focus, or GPU
+acceleration. Run embedded application cases serially because Qt services
+use a shared application settings identity.
 
-`Main.qml` owns one `LiveConsolePinHost` for both PSN and stream routes.
+The replaced `ManualHostDialog`, saved `ConsolePinDialog`, and their dedicated
+QML fixtures and tests are removed. `ConsolePinContent` remains shared by the
+native live PIN route. The legacy library and settings resource chains remain
+for the setup flows that later tickets replace.
+
+`StreamRoot.qml` owns the native `LiveConsolePinHost` during playback and connection progress.
 The backend retains `sessionPinRequest` across the route handoff. Its opaque
 `id` owns `enterPin(id, pin)`, `cancelSessionPin(id)`, and
 `dismissSessionPin(id)`. The request contains no PIN value. Native connection
@@ -164,7 +230,7 @@ need the full application and the relevant hardware or account. Native display
 scaling also needs a separate full-application check. A passing build alone
 does not verify any of these behaviors.
 
-## Confirmation and registration method tests
+## Confirmation tests
 
 `ConfirmationHarness.qml` loads production `MainView.qml` or `SettingsDialog.qml`
 with the production `ConfirmDialog.qml`. Tests supply the backend and navigation.
@@ -173,25 +239,19 @@ action label. Cancel and Escape call only `cancel` after the popup closes.
 
 `Confirmations` checks labels, visible initial Cancel focus, keyboard navigation,
 disabled actions, repeated input, focus return, and current console targets.
-`RegistrationMethod` checks automatic, manual, and cancelled outcomes through
-production `RegistrationMethodDialog.qml`. Both suites check long text at
-900 by 600 and 1280 by 720. Backend commands are controlled test observations.
+The suite checks long text at 900 by 600 and 1280 by 720. Backend commands are controlled test observations.
 Real registration and native input capture require separate acceptance checks.
 
 ## Startup reminder tests
 
-`RemindersHarness.qml` loads production `MainView.qml`, `RemindDialog.qml`, and
-the Steam setup screen through a real `StackView`. `Reminders` checks all three
-choices, Escape, the controller triangle/Y dismissal key, initial Later focus,
-focus return, duplicate requests, startup eligibility, and Steam-then-PSN order.
-The long-text checks use 900 by 600 and 1280 by 720 logical pixels.
-
-The navigation contract remains `showRemindDialog(title, text, remotePlay, callback)`.
-Set up now starts that callback after the popup closes. Later leaves the preference
-unchanged. Don't ask again disables the selected reminder. Setup completion uses
-the existing preference and credential-presence contract. The Steam route tests
-use controlled final outcomes and check that success alone disables its reminder.
-These tests do not create Steam files or authenticate a PSN account.
+The embedded `setupReminders`, `setupReminderOwnership`, and
+`setupReminderEligibility` cases use compiled Svelte, WebEngine, WebChannel,
+the production bridge, and native settings. They check Steam-before-PSN order,
+Later and Don't ask again, stored and reopened values, account route focus,
+page reload, complete credentials, auto-connect suppression, and the native
+triangle/Y key. Autorepeat and key release cannot dismiss a later reminder.
+The 200 percent DOM bounds check keeps at least 1024 CSS pixels. Offscreen
+checks do not establish physical focus, controller, or display acceptance.
 
 ## Settings screen tests
 
@@ -237,20 +297,23 @@ native acceptance. Real transport checks need a console.
 
 ## Auto-connect and console wake-up tests
 
-`ConnectionWake` loads production `AutoConnectView.qml` through
-`ConnectionHarness.qml`. This view uses `ConnectionView.qml` for the selected
-console, actual wait state, persistent timeout, safe retry, and cancellation.
-`context` distinguishes startup auto-connect from a manual wake request.
-`waitingForWake` retains wait-screen ownership until the connection starts.
-The same attempt ID continues through local or PSN handoff.
+`chiaki-embedded-wake-auto-connect` uses compiled Svelte, WebEngine,
+WebChannel, and native services. It checks saved target persistence, wake
+progress, reload without replay, transport failure, timeout, retry, cancellation,
+and current target and profile guards. The native wake transport is controlled.
+Unexpected wake, PSN, and raw session requests fail closed.
 
-These tests check repeated input, cleanup before retry, closed views, invalid
-targets, streamer mode, and action focus at 900 by 600 and 1280 by 720.
-The real `StackView` check verifies that an old view cannot dismiss a new
-attempt or take focus during its exit transition.
-The fake backend supplies native results. It does not simulate discovery,
-wake packets, or a session. Isolated native checks cover those handlers with
-transport disabled. Real console wake-up still needs a console.
+`chiaki-startup-native-connection` disables page JavaScript before startup work.
+Native discovery and PSN completions must prepare the native window and start
+the selected session without the page. Its raw session producer uses a real
+compatible native thread. Native Stop and cleanup join that thread. The checks
+cover local priority, wake wait, PS4 and PS5 remote targets, a late console list,
+cancellation, removed registrations, replacement, and profile changes.
+
+The unused setup wrapper `AutoConnectView.qml` and its fake wake tests are
+removed. Native stream `ConnectionView.qml` and its tests remain. These checks
+do not prove real wake packets, live PSN, foreground focus, graphics output,
+physical input, or media performance.
 
 ## PSN setup tests
 
@@ -273,24 +336,55 @@ The native Qt build lacks QtWebEngine, so its browser check proves external
 fallback. The embedded route uses the supplied browser in screen tests.
 Real PSN sign-in and physical controller input remain separate checks.
 
-## Account ID retrieval for registration
+## Pairing and Account ID tests
 
-`RegistrationAccountHarness.qml` uses production `RegistDialog.qml` and its
-default Account ID route through a real `StackView`. `RegistDialog.accountLookup`
-replaces only the public lookup service. Its callback receives an HTTP status
-and response text. Production keeps the `psn.flipscreen.games` service.
+`chiaki-embedded-pairing` runs the compiled `Pairing.svelte` screen through the
+production WebEngine view, WebChannel, SetupBridge, and native services.
+`RegistrationRequests` controls only the native registration transport.
+`PsnRequests::networkManager` controls the lookup and OAuth network replies.
+The native backend still validates input, owns attempts, and saves registration.
 
-`RegistrationAccount` checks empty input, network and response errors, retry,
-the 30-second timeout, privacy, focus, keyboard/controller keys, and both required
-window sizes with long text. It checks direct return to the original form,
-duplicate and late results, replacement screens, and profile changes.
-Public lookup uses no authentication command or credential save.
+The cases check firmware choices, broadcast registration, leading zeroes,
+optional console login PINs, progress, failure, correction, duplicate completion,
+and saved manual associations. They reject changed profiles and manual or
+discovered targets. Lookup checks cover invalid replies, service failure, the
+real 30-second timeout, replacement, and late replies. The account source cases
+retain form input through lookup and PSN sign-in. Only a current native result
+can fill the Account ID field. Public lookup does not save credentials.
 
-The sign-in route loads production `PSNTokenDialog.qml` in registration mode.
-It retains the credential-save and background-completion explanations. A new
-registration screen can show an existing request, but cannot receive its
-Account ID. The screen tests supply authentication outcomes. Native persistence
-is covered by ticket 01; integrated native acceptance is covered by ticket 08.
+The maintained pairing fixture uses widths of at least 1024 CSS pixels.
+Its 200 percent zoom check uses a 2560-pixel window. Earlier narrow captures
+remain historical evidence and do not set the supported layout scope.
+The test uses offscreen rendering and a test-only `--disable-gpu` flag.
+`registrationHandoff` is a separate Windows desktop case. It registers through
+the controlled native transport, then uses the normal connection path with a
+loopback address. These cases do not prove live console registration, live PSN,
+GPU acceleration, physical focus, streaming quality, or input latency.
+
+Run the focused functional group with:
+
+```text
+ctest --test-dir build -R "^chiaki-embedded-pairing$" --output-on-failure
+```
+
+The replaced QML registration and Account ID lookup screens, callback adapter,
+and their screen fixtures are removed. The automatic method now uses the
+embedded application check below.
+
+`automaticRegistration` runs the compiled setup page, real WebChannel, bridge,
+native renderer, and native registration-only connection. Controlled HTTP,
+discovery, PSN workers, registration callbacks, and raw session starts prevent
+console traffic. Successful starts create a real native thread that sends
+registration and quit events through the session callback and is joined during
+cleanup. The check covers save-once completion, retry, cancellation limits,
+profile and target changes, wrong results, the PS4 nickname guard, request
+exclusion, hidden resource cleanup, and a later controlled playback handoff.
+Its context row also checks manual pairing for a discovered console with PSN
+metadata, changed addresses, duplicate targets, and rejection of remote rows.
+Run `ctest --test-dir build -R "^chiaki-embedded-automatic-registration$"` on
+a desktop platform with native graphics support. The Windows offscreen plug-in
+cannot create the required OpenGL context. These controlled checks do not prove
+live PSN registration, physical input, GPU coexistence, or playback performance.
 
 ## Disconnect checks
 
@@ -384,39 +478,23 @@ composition, live media, physical controllers, or other display scales.
 
 ## Steam shortcut checks
 
-`SteamShortcut` loads the production `SteamShortcutDialog.qml` with a supplied
-backend and navigation object. The checks use the production controls. They cover
-profile defaults, name validation, custom options and folders, persistent failure,
-retry, terminal success, privacy, keyboard input, controller key mappings, and
-return focus. Layout checks use 900 by 600 and 1280 by 720 logical pixels.
-`SteamShortcutHarness` composes the production Library and Steam form.
+`steamShortcutWorkflow` and `steamShortcutGuards` use the embedded application
+and native folder picker. All Steam writes use an isolated temporary tree.
+The cases read the actual shortcut records, five artwork files, controller
+configuration, backup, matching-entry update, and partial failure. Retry must
+report its actual result. Success alone clears the stored reminder choice.
 
-The separate `gui/tests/steam` CMake target builds the exact Steam command from
-`qmlbackend.cpp` with the real pinned SteamTools dependency and artwork. The test
-supplies only the executable path boundary. It creates a temporary Steam directory
-and checks the written shortcut records, matching-entry updates, artwork, and
-controller configuration. Windows file locks test backup and write failures.
-The checks do not access the user's Steam installation.
+The bridge retains the selected native path and profile defaults. Commands use
+opaque form and profile identities. Tests reject repeated activation, empty
+names, path injection, changed profiles, obsolete completions, and closed or
+reloaded presentations. Cancelled folder selection keeps the prior path.
+Streamer mode masks the path, diagnostics, and profile defaults before transport.
+A queued operation cannot write after its presentation closes.
 
-Build it with the same Qt and compiler environment as the screen target:
-
-```powershell
-& $cmake -S gui/tests/steam -B build/steam-native -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_PREFIX_PATH=$qtPrefix"
-& $cmake --build build/steam-native
-$env:PATH = (Resolve-Path build/steam-native/steam-tools).Path + ';' + $env:PATH
-$env:QT_QPA_PLATFORM = 'offscreen'
-& .\build\steam-native\chiaki-steam-shortcut-tests.exe
-```
-
-`cmake/SteamTools.cmake` applies `cmake/steam-tools.patch` to a build copy of the
-pinned dependency. Both the normal application and the native check use this
-copy. The source submodule stays unchanged. The patch fixes custom folder checks,
-new shortcut files, Windows backup names, artwork error reporting, and failed
-backup or write results. Reconfiguration copies the original source before the
-patch is applied again.
-
-These controlled checks do not verify physical controllers, native display
-scaling, or shortcut visibility after the user restarts Steam.
+`cmake/SteamTools.cmake` still applies `cmake/steam-tools.patch` to a build copy
+of the pinned dependency. The native command retains its existing file checks,
+backup rules, error handling, and partial-write result. Steam is not restarted.
+These checks do not establish visibility in the user's Steam library.
 
 ## About and renderer information
 
@@ -433,3 +511,51 @@ The screen runner supplies the application name Chiaki and synthetic version
 The tests do not exercise native input capture, the Main non-Library focus fallback,
 display scaling, a real renderer failure, or a physical controller. Ticket 08 covers
 native acceptance.
+
+The maintained `chiaki-native-services-tests` check loads the production
+`StreamRoot.qml` through `QmlMainWindow`. It checks stream-only progress,
+saved stream geometry, PIN cancellation and acknowledgement, the return request,
+window recreation, and direct-stream exit. `sessionAndFeedback` and
+`keyboardMouseSettingsRoute` retain production root settings and input checks.
+The former also checks renderer-fallback input ownership while live settings close.
+Use a direct process launch for normal saved-size window checks. On Windows,
+`Start-Process -WindowStyle Hidden` can suppress the native first normal show,
+although Qt reports the window as visible.
+
+## Web setup and native stream handoff
+
+`chiaki-embedded-setup-tests localHandoff` starts a connection through the
+compiled Svelte page, WebChannel, and production bridge. The application
+controller prepares the native renderer before session creation. Setup hides
+after the native window presents its first frame. The check covers page
+freezing, cancellation, cleanup, and setup restoration.
+
+`decodedSessionCleanup` supplies native session events and encoded H.264
+samples at the existing transport and decoder boundaries. It uses the real
+decoder, frame worker, native renderer, QML PIN form, menu, and disconnect
+dialog. It tracks decoded AVBuffer lifetimes through normal OpenGL disconnect
+and Vulkan controller destruction with queued GUI delivery. The same native
+backend and QML engine serve both connections.
+
+`suspendClosesSignIn` checks the account and handoff merge boundary. It closes
+the native sign-in page during a pending exchange, freezes setup, completes
+the exchange through the controlled native HTTP boundary, and resumes with
+fresh account status. Closing the page does not cancel the native operation.
+
+The fixture explicitly clears the saved console login PIN. A zeroed
+`ChiakiRegisteredHost` otherwise creates the saved string `0`, which selects
+the existing automatic PIN submission route. The frame fixture is generated
+with FFmpeg 7.1:
+
+```text
+ffmpeg -f lavfi -i color=c=red:s=320x180:r=60 -frames:v 1 -c:v libx264 -preset ultrafast -tune zerolatency -f h264 red.h264
+```
+
+On Windows, `nativeInitializationFailure` uses the offscreen platform's real
+OpenGL context creation failure. Its test process disables Chromium GPU use
+and crash-report UI. It checks that setup remains visible and presents the
+native error once. These process options do not change production startup.
+
+The native tests use the existing Fast preset. They do not certify other
+presets, real-console playback, hardware decoding, physical input, or screen
+output. Actual foreground checks require the active unlocked input desktop.

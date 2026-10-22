@@ -1,0 +1,7 @@
+-- Install configuration: "Release"
+-- Installing: C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket19-notice-install/bin/chiaki.exe
+-- Installing: C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket19-notice-install/bin/qt.conf
+-- Installing: C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket19-notice-install/share/applications/chiaking.desktop
+-- Installing: C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket19-notice-install/share/icons/hicolor/512x512/apps/chiaking.png
+-- Installing: C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket19-notice-install/share/metainfo/io.github.streetpea.Chiaki4deck.appdata.xml
+-- Installing: C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket19-notice-install/share/licenses/chiaki-ng/frontend/THIRD-PARTY-NOTICES.txt

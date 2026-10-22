@@ -1,7 +1,7 @@
 <RCC>
   <qresource prefix="/">
     <file>qtquickcontrols2.conf</file>
-    <file>Main.qml</file>
+    <file>StreamRoot.qml</file>
     <file>MainView.qml</file>
     <file>ConsoleLibrary.qml</file>
     <file>ConsoleCard.qml</file>
@@ -19,12 +19,7 @@
     <file>StreamActionNotice.qml</file>
     <file>ConfirmDialog.qml</file>
     <file>RendererFallbackDialog.qml</file>
-    <file>RegistrationMethodDialog.qml</file>
-    <file>RemindDialog.qml</file>
     <file>DialogView.qml</file>
-    <file>ManualHostDialog.qml</file>
-    <file>RegistDialog.qml</file>
-    <file>SteamShortcutDialog.qml</file>
     <file>SettingsDialog.qml</file>
     <file>KeyboardMousePage.qml</file>
     <file>KeyboardMouseSettingsDialog.qml</file>
@@ -34,15 +29,10 @@
     <file>DisplaySettingsDialog.qml</file>
     <file>PlaceboSettingsDialog.qml</file>
     <file>PlaceboColorMappingDialog.qml</file>
-    <file>ProfileDialog.qml</file>
-    <file>ConsolePinDialog.qml</file>
     <file>ConsolePinContent.qml</file>
     <file>LiveConsolePinContent.qml</file>
     <file>LiveConsolePinHost.qml</file>
-    <file>PSNLoginDialog.qml</file>
     <file>PSNTokenDialog.qml</file>
-    <file>ControllerMappingDialog.qml</file>
-    <file>AutoConnectView.qml</file>
     <file>PsnView.qml</file>
     <file>controls/Button.qml</file>
     <file>controls/CheckBox.qml</file>

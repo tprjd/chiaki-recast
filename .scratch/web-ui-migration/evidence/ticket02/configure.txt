@@ -1,0 +1,175 @@
+-- The C compiler identification is GNU 16.2.0
+-- The CXX compiler identification is GNU 16.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/bin/cc.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/bin/c++.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/bin/pkg-config.exe (found version "3.0.10")
+-- Checking for module 'libplacebo>=7.349.0'
+--   Found libplacebo, version 7.360.1
+-- Checking for one of the modules 'speexdsp'
+-- Checking for module 'speexdsp'
+--   Found speexdsp, version 1.2.1
+-- Speex DSP found echo cancelling and noise suppression enabled
+CMake Warning (policy) at CMakeLists.txt:114 (find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+This warning is for project developers.  Use -Wno-author or -Wno-policy to
+suppress it.
+
+-- Found PythonInterp: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/bin/python3.exe (found suitable version "3.14.8", minimum required is "3")
+-- Could NOT find nanopb (missing: nanopb_DIR)
+-- Found Python: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/bin/python3.14.exe (found version "3.14.8") found components: Interpreter
+-- Python install dir: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/python3.14/site-packages
+-- Checking for module 'libidn2'
+--   Found libidn2, version 2.3.8
+-- Using CMake version 4.4.4
+-- curl version=[8.11.0-DEV]
+-- CMake platform flags: WIN32 GCC MINGW
+-- Performing Test HAVE_WIN32_WINNT
+-- Performing Test HAVE_WIN32_WINNT - Success
+-- Found _WIN32_WINNT=0xa00
+-- Performing Test OPT_Wdouble_promotion
+-- Performing Test OPT_Wdouble_promotion - Success
+-- Performing Test OPT_Wenum_conversion
+-- Performing Test OPT_Wenum_conversion - Success
+-- Performing Test OPT_Wpragmas
+-- Performing Test OPT_Wpragmas - Success
+-- Performing Test OPT_Wunused_const_variable
+-- Performing Test OPT_Wunused_const_variable - Success
+-- Picky compiler options: -Werror-implicit-function-declaration -W -Wall -pedantic -Wbad-function-cast -Wconversion -Winline -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wno-long-long -Wno-multichar -Wpointer-arith -Wshadow -Wsign-compare -Wundef -Wunused -Wwrite-strings -Waddress -Wattributes -Wcast-align -Wdeclaration-after-statement -Wdiv-by-zero -Wempty-body -Wendif-labels -Wfloat-equal -Wformat-security -Wignored-qualifiers -Wmissing-field-initializers -Wmissing-noreturn -Wno-format-nonliteral -Wno-system-headers -Wold-style-definition -Wredundant-decls -Wsign-conversion -Wno-error=sign-conversion -Wstrict-prototypes -Wtype-limits -Wunreachable-code -Wunused-parameter -Wvla -Wclobbered -Wmissing-parameter-type -Wold-style-declaration -Wstrict-aliasing=3 -Wtrampolines -Wno-pedantic-ms-format -Wformat=2 -Warray-bounds=2 -ftree-vrp -Wduplicated-cond -Wnull-dereference -fdelete-null-pointer-checks -Wshift-negative-value -Wshift-overflow=2 -Walloc-zero -Wduplicated-branches -Wformat-truncation=2 -Wimplicit-fallthrough -Wrestrict -Warith-conversion -Wdouble-promotion -Wenum-conversion -Wpragmas -Wunused-const-variable
+-- Could NOT find Perl (missing: PERL_EXECUTABLE) 
+CMake Warning at third-party/curl/CMakeLists.txt:444 (message):
+  Perl not found.  Will not build manuals.
+
+
+-- Found ZLIB: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/libz.dll.a (found version "1.3.2")
+-- Checking for module 'libnghttp2'
+--   Found libnghttp2, version 1.70.0
+-- Found NGHTTP2: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include (found version "1.70.0")
+-- Found Libidn2: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include (found version "2.3.8")
+-- Checking for module 'libpsl'
+--   Found libpsl, version 0.21.5
+-- Found Libpsl: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include (found version "0.21.5")
+-- Checking for module 'libssh2'
+--   Found libssh2, version 1.11.1
+-- Found Libssh2: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include (found version "1.11.1")
+-- Looking for stdatomic.h
+-- Looking for stdatomic.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Check size of size_t
+-- Check size of size_t - done
+-- Check size of ssize_t
+-- Check size of ssize_t - done
+-- Check size of long long
+-- Check size of long long - done
+-- Check size of long
+-- Check size of long - done
+-- Check size of int
+-- Check size of int - done
+-- Check size of __int64
+-- Check size of __int64 - done
+-- Check size of time_t
+-- Check size of time_t - done
+-- Looking for strtok_r
+-- Looking for strtok_r - found
+-- Check size of ADDRESS_FAMILY
+-- Check size of ADDRESS_FAMILY - done
+-- Performing Test HAVE_FILE_OFFSET_BITS
+-- Performing Test HAVE_FILE_OFFSET_BITS - Success
+-- Performing Test HAVE_ATOMIC
+-- Performing Test HAVE_ATOMIC - Success
+-- Check size of off_t
+-- Check size of off_t - done
+-- Check size of curl_off_t
+-- Check size of curl_off_t - done
+-- Check size of curl_socket_t
+-- Check size of curl_socket_t - done
+-- Protocols: http https scp sftp ws wss
+-- Features: alt-svc AsynchDNS HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM PSL SPNEGO SSL SSPI threadsafe UnixSockets
+-- Enabled SSL backends: Schannel
+-- Found Git: C:/Program Files/Git/cmd/git.exe (found version "2.54.0.windows.1")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Found WrapVulkanHeaders: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Steam shortcut enabled
+-- Checking for module 'libavutil'
+--   Found libavutil, version 59.39.100
+-- Checking for module 'libswresample'
+--   Found libswresample, version 5.3.100
+-- Checking for module 'libswscale'
+--   Found libswscale, version 8.3.100
+-- Checking for module 'libavcodec'
+--   Found libavcodec, version 61.19.101
+-- Checking for module 'libavformat'
+--   Found libavformat, version 61.7.100
+-- Found FFMPEG: avcodec;avutil;avformat (found version "59.39.100") found components: avcodec avutil avformat
+-- FFMPEG Decoder enabled
+-- Could NOT find ILClient (missing: ILClient_libbcm_host_LIBRARY ILClient_libvcilcs_LIBRARY ILClient_libvchiq_arm_LIBRARY ILClient_libvcos_LIBRARY ILClient_INCLUDE_DIR ILClient_SOURCE_DIR) 
+-- Pi Decoder disabled
+-- Found Opus: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/include
+-- Checking for one of the modules 'json-c'
+-- Checking for one of the modules 'miniupnpc'
+-- Found OpenSSL: C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/libcrypto.dll.a (found version "3.6.5")
+-- Steamdeck native gyro and hatpics disabled
+-- Found SDL2: TRUE (found version "2.32.10")
+-- SDL version 2.32.10 is >= 2.0.14, disabling Setsu
+-- Setsu disabled
+CMake Warning at C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:339 (message):
+  This project is using headers of the GuiPrivate module and will therefore
+  be tied to this specific Qt module build version.  Running this project
+  against other versions of the Qt modules may crash at any arbitrary point.
+  This is not a bug, but a result of using Qt internals.  You have been
+  warned!
+
+  You can disable this warning by setting QT_NO_PRIVATE_MODULE_WARNING to ON.
+Call Stack (most recent call first):
+  C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6GuiPrivate/Qt6GuiPrivateConfig.cmake:48 (_qt_internal_show_private_module_warning)
+  C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/Qt6Config.cmake:257 (find_package)
+  gui/CMakeLists.txt:12 (find_package)
+
+
+-- Could NOT find Qt6WebEngineQuick (missing: Qt6WebEngineQuick_DIR)
+CMake Warning at gui/CMakeLists.txt:15 (find_package):
+  Found package configuration file:
+
+    C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6/Qt6Config.cmake
+
+  but it set Qt6_FOUND to FALSE so package "Qt6" is considered to be NOT
+  FOUND.  Reason given by package:
+
+  Failed to find required Qt component "WebEngineQuick".
+
+  Expected Config file at
+  "C:/Users/david/.cache/chiaki-ui-native/msys64/ucrt64/lib/cmake/Qt6WebEngineQuick/Qt6WebEngineQuickConfig.cmake"
+  does NOT exist
+
+
+
+  Configuring with --debug-find-pkg=Qt6WebEngineQuick might reveal details
+  why the package was not found.
+
+  Configuring with -DQT_DEBUG_FIND_PACKAGE=ON will print the values of some
+  of the path variables that find_package uses to try and find the package.
+
+
+
+CMake Warning (author) at gui/CMakeLists.txt:162 (install):
+  Target chiaki has RESOURCE files but no RESOURCE DESTINATION.
+This warning is for project developers.  Use -Wno-author to suppress it.
+
+-- Configuring done (14.1s)
+-- Generating done (0.4s)
+-- Build files have been written to: C:/Users/david/.codex/worktrees/web-ui-ticket-02/chiaki-ng-ui/build/native-stream

@@ -1,0 +1,125 @@
+{
+  "base": "25ece857523668ac7b2af4cd54ff1f9039944cd9",
+  "worker": "d63554c4c2b02fd3440db9dc3b11a8029d944856",
+  "merge": "13b594df87f86da0412f7bd9d6dfde5dc17479b8",
+  "merge_tree": "2a23d86c4f1e41a9379b4d424aee13d47c9e1477",
+  "worker_tree": "2a23d86c4f1e41a9379b4d424aee13d47c9e1477",
+  "gui_tree": "962d140dd463ad143e9f7b165b1a9e76708d92e5",
+  "artifacts": [
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket09-build\\gui\\chiaki.exe",
+      "sha256": "6d1270c53950768d2effa4be1f7fd7ce936725bda877a2d119a4893849b99111"
+    },
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket09-build\\gui\\tests\\chiaki-embedded-setup-tests.exe",
+      "sha256": "5dc0b58ae94eaa0b6b2f8130124f070b7e1a9b53f5700dd1ead634109886c035"
+    },
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket09-build\\gui\\web\\app.js",
+      "sha256": "85e5e3c9dbf87114e31bc07a446d17f29489e8e23d56dc8208db8a63be098e0b"
+    },
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket09-build\\gui\\web\\app.css",
+      "sha256": "0ff905cd7ddbf2181823d32c26192b07363d4f5526f7a93c416ce0e1f193ef03"
+    },
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket09-build\\gui\\web\\index.html",
+      "sha256": "83231c8155e6809612b2b808259e4aec880059a7d985710e3ed6aae40f07bf0c"
+    },
+    {
+      "path": "C:\\Users\\david\\.codex\\worktrees\\web-ui-ticket-09\\chiaki-ng-ui\\gui\\web\\package-lock.json",
+      "sha256": "59e9bbe871ea16981ea1fd5beb0913760e66d684de0e3de8c15f2fed0a6b31e6"
+    }
+  ],
+  "runtime_sources": [
+    {
+      "group": "final01",
+      "initial_source": "70e45ce6f40b7ae0ae13ca8b85f13ceaead990aa",
+      "patch_sha256": "05af40aa1e6427593ce242bb144cd082df8ed367574911fba15cd4c637d8ab49",
+      "reconstructed_gui": "2745e3de94365df3e2b8876c4ddc2f8e1ee7a22a",
+      "production_source_gui": "941691f4212dc1ca99bfdd51ce23415a0e9a50a0",
+      "equals_production_source": false
+    },
+    {
+      "group": "final02",
+      "initial_source": "70e45ce6f40b7ae0ae13ca8b85f13ceaead990aa",
+      "patch_sha256": "e115a6ab918b954334c8c923e50836c4533fe2d939d02826c4f4083cea26350f",
+      "reconstructed_gui": "941691f4212dc1ca99bfdd51ce23415a0e9a50a0",
+      "production_source_gui": "941691f4212dc1ca99bfdd51ce23415a0e9a50a0",
+      "equals_production_source": true
+    }
+  ],
+  "runtime_source_delta": [
+    "gui/tests/embeddedsetup.cpp"
+  ],
+  "protected_files": [
+    {
+      "path": "gui/src/qmlnativeservices.cpp",
+      "blob": "629baf308636d6b9ee25824fb53199a76c78e28d"
+    },
+    {
+      "path": "gui/include/qmlnativeservices.h",
+      "blob": "d0378c6d1a0cf4baf44fec90828bfc4ecba98c2a"
+    },
+    {
+      "path": "gui/src/qmlmainwindow.cpp",
+      "blob": "d6e78bbb757286f4b1356881a2d39574f430c1ac"
+    },
+    {
+      "path": "gui/src/streamsession.cpp",
+      "blob": "e2b82aac328e6a254b68f4a852a152538b0ad858"
+    },
+    {
+      "path": "gui/src/qml/StreamRoot.qml",
+      "blob": "e8131794d9f26173cd5591b481d9ff78eb1bd229"
+    },
+    {
+      "path": "gui/src/streaminputownership.cpp",
+      "blob": "1fb1ba42c05c5dcca79b9c524d68fbfe4f47f4bf"
+    },
+    {
+      "path": "gui/include/streaminputownership.h",
+      "blob": "fd450a98d0dd543ccb2e648f64ba17cd1a1cb85a"
+    },
+    {
+      "path": "gui/src/qmlcontroller.cpp",
+      "blob": "37e471e84644e0ad944af8e28740e92342fef222"
+    },
+    {
+      "path": "gui/src/setupwindow.cpp",
+      "blob": "9ecc0ed23eb1654c4c99f67baf0dacbe21ed3a74"
+    },
+    {
+      "path": "gui/web/src/navigation.ts",
+      "blob": "67d78f68f2297cfa9d22f442309487da34405988"
+    },
+    {
+      "path": "gui/web/src/Controllers.svelte",
+      "blob": "0e98edacaa7969bc600220a76c19617baf890a5a"
+    },
+    {
+      "path": "gui/web/src/App.svelte",
+      "blob": "18cb0c6084e94fa86bcbae9caf8f6ea725a8b935"
+    }
+  ],
+  "preserved_backend_sections": [
+    {
+      "path": "gui/src/qmlbackend.cpp",
+      "start": "QmlBackend::QmlBackend",
+      "end": "QmlBackend::~QmlBackend",
+      "sha256": "dee01faef75e46b7743ea0cc78bebecd6ba550f6fd289f3434e1ea1cb736762c"
+    },
+    {
+      "path": "gui/src/qmlbackend.cpp",
+      "start": "void QmlBackend::releaseSession",
+      "end": "void QmlBackend::attachWindow",
+      "sha256": "5c89e7be214a1721dddaf5182e993ab5365f56b26fd48e41f98704a896d84ba3"
+    },
+    {
+      "path": "gui/src/qmlbackend.cpp",
+      "start": "void QmlBackend::creatingControllerMapping",
+      "end": "void QmlBackend::updateDiscoveryHosts",
+      "sha256": "0a935590f282e4e5d06135e98c44ee2583a34b50619c6c66ebc85e57b55512f0"
+    }
+  ]
+}

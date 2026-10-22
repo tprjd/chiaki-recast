@@ -1,0 +1,200 @@
+{
+  "date": "2026-10-22",
+  "base": "5cd421067e06eb803e21ecbd1dcc1b97c97a8804",
+  "worker": "382f078450e98382fa6edc268c0c6ac5bca5655b",
+  "merge": "56acff7791d1bb49ad4ade2e063f281a6b4bbbc4",
+  "mergeTree": "e56c28ddb8e3b0c3ba51d70db123aa28d6d59b11",
+  "workerTree": "e56c28ddb8e3b0c3ba51d70db123aa28d6d59b11",
+  "sourceCount": 189,
+  "rawMatches": 187,
+  "lineEndingExceptions": [
+    {
+      "path": "gui\\web\\src\\navigation.ts",
+      "recorded": "13B257CF15B2DA80B1341841A44EE0DB76B5FD5E38528297BCB242833BEE018B",
+      "raw": "AE71E06316783C707F6DF41F5F6BEA6B945A83C5CDA1927EA8F9DF3D0F8ED363",
+      "normalizedLF": "13B257CF15B2DA80B1341841A44EE0DB76B5FD5E38528297BCB242833BEE018B"
+    },
+    {
+      "path": "gui\\web\\src\\Controllers.svelte",
+      "recorded": "670F20C9F0A46FB54A0D9F2676F37864EF5E0A10799D0411A5EFA098DBF15878",
+      "raw": "419480273CD21205479CC735ECBFD7AD2228624FA1628D63FA1F9FDBB91EE426",
+      "normalizedLF": "670F20C9F0A46FB54A0D9F2676F37864EF5E0A10799D0411A5EFA098DBF15878"
+    }
+  ],
+  "sourceMismatches": [],
+  "artifacts": [
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket16-build\\gui\\tests\\chiaki-embedded-setup-tests.exe",
+      "sha256": "3215ABB2F83A98A3F4222339E5D48A3C3E6D185BFEC3781EDDC1B39812F9DC59"
+    },
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket16-build\\gui\\tests\\chiaki-console-screen-tests.exe",
+      "sha256": "4CB35676642607BE05F3DEFEACA8C069A68EC6874EEBD2ACA78AF8D1FF93EC04"
+    },
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket16-build\\gui\\web\\app.js",
+      "sha256": "79DF1A2F61FAADB15E1303F9157351A3AB7D1830DB5D22D0E2F2D82B60EFAE36"
+    },
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket16-build\\gui\\web\\app.css",
+      "sha256": "0FF905CD7DDBF2181823D32C26192B07363D4F5526F7A93C416CE0E1F193EF03"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "source-sha256.csv",
+      "sha256": "879E42979C49ACB3E438CEF2C3B0BE6E4F22E905A3347784EF0C7C6974A8CF97",
+      "run": "ticket16-green03"
+    },
+    {
+      "path": "settings-and-mapping.txt",
+      "sha256": "0F5EB5F74D4CAD721A02905B5CA98BF1DD61112632420353D92C0C58F686D8E5",
+      "run": "ticket16-green02"
+    },
+    {
+      "path": "final-mapping.txt",
+      "sha256": "4D5C444CCA3893EBC5CD5B2C34A564556CFDBFA40A429D1A8A4F331918FB191D",
+      "run": "ticket16-green03"
+    },
+    {
+      "path": "affected-qml.txt",
+      "sha256": "7D6F0ECB232035BBCAA6CBEA5D6A79EB230BA97C5B94DEB4EAB86C57FA90910F",
+      "run": "ticket16-green03"
+    },
+    {
+      "path": "controller-mapping.png",
+      "sha256": "AC24E7A7EB46063E42138F4FDAF10D968AA1F186D3A8AFA2C26883260E8FEA9F",
+      "run": "ticket16-green03"
+    }
+  ],
+  "protectedFiles": [
+    {
+      "path": "gui/src/controllermanager.cpp",
+      "blob": "8bf27f308b4da4b186e36e04cc076c1bb8255118"
+    },
+    {
+      "path": "gui/include/controllermanager.h",
+      "blob": "91fd640d9f46ab40d0a13f24a180f92999444414"
+    },
+    {
+      "path": "gui/src/streamsession.cpp",
+      "blob": "e2b82aac328e6a254b68f4a852a152538b0ad858"
+    },
+    {
+      "path": "gui/include/streamsession.h",
+      "blob": "ad522a23fd74e7c37d33f0cd3517f18bc29204ec"
+    },
+    {
+      "path": "gui/src/streaminputownership.cpp",
+      "blob": "1fb1ba42c05c5dcca79b9c524d68fbfe4f47f4bf"
+    },
+    {
+      "path": "gui/include/streaminputownership.h",
+      "blob": "fd450a98d0dd543ccb2e648f64ba17cd1a1cb85a"
+    },
+    {
+      "path": "gui/src/settings.cpp",
+      "blob": "3c0b55cad0435b1e68d4ac61feb7792eff8968c0"
+    },
+    {
+      "path": "gui/include/settings.h",
+      "blob": "5e086385ff83473d23e42ff7b099123c6dc7c142"
+    },
+    {
+      "path": "gui/src/qmlsettings.cpp",
+      "blob": "184729cecab0e7389f5ad87ed8d3e9278f41c7c9"
+    },
+    {
+      "path": "gui/include/qmlsettings.h",
+      "blob": "809e7868ea14daab45a10a89efcef5c91693b28d"
+    },
+    {
+      "path": "gui/src/qmlmainwindow.cpp",
+      "blob": "d6e78bbb757286f4b1356881a2d39574f430c1ac"
+    },
+    {
+      "path": "gui/include/qmlmainwindow.h",
+      "blob": "a230c81113fa7c61f10b21eeca1db374315b55e6"
+    },
+    {
+      "path": "gui/src/applicationcontroller.cpp",
+      "blob": "91ab4b5ccc43373658349af85ac4a8f6afc8707d"
+    },
+    {
+      "path": "gui/include/applicationcontroller.h",
+      "blob": "0df514b653758977eba3a805bdf0d178b29fd1d6"
+    },
+    {
+      "path": "gui/src/qmlnativeservices.cpp",
+      "blob": "629baf308636d6b9ee25824fb53199a76c78e28d"
+    },
+    {
+      "path": "gui/include/qmlnativeservices.h",
+      "blob": "d0378c6d1a0cf4baf44fec90828bfc4ecba98c2a"
+    },
+    {
+      "path": "gui/src/qml/StreamRoot.qml",
+      "blob": "e8131794d9f26173cd5591b481d9ff78eb1bd229"
+    },
+    {
+      "path": "gui/src/qml/KeyboardMouseSettingsDialog.qml",
+      "blob": "10aeb0fbf597e655e197c7967cc4014843e4beda"
+    },
+    {
+      "path": "gui/src/qml/DisplaySettingsDialog.qml",
+      "blob": "8295b6d3f6e98450bb2fb69bfb3cd8a5149194a7"
+    },
+    {
+      "path": "gui/src/qml/PlaceboSettingsDialog.qml",
+      "blob": "8d2301ebcc046f6e1b4f9f957080ba492ec18659"
+    },
+    {
+      "path": "gui/src/qml/PlaceboColorMappingDialog.qml",
+      "blob": "48960b2fe65e6d2319b7b62680f5a7c76dd6f039"
+    }
+  ],
+  "boundedComparisons": [
+    {
+      "path": "gui/src/qmlbackend.cpp",
+      "start": "QmlBackend::QmlBackend",
+      "end": "QmlBackend::~QmlBackend",
+      "sha256": "DEE01FAEF75E46B7743EA0CC78BEBECD6BA550F6FD289F3434E1EA1CB736762C"
+    },
+    {
+      "path": "gui/src/qmlbackend.cpp",
+      "start": "void QmlBackend::releaseSession",
+      "end": "void QmlBackend::attachWindow",
+      "sha256": "5C89E7BE214A1721DDDAF5182E993AB5365F56B26FD48E41F98704A896D84BA3"
+    },
+    {
+      "path": "gui/src/qmlbackend.cpp",
+      "start": "void QmlBackend::creatingControllerMapping",
+      "end": "void QmlBackend::updateDiscoveryHosts",
+      "sha256": "0A935590F282E4E5D06135E98C44EE2583A34B50619C6C66EBC85E57B55512F0"
+    },
+    {
+      "path": "gui/src/setupbridge.cpp",
+      "start": "QVariantMap SetupBridge::beginKeyboardMouse",
+      "end": "QVariantMap SetupBridge::setMediaSetting",
+      "sha256": "ACF6DA8F2624039049FFB994A10BCDEA6FDA51BF25DBC842053765D300F286EB"
+    },
+    {
+      "path": "gui/src/setupbridge.cpp",
+      "start": "QVariantMap SetupBridge::setMediaSetting",
+      "end": "QVariantMap SetupBridge::saveManualAddress",
+      "sha256": "DEE0BD9DA1B9FE378D59E7B61AF5C41E991EFADA1A72FF687E455E05E53C39B8"
+    },
+    {
+      "path": "gui/src/setupbridge.cpp",
+      "start": "QVariantMap SetupBridge::setRendererSetting",
+      "end": "QVariantMap SetupBridge::rendererAction",
+      "sha256": "5B350A4927F737B6E557EB68253CA3128A93E3E1AABA56A3CA8FF2D2E9450F3E"
+    },
+    {
+      "path": "gui/web/src/settings.ts",
+      "start": "export const colorMappingSettings",
+      "end": null,
+      "sha256": "18C7DA76D3AC566DA2A746DA01D10CB0AEB9BCEB6E4E450F62C01CAA47563312"
+    }
+  ]
+}

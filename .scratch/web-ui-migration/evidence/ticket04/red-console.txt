@@ -1,0 +1,24 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[43840:43760:1022/150629.747:ERROR:d3d_image_backing.cc(1169)] Already being accessed for read
+[43840:43760:1022/150629.747:ERROR:shared_image_representation.cc(338)] Unable to initialize SkSurface
+[43840:43760:1022/150629.748:ERROR:raster_decoder.cc(1146)]   RasterDecoderImpl: Context lost during MakeCurrent.
+[43840:43760:1022/150629.748:ERROR:raster_decoder.cc(1146)]   RasterDecoderImpl: Context lost during MakeCurrent.
+[43840:43760:1022/150629.748:ERROR:raster_decoder.cc(1146)]   RasterDecoderImpl: Context lost during MakeCurrent.
+[43840:43760:1022/150629.748:ERROR:raster_decoder.cc(1146)]   RasterDecoderImpl: Context lost during MakeCurrent.
+[43840:43760:1022/150629.748:ERROR:shared_image_stub.cc(569)] SharedImageStub: context already lost
+[43840:43760:1022/150629.748:ERROR:shared_context_state.cc(885)] Failed to make current since context is marked as lost
+[43840:43760:1022/150629.748:ERROR:shared_context_state.cc(885)] Failed to make current since context is marked as lost
+[43840:43760:1022/150629.748:ERROR:shared_context_state.cc(885)] Failed to make current since context is marked as lost
+[43840:43760:1022/150629.748:ERROR:shared_context_state.cc(885)] Failed to make current since context is marked as lost
+[43840:43760:1022/150629.748:ERROR:skia_output_surface_impl_on_gpu.cc(2264)] Failed to make current.
+[43840:43760:1022/150629.748:ERROR:shared_context_state.cc(885)] Failed to make current since context is marked as lost
+[43840:43760:1022/150629.761:ERROR:shared_context_state.cc(885)] Failed to make current since context is marked as lost
+[43840:43760:1022/150629.761:ERROR:skia_output_surface_impl_on_gpu.cc(2264)] Failed to make current.
+[43840:43760:1022/150629.761:ERROR:shared_context_state.cc(885)] Failed to make current since context is marked as lost
+[43840:43760:1022/150629.761:ERROR:skia_output_surface_impl_on_gpu.cc(2264)] Failed to make current.
+[43840:43760:1022/150629.772:ERROR:shared_image_manager.cc(248)] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[43840:43760:1022/150629.777:ERROR:shared_image_manager.cc(248)] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.
+[43840:43760:1022/150629.781:ERROR:shared_image_manager.cc(248)] SharedImageManager::ProduceSkia: Trying to Produce a Skia representation from a non-existent mailbox.

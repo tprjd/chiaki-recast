@@ -43,6 +43,7 @@
 #include <QThread>
 #include <QWaitCondition>
 #include <QAtomicInteger>
+#include <functional>
 #if CHIAKI_GUI_ENABLE_SPEEX
 #include <QQueue>
 #include <speex/speex_echo.h>
@@ -162,6 +163,7 @@ class StreamSession : public QObject
 
 	private:
 		SessionLog log;
+		std::function<ChiakiErrorCode(ChiakiSession *)> start_request;
 		ChiakiSession session;
 		ChiakiOpusDecoder opus_decoder;
 		ChiakiOpusEncoder opus_encoder;
@@ -328,7 +330,6 @@ class StreamSession : public QObject
 		void InitAudio(unsigned int channels, unsigned int rate);
 		void InitMic(unsigned int channels, unsigned int rate);
 		void InitHaptics();
-		void Event(ChiakiEvent *event);
 		void DisconnectHaptics();
 		void ConnectHaptics();
 #if CHIAKI_GUI_ENABLE_STEAMDECK_NATIVE
@@ -339,7 +340,8 @@ class StreamSession : public QObject
 		void ConnectRumbleHaptics();
 
 	public:
-		explicit StreamSession(const StreamSessionConnectInfo &connect_info, QObject *parent = nullptr);
+		explicit StreamSession(const StreamSessionConnectInfo &connect_info, QObject *parent = nullptr,
+			std::function<ChiakiErrorCode(ChiakiSession *)> start_request = chiaki_session_start);
 		~StreamSession();
 
 		bool IsConnected()	{ return connected; }
@@ -347,6 +349,8 @@ class StreamSession : public QObject
 
 		void Start();
 		void Stop();
+		void WaitForStop();
+		void Event(ChiakiEvent *event);
 		void GoToBed();
 	Q_INVOKABLE bool RequestIDR();
 		void ToggleMute();

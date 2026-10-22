@@ -1,0 +1,22 @@
+691342dfac10d6e5857190ba40808247a2e8a879
+
+Algorithm : SHA256
+Hash      : 71FE594BE72B94E9BF55ABA9FA4535243FAF3227F3D7CD250FFC5A5A1ABC2A19
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\include\registrationrequests.h
+
+Algorithm : SHA256
+Hash      : 221AA388BF0B4545D200E5C8A130ABBEDB733327D39E43BBA0B99FD25282FAD8
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\web\src\Pairing.svelte
+
+Algorithm : SHA256
+Hash      : 1B7F6535A337B6FA7FE5AFA34691BE3F6AF35E31DDACBD2B515228055208655A
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp
+
+Algorithm : SHA256
+Hash      : 8D246E20DD1DC203258A012C75E3B6450482964CEAF5AC14A9994B694D99EDC6
+Path      : C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\ticket07-registration-source.patch
+
+Algorithm : SHA256
+Hash      : CBEE3EF8AE1F90D7B9E41DA439AE3D850EBED269D44E58488D92BEFE3D5C80E0
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\chiaki-embedded-setup-tests.exe
+
