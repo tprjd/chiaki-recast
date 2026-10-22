@@ -45,3 +45,18 @@ remove it. No new setup-only callback adapter was added.
 
 Physical audio/hotplug, HDR/decoder hardware, haptics, live playback, audible
 volume, Linux/macOS execution, GPU/focus and package acceptance remain unverified.
+
+Integration merge `fd41b8d2` contains worker commit `cca37231` without conflicts.
+The merged tree matches the worker tree. Its source matches tested source
+`3f19a3c6`; production source matches `b3dbb435`. All 16 recorded source,
+artifact, and vendor-patch hashes match. The merger also compared all four
+capture hashes and inspected the images. The narrow and zoomed Audio/Wifi
+captures show the top of the scrollable page. The recorded layout assertions
+check horizontal bounds.
+
+Ticket 06 account controls and ticket 11 general controls remain. Shared fields
+retain numeric and string choices, the profile-generation key reset, and the
+generation captured when a numeric draft starts. The recorded expanded 3/0,
+state/restart/general 5/0, child 3/0, and SDL dummy device/layout 4/0 results
+were reused without builds or test reruns. Source-only whitespace checks pass.
+Physical audio, hotplug, GPU, live playback, and platform acceptance remain open.
