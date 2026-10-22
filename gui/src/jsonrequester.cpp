@@ -7,7 +7,8 @@ namespace {
 constexpr int kRequestTimeoutMs = 10000;
 }
 
-JsonRequester::JsonRequester(QObject* parent) : QObject(parent), networkManager(new QNetworkAccessManager(this)) {
+JsonRequester::JsonRequester(QObject* parent, const ManagerFactory &factory)
+    : QObject(parent), networkManager(factory ? factory(this) : new QNetworkAccessManager(this)) {
     connect(networkManager, &QNetworkAccessManager::finished, this, &JsonRequester::onRequestFinished);
 }
 

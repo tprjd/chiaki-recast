@@ -41,8 +41,11 @@ set_tests_properties(chiaki-console-screen PROPERTIES
 if(TARGET chiaki-gui)
     add_executable(chiaki-embedded-setup-tests embeddedsetup.cpp)
     target_link_libraries(chiaki-embedded-setup-tests PRIVATE chiaki-gui Qt6::Test)
+    target_compile_definitions(chiaki-embedded-setup-tests PRIVATE CHIAKI_TEST_PYTHON="${PYTHON_EXECUTABLE}")
     add_test(NAME chiaki-embedded-setup COMMAND chiaki-embedded-setup-tests consoleLibrary)
     set_tests_properties(chiaki-embedded-setup PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-psn COMMAND chiaki-embedded-setup-tests psnAccountStatus psnSignIn psnRefreshCredentials psnEmbeddedIsolation psnAccountPresentation)
+    set_tests_properties(chiaki-embedded-psn PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-graphics COMMAND chiaki-embedded-setup-tests graphicsCoexistence)
     set_tests_properties(chiaki-embedded-graphics PROPERTIES LABELS "desktop;gpu")
 

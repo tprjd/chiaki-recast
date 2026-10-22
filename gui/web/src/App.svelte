@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { connectSetup, type State, type Console } from './bridge';
+  import PsnAccount from './PsnAccount.svelte';
 
   let current = $state<State>();
   let connection = $state<Awaited<ReturnType<typeof connectSetup>>>();
@@ -37,6 +38,7 @@
   }
   async function navigate(event: KeyboardEvent) {
     const target = event.target as HTMLElement;
+    if (target.closest('[data-setup-panel]')) return;
     if (event.key === 'Escape') {
       event.preventDefault();
       query = '';
@@ -95,6 +97,7 @@
       {#if !query}<p>{t('Turn on discovery to find consoles on your local network.')}</p>{/if}
     </section>
   {/if}
+  {#if current && connection}<PsnAccount {current} {connection} />{/if}
   <div class="console-grid">
     {#each consoles as console, index (console.key || `unavailable-${index}`)}
       <button class="console-card" class:selected={current?.selectedKey === console.key && !!console.key}
