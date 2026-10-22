@@ -11,7 +11,7 @@ export interface State {
   mediaChoices: Record<string, { label: string; value: string }[]>;
   generalSettings: Record<string, boolean | number>;
   keyboardMouse: {
-    supported: boolean; values: Record<string, boolean | number>; limits: Record<string, number>;
+    supported: boolean; windowGeneration: string; values: Record<string, boolean | number>; limits: Record<string, number>;
     bindings: { action: number; name: string; group: number; primaryName: string; alternativeName: string }[];
     keys: { buttonName: string; buttonValue: number; keyName: string }[];
   };

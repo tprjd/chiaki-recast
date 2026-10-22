@@ -51,6 +51,8 @@ class BindingCapture : public QDialog
             pending = input;
             status->setText(tr("This input is assigned to %1. Move binding or cancel.").arg(result.value("name").toString()));
             prompt->setEnabled(false);
+            findChild<QPushButton *>("setupBindingTab")->hide();
+            findChild<QPushButton *>("setupBindingClear")->hide();
             move->show();
             move->setFocus(Qt::TabFocusReason);
             return;
@@ -118,6 +120,7 @@ public:
         status->setWordWrap(true);
         layout->addWidget(status);
         auto *buttons = new QDialogButtonBox(QDialogButtonBox::Cancel, this);
+        buttons->setOrientation(Qt::Vertical);
         connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
         if (!legacy) {
             auto *tab = buttons->addButton(tr("Assign Tab"), QDialogButtonBox::ActionRole);
@@ -133,7 +136,7 @@ public:
         }
         for (auto *button : buttons->findChildren<QPushButton *>()) button->setAutoDefault(false);
         layout->addWidget(buttons);
-        resize(500, sizeHint().height());
+        resize(qMin(500, parent->width() - 32), sizeHint().height());
         prompt->setFocus(Qt::TabFocusReason);
     }
 };

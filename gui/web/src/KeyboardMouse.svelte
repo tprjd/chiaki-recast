@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { tick } from 'svelte';
   import SettingField from './SettingField.svelte';
   import type { State, connectSetup } from './bridge';
   import { keyboardMouseSettings } from './settings';
@@ -14,6 +14,7 @@
   let confirmation: HTMLDialogElement;
   let resetIdentity: { form: string; generation: string } | undefined;
   const generation = $derived(current.profileGeneration);
+  const windowGeneration = $derived(current.keyboardMouse.windowGeneration);
   const values = $derived(current.keyboardMouse.values);
   const enabled = $derived(values.mouseCameraEnabled === true);
   const fields = $derived(keyboardMouseSettings.map(field => {
@@ -24,13 +25,20 @@
     return field;
   }));
 
-  onMount(() => {
+  $effect(() => {
+    windowGeneration;
+    const profile = generation;
     let disposed = false;
-    connection.beginKeyboardMouse(generation).then(reply => {
+    let identity = '';
+    form = '';
+    resetIdentity = undefined;
+    confirmation?.close();
+    connection.beginKeyboardMouse(profile).then(reply => {
       if (disposed) { if (reply.form) connection.endKeyboardMouse(reply.form); return; }
-      form = reply.form ?? '';
+      identity = reply.form ?? '';
+      form = identity;
     });
-    return () => { disposed = true; if (form) connection.endKeyboardMouse(form); };
+    return () => { disposed = true; if (identity) connection.endKeyboardMouse(identity); };
   });
   $effect(() => {
     if (target.startsWith('keyboardMouseBinding')) tab = 'Bindings';
@@ -52,6 +60,7 @@
   function openReset() {
     resetIdentity = { form, generation };
     confirmation.showModal();
+    confirmation.querySelector<HTMLButtonElement>('[data-keyboard-reset-cancel]')?.focus();
   }
   function cancelReset() {
     resetIdentity = undefined;

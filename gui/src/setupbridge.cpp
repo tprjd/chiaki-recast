@@ -230,7 +230,7 @@ void SetupBridge::refresh()
     addChoices("decoder", decoders, settings->decoder(), false);
     addChoices("audioInDevice", settings->availableAudioInDevices(), settings->audioInDevice(), true);
     addChoices("audioOutDevice", settings->availableAudioOutDevices(), settings->audioOutDevice(), true);
-    QVariantMap keyboardMouse{{"supported", settings->mouseCameraSupported()},
+    QVariantMap keyboardMouse{{"supported", settings->mouseCameraSupported()}, {"windowGeneration", QString::number(keyboardMouseWindowGeneration)},
         {"values", QVariantMap{{"mouseCameraEnabled", settings->mouseCameraEnabled()},
             {"mouseHorizontalSensitivity", settings->mouseHorizontalSensitivity()},
             {"mouseVerticalSensitivity", settings->mouseVerticalSensitivity()},
@@ -364,6 +364,7 @@ QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &
 void SetupBridge::setSuspended(bool value)
 {
     suspended = value;
+    if (suspended) invalidateKeyboardMouse();
     if (!suspended) refresh();
 }
 
@@ -405,7 +406,7 @@ QVariantMap SetupBridge::refreshAudioDevices()
 
 bool SetupBridge::keyboardMouseFormValid(const QString &form, const QString &profile) const
 {
-    return keyboardMouseAvailable && !form.isEmpty() && form == keyboardMouseForm && currentProfile(profile);
+    return !suspended && keyboardMouseAvailable && !form.isEmpty() && form == keyboardMouseForm && currentProfile(profile);
 }
 
 void SetupBridge::invalidateKeyboardMouse()
@@ -416,13 +417,16 @@ void SetupBridge::invalidateKeyboardMouse()
 
 void SetupBridge::setKeyboardMouseAvailable(bool available)
 {
+    if (keyboardMouseAvailable == available) return;
     keyboardMouseAvailable = available;
+    ++keyboardMouseWindowGeneration;
     if (!available) invalidateKeyboardMouse();
+    refresh();
 }
 
 QVariantMap SetupBridge::beginKeyboardMouse(const QString &profile)
 {
-    if (!keyboardMouseAvailable || !currentProfile(profile)) return {{"accepted", false}};
+    if (suspended || !keyboardMouseAvailable || !currentProfile(profile)) return {{"accepted", false}};
     invalidateKeyboardMouse();
     keyboardMouseForm = QUuid::createUuid().toString(QUuid::WithoutBraces);
     return {{"accepted", true}, {"form", keyboardMouseForm}};

@@ -60,6 +60,7 @@ private:
     QTimer accountExpiry;
     bool credentialsRejected = false;
     bool keyboardMouseAvailable = false;
+    quint64 keyboardMouseWindowGeneration = 0;
     QString keyboardMouseForm;
     bool currentProfile(const QString &profile) const;
 };
