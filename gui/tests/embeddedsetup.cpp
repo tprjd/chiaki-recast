@@ -1192,6 +1192,12 @@ private slots:
         QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
         script(setup.view(), "document.querySelector('[data-registration-submit]').click()");
         QTRY_COMPARE(registration.requests.size(), 1);
+        setup.view()->reload();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]')?.textContent.includes('View registration progress')").toBool());
+        QCOMPARE(registration.requests.size(), 1);
+        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.body.textContent.includes('Registering console')").toBool());
+        QCOMPARE(registration.requests.size(), 1);
         registration.complete(0, true);
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-connect]')").toBool());
         QVERIFY(settings.GetManualHosts().first().GetRegistered());

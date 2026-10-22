@@ -326,24 +326,37 @@ The native Qt build lacks QtWebEngine, so its browser check proves external
 fallback. The embedded route uses the supplied browser in screen tests.
 Real PSN sign-in and physical controller input remain separate checks.
 
-## Account ID retrieval for registration
+## Pairing and Account ID tests
 
-`RegistrationAccountHarness.qml` uses production `RegistDialog.qml` and its
-default Account ID route through a real `StackView`. `RegistDialog.accountLookup`
-replaces only the public lookup service. Its callback receives an HTTP status
-and response text. Production keeps the `psn.flipscreen.games` service.
+`chiaki-embedded-pairing` runs the compiled `Pairing.svelte` screen through the
+production WebEngine view, WebChannel, SetupBridge, and native services.
+`RegistrationRequests` controls only the native registration transport.
+`PsnRequests::networkManager` controls the lookup and OAuth network replies.
+The native backend still validates input, owns attempts, and saves registration.
 
-`RegistrationAccount` checks empty input, network and response errors, retry,
-the 30-second timeout, privacy, focus, keyboard/controller keys, and both required
-window sizes with long text. It checks direct return to the original form,
-duplicate and late results, replacement screens, and profile changes.
-Public lookup uses no authentication command or credential save.
+The cases check firmware choices, broadcast registration, leading zeroes,
+optional console login PINs, progress, failure, correction, duplicate completion,
+and saved manual associations. They reject changed profiles and manual or
+discovered targets. Lookup checks cover invalid replies, service failure, the
+real 30-second timeout, replacement, and late replies. The account source cases
+retain form input through lookup and PSN sign-in. Only a current native result
+can fill the Account ID field. Public lookup does not save credentials.
 
-The sign-in route loads production `PSNTokenDialog.qml` in registration mode.
-It retains the credential-save and background-completion explanations. A new
-registration screen can show an existing request, but cannot receive its
-Account ID. The screen tests supply authentication outcomes. Native persistence
-is covered by ticket 01; integrated native acceptance is covered by ticket 08.
+The test uses offscreen rendering and a test-only `--disable-gpu` flag.
+`registrationHandoff` is a separate Windows desktop case. It registers through
+the controlled native transport, then uses the normal connection path with a
+loopback address. These cases do not prove live console registration, live PSN,
+GPU acceleration, physical focus, streaming quality, or input latency.
+
+Run the focused functional group with:
+
+```text
+ctest --test-dir build -R "^chiaki-embedded-pairing$" --output-on-failure
+```
+
+The replaced QML registration and Account ID lookup screens, callback adapter,
+and their screen fixtures are removed. Automatic registration keeps its
+`RegistrationMethod` checks until that route migrates.
 
 ## Disconnect checks
 

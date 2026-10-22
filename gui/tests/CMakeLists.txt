@@ -45,7 +45,7 @@ if(TARGET chiaki-gui)
     add_test(NAME chiaki-embedded-setup COMMAND chiaki-embedded-setup-tests consoleLibrary)
     set_tests_properties(chiaki-embedded-setup PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-pairing COMMAND chiaki-embedded-setup-tests registrationForm registrationProgress
-        registrationLookup registrationLookupTimeout registrationAccountSources registrationNativeValidation registrationStaleTargets)
+        registrationLookup registrationLookupTimeout registrationAccountSources registrationNativeValidation registrationStaleTargets registrationAddressCorrection)
     set_tests_properties(chiaki-embedded-pairing PROPERTIES
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
     add_test(NAME chiaki-registration-handoff COMMAND chiaki-embedded-setup-tests registrationHandoff)
