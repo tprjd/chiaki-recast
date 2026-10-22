@@ -1,0 +1,56 @@
+[
+  {
+    "name": "Qt6Core.dll",
+    "version": "6.9.3.0",
+    "sha256": "b6c6bedca4e798f9a6cfae20946688ab0a0c3dbd7de605951b0ffb7b679e4f53",
+    "sdkSha256": "b6c6bedca4e798f9a6cfae20946688ab0a0c3dbd7de605951b0ffb7b679e4f53"
+  },
+  {
+    "name": "Qt6Gui.dll",
+    "version": "6.9.3.0",
+    "sha256": "569f50c8fde5e3841197e4f44bc4673b330e2f8744391f36f0dccc17fc858f03",
+    "sdkSha256": "569f50c8fde5e3841197e4f44bc4673b330e2f8744391f36f0dccc17fc858f03"
+  },
+  {
+    "name": "Qt6Quick.dll",
+    "version": "6.9.3.0",
+    "sha256": "1213d2ff0583399be7b87c0aa8ccc9a7e7d824f3b93f555f58cbecdb82d76d60",
+    "sdkSha256": "1213d2ff0583399be7b87c0aa8ccc9a7e7d824f3b93f555f58cbecdb82d76d60"
+  },
+  {
+    "name": "Qt6WebEngineCore.dll",
+    "version": "6.9.3.0",
+    "sha256": "7f413967e207e378ba3944501869b1e742cd89c6218d76d4d10defc4fbe40d3d",
+    "sdkSha256": "7f413967e207e378ba3944501869b1e742cd89c6218d76d4d10defc4fbe40d3d"
+  },
+  {
+    "name": "QtWebEngineProcess.exe",
+    "version": "6.9.3.0",
+    "sha256": "f056b1a7b37bb0d5b934d4cb9088fba3bbde990810969c699f9203e505b55eb5",
+    "sdkSha256": "f056b1a7b37bb0d5b934d4cb9088fba3bbde990810969c699f9203e505b55eb5"
+  },
+  {
+    "name": "libplacebo-360.dll",
+    "version": "v7.360.1 (v7.360.1)",
+    "sha256": "cf4e4dccea7d0e9924206902a2b37513d2ad5b4fbc6631f2f54595e726bbeb20",
+    "sdkSha256": null
+  },
+  {
+    "name": "avcodec-61.dll",
+    "version": "61.19.101",
+    "sha256": "dbe62f12cc2c8d67b68ac59ea310af8d76cf8d1a8c7742d39df49be4e6dd15a1",
+    "sdkSha256": null
+  },
+  {
+    "name": "SDL2.dll",
+    "version": "2, 30, 0, 0",
+    "sha256": "03f5109868393d441eb2bf39f8c2c369840be5e83b03208792773549ffddb640",
+    "sdkSha256": null
+  },
+  {
+    "name": "msvcp140.dll",
+    "version": "14.44.35211.0",
+    "sha256": "0f885b509a685d2bbfa652fed26b5fb31d88fbdab0a978c641d1c7b8aa460aa9",
+    "sdkSha256": null
+  }
+]

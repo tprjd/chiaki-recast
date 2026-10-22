@@ -42,6 +42,7 @@ int main(int argc, char *argv[]) { return real_main(argc, argv); }
 #include <QCommandLineParser>
 #include <QMap>
 #include <QSurfaceFormat>
+#include <QFile>
 
 Q_DECLARE_METATYPE(ChiakiLogLevel)
 Q_DECLARE_METATYPE(ChiakiRegistEventType)
@@ -68,6 +69,31 @@ int RunMain(QGuiApplication &app, Settings *settings, bool exit_app_on_stream_ex
 
 int real_main(int argc, char *argv[])
 {
+	// Check release resources without starting audio, discovery, settings, or Chromium.
+	if(argc == 2 && strcmp(argv[1], "--check-package") == 0)
+	{
+		QCoreApplication app(argc, argv);
+		for(const auto *path : {":/setup/index.html", ":/setup/app.js", ":/setup/app.css", ":/qtwebchannel/qwebchannel.js"})
+		{
+			QFile file(QString::fromUtf8(path));
+			if(!file.open(QIODevice::ReadOnly) || file.size() == 0)
+			{
+				fprintf(stderr, "Missing embedded package asset: %s\n", path);
+				return 1;
+			}
+			if(strcmp(path, ":/setup/index.html") == 0)
+			{
+				const auto html = file.readAll();
+				if(!html.contains("src=\"./app.js\"") || !html.contains("href=\"./app.css\"")
+					|| !html.contains("qrc:/qtwebchannel/qwebchannel.js"))
+				{
+					fprintf(stderr, "Embedded setup must reference its packaged script, style, and WebChannel.\n");
+					return 1;
+				}
+			}
+		}
+		return 0;
+	}
 	qRegisterMetaType<DiscoveryHost>();
 	qRegisterMetaType<RegisteredHost>();
 	qRegisterMetaType<HostMAC>();

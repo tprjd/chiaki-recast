@@ -1,0 +1,13 @@
+{
+  "command": [
+    "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final\\chiaki-embedded-setup-tests.exe",
+    "startupNativeConnection:local-ready",
+    "setupReload:reload",
+    "graphicsCoexistence",
+    "-o",
+    "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-final-runtime\\package-qt.txt,txt"
+  ],
+  "cwd": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final",
+  "PATH": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final;C:\\Windows\\System32;C:\\Windows",
+  "QtOverrides": {}
+}

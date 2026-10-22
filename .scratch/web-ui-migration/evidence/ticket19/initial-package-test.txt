@@ -1,0 +1,6 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+PASS: Windows package dependencies, matching WebEngine files, locales, and notices.
+PASS: complete package accepted; missing helper and browser assets rejected.

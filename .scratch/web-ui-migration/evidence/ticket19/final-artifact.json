@@ -1,0 +1,10 @@
+{
+  "source": "584d6471d81092a4a7c63eb78ab220539f198702",
+  "zip": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\chiaki-recast-windows-x64-web-native-584d6471.zip",
+  "sha256": "94ff670d03f1a9eea6cb4227336e3f0a18d170cb7fdcc98e44b4cdd25077f62a",
+  "archiveBytes": 190837567,
+  "packageFiles": 1541,
+  "packageBytes": 520315789,
+  "manifestSha256": "33a727071260a778f31a2b349be50f0f882076976171671cd6d379968bc6cecc",
+  "result": "All ZIP member SHA256 values equal the prelaunch production stage manifest, including the manifest file. No QA-only files or runtime Node."
+}

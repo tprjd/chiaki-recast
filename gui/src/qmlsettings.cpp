@@ -2101,7 +2101,7 @@ void QmlSettings::refreshAllPlaceboKeys()
     emit placeboChanged();
 }
 
-QVariantMap QmlSettings::exportSettings()
+QVariantMap QmlSettings::exportSettings(std::function<bool()> current)
 {
     if(rendererFilePending) return {{"accepted", false}, {"message", tr("A settings file action is already open.")}};
     rendererFilePending = true;
@@ -2112,13 +2112,14 @@ QVariantMap QmlSettings::exportSettings()
     QString fileName = QFileDialog::getSaveFileName(QApplication::focusWidget(), tr("Export %1 Profile To File").arg(safeProfile),
         QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + "/chiaki-ng-" + (streamerMode() ? QStringLiteral("profile") : profile),
         tr("Settings files (*.ini)"), nullptr, QFileDialog::DontUseNativeDialog);
+    if(current && !current()) return {{"accepted", false}, {"message", tr("This setup action is no longer open.")}};
     if(generation != settingsGeneration) return {{"accepted", false}, {"message", tr("The profile changed. No file action was applied.")}};
     if(fileName.isEmpty()) return {{"accepted", false}, {"cancelled", true}, {"message", tr("Export cancelled.")}};
     const bool saved = settings->ExportSettings(std::move(fileName));
     return {{"accepted", saved}, {"message", saved ? tr("Settings exported.") : tr("Settings could not be exported. Check the file permissions and free space.")}};
 }
 
-QVariantMap QmlSettings::importSettings()
+QVariantMap QmlSettings::importSettings(std::function<bool()> current)
 {
     if(rendererFilePending) return {{"accepted", false}, {"message", tr("A settings file action is already open.")}};
     rendererFilePending = true;
@@ -2126,6 +2127,7 @@ QVariantMap QmlSettings::importSettings()
     const auto generation = settingsGeneration;
     QString fileName = QFileDialog::getOpenFileName(QApplication::focusWidget(), tr("Import Profile From File"),
         QStandardPaths::writableLocation(QStandardPaths::DownloadLocation), tr("Settings files (*.ini)"), nullptr, QFileDialog::DontUseNativeDialog);
+    if(current && !current()) return {{"accepted", false}, {"message", tr("This setup action is no longer open.")}};
     if(generation != settingsGeneration) return {{"accepted", false}, {"message", tr("The profile changed. No file action was applied.")}};
     if(fileName.isEmpty()) return {{"accepted", false}, {"cancelled", true}, {"message", tr("Import cancelled.")}};
     const bool loaded = settings->ImportSettings(std::move(fileName));
@@ -2141,7 +2143,7 @@ QString QmlSettings::chooseSteamBasePath()
     return fileName;
 }
 
-QVariantMap QmlSettings::exportPlaceboSettings()
+QVariantMap QmlSettings::exportPlaceboSettings(std::function<bool()> current)
 {
     if(rendererFilePending) return {{"accepted", false}, {"message", tr("A renderer file action is already open.")}};
     rendererFilePending = true;
@@ -2150,13 +2152,14 @@ QVariantMap QmlSettings::exportPlaceboSettings()
     QString fileName = QFileDialog::getSaveFileName(QApplication::focusWidget(), tr("Export Placebo Renderer Settings To File"),
         QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + "/chiaki-ng-placebo",
         tr("Settings files (*.ini)"), nullptr, QFileDialog::DontUseNativeDialog);
+    if(current && !current()) return {{"accepted", false}, {"message", tr("This setup action is no longer open.")}};
     if(generation != settingsGeneration) return {{"accepted", false}, {"message", tr("The profile changed. No file action was applied.")}};
     if(fileName.isEmpty()) return {{"accepted", false}, {"cancelled", true}, {"message", tr("Export cancelled.")}};
     const bool saved = settings->ExportPlaceboSettings(std::move(fileName));
     return {{"accepted", saved}, {"message", saved ? tr("Renderer settings exported.") : tr("Renderer settings could not be exported. Check the file permissions and free space.")}};
 }
 
-QVariantMap QmlSettings::importPlaceboSettings()
+QVariantMap QmlSettings::importPlaceboSettings(std::function<bool()> current)
 {
     if(rendererFilePending) return {{"accepted", false}, {"message", tr("A renderer file action is already open.")}};
     rendererFilePending = true;
@@ -2164,6 +2167,7 @@ QVariantMap QmlSettings::importPlaceboSettings()
     const auto generation = settingsGeneration;
     QString fileName = QFileDialog::getOpenFileName(QApplication::focusWidget(), tr("Import Placebo Renderer Settings From File"),
         QStandardPaths::writableLocation(QStandardPaths::DownloadLocation), tr("Settings files (*.ini)"), nullptr, QFileDialog::DontUseNativeDialog);
+    if(current && !current()) return {{"accepted", false}, {"message", tr("This setup action is no longer open.")}};
     if(generation != settingsGeneration) return {{"accepted", false}, {"message", tr("The profile changed. No file action was applied.")}};
     if(fileName.isEmpty()) return {{"accepted", false}, {"cancelled", true}, {"message", tr("Import cancelled.")}};
     const bool loaded = settings->ImportPlaceboSettings(std::move(fileName));
