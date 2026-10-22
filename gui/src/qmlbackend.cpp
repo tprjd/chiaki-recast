@@ -140,10 +140,10 @@ void QmlRegist::regist_cb(ChiakiRegistEvent *event, void *user)
     }
 }
 
-QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests)
+QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests, QmlSettings::ProcessLauncher launcher)
     : QObject(parent)
     , settings(settings)
-    , settings_qml(new QmlSettings(settings, this))
+    , settings_qml(new QmlSettings(settings, this, std::move(launcher)))
     , psn_requests(std::move(requests))
 {
     qt_msg_handler = qInstallMessageHandler(msg_handler);

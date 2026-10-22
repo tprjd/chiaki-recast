@@ -1605,6 +1605,65 @@ private slots:
         QVERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains("fsrcnnx_x2_8_0_4_1"));
     }
 
+    void rendererRestartPolicy_data()
+    {
+        QTest::addColumn<int>("runtimeBackend");
+        QTest::newRow("Vulkan") << 0;
+        QTest::newRow("OpenGL") << 1;
+    }
+
+    void rendererRestartPolicy()
+    {
+        QFETCH(int, runtimeBackend);
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRenderBackend(static_cast<RenderBackend>(runtimeBackend));
+        int launches = 0;
+        QString launchedProgram;
+        QStringList launchedArguments;
+        QmlNativeServices services(&settings, {}, [&](const QString &program, const QStringList &arguments) {
+            ++launches;
+            launchedProgram = program;
+            launchedArguments = arguments;
+            return false;
+        });
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        backend->setDiscoveryEnabled(false);
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#disconnectAction')").toBool());
+        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='Renderer').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#vSyncEnabled')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('#vSyncEnabled').click()");
+        QTRY_VERIFY(!settings.GetVSyncEnabled());
+        QTRY_COMPARE(launches, runtimeBackend == 1 ? 1 : 0);
+        if(runtimeBackend == 1)
+            QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-message')?.textContent.includes('could not restart')").toBool());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#rendererBackend')?.disabled===false").toBool());
+        script(setup.view(), QString("{const field=document.querySelector('#rendererBackend');field.value='%1';field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(1 - runtimeBackend));
+        QTRY_COMPARE(int(settings.GetRenderBackend()), 1 - runtimeBackend);
+        QTRY_COMPARE(launches, runtimeBackend == 1 ? 2 : 1);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-message')?.textContent.includes('could not restart')").toBool());
+        QCOMPARE(launchedProgram, QCoreApplication::applicationFilePath());
+        QCOMPARE(launchedArguments, QCoreApplication::arguments().mid(1));
+        QVERIFY(!setup.bridge()->snapshot().value("rendererStatus").toMap().contains("runtimeBackend"));
+        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+        const int previous = launches;
+        QVERIFY(settingRequest(setup.view(), "rendererBackend", 1 - runtimeBackend, generation, "setRendererSetting").value("accepted").toBool());
+        QVERIFY(settingRequest(setup.view(), "vSyncEnabled", false, generation, "setRendererSetting").value("accepted").toBool());
+        QVERIFY(!settingRequest(setup.view(), "rendererBackend", 2, generation, "setRendererSetting").value("accepted").toBool());
+        QVERIFY(!settingRequest(setup.view(), "rendererBackend", runtimeBackend, generation + "-old", "setRendererSetting").value("accepted").toBool());
+        QCOMPARE(launches, previous);
+    }
+
     void rendererLayout()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);

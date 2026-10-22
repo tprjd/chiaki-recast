@@ -1,6 +1,7 @@
 #pragma once
 
 #include "settings.h"
+#include <functional>
 
 class QmlSettings : public QObject
 {
@@ -171,7 +172,8 @@ class QmlSettings : public QObject
     Q_PROPERTY(float placeboToneMappingContrastSmoothness READ placeboToneMappingContrastSmoothness WRITE setPlaceboToneMappingContrastSmoothness NOTIFY placeboToneMappingContrastSmoothnessChanged)
 
 public:
-    QmlSettings(Settings *settings, QObject *parent = nullptr);
+    using ProcessLauncher = std::function<bool(const QString &, const QStringList &)>;
+    QmlSettings(Settings *settings, QObject *parent = nullptr, ProcessLauncher launcher = {});
 
     int resolutionLocalPS4() const;
     void setResolutionLocalPS4(int resolution);
@@ -782,6 +784,7 @@ signals:
     void placeboChanged();
 
 private:
+    ProcessLauncher processLauncher;
     Settings *settings = {};
     quint64 settingsGeneration = 0;
     bool rendererFilePending = false;

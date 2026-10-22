@@ -4,7 +4,7 @@
 
 **Blocked by:** 11: Open settings and change general session options.
 
-**Status:** resolved
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 50, 51, 52, 56, 75.
 

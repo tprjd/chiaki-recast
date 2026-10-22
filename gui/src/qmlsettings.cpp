@@ -57,10 +57,12 @@ static bool hwDecoderRuntimeAvailable(const QString &name)
     return true;
 }
 
-QmlSettings::QmlSettings(Settings *settings, QObject *parent)
+QmlSettings::QmlSettings(Settings *settings, QObject *parent, ProcessLauncher launcher)
     : QObject(parent)
+    , processLauncher(std::move(launcher))
     , settings(settings)
 {
+    if (!processLauncher) processLauncher = [](const QString &program, const QStringList &arguments) { return QProcess::startDetached(program, arguments); };
     if (settings->GetLogVerbose())
         QLoggingCategory::setFilterRules(QStringLiteral("chiaki.gui.debug=true"));
 
@@ -692,7 +694,7 @@ void QmlSettings::restartApplication()
 {
     const QString application = QCoreApplication::applicationFilePath();
     const QStringList arguments = QCoreApplication::arguments().mid(1);
-    if (!QProcess::startDetached(application, arguments))
+    if (!processLauncher(application, arguments))
     {
         qWarning() << "Failed to relaunch application for renderer backend switch";
         return;
