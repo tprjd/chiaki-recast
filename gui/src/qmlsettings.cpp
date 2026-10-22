@@ -2138,7 +2138,6 @@ QString QmlSettings::chooseSteamBasePath()
     QString fileName = QFileDialog::getExistingDirectory(QApplication::focusWidget(), tr("Choose Steam Base Path"),
                                                     QStandardPaths::writableLocation(QStandardPaths::DownloadLocation),
                                                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks | QFileDialog::DontUseNativeDialog);
-    printf("Chosen filename: %s", fileName.toUtf8().constData());
     return fileName;
 }
 

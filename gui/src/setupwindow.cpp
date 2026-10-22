@@ -208,6 +208,7 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
             signInWindow->start();
         }
     });
+    qApp->installEventFilter(this);
     setMinimumSize(320, 240);
     const auto geometry = backend->nativeSettings()->GetGeometry();
     if (geometry.isEmpty()) resize(1280, 720);
@@ -224,6 +225,8 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
     backend->setSetupNavigationTarget(webView);
     connect(page, &QWebEnginePage::loadStarted, this, [this] { setupBridge->invalidateControllerMapping(); });
     connect(page, &QWebEnginePage::renderProcessTerminated, this, [this] { setupBridge->invalidateControllerMapping(); });
+    connect(page, &QWebEnginePage::loadStarted, setupBridge, &SetupBridge::invalidateSteamShortcut);
+    connect(page, &QWebEnginePage::renderProcessTerminated, setupBridge, &SetupBridge::invalidateSteamShortcut);
     connect(page, &QWebEnginePage::loadStarted, setupBridge, &SetupBridge::invalidateKeyboardMouse);
     connect(page, &QWebEnginePage::renderProcessTerminated, setupBridge, &SetupBridge::invalidateKeyboardMouse);
     connect(page, &QWebEnginePage::recommendedStateChanged, this, [this, page](QWebEnginePage::LifecycleState state) {
@@ -240,6 +243,22 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
     page->setWebChannel(channel);
     webView->setContextMenuPolicy(Qt::NoContextMenu);
     webView->load(setupUrl);
+}
+
+bool SetupWindow::eventFilter(QObject *object, QEvent *event)
+{
+    if ((object == webView || object == webView->focusProxy()) && isVisible() && isActiveWindow()
+        && (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)) {
+        auto *key = static_cast<QKeyEvent *>(event);
+        const auto state = setupBridge->snapshot();
+        const auto reminder = state.value("reminder").toMap().value("id").toString();
+        if (key->key() == Qt::Key_Yes && !reminder.isEmpty()) {
+            if (event->type() == QEvent::KeyPress && !key->isAutoRepeat())
+                setupBridge->reminderAction(reminder, "later", state.value("profileGeneration").toString());
+            return true;
+        }
+    }
+    return QWidget::eventFilter(object, event);
 }
 
 void SetupWindow::suspend()
@@ -267,6 +286,7 @@ void SetupWindow::closeEvent(QCloseEvent *event)
 {
     setupBridge->invalidateControllerMapping();
     setupBridge->invalidateKeyboardMouse();
+    setupBridge->invalidateSteamShortcut();
     if (signInWindow) signInWindow->close();
     backend->nativeSettings()->SetGeometry(geometry());
     QWidget::closeEvent(event);
