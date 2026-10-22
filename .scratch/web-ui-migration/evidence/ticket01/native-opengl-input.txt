@@ -1,0 +1,98 @@
+********* Start testing of StreamInputNativeTest *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : StreamInputNativeTest::initTestCase()
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (API v360)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: Using amd graphics card
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] GPU information:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]     Limits:
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : StreamInputNativeTest::sessionAndFeedback() chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: StreamInputNativeTest::sessionAndFeedback() chiaki.gui: Current Profile:  ""
+QWARN  : StreamInputNativeTest::sessionAndFeedback() qrc:/Main.qml:504:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+QWARN  : StreamInputNativeTest::sessionAndFeedback() qrc:/Main.qml:474:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+QWARN  : StreamInputNativeTest::sessionAndFeedback() qrc:/Main.qml:444:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+PASS   : StreamInputNativeTest::sessionAndFeedback()
+PASS   : StreamInputNativeTest::keyboardCapture()
+PASS   : StreamInputNativeTest::cleanupTestCase()
+Totals: 4 passed, 0 failed, 0 skipped, 0 blacklisted, 1264ms
+********* Finished testing of StreamInputNativeTest *********

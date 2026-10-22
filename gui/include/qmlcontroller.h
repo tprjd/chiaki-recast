@@ -1,6 +1,7 @@
 #pragma once
 
 #include "controllermanager.h"
+#include <QPointer>
 
 class QTimer;
 
@@ -23,13 +24,14 @@ public:
     bool isDualSenseEdge() const;
     bool isPS() const;
     void setEscapeShortcut(uint32_t shortcut) { escape_shortcut = shortcut; };
+    void setTarget(QObject *target);
     QString GetGUID() const;
     QString GetVIDPID() const;
 
 private:
     void sendKey(Qt::Key key, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
 
-    QObject *target = {};
+    QPointer<QObject> target;
     uint32_t escape_shortcut = 0;
     uint32_t old_buttons = 0;
     Controller *controller = {};

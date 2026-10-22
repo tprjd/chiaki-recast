@@ -33,6 +33,7 @@
 #include <QDesktopServices>
 #include <QtConcurrent>
 #include <memory>
+#include <utility>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -139,11 +140,10 @@ void QmlRegist::regist_cb(ChiakiRegistEvent *event, void *user)
     }
 }
 
-QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
-    : QObject(window)
+QmlBackend::QmlBackend(Settings *settings, QObject *parent)
+    : QObject(parent)
     , settings(settings)
     , settings_qml(new QmlSettings(settings, this))
-    , window(window)
 {
     qt_msg_handler = qInstallMessageHandler(msg_handler);
 
@@ -153,13 +153,15 @@ QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
     qmlRegisterUncreatableType<QmlSettings>(uri, 1, 0, "ChiakiSettings", {});
     qmlRegisterUncreatableType<StreamSession>(uri, 1, 0, "ChiakiSession", {});
 
-    QObject *frame_obj = new QObject();
-    frame_thread = new QThread(frame_obj);
+    frame_worker = new QObject();
+    frame_thread = new QThread(this);
     frame_thread->setObjectName("frame");
     frame_thread->start();
-    frame_obj->moveToThread(frame_thread);
+    frame_worker->moveToThread(frame_thread);
+    connect(frame_thread, &QThread::finished, frame_worker, &QObject::deleteLater);
 
     PsnConnectionWorker *worker = new PsnConnectionWorker;
+    psn_connection_worker = worker;
     worker->moveToThread(&psn_connection_thread);
     connect(&psn_connection_thread, &QThread::finished, worker, &QObject::deleteLater);
     connect(this, &QmlBackend::psnConnect, worker, &PsnConnectionWorker::ConnectPsnConnection);
@@ -184,8 +186,6 @@ QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
 
     setConnectState(PsnConnectState::NotStarted);
     connect(settings_qml, &QmlSettings::audioVolumeChanged, this, &QmlBackend::updateAudioVolume);
-    connect(settings_qml, &QmlSettings::placeboChanged, window, &QmlMainWindow::updatePlacebo);
-    connect(settings_qml, &QmlSettings::vSyncEnabledChanged, window, &QmlMainWindow::updateVSync);
     connect(settings_qml, &QmlSettings::streamMenuEnabledChanged, this, &QmlBackend::updateStreamShortcut);
     connect(settings_qml, &QmlSettings::streamMenuShortcut1Changed, this, &QmlBackend::updateStreamShortcut);
     connect(settings_qml, &QmlSettings::streamMenuShortcut2Changed, this, &QmlBackend::updateStreamShortcut);
@@ -203,21 +203,15 @@ QmlBackend::QmlBackend(Settings *settings, QmlMainWindow *window)
         }
         emit connectionAttemptChanged();
     });
-    connect(window, &QmlMainWindow::hasVideoChanged, this, [this] {
-        if (session && session->IsConnected() && this->window->hasVideo() && !connection_cancelled && !connection_dismissed
-                && connection_profile_generation == profile_generation
-                && (connection_attempt.value("phase") == "connecting" || connection_attempt.value("phase") == "video"))
-            setConnectionPhase(QStringLiteral("ready"));
-    });
     connect(&discovery_manager, &DiscoveryManager::HostsUpdated, this, &QmlBackend::updateDiscoveryHosts);
     discovery_manager.SetSettings(settings);
     setDiscoveryEnabled(true);
     connect(ControllerManager::GetInstance(), &ControllerManager::AvailableControllersUpdated, this, &QmlBackend::updateControllers);
     connect(settings_qml, &QmlSettings::allowJoystickBackgroundEventsChanged, this, &QmlBackend::setAllowJoystickBackgroundEvents);
-    connect(window, &QmlMainWindow::activeChanged, this, &QmlBackend::setIsAppActive);
+    connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, &QmlBackend::setIsAppActive);
+    connect(qGuiApp, &QGuiApplication::focusWindowChanged, this, &QmlBackend::setIsAppActive);
     setAllowJoystickBackgroundEvents();
     setIsAppActive();
-    ControllerManager::GetInstance()->SetIsAppActive(window->isActive());
     updateControllers();
     updateControllerMappings();
     connect(settings, &Settings::ControllerMappingsUpdated, this, &QmlBackend::updateControllerMappings);
@@ -316,25 +310,89 @@ bool QmlBackend::prepareFrameForPresentation(ChiakiFfmpegFrame &frame, bool use_
 QmlBackend::~QmlBackend()
 {
     psn_hosts_future.waitForFinished();
-    if (session && psn_worker_pending)
-        session->CancelPsnConnection(true);
-    if(session)
-    {
-        chiaki_log_mutex.lock();
-        chiaki_log_ctx = nullptr;
-        chiaki_log_mutex.unlock();
-        session->deleteLater();
-        session = nullptr;
-    }
+    releaseSession();
+    qInstallMessageHandler(qt_msg_handler);
 #ifdef CHIAKI_HAVE_WEBENGINE
     if(request_interceptor)
         request_interceptor->deleteLater();
 #endif
     frame_thread->quit();
     frame_thread->wait();
-    frame_thread->parent()->deleteLater();
     psn_connection_thread.quit();
     psn_connection_thread.wait();
+}
+
+void QmlBackend::releaseSession()
+{
+    if (!session)
+        return;
+    if (window) {
+        window->releaseGameplayCapture();
+        window->session = nullptr;
+    }
+    auto *old_session = std::exchange(session, nullptr);
+    {
+        QMutexLocker locker(&chiaki_log_mutex);
+        chiaki_log_ctx = nullptr;
+    }
+    disconnect(old_session, nullptr, this, nullptr);
+    disconnect(old_session, nullptr, frame_worker, nullptr);
+    old_session->Stop();
+    if (psn_worker_pending) {
+        old_session->CancelPsnConnection(true);
+        QMetaObject::invokeMethod(psn_connection_worker, [] {}, Qt::BlockingQueuedConnection);
+        psn_worker_pending = false;
+    }
+    QMetaObject::invokeMethod(frame_worker, [] {}, Qt::BlockingQueuedConnection);
+    // Destroy posted frame callbacks before the window releases its GPU.
+    delete frame_delivery;
+    frame_delivery = nullptr;
+    delete old_session;
+    session_info.hw_device_ctx = nullptr;
+}
+
+void QmlBackend::attachWindow(QmlMainWindow *native_window)
+{
+    Q_ASSERT(native_window && !window && !session);
+    window = native_window;
+    window->setSettings(settings);
+    window_connections.append(connect(settings_qml, &QmlSettings::placeboChanged, window, &QmlMainWindow::updatePlacebo));
+    window_connections.append(connect(settings_qml, &QmlSettings::vSyncEnabledChanged, window, &QmlMainWindow::updateVSync));
+    window_connections.append(connect(window, &QmlMainWindow::hasVideoChanged, this, [this] {
+        if (session && window && session->IsConnected() && window->hasVideo() && !connection_cancelled && !connection_dismissed
+                && connection_profile_generation == profile_generation
+                && (connection_attempt.value("phase") == "connecting" || connection_attempt.value("phase") == "video"))
+            setConnectionPhase(QStringLiteral("ready"));
+    }));
+    for (auto *controller : std::as_const(controllers))
+        controller->setTarget(window);
+    emit windowChanged();
+}
+
+void QmlBackend::detachWindow(QmlMainWindow *native_window)
+{
+    if (window != native_window)
+        return;
+    const bool had_session = session != nullptr;
+    releaseSession();
+    if (had_session) {
+        connection_attempt["cleanupPending"] = false;
+        connection_attempt["phase"] = "cancelled";
+        connection_cancelled = true;
+        session_pin_request.clear();
+        emit sessionPinRequestChanged();
+        emit sessionChanged(nullptr);
+        emit connectionAttemptChanged();
+        sleep_inhibit->release();
+        setDiscoveryEnabled(true);
+    }
+    for (const auto &connection : std::as_const(window_connections))
+        disconnect(connection);
+    window_connections.clear();
+    for (auto *controller : std::as_const(controllers))
+        controller->setTarget(nullptr);
+    window = nullptr;
+    emit windowChanged();
 }
 
 QmlMainWindow *QmlBackend::qmlWindow() const
@@ -498,7 +556,7 @@ void QmlBackend::profileChanged()
     session_pin_request.clear();
     emit sessionPinRequestChanged();
     QString profile = settings->GetCurrentProfile();
-    Settings *settings_copy = new Settings(profile);
+    Settings *settings_copy = new Settings(profile, this);
     if(settings_allocd)
         settings->deleteLater();
     settings_allocd = true;
@@ -512,7 +570,8 @@ void QmlBackend::profileChanged()
     connect(settings, &Settings::ControllerMappingsUpdated, this, &QmlBackend::updateControllerMappings);
     settings_qml->setSettings(settings);
     discovery_manager.SetSettings(settings);
-    window->setSettings(settings);
+    if (window)
+        window->setSettings(settings);
     setDiscoveryEnabled(true);
 
     auto_connect_mac = settings->GetAutoConnectHost().GetServerMAC();
@@ -614,7 +673,7 @@ void QmlBackend::setConnectState(PsnConnectState connect_state)
         if (!phase.isEmpty()) connection_attempt["phase"] = phase;
         emit connectionAttemptChanged();
     }
-    if(connect_state == PsnConnectState::ConnectFailed)
+    if(window && connect_state == PsnConnectState::ConnectFailed)
     {
         if(!this->settings->GetGeometry().isEmpty())
         {
@@ -771,9 +830,7 @@ void QmlBackend::finishPsnCleanup()
     chiaki_log_mutex.lock();
     chiaki_log_ctx = nullptr;
     chiaki_log_mutex.unlock();
-    if (session)
-        session->deleteLater();
-    session = nullptr;
+    releaseSession();
     psn_session_started = false;
     connection_attempt["cleanupPending"] = false;
     if (connection_cancelled)
@@ -1132,6 +1189,14 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
         failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
         return;
     }
+    if (!window && !connect_info.auto_regist) {
+        failConnection(tr("Stream window is unavailable"), tr("Prepare the native stream window before connecting."));
+        return;
+    }
+    if (!window) {
+        session_info.hw_decoder.clear();
+        session_info.hw_device_ctx = nullptr;
+    }
     connection_attempt["cleanupPending"] = true;
     psn_session_started = false;
     disable_zero_copy = !settings->GetUseZeroCopy();
@@ -1299,7 +1364,11 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
     const QPointer<StreamSession> owned_session(session);
     const auto attempt_id = connection_generation;
 
-    connect(session, &StreamSession::FfmpegFrameAvailable, frame_thread->parent(), [this, use_opengl_renderer, owned_session, attempt_id]() {
+    if (!frame_delivery)
+        frame_delivery = new QObject(this);
+    auto *delivery = frame_delivery;
+    const QPointer<QmlMainWindow> render_window(window);
+    connect(session, &StreamSession::FfmpegFrameAvailable, frame_worker, [this, use_opengl_renderer, owned_session, attempt_id, delivery, render_window]() {
         if (!owned_session)
             return;
         ChiakiFfmpegDecoder *decoder = owned_session->GetFfmpegDecoder();
@@ -1324,13 +1393,18 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
             frame.recovered = true;
         }
 
-        QMetaObject::invokeMethod(window, [this, owned_session, attempt_id, frame, frames_lost]() mutable {
-            if (owned_session && session == owned_session && connection_generation == attempt_id && !connection_cancelled
+        auto queued_frame = std::unique_ptr<AVFrame, void (*)(AVFrame *)>(frame.frame, [](AVFrame *value) {
+            av_frame_free(&value);
+        });
+        QMetaObject::invokeMethod(delivery, [this, owned_session, attempt_id, frame,
+                queued_frame = std::move(queued_frame), frames_lost, render_window]() mutable {
+            if (render_window && window == render_window && owned_session && session == owned_session
+                    && connection_generation == attempt_id && !connection_cancelled
                     && !connection_dismissed && connection_profile_generation == profile_generation
-                    && connection_attempt.value("phase") != "failure")
-                window->presentFrame(frame, frames_lost);
-            else
-                av_frame_free(&frame.frame);
+                    && connection_attempt.value("phase") != "failure") {
+                frame.frame = queued_frame.release();
+                render_window->presentFrame(frame, frames_lost);
+            }
         });
     });
 
@@ -1356,8 +1430,7 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
             logged_hw_transfer_failures.clear();
         }
 
-        session->deleteLater();
-        session = nullptr;
+        releaseSession();
         connection_attempt["cleanupPending"] = false;
         if (connection_cancelled)
             connection_attempt["phase"] = "cancelled";
@@ -1454,13 +1527,12 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
                 connection_attempt["waitingForWake"] = false;
             }
             connection_attempt["cancelable"] = true;
-            setConnectionPhase((session_info.audio_video_disabled & CHIAKI_VIDEO_DISABLED) || window->hasVideo()
+            setConnectionPhase((session_info.audio_video_disabled & CHIAKI_VIDEO_DISABLED) || (window && window->hasVideo())
                 ? QStringLiteral("ready") : QStringLiteral("video"));
             if (!session_info.duid.isEmpty())
                 emit sessionChanged(session);
         }
     });
-    QmlMainWindow *window_ptr = window;
     chiaki_log_mutex.lock();
     chiaki_log_ctx = session->GetChiakiLog();
     chiaki_log_mutex.unlock();
@@ -1484,8 +1556,7 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
                 chiaki_log_mutex.lock();
                 chiaki_log_ctx = nullptr;
                 chiaki_log_mutex.unlock();
-                session->deleteLater();
-                session = nullptr;
+                releaseSession();
                 failConnection(tr("Stream failed"), tr("Failed to start Stream Session: %1").arg(e.what()));
                 emit error(tr("Stream failed"), tr("Failed to start Stream Session: %1").arg(e.what()));
                 return;
@@ -1503,7 +1574,7 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
         psn_worker_pending = true;
         emit psnConnect(session, session_info.duid, chiaki_target_is_ps5(session_info.target), connection_generation);
     }
-    if (window->windowState() != Qt::WindowFullScreen)
+    if (window && window->windowState() != Qt::WindowFullScreen)
     {
         if(settings->GetWindowType() == WindowType::CustomResolution)
         {
@@ -1854,7 +1925,8 @@ void QmlBackend::connectToHost(int index, QString nickname)
 {
     if (session)
         return;
-    window->setWindowAdjustable(false);
+    if (window)
+        window->setWindowAdjustable(false);
     auto server = displayServerAt(index);
     if (!server.valid)
         return;
@@ -2079,10 +2151,7 @@ void QmlBackend::clearWakeWait()
     psn_auto_connect_timer->stop();
     auto_connect_mac = {};
     if (allocated && session) {
-        QMutexLocker locker(&chiaki_log_mutex);
-        chiaki_log_ctx = nullptr;
-        session->deleteLater();
-        session = nullptr;
+        releaseSession();
         connection_attempt["cleanupPending"] = false;
     }
     emit autoConnectChanged();
@@ -2239,7 +2308,7 @@ void QmlBackend::setAllowJoystickBackgroundEvents()
 
 void QmlBackend::setIsAppActive()
 {
-    ControllerManager::GetInstance()->SetIsAppActive(window->isActive());
+    ControllerManager::GetInstance()->SetIsAppActive(QGuiApplication::applicationState() == Qt::ApplicationActive);
 }
 
 uint32_t QmlBackend::getStreamShortcut() const
@@ -2751,8 +2820,7 @@ void QmlBackend::updateDiscoveryHosts()
                         QMutexLocker locker(&chiaki_log_mutex);
                         chiaki_log_ctx = nullptr;
                     }
-                    session->deleteLater();
-                    session = nullptr;
+                    releaseSession();
                     failConnection(tr("Stream failed"), tr("Failed to start Stream Session: %1").arg(e.what()));
                     break;
                 }

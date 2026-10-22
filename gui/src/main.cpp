@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) { return real_main(argc, argv); }
 #include <controllermanager.h>
 #include <discoverymanager.h>
 #include <qmlmainwindow.h>
+#include <qmlnativeservices.h>
 #include <QApplication>
 #include <QtTypes>
 
@@ -318,14 +319,16 @@ int real_main(int argc, char *argv[])
 
 int RunMain(QGuiApplication &app, Settings *settings, bool exit_app_on_stream_exit)
 {
-	QmlMainWindow main_window(settings, exit_app_on_stream_exit);
+	QmlNativeServices services(settings);
+	QmlMainWindow main_window(services.backend(), services.engine(), exit_app_on_stream_exit);
 	main_window.show();
 	return app.exec();
 }
 
 int RunStream(QGuiApplication &app, const StreamSessionConnectInfo &connect_info)
 {
-	QmlMainWindow main_window(connect_info);
+	QmlNativeServices services(connect_info.settings);
+	QmlMainWindow main_window(services.backend(), services.engine(), connect_info);
 	main_window.show();
 	return app.exec();
 }

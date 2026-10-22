@@ -82,7 +82,7 @@ class QmlBackend : public QObject
 {
     friend class StreamInputNativeTest;
     Q_OBJECT
-    Q_PROPERTY(QmlMainWindow* window READ qmlWindow CONSTANT)
+    Q_PROPERTY(QmlMainWindow* window READ qmlWindow NOTIFY windowChanged)
     Q_PROPERTY(QmlSettings* settings READ qmlSettings CONSTANT)
     Q_PROPERTY(StreamSession* session READ qmlSession NOTIFY sessionChanged)
     Q_PROPERTY(QVariantMap connectionAttempt READ connectionAttempt NOTIFY connectionAttemptChanged)
@@ -118,10 +118,13 @@ public:
         ConnectFailedConsoleUnreachable,
     };
     Q_ENUM(PsnConnectState);
-    QmlBackend(Settings *settings, QmlMainWindow *window);
+    explicit QmlBackend(Settings *settings, QObject *parent = nullptr);
     ~QmlBackend();
 
     QmlMainWindow *qmlWindow() const;
+    Settings *nativeSettings() const { return settings; }
+    void attachWindow(QmlMainWindow *window);
+    void detachWindow(QmlMainWindow *window);
     QmlSettings *qmlSettings() const;
     StreamSession *qmlSession() const;
     QList<QmlController*> qmlControllers() const;
@@ -233,6 +236,7 @@ public:
 #endif
 
 signals:
+    void windowChanged();
     void sessionChanged(StreamSession *session);
     void connectionAttemptChanged();
     void sessionPinRequestChanged();
@@ -293,6 +297,7 @@ private:
     void startPsnConnection(const StreamSessionConnectInfo &info, const QVariantMap &target, bool continue_attempt = false);
     void watchConnectionToken(PSNToken *token);
     void finishPsnCleanup();
+    void releaseSession();
     void failConnection(const QString &title, const QString &text);
     void setConnectionPhase(const QString &phase);
     void beginAutoConnect(const HostMAC &mac);
@@ -314,9 +319,13 @@ private:
 
     Settings *settings = {};
     QmlSettings *settings_qml = {};
-    QmlMainWindow *window = {};
+    QPointer<QmlMainWindow> window;
+    QList<QMetaObject::Connection> window_connections;
     StreamSession *session = {};
     QThread *frame_thread = {};
+    QObject *frame_worker = {};
+    QObject *frame_delivery = {};
+    PsnConnectionWorker *psn_connection_worker = {};
     QTimer *psn_reconnect_timer = {};
     QTimer *psn_auto_connect_timer = {};
     QTimer *wakeup_start_timer = {};

@@ -7,10 +7,11 @@ import org.streetpea.chiaking
 
 Item {
     id: root
+    required property var nativeWindow
     property string settingsPresentation: ""
     property bool initialAsk: false
     property var librarySelection: null
-    readonly property bool preferSeparateStreamSettingsWindows: Chiaki.window.runtimeRendererBackend === 1 && Chiaki.session
+    readonly property bool preferSeparateStreamSettingsWindows: root.nativeWindow.runtimeRendererBackend === 1 && Chiaki.session
     property bool useSeparateStreamSettingsWindows: false
     readonly property bool streamSettingsOpen: displaySettingsRect.opacity > 0 || placeboSettingsRect.opacity > 0 || colorMappingSettingsRect.opacity > 0 || keyboardMouseSettingsRect.opacity > 0
     Material.theme: Material.Dark
@@ -31,12 +32,12 @@ Item {
         return "image://svg/button-%1#%2".arg(type).arg(name);
     }
     function presentSettings(loader, role) {
-        settingsPresentation = Chiaki.window.streamInput.present(loader, role, loader);
+        settingsPresentation = root.nativeWindow.streamInput.present(loader, role, loader);
     }
     function dismissSettings() {
         const id = settingsPresentation;
-        Chiaki.window.streamInput.dismiss(id);
-        Chiaki.window.streamInput.settled(id);
+        root.nativeWindow.streamInput.dismiss(id);
+        root.nativeWindow.streamInput.settled(id);
         settingsPresentation = "";
     }
 
@@ -302,7 +303,7 @@ Item {
 
     Pane {
         anchors.fill: parent
-        visible: !Chiaki.window.hasVideo && !Chiaki.window.keepVideo
+        visible: !root.nativeWindow.hasVideo && !root.nativeWindow.keepVideo
     }
 
     StackView {
@@ -403,7 +404,7 @@ Item {
         id: separateKeyboardMouseSettingsWindow
         objectName: "keyboardMouseSettingsWindow"
         visible: useSeparateStreamSettingsWindows && keyboardMouseSettingsRect.opacity > 0
-        transientParent: Chiaki.window
+        transientParent: root.nativeWindow
         flags: Qt.Dialog | Qt.FramelessWindowHint
         color: Material.background
         modality: Qt.NonModal
@@ -425,7 +426,7 @@ Item {
     Window {
         id: separateDisplaySettingsWindow
         visible: useSeparateStreamSettingsWindows && displaySettingsRect.opacity > 0.0
-        transientParent: Chiaki.window
+        transientParent: root.nativeWindow
         flags: Qt.Dialog | Qt.FramelessWindowHint
         color: Material.background
         modality: Qt.NonModal
@@ -455,7 +456,7 @@ Item {
     Window {
         id: separatePlaceboSettingsWindow
         visible: useSeparateStreamSettingsWindows && placeboSettingsRect.opacity > 0.0
-        transientParent: Chiaki.window
+        transientParent: root.nativeWindow
         flags: Qt.Dialog | Qt.FramelessWindowHint
         color: Material.background
         modality: Qt.NonModal
@@ -485,7 +486,7 @@ Item {
     Window {
         id: separateColorMappingSettingsWindow
         visible: useSeparateStreamSettingsWindows && colorMappingSettingsRect.opacity > 0.0
-        transientParent: Chiaki.window
+        transientParent: root.nativeWindow
         flags: Qt.Dialog | Qt.FramelessWindowHint
         color: Material.background
         modality: Qt.NonModal

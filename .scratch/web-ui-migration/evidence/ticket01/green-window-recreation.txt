@@ -1,0 +1,15 @@
+Test project C:/Users/david/.codex/worktrees/web-ui-ticket-01/chiaki-ng-ui/build/native-services
+    Start 3: chiaki-native-services
+1/1 Test #3: chiaki-native-services ...........***Failed    1.20 sec
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+desktop    =   1.20 sec*proc (1 test)
+
+Total Test time (real) =   1.21 sec
+
+The following tests FAILED:
+	  3 - chiaki-native-services (Failed)                   desktop
+Errors while running CTest

@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QStyleHints>
 #include <QGuiApplication>
+#include <QWindow>
 
 static QVector<QPair<uint32_t, Qt::Key>> key_map = {
     { CHIAKI_CONTROLLER_BUTTON_DPAD_UP, Qt::Key_Up },
@@ -113,8 +114,18 @@ QString QmlController::GetVIDPID() const
     return controller->GetVIDPIDString();
 }
 
+void QmlController::setTarget(QObject *new_target)
+{
+    repeat_timer->stop();
+    target = new_target;
+}
+
 void QmlController::sendKey(Qt::Key key, Qt::KeyboardModifiers modifiers)
 {
+    auto *native_window = qobject_cast<QWindow *>(target.data());
+    QObject *receiver = native_window && native_window->isVisible() ? native_window : QGuiApplication::focusWindow();
+    if (!receiver)
+        return;
     // SDL2-compat/SDL3 on macOS can expose a single physical controller as
     // two devices, creating two QmlController instances that both fire for
     // the same button press. Deduplicate by VID:PID + key as a workaround
@@ -131,6 +142,6 @@ void QmlController::sendKey(Qt::Key key, Qt::KeyboardModifiers modifiers)
 
     QKeyEvent press(QEvent::KeyPress, key, modifiers);
     QKeyEvent release(QEvent::KeyRelease, key, Qt::NoModifier);
-    QGuiApplication::sendEvent(target, &press);
-    QGuiApplication::sendEvent(target, &release);
+    QGuiApplication::sendEvent(receiver, &press);
+    QGuiApplication::sendEvent(receiver, &release);
 }
