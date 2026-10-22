@@ -23,3 +23,19 @@
 - [ ] Exercise the first connection and a subsequent connection with recreated resources. Verify release of windows, callbacks, threads, GPU resources, held input, and browser helpers as appropriate to their lifetime. Target cancellation, failure, and late completion at native boundaries. Extend loops only for growing counters, uncertain cleanup, or a known race.
 - [ ] Complete the remaining live playback, launch behavior, and live-frame cleanup acceptance from [01](01-application-owned-native-services.md). Reuse applicable [04](04-local-native-stream-handoff.md) evidence. The native service loopback checks do not establish live console playback or safe teardown with real decoded frames.
 - [ ] Measure input latency externally when equipment is available. Report unavailable measurements and unsupported combinations explicitly instead of treating them as passed.
+
+## Comments
+
+### Ticket 02 acceptance limits
+
+[02](02-native-stream-only-interface.md) preserves the native media and device
+pipelines in source. Its checked pipeline criterion does not establish live
+or hardware acceptance. The [recorded checks](../evidence/ticket02/verification.md)
+use loopback sessions without live decoded frames.
+
+Retain real-console playback, live-frame cleanup, microphone, physical
+controller, touch, haptics, HDR output, external latency when available, and
+matched performance acceptance. The combined accelerated WebEngine and native
+renderer checks remain required in [03](03-accelerated-web-console-library.md)
+and [04](04-local-native-stream-handoff.md). Reuse valid focused native evidence
+without treating these unverified combinations as passed.

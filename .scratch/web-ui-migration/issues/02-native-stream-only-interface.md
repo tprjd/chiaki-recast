@@ -18,6 +18,25 @@
 - [x] The direct stream command preserves its profile, fullscreen, zoom, stretch, and exit behavior without creating a WebEngine setup page.
 - [x] Existing native stream QML and input tests exercise the extracted production root and its observable behavior.
 
+## Comments
+
+### Integration review, 2026-10-22
+
+The checked criteria describe the delivered native code and focused production
+checks. Source inspection confirms that the media and device pipelines did not
+change. It does not establish hardware acceptance. The direct-stream profile,
+fullscreen, zoom, and stretch paths remain in native code. Recorded controlled
+checks cover saved geometry, profile state, and direct-stream exit.
+
+Ticket [04](04-local-native-stream-handoff.md) owns the real-console handoff,
+decoded-media playback, and cleanup before window destruction and setup return.
+Ticket [23](23-complete-web-only-acceptance.md) retains live baseline and
+performance comparisons, HDR output, microphone, physical controller, touch,
+haptics, latency, and package acceptance. Accelerated WebEngine and native
+coexistence remains required in tickets
+[03](03-accelerated-web-console-library.md) and
+[04](04-local-native-stream-handoff.md). These acceptance checks remain unverified.
+
 ## Answer
 
 The native stream root is extracted and its production window checks pass.
@@ -35,3 +54,14 @@ the Windows hidden-startup test correction. The pipeline checkbox records
 unchanged production paths. It does not claim physical media or input acceptance.
 Live console, native/browser GPU coexistence, HDR, latency, performance, and
 package acceptance remain with tickets 03, 04, and 23.
+
+Integration merge `d893e46ff525fd06d50037c99b3acbd303cf1a6b` merged ticket branch
+`d5826be0`, including source and evidence commit `15bc0f9c`, without conflicts.
+The merged `gui` tree equals the ticket tree. No build or test was repeated.
+The final OpenGL and Vulkan root logs each report 3 passed, 0 failed, and
+0 skipped. The input logs report 5 passed on OpenGL and 4 passed on Vulkan,
+with no failures or skips. The earlier mixed Vulkan run supplies only its
+passing `windowRecreation` case, not a passing full run.
+
+The source-only whitespace check passes. The full-range check reports trailing
+spaces in verbatim tool logs. Those raw logs remain unchanged.

@@ -39,7 +39,8 @@ events control completion. These checks do not establish live console playback.
 
 The worktree first merged integration `96a34500`. Ticket 01 ownership is
 present: application-owned `QmlNativeServices`, shared engine, explicit native
-window attachment, and producer cleanup before window teardown.
+window attachment, and the recorded controlled cleanup checks. Live-frame
+teardown order remains an acceptance requirement in tickets 04 and 23.
 
 ## Red and green results
 
@@ -79,8 +80,9 @@ ownership module, including duplicate opens and obsolete completion.
 `chiaki`, `chiaki-native-services-tests`, and
 `chiaki-stream-input-native-tests` build successfully. Build records are
 `green-build.txt`, `green-geometry-build.txt`, `green-fallback-build.txt`, and
-`pin-check-build.txt`. `git diff --check` passes. Existing FFmpeg deprecation
-warnings and QML Shortcut warnings remain. No complete test suite or stress
+`pin-check-build.txt`. The source-only `git diff --check` passes.
+Existing FFmpeg deprecation warnings and QML Shortcut warnings remain.
+No complete test suite or stress
 loop ran.
 
 ## Failed harness observations
@@ -141,3 +143,16 @@ HDR output, external latency measurement, suspend/resume, or release package
 was checked. No accelerated WebEngine/native coexistence or matched live
 performance comparison ran in this ticket. Native Vulkan format logs do not
 prove HDR output. Tickets 03, 04, and 23 retain those acceptance checks.
+
+## Integration review
+
+Merge `d893e46ff525fd06d50037c99b3acbd303cf1a6b` integrates ticket branch
+`d5826be0` without conflicts. The merged `gui` tree equals the tested branch.
+No build or test was repeated during merge. The source-only command
+`git diff --check 9fbc05a2 d5826be0 -- gui` returns 0.
+
+The full-range whitespace check reports trailing spaces in `configure.txt`,
+`green-build.txt`, and native root diagnostic logs. The original check applied
+to the uncommitted source before these logs were added. Raw logs are retained
+without whitespace edits. The failed harness observations above remain failed
+evidence, except for the separately identified passing window recreation case.

@@ -24,13 +24,16 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [01: Application-owned native services](issues/01-application-owned-native-services.md): resolved for the native ownership milestone. Required graphics, live playback, cleanup, and performance acceptance remains assigned to tickets 03, 04, and 23.
 - [02: Native stream-only interface](issues/02-native-stream-only-interface.md): resolved for the native stream-root milestone. OpenGL and Vulkan production root/input checks pass. Live media and combined graphics acceptance remains with tickets 03, 04, and 23.
 - [03: Accelerated web console library](issues/03-accelerated-web-console-library.md): claimed. The required combined graphics check from ticket 01 remains pending.
-- Tickets 04 through 23: waiting for their declared blockers.
+- [04: Local native stream handoff](issues/04-local-native-stream-handoff.md): waiting for ticket 03. Ticket 02 is resolved.
+- Tickets 05 through 23: waiting for their declared blockers.
 
 ## Integration history
 
 - d0e2f052: preserved current source and approved planning baseline.
 - 42bffb7d: recorded the Linux WebEngine build baseline and graphics limits.
 - 2ac4e5dc: merged ticket 01 commit 8f1bacb4 without conflicts. The merged native source matches the tested ticket tree. Reused the recorded passing checks without a build or test rerun.
+- 9fbc05a2: recorded the compatible Windows native and WebEngine build baseline. Build availability does not establish accelerated coexistence.
+- d893e46f: merged ticket 02 branch d5826be0 and source/evidence commit 15bc0f9c without conflicts. The merged native source matches the tested ticket tree. Reused the recorded passing checks without a build or test rerun.
 
 ## Decisions
 
