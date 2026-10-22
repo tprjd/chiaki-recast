@@ -1,0 +1,4 @@
+PURE device NVIDIA Corporation | NVIDIA GeForce RTX 5090/PCIe/SSE2 | 4.6.0 NVIDIA 617.42
+PURE native center 254 0 0 255
+PURE native center 253 0 0 255
+PURE no_compute=1 known_red=1

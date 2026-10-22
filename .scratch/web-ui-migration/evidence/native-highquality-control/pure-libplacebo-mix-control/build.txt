@@ -1,0 +1,31 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+-- The CXX compiler identification is Clang 19.1.7 with MSVC-like command-line
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Users/david/.cache/chiaki-msvc-native/llvm19/bin/clang-cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Found WrapVulkanHeaders: C:/VulkanSDK/1.4.357.0/Include
+-- Configuring done (2.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/pure-libplacebo-mix-control/build
+[1/2] Building CXX object CMakeFiles\chiaki-libplacebo-mix-control.dir\main.cpp.obj
+In file included from C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\pure-libplacebo-mix-control\main.cpp:15:
+C:\Users\david\.cache\chiaki-msvc-native\libplacebo-prefix\include\libplacebo/utils/libav.h(29,3): warning: Remember to include this file with a PL_LIBAV_IMPLEMENTATION set to 1 in           C translation unit to provide implementation. Suppress this warning by           defining PL_LIBAV_IMPLEMENTATION to 0 in C++ files. [-W#warnings]
+   29 | # warning Remember to include this file with a PL_LIBAV_IMPLEMENTATION set to 1 in \
+      |   ^
+1 warning generated.
+[2/2] Linking CXX executable chiaki-libplacebo-mix-control.exe

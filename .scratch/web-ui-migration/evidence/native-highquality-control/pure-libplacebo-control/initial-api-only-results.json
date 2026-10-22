@@ -1,0 +1,12 @@
+[
+  {
+    "mode": "compute-control",
+    "exitCode": 0,
+    "diagnosticOnly": true
+  },
+  {
+    "mode": "no-compute",
+    "exitCode": 0,
+    "diagnosticOnly": true
+  }
+]

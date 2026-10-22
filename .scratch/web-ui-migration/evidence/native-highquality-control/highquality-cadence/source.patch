@@ -1,0 +1,199 @@
+diff --git a/gui/src/qmlmainwindow.cpp b/gui/src/qmlmainwindow.cpp
+index 43c05688..7dab20aa 100644
+--- a/gui/src/qmlmainwindow.cpp
++++ b/gui/src/qmlmainwindow.cpp
+@@ -1620,6 +1620,7 @@ void QmlMainWindow::init(Settings *settings, bool exit_app_on_stream_exit)
+             .proc_ctx = qt_gl_context,
+             .debug = false,
+             .allow_software = true,
++            .no_compute = qEnvironmentVariableIsSet("CHIAKI_GL_NO_COMPUTE_DIAGNOSTIC"),
+             .make_current = [](void *priv) -> bool {
+                 auto q = static_cast<QmlMainWindow *>(priv);
+                 return q->makeOpenGLContextCurrent();
+@@ -2142,6 +2143,107 @@ void QmlMainWindow::createSwapchain()
+         struct pl_opengl_swapchain_params sw_params = {
+             .swap_buffers = [](void *priv) {
+                 auto q = static_cast<QmlMainWindow *>(priv);
++                static int diagnosticSamples = 0;
++                static QElapsedTimer diagnosticTimer;
++                static bool lateSample = false;
++                if (qEnvironmentVariableIsSet("CHIAKI_GL_DIAGNOSTIC") && q->has_video) {
++                    if (!diagnosticTimer.isValid()) diagnosticTimer.start();
++                    const auto elapsed = diagnosticTimer.elapsed();
++                    ++diagnosticSamples;
++                    const bool record = diagnosticSamples <= 24 || (!lateSample && elapsed >= 750);
++                    if (!record) {
++                        if (q->qt_gl_context) q->qt_gl_context->swapBuffers(q);
++                        return;
++                    }
++                    if (elapsed >= 750) lateSample = true;
++                    auto *context = QOpenGLContext::currentContext();
++                    if (context) {
++                        auto *gl = context->extraFunctions();
++                        const auto errorBefore = gl->glGetError();
++                        GLint drawFbo = -1, readFbo = -1, readBuffer = -1, drawBuffer = -1;
++                        GLboolean doubleBuffered = false, colorMask[4] = {};
++                        gl->glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFbo);
++                        gl->glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFbo);
++                        gl->glGetIntegerv(GL_READ_BUFFER, &readBuffer);
++                        gl->glGetIntegerv(GL_DRAW_BUFFER, &drawBuffer);
++                        gl->glGetBooleanv(GL_DOUBLEBUFFER, &doubleBuffered);
++                        gl->glGetBooleanv(GL_COLOR_WRITEMASK, colorMask);
++                        const bool stencil = gl->glIsEnabled(GL_STENCIL_TEST);
++                        const bool blend = gl->glIsEnabled(GL_BLEND);
++                        const bool scissor = gl->glIsEnabled(GL_SCISSOR_TEST);
++                        const int width = qRound(q->width() * q->devicePixelRatio());
++                        const int height = qRound(q->height() * q->devicePixelRatio());
++                        unsigned char center[4] = {}, overlay[4] = {};
++                        gl->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
++                        gl->glReadBuffer(GL_BACK);
++                        gl->glReadPixels(width / 2, height / 2, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, center);
++                        gl->glReadPixels(width / 2 - qRound(100 * q->devicePixelRatio()),
++                            qRound(40 * q->devicePixelRatio()), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, overlay);
++                        const auto errorRead = gl->glGetError();
++                        gl->glBindFramebuffer(GL_READ_FRAMEBUFFER, readFbo);
++                        gl->glReadBuffer(readBuffer);
++                        const auto errorRestore = gl->glGetError();
++                        qInfo() << "TEMP GL_BACK" << diagnosticSamples << "elapsed ms" << elapsed << "context matches" << (context == q->qt_gl_context)
++                            << "surface matches" << (context->surface() == q) << "exposed" << q->isExposed()
++                            << "double" << doubleBuffered << "size" << width << height
++                            << "FBO draw/read" << drawFbo << readFbo << "buffer draw/read" << drawBuffer << readBuffer
++                            << "RGBA mask" << colorMask[0] << colorMask[1] << colorMask[2] << colorMask[3]
++                            << "stencil/blend/scissor" << stencil << blend << scissor
++                            << "center RGBA" << QByteArray(reinterpret_cast<const char *>(center), 4).toHex()
++                            << "overlay RGBA" << QByteArray(reinterpret_cast<const char *>(overlay), 4).toHex()
++                            << "GL errors before/read/restore" << errorBefore << errorRead << errorRestore;
++                        qInfo() << "TEMP mix" << q->frame_mix.num_frames << "first mapped planes"
++                            << (q->frame_mix.num_frames ? q->frame_mix.frames[0]->num_planes : 0)
++                            << "signature" << (q->frame_mix.num_frames ? q->frame_mix.signatures[0] : 0);
++                        if (diagnosticSamples == 1 && q->frame_mix.num_frames) {
++                            const auto *mapped = q->frame_mix.frames[0];
++                            qInfo() << "TEMP mapped crop" << mapped->crop.x0 << mapped->crop.y0 << mapped->crop.x1 << mapped->crop.y1
++                                << "repr system/levels/alpha" << mapped->repr.sys << mapped->repr.levels << mapped->repr.alpha
++                                << "color primaries/transfer" << mapped->color.primaries << mapped->color.transfer
++                                << "mix timestamp" << q->frame_mix.timestamps[0];
++                            for (int i = 0; i < mapped->num_planes; ++i) {
++                                const auto &plane = mapped->planes[i];
++                                qInfo() << "TEMP mapped plane" << i << "size" << plane.texture->params.w << plane.texture->params.h
++                                    << "components" << plane.components << "mapping" << plane.component_mapping[0]
++                                    << plane.component_mapping[1] << plane.component_mapping[2] << plane.component_mapping[3];
++                            }
++                        }
++                        if (elapsed >= 750 && q->frame_mix.num_frames) {
++                            using ReadTexture = void (*)(GLuint, GLint, GLint, GLint, GLint, GLsizei, GLsizei, GLsizei,
++                                GLenum, GLenum, GLsizei, void *);
++                            const auto readTexture = reinterpret_cast<ReadTexture>(context->getProcAddress("glGetTextureSubImage"));
++                            qInfo() << "TEMP texture DSA resolved" << bool(readTexture);
++                            if (readTexture) {
++                                GLint packBuffer = 0, packValues[6] = {};
++                                const GLenum packNames[] = {GL_PACK_ALIGNMENT, GL_PACK_ROW_LENGTH, GL_PACK_IMAGE_HEIGHT,
++                                    GL_PACK_SKIP_PIXELS, GL_PACK_SKIP_ROWS, GL_PACK_SKIP_IMAGES};
++                                gl->glGetIntegerv(GL_PIXEL_PACK_BUFFER_BINDING, &packBuffer);
++                                for (int i = 0; i < 6; ++i) {
++                                    gl->glGetIntegerv(packNames[i], &packValues[i]);
++                                    gl->glPixelStorei(packNames[i], i == 0 ? 1 : 0);
++                                }
++                                gl->glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
++                                const auto sampleTexture = [&](pl_tex texture, int plane) {
++                                    unsigned target = 0;
++                                    int format = 0;
++                                    const auto id = pl_opengl_unwrap(q->placeboGpu(), texture, &target, &format, nullptr);
++                                    unsigned char rgba[4] = {};
++                                    if (id) readTexture(id, 0, texture->params.w / 2, texture->params.h / 2, 0,
++                                        1, 1, 1, plane < 0 ? GL_RGBA : GL_RED, GL_UNSIGNED_BYTE, plane < 0 ? 4 : 1, rgba);
++                                    qInfo() << "TEMP texture sample plane" << plane << "id/target/format" << id << target << format
++                                        << "RGBA" << QByteArray(reinterpret_cast<const char *>(rgba), plane < 0 ? 4 : 1).toHex()
++                                        << "GL error" << gl->glGetError();
++                                };
++                                const auto *mapped = q->frame_mix.frames[0];
++                                for (int i = 0; i < mapped->num_planes; ++i) sampleTexture(mapped->planes[i].texture, i);
++                                sampleTexture(q->quick_tex, -1);
++                                for (int i = 0; i < 6; ++i) gl->glPixelStorei(packNames[i], packValues[i]);
++                                gl->glBindBuffer(GL_PIXEL_PACK_BUFFER, packBuffer);
++                                qInfo() << "TEMP texture pack state restored GL error" << gl->glGetError();
++                            }
++                        }
++                    }
++                }
+                 if (q->qt_gl_context)
+                     q->qt_gl_context->swapBuffers(q);
+             },
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 346420e8..3cdff08d 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -93,6 +93,63 @@ class EmbeddedSetupTest : public QObject
+     }
+ 
+ private slots:
++    void highQualityBufferDiagnostic()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto removeSettings = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        settings.SetRemotePlayAsk(false);
++        settings.SetAddSteamShortcutAsk(false);
++        settings.SetPlaceboPreset(PlaceboPreset::HighQuality);
++        settings.SetRenderBackend(RenderBackend::OpenGL);
++        settings.SetStreamGeometry(QRect(80, 80, 960, 640));
++        QmlNativeServices services(&settings);
++        auto *backend = services.backend();
++        backend->stopAutoConnect();
++        backend->setDiscoveryEnabled(false);
++        QmlMainWindow native(backend, services.engine());
++        native.setFlag(Qt::WindowDoesNotAcceptFocus);
++        QCOMPARE(native.videoPreset(), QmlMainWindow::VideoPreset::HighQuality);
++        native.show();
++        QTRY_VERIFY(native.isExposed());
++        AVFrame *frame = av_frame_alloc();
++        QVERIFY(frame);
++        frame->format = AV_PIX_FMT_YUV420P;
++        frame->width = 320;
++        frame->height = 180;
++        frame->colorspace = AVCOL_SPC_SMPTE170M;
++        frame->color_range = AVCOL_RANGE_MPEG;
++        QVERIFY(av_frame_get_buffer(frame, 32) >= 0);
++        for (int plane = 0; plane < 3; ++plane)
++            for (int y = 0; y < (plane ? 90 : 180); ++y)
++                memset(frame->data[plane] + y * frame->linesize[plane], plane == 0 ? 81 : plane == 1 ? 90 : 240, plane ? 160 : 320);
++        AVFrame *seed = av_frame_clone(frame);
++        QVERIFY(seed);
++        const auto releaseSeed = qScopeGuard([&] { av_frame_free(&seed); });
++        QElapsedTimer cadence;
++        cadence.start();
++        QTimer input;
++        int submitted = 1;
++        connect(&input, &QTimer::timeout, &native, [&] {
++            AVFrame *next = av_frame_clone(seed);
++            if (!next) return;
++            native.presentFrame({next, cadence.elapsed() / 1000.0, 1.0 / 60.0, false}, 0);
++            ++submitted;
++        });
++        native.presentFrame({frame, 0.0, 1.0 / 60.0, false}, 0);
++        input.start(16);
++        QTRY_VERIFY(native.hasVideo());
++        emit backend->error("GPU coexistence", "Native overlay rendered");
++        QTest::qWait(1250);
++        input.stop();
++        qInfo() << "TEMP realistic cadence submitted" << submitted << "elapsed ms" << cadence.elapsed();
++        QFAIL("Temporary HighQuality native-buffer diagnostic only; no desktop or acceptance result");
++    }
++
+     void graphicsCoexistence()
+     {
+ #ifdef Q_OS_WIN
+@@ -372,8 +429,8 @@ int main(int argc, char **argv)
+     QtWebEngineQuick::initialize();
+ #endif
+     QApplication app(argc, argv);
+-    QCoreApplication::setOrganizationName("Chiaki embedded setup tests");
+-    QCoreApplication::setApplicationName("Chiaki embedded setup tests");
++    QCoreApplication::setOrganizationName("Chiaki native buffer diagnostic");
++    QCoreApplication::setApplicationName("Chiaki native buffer diagnostic");
+     EmbeddedSetupTest test;
+     return QTest::qExec(&test, argc, argv);
+ }
