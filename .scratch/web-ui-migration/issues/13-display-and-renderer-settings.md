@@ -4,7 +4,7 @@
 
 **Blocked by:** 11: Open settings and change general session options.
 
-**Status:** claimed
+**Status:** resolved
 
 **Source:** [Web setup UI specification](../spec.md). Stories 50, 51, 52, 56, 75.
 
@@ -26,7 +26,10 @@ backend choices, presets, queue depth, and custom renderer groups. Ticket 14
 owns color mapping. The explicit native allowlist checks types, ranges,
 conditions, and profile generations. Native QmlSettings setters retain saved
 values and live notifications. Saved backend choices and active native renderer
-status remain distinct. The UI offers the existing native restart action.
+status remain distinct. Backend changes restart immediately. OpenGL vertical
+sync changes retain the same immediate trigger. Failed launches keep their
+warning log and show the actual native failure result. Duplicate writes do not
+restart. The focused test controls the external native launch boundary.
 
 Renderer import and export now return actual native outcomes. Import validates
 all input before it replaces keys. Export checks writes and atomically commits
@@ -37,13 +40,14 @@ The shared documentation helper returns the actual libplacebo URL.
 
 Focused embedded checks passed for writes, invalid values, custom conditions,
 presets, native notifications, reload, native store reads, file outcomes,
-profile changes during a picker, and responsive layout. The retained native
+profile changes during a picker, responsive layout, and immediate restart
+policy with controlled native launch failures. The retained native
 QML action caller also passes. See [ticket 13 evidence](../evidence/ticket13/verification.md)
-for exact commands, source comparisons, reports, captures, and the recorded
+for exact commands, bounded source comparisons, reports, captures, and the recorded
 missing digest for the earlier file-only executable.
 
 The native live dialogs and their resources still have callers and remain.
 No new setup-only callback adapter was added. The Color mapping entry is ready
-for ticket 14. Live playback, GPU, physical displays, application restart,
+for ticket 14. Live playback, GPU, physical displays, successful OS relaunch,
 platform, and package acceptance remain unverified. Production presets and
 the known HighQuality acceptance limit are unchanged.
