@@ -29,6 +29,14 @@ The final tested source is `f7524810` plus [final-source.patch](final-source.pat
 [source-sha256.csv](source-sha256.csv) records the actual GUI source files before
 the final launch. Later commits add evidence and merge documentation only.
 
+Merge `5ba1ca0c` includes the latest integration `5cd42106`. Its GUI tree is
+unchanged from integration `915be521`. The final worker GUI source is unchanged
+from `92a70fe`, which records the final tested patch. The read-only
+[source-preservation.json](source-preservation.json) comparison checks all 189
+recorded source hashes with no mismatch. It also records both executable hashes
+and the compiled JavaScript and CSS hashes. No build or runtime check follows
+this documentation merge.
+
 | Run | Executable SHA256 | Result |
 | --- | --- | --- |
 | Settings and mapping, green02 | `b50630841f0fa1c2dc31e772de4a06851c3a13a52bcdb2860be1eec77728147d` | 4 passed, 0 failed, 0 skipped |
