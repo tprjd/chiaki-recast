@@ -1265,6 +1265,53 @@ private slots:
         QVERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains("fsrcnnx_x2_8_0_4_1"));
     }
 
+    void rendererLayout()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+            QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
+        });
+        QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        services.backend()->setDiscoveryEnabled(false);
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 900);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#disconnectAction')").toBool());
+        script(setup.view(), "{const field=document.querySelector('.settings-search input');field.value='deband iterations';field.dispatchEvent(new Event('input',{bubbles:true}));}");
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 1);
+        script(setup.view(), "document.querySelector('.settings-results button').click()");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("videoPreset"));
+        script(setup.view(), "{const field=document.querySelector('#videoPreset');field.value='5';field.dispatchEvent(new Event('change',{bubbles:true}));}");
+        QTRY_COMPARE(int(settings.GetPlaceboPreset()), 5);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#placeboDebandEnabled')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('#placeboDebandEnabled').click()");
+        QTRY_VERIFY(!settings.GetPlaceboDebandEnabled());
+        script(setup.view(), "{const field=document.querySelector('.settings-search input');field.value='deband iterations';field.dispatchEvent(new Event('input',{bubbles:true}));}");
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 1);
+        script(setup.view(), "document.querySelector('.settings-results button').click()");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("placeboDebandEnabled"));
+        const QDir evidence(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE", "."));
+        const auto capture = [&](const QString &category, int width, int height, qreal zoom, const QString &file) {
+            setup.resize(width, height);
+            setup.view()->setZoomFactor(zoom);
+            script(setup.view(), QString("[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='%1').click();document.querySelector('h2').scrollIntoView()").arg(category));
+            QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth<=innerWidth && [...document.querySelectorAll('.settings-content input,.settings-content select,.settings-content button')].every(e=>{const r=e.getBoundingClientRect();return r.left>=0 && r.right<=innerWidth})").toBool());
+            QVERIFY(setup.view()->grab().save(evidence.filePath(file)));
+        };
+        capture("Renderer", 390, 720, 1, "renderer-390.png");
+        capture("Renderer", 800, 900, 2, "renderer-200-percent.png");
+        capture("Display", 390, 720, 1, "display-390.png");
+        capture("Display", 800, 900, 2, "display-200-percent.png");
+    }
+
     void generalSettings()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
