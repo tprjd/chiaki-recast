@@ -30,7 +30,7 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [12: Video and audio settings](issues/12-video-and-audio-settings.md): resolved for native Video/Stream/Audio settings. Real-bridge writes, validation, profile drafts, device refresh through a controlled SDL driver, reload/restart and layout checks pass. Hardware/platform acceptance remains in later tickets.
 - [13: Display and native renderer settings](issues/13-display-and-renderer-settings.md): resolved for display targets, native renderer controls, and safe native file actions. Focused bridge, file preservation, native QML caller, search, and layout checks pass. Immediate native restart policy and launch failure feedback also pass. Live display, GPU, successful OS relaunch, and platform acceptance remain open.
 - [15: Keyboard and mouse controls](issues/15-keyboard-and-mouse-controls.md): resolved.
-- [14: Native color mapping](issues/14-color-mapping-settings.md): claimed after ticket 13.
+- [14: Native color mapping](issues/14-color-mapping-settings.md): resolved. All 28 native controls, guarded persistence, dependent search, Back/focus, reload/restart, and corrected layout checks pass. Shared numeric callers pass. Native live QML remains. See [evidence](evidence/ticket14/verification.md). Hardware and package acceptance remains in later tickets.
 - [16: Controller setup and mapping](issues/16-controller-setup-and-mapping.md): claimed after ticket 11.
 - [17: Profiles, files and logs](issues/17-profiles-files-and-logs.md): ready after ticket 11.
 - [18: Setup reminders and Steam shortcuts](issues/18-reminders-and-steam-shortcuts.md): ready after ticket 06.

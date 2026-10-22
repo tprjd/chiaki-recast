@@ -1,0 +1,56 @@
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 096e18ed..1b5b9e3d 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -1958,6 +1958,45 @@ private slots:
+         capture("Audio/Wifi", 800, 600, 2, "audio-200-percent.png");
+     }
+ 
++    void colorMappingSettings()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto removeSettings = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++            QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
++        });
++        QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        QmlNativeServices services(&settings);
++        auto *backend = services.backend();
++        backend->stopAutoConnect();
++        backend->setDiscoveryEnabled(false);
++        SetupWindow setup(backend);
++        setup.show();
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
++        script(setup.view(), "document.querySelector('.open-settings').click()");
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav')!==null").toBool());
++        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='Renderer').click()");
++        const auto change = [&](const QString &key, double value) {
++            QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled===false").arg(key)).toBool());
++            script(setup.view(), QString("{const field=document.getElementById('%1');field.value='%2';field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(key).arg(value));
++        };
++        change("videoPreset", 5);
++        QTRY_COMPARE(int(settings.GetPlaceboPreset()), 5);
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('#placeboColorMappingEnabled')!==null").toBool());
++        QCOMPARE(script(setup.view(), "document.querySelector('#placeboColorMappingEnabled').checked").toBool(), true);
++        change("placeboColorMappingPreset", 0);
++        QTRY_COMPARE(int(settings.GetPlaceboColorMappingPreset()), 0);
++        script(setup.view(), "document.querySelector('#openPlaceboColorMapping').click()");
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboGamutMappingFunction')?.options.length").toInt(), 10);
++        QSignalSpy changed(backend->qmlSettings(), &QmlSettings::placeboChanged);
++        change("placeboGamutMappingPerceptualDeadzone", 0.42);
++        QTRY_VERIFY(qAbs(settings.GetPlaceboGamutMappingPerceptualDeadzone() - 0.42f) < 0.001f);
++        QVERIFY(changed.count() > 0);
++    }
++
+     void rendererSettings()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+diff --git a/third-party/gf-complete b/third-party/gf-complete
+--- a/third-party/gf-complete
++++ b/third-party/gf-complete
+@@ -1 +1 @@
+-Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478
++Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478-dirty
