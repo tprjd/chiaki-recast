@@ -340,6 +340,7 @@ void QmlBackend::releaseSession()
         QMetaObject::invokeMethod(psn_connection_worker, [] {}, Qt::BlockingQueuedConnection);
         psn_worker_pending = false;
     }
+    old_session->WaitForStop();
     QMetaObject::invokeMethod(frame_worker, [] {}, Qt::BlockingQueuedConnection);
     // Destroy posted frame callbacks before the window releases its GPU.
     delete frame_delivery;
@@ -1176,8 +1177,11 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
         failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
         return;
     }
-    if (!window && !connect_info.auto_regist) {
-        failConnection(tr("Stream window is unavailable"), tr("Prepare the native stream window before connecting."));
+    if (!window && !connect_info.auto_regist)
+        emit streamWindowRequested();
+    if ((!window || !window->initializationError().isEmpty()) && !connect_info.auto_regist) {
+        failConnection(tr("Stream window is unavailable"), window ? window->initializationError()
+            : tr("Prepare the native stream window before connecting."));
         return;
     }
     if (!window) {
@@ -1913,7 +1917,7 @@ void QmlBackend::setWebEngineHints(QWebEngineProfile *profile) { applyWebEngineH
 
 void QmlBackend::connectToHost(int index, QString nickname)
 {
-    if (session)
+    if (session || connection_token || connection_attempt.value("cleanupPending").toBool())
         return;
     if (window)
         window->setWindowAdjustable(false);

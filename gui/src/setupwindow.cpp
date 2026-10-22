@@ -77,6 +77,10 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
     profile->setUrlRequestInterceptor(new SetupRequests(profile));
     auto *page = new SetupPage(profile, webView);
     webView->setPage(page);
+    connect(page, &QWebEnginePage::recommendedStateChanged, this, [this, page](QWebEnginePage::LifecycleState state) {
+        if (!isVisible() && state != QWebEnginePage::LifecycleState::Active)
+            page->setLifecycleState(QWebEnginePage::LifecycleState::Frozen);
+    });
     page->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, false);
     page->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, false);
     page->settings()->setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, false);
@@ -89,9 +93,31 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
     webView->load(setupUrl);
 }
 
+void SetupWindow::suspend()
+{
+    if(signInWindow)
+        signInWindow->close();
+    setupBridge->setSuspended(true);
+    hide();
+    auto *page = webView->page();
+    if (page->recommendedState() != QWebEnginePage::LifecycleState::Active)
+        page->setLifecycleState(QWebEnginePage::LifecycleState::Frozen);
+}
+
+void SetupWindow::resume()
+{
+    webView->page()->setLifecycleState(QWebEnginePage::LifecycleState::Active);
+    setupBridge->setSuspended(false);
+    show();
+    raise();
+    activateWindow();
+    webView->setFocus();
+}
+
 void SetupWindow::closeEvent(QCloseEvent *event)
 {
     if (signInWindow) signInWindow->close();
     backend->nativeSettings()->SetGeometry(geometry());
     QWidget::closeEvent(event);
+    if (event->isAccepted()) emit closed();
 }

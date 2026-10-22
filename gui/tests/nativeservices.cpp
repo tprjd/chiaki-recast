@@ -8,6 +8,7 @@
 #include "qmlnativeservices.h"
 #include "qmlmainwindow.h"
 #include "qmlbackend.h"
+#undef main
 
 class NativeServicesTest : public QObject
 {

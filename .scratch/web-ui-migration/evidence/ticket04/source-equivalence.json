@@ -1,0 +1,157 @@
+[
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/src/applicationcontroller.cpp",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/include/applicationcontroller.h",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/src/main.cpp",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/src/qmlmainwindow.cpp",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/include/qmlmainwindow.h",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/src/streamsession.cpp",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/include/streamsession.h",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/src/qmlbackend.cpp",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/include/qmlbackend.h",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/src/setupwindow.cpp",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/include/setupwindow.h",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/src/psnsigninwindow.cpp",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/include/psnsigninwindow.h",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/tests/nativeservices.cpp",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/src/applicationcontroller.cpp",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/src/qmlmainwindow.cpp",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/include/qmlmainwindow.h",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/src/streamsession.cpp",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/include/streamsession.h",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/src/qmlbackend.cpp",
+    "method": "void QmlBackend::releaseSession()",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/src/qmlbackend.cpp",
+    "method": "void QmlBackend::detachWindow(",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/src/qmlbackend.cpp",
+    "method": "void QmlBackend::createSession(",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/tests/embeddedsetup.cpp",
+    "method": "void decodedSessionCleanup()",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/tests/embeddedsetup.cpp",
+    "method": "void nativeInitializationFailure()",
+    "equal": true
+  },
+  {
+    "reference": "7cd7ec8e",
+    "file": "gui/tests/embeddedsetup.cpp",
+    "method": "void suspendClosesSignIn()",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/src/setupbridge.cpp",
+    "method": "void SetupBridge::setSuspended(",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/src/setupbridge.cpp",
+    "method": "QVariantMap SetupBridge::connectConsole(",
+    "equal": true
+  },
+  {
+    "reference": "55140aa9",
+    "file": "gui/src/setupbridge.cpp",
+    "method": "QVariantMap SetupBridge::dismissStreamError(",
+    "equal": true
+  },
+  {
+    "reference": "2abe34f5",
+    "file": "gui/src/setupbridge.cpp",
+    "method": "QVariantMap SetupBridge::setMediaSetting(",
+    "equal": true
+  }
+]

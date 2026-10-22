@@ -1,0 +1,21 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_15-10-06-460460.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Starting session request for PS5
+[I] Trying to request session from <redacted-ipv4>:9295
+[I] [libplacebo] Available surface configurations:
+[I] [libplacebo]     0: VK_FORMAT_B8G8R8A8_UNORM                 VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+[I] [libplacebo]     1: VK_FORMAT_B8G8R8A8_SRGB                  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+[I] [libplacebo]     2: VK_FORMAT_R8G8B8A8_UNORM                 VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+[I] [libplacebo]     3: VK_FORMAT_R8G8B8A8_SRGB                  VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+[I] [libplacebo]     4: VK_FORMAT_R16G16B16A16_SFLOAT            VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT
+[I] [libplacebo]     5: VK_FORMAT_A2B10G10R10_UNORM_PACK32       VK_COLOR_SPACE_HDR10_ST2084_EXT
+[I] [libplacebo]     6: VK_FORMAT_A2B10G10R10_UNORM_PACK32       VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+[I] [libplacebo] Picked surface configuration 6: VK_FORMAT_A2B10G10R10_UNORM_PACK32 + VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+[I] Session stopped while connecting for session request
+[38;5;31m[E] [0mSession request connect failed eventually.
+[I] Session has quit

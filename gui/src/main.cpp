@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) { return real_main(argc, argv); }
 #include <discoverymanager.h>
 #include <qmlmainwindow.h>
 #include <qmlnativeservices.h>
-#include <setupwindow.h>
+#include <applicationcontroller.h>
 #include <QApplication>
 #include <QtTypes>
 
@@ -320,8 +320,9 @@ int real_main(int argc, char *argv[])
 int RunMain(QGuiApplication &app, Settings *settings, bool exit_app_on_stream_exit)
 {
 	QmlNativeServices services(settings);
-	SetupWindow main_window(services.backend());
-	main_window.show();
+	QApplication::setQuitOnLastWindowClosed(false);
+	ApplicationController controller(&services, exit_app_on_stream_exit);
+	controller.setupWindow()->show();
 	return app.exec();
 }
 
@@ -329,6 +330,11 @@ int RunStream(QGuiApplication &app, const StreamSessionConnectInfo &connect_info
 {
 	QmlNativeServices services(connect_info.settings);
 	QmlMainWindow main_window(services.backend(), services.engine(), connect_info);
+	if (!main_window.initializationError().isEmpty()) {
+		qCritical() << main_window.initializationError();
+		return 1;
+	}
+	QObject::connect(&main_window, &QmlMainWindow::initializationFailed, &app, [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);
 	main_window.show();
 	return app.exec();
 }

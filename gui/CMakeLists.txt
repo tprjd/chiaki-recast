@@ -65,6 +65,8 @@ set(SOURCE_FILES
 	src/setupbridge.cpp
 	include/setupwindow.h
 	src/setupwindow.cpp
+	include/applicationcontroller.h
+	src/applicationcontroller.cpp
 	include/psnsigninwindow.h
 	src/psnsigninwindow.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/setup.qrc

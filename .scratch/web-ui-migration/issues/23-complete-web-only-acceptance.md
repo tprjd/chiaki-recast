@@ -60,3 +60,22 @@ is active are inconclusive. Actual native handoff focus, physical controller,
 touch, screen reader, translated locales, display scaling, Linux/macOS GPUs,
 live console decode, HDR, audio/microphone, cleanup, and matched performance
 remain required acceptance work.
+
+### Ticket 04 lifetime evidence and remaining acceptance
+
+[04](04-local-native-stream-handoff.md) resolves the implemented local handoff
+and lifetime milestone. Its [controlled decoded-frame check](../evidence/ticket04/verification.md)
+uses the real H.264 decoder and frame worker at advancing native PTS/cadence.
+Normal OpenGL disconnect releases 51/51 tracked AVBuffers; active Vulkan
+controller destruction releases 54/54, including queued GUI delivery. Native
+initialization recovery, page freeze/fresh resume, merged sign-in closure, and
+direct native callers pass. Reuse this evidence when the relevant source and
+dependencies are unchanged.
+
+These checks do not prove real-console playback, actual foreground/focus,
+physical input or held-input release, console sleep, native video-disabled
+operation, hardware decoding, audio/microphone, default/other presets,
+supported platform packages, or matched performance. The minimal pure native
+HighQuality control reproduces wrong pixels without Qt Quick or WebEngine;
+it does not supply a complete old-application baseline. Preserve production
+defaults and the user's preset while completing that acceptance.

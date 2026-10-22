@@ -86,6 +86,7 @@ public:
     QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, bool exit_app_on_stream_exit = false);
     QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, const StreamSessionConnectInfo &connect_info);
     ~QmlMainWindow();
+    QString initializationError() const { return initialization_error; }
     void updateWindowType(WindowType type);
     void setSettings(Settings *new_settings);
 
@@ -153,6 +154,8 @@ signals:
     void videoPresetChanged();
     void menuRequested();
     void streamViewDismissed();
+    void streamWindowReady();
+    void initializationFailed(const QString &reason);
     void directStreamChanged();
     void queueDepthAverageChanged();
     void pendingFrameAgeChanged();
@@ -165,6 +168,7 @@ private:
     void doneOpenGLContextCurrent();
 
     void init(Settings *settings, bool exit_app_on_stream_exit = false);
+    void reportInitializationFailure(const QString &reason);
     pl_gpu placeboGpu() const;
     void update();
     void scheduleUpdate();
@@ -312,6 +316,9 @@ private:
     QAtomicInteger<int> quick_need_sync = 0;
     QAtomicInteger<int> quick_need_render = 0;
     QString pending_renderer_fallback_reason;
+    QString initialization_error;
+    QAtomicInteger<int> graphics_failed = 0;
+    bool stream_ready = false;
     pl_options renderparams_opts = {};
     bool renderparams_changed = false;
     const struct pl_hook *fsr_hook = nullptr;
