@@ -3,11 +3,23 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+find_program(NPM_EXECUTABLE NAMES npm.cmd npm REQUIRED)
+file(GLOB_RECURSE SETUP_FRONTEND_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/web/src/*")
+add_custom_command(
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/web/app.js" "${CMAKE_CURRENT_BINARY_DIR}/web/app.css"
+    COMMAND "${NPM_EXECUTABLE}" ci --ignore-scripts --no-audit --no-fund
+    COMMAND "${NPM_EXECUTABLE}" run build -- --outDir "${CMAKE_CURRENT_BINARY_DIR}/web"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/web"
+    DEPENDS ${SETUP_FRONTEND_SOURCES} web/package.json web/package-lock.json web/index.html web/vite.config.ts
+    VERBATIM)
+add_custom_target(chiaki-setup-assets DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/web/app.js" "${CMAKE_CURRENT_BINARY_DIR}/web/app.css")
+configure_file(web/resources.qrc.in "${CMAKE_CURRENT_BINARY_DIR}/setup.qrc" @ONLY)
+
 if(APPLE)
 	enable_language(OBJCXX)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Concurrent Svg Qml Quick Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Concurrent Svg Qml Quick Widgets WebEngineWidgets WebChannel)
 if(Qt6_VERSION VERSION_GREATER_EQUAL "6.10.0")
 	find_package(Qt6 REQUIRED COMPONENTS GuiPrivate)
 endif()
@@ -51,6 +63,11 @@ set(SOURCE_FILES
 	src/qmlmainwindow.cpp
 	include/qmlnativeservices.h
 	src/qmlnativeservices.cpp
+	include/setupbridge.h
+	src/setupbridge.cpp
+	include/setupwindow.h
+	src/setupwindow.cpp
+	${CMAKE_CURRENT_BINARY_DIR}/setup.qrc
 	include/qmlbackend.h
 	src/qmlbackend.cpp
 	include/qmlcontroller.h
@@ -96,6 +113,7 @@ elseif(WIN32)
 endif()
 
 add_library(chiaki-gui OBJECT ${SOURCE_FILES})
+add_dependencies(chiaki-gui chiaki-setup-assets)
 target_include_directories(chiaki-gui PUBLIC include)
 add_executable(chiaki WIN32 ${RESOURCE_FILES} src/main.cpp)
 target_link_libraries(chiaki PRIVATE chiaki-gui)
@@ -111,6 +129,7 @@ if(CHIAKI_ENABLE_CLI)
 endif()
 
 target_link_libraries(chiaki-gui PUBLIC Qt::Core Qt::Gui Qt::GuiPrivate Qt::Concurrent Qt::Svg Qt::Qml Qt::Quick Qt::Widgets)
+target_link_libraries(chiaki-gui PUBLIC Qt::WebEngineWidgets Qt::WebChannel)
 if (${Qt6DBus_FOUND} AND NOT WIN32)
 	target_link_libraries(chiaki-gui PUBLIC Qt::DBus)
 if (NOT APPLE)

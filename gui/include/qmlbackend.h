@@ -123,6 +123,8 @@ public:
 
     QmlMainWindow *qmlWindow() const;
     Settings *nativeSettings() const { return settings; }
+    DiscoveryManager *discoveryManager() { return &discovery_manager; }
+    quint64 profileGeneration() const { return profile_generation; }
     void attachWindow(QmlMainWindow *window);
     void detachWindow(QmlMainWindow *window);
     QmlSettings *qmlSettings() const;
