@@ -4,7 +4,10 @@
 
 **Blocked by:** 04: Connect locally from web setup to native playback; 06: Sign in to PSN independently from web setup.
 
-**Status:** resolved for pairing and Account ID routes. Live-service, physical, GPU, and platform acceptance remains in ticket 23.
+**Status:** resolved
+
+Pairing and Account ID routes are complete. Live-service, physical, GPU, and
+platform acceptance remains recorded in ticket 23 under the user's waiver.
 
 **Source:** [Web setup UI specification](../spec.md). Stories 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 44, 45, 46.
 
