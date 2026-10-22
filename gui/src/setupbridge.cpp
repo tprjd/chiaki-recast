@@ -266,6 +266,52 @@ void SetupBridge::refresh()
         QT_TR_NOOP("Use an existing registration, or register when you first connect. Saving an address does not pair the console or start a connection.")};
     for (const auto *text : managementTexts) strings.insert(QString::fromUtf8(text), tr(text));
     for (const auto *text : texts) strings.insert(QString::fromUtf8(text), tr(text));
+    const char *registrationTexts[] = {
+        QT_TR_NOOP("Register console"),
+        QT_TR_NOOP("View registration progress"),
+        QT_TR_NOOP("Register selected console"),
+        QT_TR_NOOP("Console and firmware"),
+        QT_TR_NOOP("PS4 firmware before 7.0"),
+        QT_TR_NOOP("PS4 firmware 7.0 to before 8.0"),
+        QT_TR_NOOP("PS4 firmware 8.0 or later"),
+        QT_TR_NOOP("Console address"),
+        QT_TR_NOOP("Use an IP address, hostname, or 255.255.255.255 for local broadcast."),
+        QT_TR_NOOP("PSN Online ID"),
+        QT_TR_NOOP("PSN Account ID in Base64"),
+        QT_TR_NOOP("Use your Account ID encoded as Base64. This is different from your PSN username."),
+        QT_TR_NOOP("Use saved Account ID"),
+        QT_TR_NOOP("Public lookup"),
+        QT_TR_NOOP("PSN sign-in"),
+        QT_TR_NOOP("Remote Play pairing code"),
+        QT_TR_NOOP("Console login PIN, optional"),
+        QT_TR_NOOP("Get your pairing code"),
+        QT_TR_NOOP("Use the same PlayStation Network account as the user signed in on your console."),
+        QT_TR_NOOP("Open Settings, System, then Remote Play. Enable Remote Play and select Link Device."),
+        QT_TR_NOOP("Open Settings, then Remote Play Connection Settings. Enable Remote Play and select Add Device."),
+        QT_TR_NOOP("Keep your console on and connected to your network. Enter the eight-digit code before it expires."),
+        QT_TR_NOOP("The Remote Play pairing code pairs the console. The optional console login PIN signs in to your console user."),
+        QT_TR_NOOP("Registering console"),
+        QT_TR_NOOP("Console registered"),
+        QT_TR_NOOP("Registration failed"),
+        QT_TR_NOOP("Address hidden"),
+        QT_TR_NOOP("Waiting for the console. Keep it on and connected to your network."),
+        QT_TR_NOOP("Closing this screen does not cancel registration. The operation can continue in the background."),
+        QT_TR_NOOP("Correct details and retry"),
+        QT_TR_NOOP("Diagnostics are hidden in streamer mode."),
+        QT_TR_NOOP("Hide diagnostics"),
+        QT_TR_NOOP("Show diagnostics"),
+        QT_TR_NOOP("Close"),
+        QT_TR_NOOP("Find a public Account ID"),
+        QT_TR_NOOP("This sends your PSN username to the third-party service psn.flipscreen.games. Your PSN privacy settings must allow anyone to find you in search. Public lookup retrieves your Account ID. It does not sign you in or save authentication credentials."),
+        QT_TR_NOOP("PSN username"),
+        QT_TR_NOOP("Retry lookup"),
+        QT_TR_NOOP("Find Account ID"),
+        QT_TR_NOOP("Cancel"),
+        QT_TR_NOOP("The profile changed. Close this screen and open registration again."),
+        QT_TR_NOOP("Registration did not start. Check your details and try again."),
+        QT_TR_NOOP("The registration context changed. Open registration again."),
+        QT_TR_NOOP("No valid saved Account ID is available.")};
+    for (const auto *text : registrationTexts) strings.insert(QString::fromUtf8(text), tr(text));
     const auto *native = backend->nativeSettings();
     const bool configured = !native->GetPsnAuthToken().isEmpty() && !native->GetPsnRefreshToken().isEmpty()
         && !native->GetPsnAccountId().isEmpty();

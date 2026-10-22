@@ -1164,6 +1164,53 @@ private slots:
 #endif
     }
 
+    void registrationHandoff()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetHardwareDecoder({});
+        settings.SetPlaceboPreset(PlaceboPreset::Fast);
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, {}, {}, registration.boundary());
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        ApplicationController controller(&services);
+        auto &setup = *controller.setupWindow();
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-new]')").toBool());
+        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
+        QVERIFY(fill(setup.view(), "[data-registration-address]", "127.0.0.1"));
+        QVERIFY(fill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
+        QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
+        script(setup.view(), "document.querySelector('[data-registration-submit]').click()");
+        QTRY_COMPARE(registration.requests.size(), 1);
+        registration.complete(0, true);
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-connect]')").toBool());
+        QVERIFY(settings.GetManualHosts().first().GetRegistered());
+        QCOMPARE(settings.GetRegisteredHosts().first().GetConsolePin(), QString());
+        script(setup.view(), "document.querySelector('[data-registration-connect]').click()");
+        QTRY_VERIFY(backend->qmlWindow());
+        QTRY_VERIFY(backend->qmlWindow()->isExposed());
+        QTRY_VERIFY(!setup.isVisible());
+        QPointer<QmlMainWindow> native = backend->qmlWindow();
+        QPointer<StreamSession> session = backend->qmlSession();
+        QVERIFY(session);
+        QVERIFY(backend->cancelConnection(backend->connectionAttempt().value("id").toString()));
+        QTRY_VERIFY(!session);
+        QTRY_VERIFY(!native);
+        QTRY_VERIFY(setup.isVisible());
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-connect]')").toBool());
+        QCOMPARE(registration.requests.size(), 1);
+    }
+
     void registrationForm()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -1179,12 +1226,21 @@ private slots:
         QmlNativeServices services(&settings, {}, {}, registration.boundary());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
+        setup.resize(1280, 720);
         setup.show();
         QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
         QVERIFY2(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool(), "The library must offer guided registration.");
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-target]').options.length").toInt(), 4);
+        const auto capture = [&](const QString &name) {
+            const auto directory = qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE");
+            if (directory.isEmpty()) return;
+            script(setup.view(), "document.querySelector('.pairing-panel').scrollIntoView({block:'start'})");
+            QTest::qWait(30);
+            QVERIFY(setup.view()->grab().save(QDir(directory).filePath(name + ".png")));
+        };
+        capture("registration-1280");
         QVERIFY(script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
         QVERIFY(fill(setup.view(), "[data-registration-account]", "not-base64"));
         QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
@@ -1211,12 +1267,16 @@ private slots:
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-online-id]').type").toString(), QStringLiteral("password"));
         QCOMPARE(registration.requests.size(), 0);
         setup.resize(900, 600);
+        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+        capture("registration-900");
         setup.view()->setZoomFactor(2);
         QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+        capture("registration-200-percent");
         setup.view()->setZoomFactor(1);
         setup.resize(390, 720);
         QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
-        script(setup.view(), "document.querySelector('[data-registration-close]').click()");
+        capture("registration-390");
+        script(setup.view(), "document.querySelector('[data-registration-close]').scrollIntoView({block:'center'});document.querySelector('[data-registration-close]').click()");
         QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-register-new')").toBool());
     }
 
@@ -1257,11 +1317,15 @@ private slots:
         chiaki_log(registration.requests[0].log, CHIAKI_LOG_INFO, "Regist waiting for response");
         chiaki_log(registration.requests[0].log, CHIAKI_LOG_VERBOSE, "registration-key-secret");
         script(setup.view(), "document.querySelector('[data-registration-close]').click()");
+        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.body.textContent.includes('Registering console')").toBool());
+        QCOMPARE(registration.requests.size(), 1);
         registration.complete(0, false);
         QTRY_COMPARE(services.backend()->registrationAttempt().value("phase").toString(), QStringLiteral("failure"));
         QVERIFY(settings.GetRegisteredHosts().isEmpty());
-        // A closed progress screen does not cancel native work. A fresh attempt can correct its fields.
-        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        // Reopening progress does not replay the request. Failure retains valid details for retry.
+        QTRY_VERIFY(script(setup.view(), "document.body.textContent.includes('Registration failed')").toBool());
+        script(setup.view(), "document.querySelector('[data-registration-edit]').click()");
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
         QVERIFY(fill(setup.view(), "[data-registration-address]", "127.0.0.1"));
         QVERIFY(fill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));

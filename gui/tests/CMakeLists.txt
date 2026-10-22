@@ -44,6 +44,12 @@ if(TARGET chiaki-gui)
     target_compile_definitions(chiaki-embedded-setup-tests PRIVATE CHIAKI_TEST_PYTHON="${PYTHON_EXECUTABLE}")
     add_test(NAME chiaki-embedded-setup COMMAND chiaki-embedded-setup-tests consoleLibrary)
     set_tests_properties(chiaki-embedded-setup PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-pairing COMMAND chiaki-embedded-setup-tests registrationForm registrationProgress
+        registrationLookup registrationLookupTimeout registrationAccountSources registrationNativeValidation registrationStaleTargets)
+    set_tests_properties(chiaki-embedded-pairing PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-registration-handoff COMMAND chiaki-embedded-setup-tests registrationHandoff)
+    set_tests_properties(chiaki-registration-handoff PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-psn COMMAND chiaki-embedded-setup-tests psnAccountStatus psnSignIn psnRefreshCredentials psnEmbeddedIsolation psnAccountPresentation)
     set_tests_properties(chiaki-embedded-psn PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-settings COMMAND chiaki-embedded-setup-tests generalSettings settingsValidation settingsRestart)
