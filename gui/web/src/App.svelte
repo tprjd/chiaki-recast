@@ -13,6 +13,9 @@
   let message = $state('');
   let changingDiscovery = $state(false);
   let settingsOpen = $state(false);
+  let settingsCategory = $state('General');
+  let settingsSearch = $state('');
+  let restoredProfile = '';
   let detailsKey = $state('');
   const t = (text: string) => current?.strings[text] ?? text;
   const type = (console: Console) => console.ps5 === undefined ? t('Console') : console.ps5 ? 'PlayStation 5' : 'PlayStation 4';
@@ -24,10 +27,23 @@
 
   onMount(() => {
     let disposed = false;
-    connectSetup(value => { current = value; }).then(value => {
+    connectSetup(value => {
+      if (restoredProfile !== value.profileGeneration) {
+        restoredProfile = value.profileGeneration;
+        query = value.viewState.search;
+        settingsOpen = value.viewState.route === 'settings';
+        settingsCategory = value.viewState.category;
+        settingsSearch = value.viewState.settingsSearch;
+      }
+      current = value;
+    }).then(value => {
       if (disposed) value.dispose(); else connection = value;
     }).catch(() => { message = t('Setup unavailable'); });
     return () => { disposed = true; connection?.dispose(); };
+  });
+
+  $effect(() => {
+    if (connection && current) connection.saveViewState(settingsOpen ? 'settings' : 'consoles', query, settingsCategory, settingsSearch, current.profileGeneration);
   });
 
   async function discovery() {
@@ -80,6 +96,8 @@
   }
   async function closeSettings() {
     settingsOpen = false;
+    settingsCategory = 'General';
+    settingsSearch = '';
     await tick();
     document.querySelector<HTMLButtonElement>('.open-settings')?.focus();
   }
@@ -91,12 +109,12 @@
 </header>
 <main>
   {#if settingsOpen && current && connection}
-    <Settings {current} {connection} close={closeSettings} {t} />
+    <Settings {current} {connection} close={closeSettings} {t} bind:category={settingsCategory} bind:query={settingsSearch} />
   {:else}
   <div class="library-heading">
     <h1>{t('Consoles')}</h1>
     <label class="search">{t('Search consoles')}
-      <input type="search" bind:value={query} aria-label={t('Search consoles')} />
+      <input type="search" maxlength="256" bind:value={query} aria-label={t('Search consoles')} />
     </label>
   </div>
   <div class="library-tools">

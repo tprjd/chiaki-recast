@@ -190,6 +190,8 @@ void SetupBridge::refresh()
         keys.clear();
         profileKeys.clear();
         selectedKey.clear();
+        viewState["search"] = "";
+        viewState["settingsSearch"] = "";
         credentialsRejected = false;
     }
     const auto hosts = backend->hosts();
@@ -734,7 +736,7 @@ void SetupBridge::refresh()
     profileKeys = updatedProfileKeys;
     const QVariantMap profileState{{"items", profiles}, {"current", privateMode ? tr("Hidden") : backend->qmlSettings()->currentProfile().isEmpty() ? tr("default") : backend->qmlSettings()->currentProfile()},
         {"logDirectory", privateMode ? tr("Log directory hidden") : backend->qmlSettings()->logDirectory()}};
-    state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
+    state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)}, {"viewState", viewState},
         {"profiles", profileState}, {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"autoConnectKey", autoConnectKey}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
         {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->registrationBusy() || backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
             || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
@@ -852,6 +854,17 @@ QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &
     else if (name == "steamDeckHaptics") settings->setSteamDeckHaptics(value.toBool());
     else if (name == "verticalDeck") settings->setVerticalDeck(value.toBool());
 #endif
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::saveViewState(const QString &route, const QString &search, const QString &category, const QString &settingsSearch, const QString &profile)
+{
+    static const QStringList categories{"General", "Video", "Stream", "Audio/Wifi", "Display", "Renderer", "Color mapping", "Keyboard and mouse", "Controllers", "Profiles"};
+    if (!currentProfile(profile) || (route != "consoles" && route != "settings")
+            || !categories.contains(category) || search.size() > 256 || settingsSearch.size() > 256)
+        return {{"accepted", false}};
+    const QVariantMap next{{"route", route}, {"search", search}, {"category", category}, {"settingsSearch", settingsSearch}};
+    if (next != viewState) { viewState = next; refresh(); }
     return {{"accepted", true}};
 }
 

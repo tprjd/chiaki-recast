@@ -5,6 +5,8 @@
 class QmlBackend;
 class SetupBridge;
 class QWebEngineView;
+class QWebEnginePage;
+class QWebEngineProfile;
 class QCloseEvent;
 class PsnSignInWindow;
 
@@ -27,8 +29,13 @@ protected:
     void hideEvent(QHideEvent *event) override;
 
 private:
+    void createPage();
+    void resetChannel(QWebEnginePage *page);
+    void invalidatePage();
     QmlBackend *backend;
     QWebEngineView *webView;
     SetupBridge *setupBridge;
+    QWebEngineProfile *webProfile = nullptr;
+    bool pageFailed = false;
     PsnSignInWindow *signInWindow = nullptr;
 };

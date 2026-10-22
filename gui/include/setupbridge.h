@@ -14,6 +14,7 @@ public:
     explicit SetupBridge(QmlBackend *backend, QObject *parent = nullptr);
     ~SetupBridge() override;
     Q_INVOKABLE QVariantMap snapshot() const { return state; }
+    Q_INVOKABLE QVariantMap saveViewState(const QString &route, const QString &search, const QString &category, const QString &settingsSearch, const QString &profile);
     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
     Q_INVOKABLE QVariantMap connectConsole(const QString &key);
@@ -80,6 +81,7 @@ private:
     quint64 generation = 0;
     quint64 revision = 0;
     QString selectedKey;
+    QVariantMap viewState{{"route", "consoles"}, {"search", ""}, {"category", "General"}, {"settingsSearch", ""}};
     QVariantMap state;
     bool suspended = false;
     QVariantMap streamError;

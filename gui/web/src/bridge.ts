@@ -4,6 +4,7 @@ export interface Console {
   state: string; route: 'local' | 'manual' | 'psn'; ps5?: boolean;
 }
 export interface State {
+  viewState: { route: string; search: string; category: string; settingsSearch: string };
   revision: string; profileGeneration: string; consoles: Console[];
   registrations: { key: string; name: string; ps5: boolean; identifier: string }[];
   hiddenConsoles: { key: string; name: string; identifier: string }[];
@@ -37,6 +38,7 @@ export interface State {
 export interface Registration { busy: boolean; savedAccount: boolean; context?: string; id?: string; phase?: string; message?: string; diagnostics?: string; profileValid?: boolean; connectKey?: string }
 interface Reply { accepted: boolean; profileGeneration?: string; message?: string; context?: string; address?: string; ps5?: boolean; id?: string; route?: string; accountId?: string; form?: string }
 interface NativeBridge {
+  saveViewState(route: string, search: string, category: string, settingsSearch: string, profile: string, callback: (reply: Reply) => void): void;
   profileAction(action: string, key: string, name: string, confirmed: boolean, profile: string, callback: (reply: Reply) => void): void;
   settingsFileAction(action: string, profile: string, callback: (reply: Reply) => void): void;
   setControllerSetting(name: string, value: boolean | number | string, profile: string, callback: (reply: Reply) => void): void;
@@ -90,6 +92,7 @@ declare global {
 }
 
 export function connectSetup(receive: (state: State) => void): Promise<{
+  saveViewState(route: string, search: string, category: string, settingsSearch: string, profile: string): Promise<Reply>;
   controllerSetting(name: string, value: boolean | number | string, profile: string): Promise<Reply>;
   beginControllerMapping(reset: boolean, profile: string): Promise<Reply>;
   controllerMappingAction(action: string, operation: string, profile: string): Promise<Reply>;
@@ -165,6 +168,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
       window.addEventListener('pageshow', refresh);
       document.addEventListener('visibilitychange', resume);
       resolve({
+        saveViewState: (route, search, category, settingsSearch, profile) => new Promise(done => setup.saveViewState(route, search, category, settingsSearch, profile, done)),
         accountBegin: (context, source) => new Promise(done => setup.beginRegistrationAccount(context, source, done)),
         accountLookup: (context, route, username) => new Promise(done => setup.lookupRegistrationAccount(context, route, username, done)),
         accountRead: (context, route, request) => new Promise(done => setup.readRegistrationAccount(context, route, request, done)),

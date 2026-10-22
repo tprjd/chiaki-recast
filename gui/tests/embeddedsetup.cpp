@@ -9,6 +9,7 @@
 #include <QWebEnginePage>
 #include <QWebEngineView>
 #include <QWebEngineSettings>
+#include <QWebChannel>
 #include <QScopeGuard>
 #include <QUuid>
 #include <QElapsedTimer>
@@ -58,6 +59,7 @@ static QVariantMap browserResources()
     } while (added);
     quint64 workingSet = 0, privateBytes = 0, cpu100ns = 0;
     int helpers = 0;
+    QVariantList identities;
     for (const auto &process : processes) {
         const bool app = process.th32ProcessID == GetCurrentProcessId();
         if (!owned.contains(process.th32ProcessID) || (!app && QString::fromWCharArray(process.szExeFile).compare("QtWebEngineProcess.exe", Qt::CaseInsensitive))) continue;
@@ -73,9 +75,33 @@ static QVariantMap browserResources()
             cpu100ns += (quint64(kernel.dwHighDateTime) << 32 | kernel.dwLowDateTime)
                 + (quint64(user.dwHighDateTime) << 32 | user.dwLowDateTime);
         CloseHandle(handle);
+        identities.append(QVariantMap{{"pid", quint64(process.th32ProcessID)}, {"parent", quint64(process.th32ParentProcessID)}, {"name", QString::fromWCharArray(process.szExeFile)}});
         if (!app) ++helpers;
     }
-    return {{"helpers", helpers}, {"workingSet", workingSet}, {"privateBytes", privateBytes}, {"cpu100ns", cpu100ns}};
+    return {{"helpers", helpers}, {"processes", identities}, {"workingSet", workingSet}, {"privateBytes", privateBytes}, {"cpu100ns", cpu100ns}};
+}
+
+static bool terminateSetupRenderer(QWebEnginePage *page)
+{
+    const auto pid = page->renderProcessPid();
+    for (const auto &process : testProcesses()) {
+        if (process.th32ProcessID != pid) continue;
+        if (process.th32ParentProcessID != GetCurrentProcessId()
+                || QString::fromWCharArray(process.szExeFile).compare("QtWebEngineProcess.exe", Qt::CaseInsensitive)) return false;
+        HANDLE handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_TERMINATE, FALSE, DWORD(pid));
+        if (!handle) return false;
+        wchar_t path[32768];
+        DWORD size = 32768;
+        const bool owned = QueryFullProcessImageNameW(handle, 0, path, &size)
+            && QString::fromWCharArray(path, size).endsWith("\\QtWebEngineProcess.exe", Qt::CaseInsensitive)
+            && page->renderProcessPid() == pid;
+        qInfo() << "Setup renderer ownership" << pid << "parent/test" << process.th32ParentProcessID << GetCurrentProcessId()
+            << "path" << (owned ? QString::fromWCharArray(path, size) : QString());
+        const bool terminated = owned && TerminateProcess(handle, 22);
+        CloseHandle(handle);
+        return terminated;
+    }
+    return false;
 }
 
 static QString windowProcess(HWND window)
@@ -899,8 +925,18 @@ private slots:
 #endif
     }
 
+    void setupReload_data()
+    {
+        QTest::addColumn<bool>("crash");
+        QTest::newRow("reload") << false;
+#ifdef Q_OS_WIN
+        QTest::newRow("renderer") << true;
+#endif
+    }
+
     void setupReload()
     {
+        QFETCH(bool, crash);
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
         const auto cleanup = qScopeGuard([&] {
             QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
@@ -926,8 +962,27 @@ private slots:
         QVERIFY(fill(setup.view(), ".library-heading input", "Office"));
         QVERIFY(click(setup.view(), ".open-settings"));
         QVERIFY(fill(setup.view(), ".settings-search input", "suspend"));
-        setup.view()->reload();
+        QPointer<QWebEnginePage> oldPage = setup.view()->page();
+        QPointer<QWebChannel> oldChannel = oldPage->webChannel();
+        auto *browserProfile = oldPage->profile();
+        if (crash) {
+#ifdef Q_OS_WIN
+            QTRY_VERIFY(oldPage->renderProcessPid() > 0);
+            QSignalSpy terminated(oldPage, &QWebEnginePage::renderProcessTerminated);
+            QVERIFY(terminateSetupRenderer(oldPage));
+            QTRY_COMPARE(terminated.size(), 1);
+            QTRY_VERIFY_WITH_TIMEOUT(setup.view()->page() != oldPage, 5000);
+#endif
+        } else setup.view()->reload();
         QTRY_COMPARE(script(setup.view(), "document.querySelector('.settings-search input')?.value").toString(), QStringLiteral("suspend"));
+        QTRY_VERIFY(!oldChannel);
+        auto *page = setup.view()->page();
+        QCOMPARE(page->profile(), browserProfile);
+        QVERIFY(browserProfile->isOffTheRecord());
+        QVERIFY(page->webChannel());
+        QVERIFY(!page->settings()->testAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls));
+        QVERIFY(!page->settings()->testAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls));
+        QVERIFY(!page->settings()->testAttribute(QWebEngineSettings::JavascriptCanOpenWindows));
         QCOMPARE(requests.size(), 1);
         QCOMPARE(setup.bridge()->snapshot().value("psn").toMap().value("refresh").toMap(), refresh);
         request->finish({}, QNetworkReply::AuthenticationRequiredError, 401);
