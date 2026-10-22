@@ -45,6 +45,7 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 
 ## Integration history
 
+- 56acff77: merged ticket 16 worker 382f0784 without conflicts. The complete merge tree equals the worker tree. The [independent audit](evidence/ticket16-integration/audit.md) confirms 189 source identities, four current artifacts, five external evidence identities, 21 protected files, and seven bounded source comparisons. Two new frontend files require line ending normalization. Reused settings and mapping 4/0, final SDL mapping 3/0, three named QML cases 5/0, frontend check, and builds. The normal 1280 capture was inspected. The 200 percent capture remains INVALID because of stale backing pixels. No build, test, or capture was repeated. Constructor order, native mapping, stream input ownership, 04 lifetime, 15 capture, and 14 fields remain. Hardware and zoom visual acceptance stays with ticket 23. The vendor patch is excluded.
 - 915be521: merged ticket 07 commit 5b13f539 without conflicts. The complete merge tree equals the worker tree. Read-only verification passes 37 bounded comparisons, 21 source identities, and four artifact identities. The discovered-local-DUID manual context case remains unchecked and tracked in ticket 09. See the [integration audit](evidence/ticket07-integration/audit.md). No build, runtime check, or new capture was run.
 - d0e2f052: preserved current source and approved planning baseline.
 - 42bffb7d: recorded the Linux WebEngine build baseline and graphics limits.
