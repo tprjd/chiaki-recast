@@ -1,4 +1,7 @@
 #include "keyboardmousebindings.h"
+#if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
+#include "steamtools.h"
+#endif
 #include <QKeyEvent>
 #include <QPushButton>
 #include <QLabel>
@@ -1050,6 +1053,392 @@ private slots:
         QVERIFY(!backend->qmlSession());
         QVERIFY(!backend->qmlWindow());
         QVERIFY(requests.isEmpty());
+    }
+
+    void setupReminders()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(true);
+        settings.SetAddSteamShortcutAsk(true);
+        QList<QPointer<PsnReply>> http;
+        RegistrationTransport registration;
+        PsnRequests requests = registration.guardedPsn();
+        requests.networkManager = [&](QObject *parent) { return new PsnNetwork(http, parent); };
+        requests.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS;
+        };
+        requests.connect = [](StreamSession *, const QString &, bool) { return CHIAKI_ERR_CANCELED; };
+        QmlNativeServices services(&settings, requests, {}, registration.boundary(), controlledDiscovery());
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 900);
+        setup.show();
+#if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-reminder]')?.getAttribute('data-reminder')").toString(), QString("steam"));
+        QVERIFY(click(setup.view(), "[data-reminder-later]"));
+        QVERIFY(settings.GetAddSteamShortcutAsk());
+#endif
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-reminder]')?.getAttribute('data-reminder')").toString(), QString("psn"));
+        QVERIFY(click(setup.view(), "[data-reminder-never]"));
+        QTRY_VERIFY(!settings.GetRemotePlayAsk());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-reminder]') === null").toBool());
+        setup.view()->reload();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings') !== null").toBool());
+        QVERIFY(script(setup.view(), "document.querySelector('[data-reminder]') === null").toBool());
+        Settings reopened(profile);
+        QVERIFY(!reopened.GetRemotePlayAsk());
+        QVERIFY(reopened.GetAddSteamShortcutAsk());
+        QVERIFY(http.isEmpty());
+    }
+
+    void steamShortcutWorkflow()
+    {
+#if !CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
+        QSKIP("Steam shortcuts are not enabled in this build");
+#else
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+        });
+        QTemporaryDir files;
+        QVERIFY(files.isValid());
+        const auto write = [&](const QString &path, const QByteArray &bytes) {
+            QVERIFY(QDir().mkpath(QFileInfo(path).absolutePath()));
+            QFile file(path); QVERIFY(file.open(QIODevice::WriteOnly)); QCOMPARE(file.write(bytes), bytes.size());
+        };
+        const QString base = files.path();
+        const QString shortcuts = base + "/userdata/1/config/shortcuts.vdf";
+        const QString controller = base + "/steamapps/common/Steam Controller Configs/1/config/configset_controller_neptune.vdf";
+        write(base + "/config/loginusers.vdf", "\"users\"\n{\n\"76561197960265729\"\n{\n\"MostRecent\" \"1\"\n}\n}\n");
+        write(controller, "\"controller_mappings\"\n{\n}\n");
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(true);
+        QList<QPointer<PsnReply>> http;
+        RegistrationTransport registration;
+        PsnRequests requests = registration.guardedPsn();
+        requests.networkManager = [&](QObject *parent) { return new PsnNetwork(http, parent); };
+        requests.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS;
+        };
+        requests.connect = [](StreamSession *, const QString &, bool) { return CHIAKI_ERR_CANCELED; };
+        QmlNativeServices services(&settings, requests, {}, registration.boundary(), controlledDiscovery());
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 900); setup.show();
+        QVERIFY(click(setup.view(), "[data-reminder-now]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-steam-form]')").toBool());
+        const auto choose = [&](bool cancel) {
+            QTimer completion;
+            completion.setInterval(10);
+            connect(&completion, &QTimer::timeout, &completion, [&] {
+                for (auto *widget : QApplication::topLevelWidgets()) if (auto *picker = qobject_cast<QFileDialog *>(widget)) {
+                    if (!picker->isVisible()) continue;
+                    completion.stop();
+                    if (!cancel) picker->selectFile(base);
+                    QMetaObject::invokeMethod(picker, "done", Qt::DirectConnection, Q_ARG(int, cancel ? QDialog::Rejected : QDialog::Accepted));
+                    return;
+                }
+            });
+            completion.start();
+            QVERIFY(click(setup.view(), "[data-steam-folder]"));
+            QTRY_VERIFY(!completion.isActive());
+        };
+        choose(true);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-steam-path]').textContent.includes('default Steam folder')").toBool());
+        choose(false);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-steam-path]').textContent").toString(), QDir::toNativeSeparators(base));
+        QVERIFY(fill(setup.view(), "[data-steam-name]", "  "));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-steam-create]').disabled").toBool());
+        QVERIFY(!QFile::exists(shortcuts));
+        QVERIFY(fill(setup.view(), "[data-steam-name]", "  Synthetic shortcut  "));
+        QVERIFY(fill(setup.view(), "[data-steam-options]", "  --profile=synthetic  "));
+        script(setup.view(), "document.querySelector('[data-steam-create]').click();document.querySelector('[data-steam-create]').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-steam-result]')?.getAttribute('data-steam-result')").toString(), QString("success"));
+        QVERIFY(!settings.GetAddSteamShortcutAsk());
+        Settings reopened(profile); QVERIFY(!reopened.GetAddSteamShortcutAsk());
+        QStringList errors;
+        SteamTools tools([](const QString &) {}, [&](const QString &error) { errors.append(error); }, base);
+        auto entries = tools.parseShortcuts();
+        QCOMPARE(entries.size(), 1);
+        QCOMPARE(entries[0].getAppName(), QString("Synthetic shortcut"));
+        QCOMPARE(entries[0].getLaunchOptions(), QString("--profile=synthetic"));
+        QCOMPARE(QDir(base + "/userdata/1/config/grid").entryList({"*.png"}, QDir::Files).size(), 5);
+        QFile config(controller); QVERIFY(config.open(QIODevice::ReadOnly));
+        const auto configBytes = config.readAll(); config.close();
+        QVERIFY(configBytes.contains("3049833406") && configBytes.contains("synthetic shortcut"));
+        QVERIFY(click(setup.view(), "[data-steam-close]"));
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('[data-steam-form]')").toBool());
+        QVERIFY(click(setup.view(), "[data-steam-open]"));
+        choose(false);
+        QVERIFY(fill(setup.view(), "[data-steam-name]", "Renamed shortcut"));
+        QVERIFY(fill(setup.view(), "[data-steam-options]", "--profile=synthetic"));
+        QVERIFY(click(setup.view(), "[data-steam-create]"));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-steam-result]')?.getAttribute('data-steam-result')").toString(), QString("success"));
+        entries = tools.parseShortcuts(); QCOMPARE(entries.size(), 1); QCOMPARE(entries[0].getAppName(), QString("Renamed shortcut"));
+        QVERIFY(!QDir(QFileInfo(shortcuts).absolutePath()).entryList({"shortcuts.vdf.*.bak"}, QDir::Files).isEmpty());
+        QVERIFY(click(setup.view(), "[data-steam-close]"));
+        services.backend()->qmlSettings()->setAddSteamShortcutAsk(true);
+        QVERIFY(QFile::remove(controller));
+        QVERIFY(click(setup.view(), "[data-steam-open]"));
+        choose(false);
+        QVERIFY(fill(setup.view(), "[data-steam-name]", "Partial write"));
+        QVERIFY(fill(setup.view(), "[data-steam-options]", "--profile=other"));
+        QVERIFY(click(setup.view(), "[data-steam-create]"));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-steam-result]')?.getAttribute('data-steam-result')").toString(), QString("failure"));
+        QVERIFY(settings.GetAddSteamShortcutAsk());
+        QCOMPARE(tools.parseShortcuts().size(), 2);
+        QVERIFY(script(setup.view(), "document.querySelector('[data-steam-form]').textContent.includes('Some files may already have changed')").toBool());
+        write(controller, "\"controller_mappings\"\n{\n}\n");
+        QVERIFY(click(setup.view(), "[data-steam-create]"));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-steam-result]')?.getAttribute('data-steam-result')").toString(), QString("success"));
+        QCOMPARE(tools.parseShortcuts().size(), 2);
+        QVERIFY(!settings.GetAddSteamShortcutAsk());
+        QVERIFY(errors.isEmpty()); QVERIFY(http.isEmpty());
+#endif
+    }
+
+    void setupReminderOwnership()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(true);
+        settings.SetAddSteamShortcutAsk(true);
+        QList<QPointer<PsnReply>> http;
+        RegistrationTransport registration;
+        PsnRequests requests = registration.guardedPsn();
+        requests.networkManager = [&](QObject *parent) { return new PsnNetwork(http, parent); };
+        requests.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS;
+        };
+        requests.connect = [](StreamSession *, const QString &, bool) { return CHIAKI_ERR_CANCELED; };
+        QmlNativeServices services(&settings, requests, {}, registration.boundary(), controlledDiscovery());
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 900); setup.show();
+#if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-reminder]')?.getAttribute('data-reminder')").toString(), QString("steam"));
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.hasAttribute('data-reminder-later')").toBool());
+        setup.activateWindow(); setup.view()->setFocus();
+        QTRY_VERIFY(setup.isActiveWindow());
+        auto *receiver = setup.view()->focusProxy(); QVERIFY(receiver);
+        QKeyEvent repeat(QEvent::KeyPress, Qt::Key_Yes, Qt::NoModifier, {}, true);
+        QCoreApplication::sendEvent(receiver, &repeat);
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-reminder]')?.getAttribute('data-reminder')").toString(), QString("steam"));
+        QTest::keyClick(receiver, Qt::Key_Yes);
+#endif
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-reminder]')?.getAttribute('data-reminder')").toString(), QString("psn"));
+        // The release from the first key must leave the next reminder open.
+        QVERIFY(settings.GetRemotePlayAsk()); QVERIFY(settings.GetAddSteamShortcutAsk());
+        QVERIFY(click(setup.view(), "[data-reminder-now]"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-embedded]')?.getClientRects().length > 0").toBool());
+        QTRY_COMPARE(script(setup.view(), "document.activeElement?.textContent").toString(), QString("PSN remote access"));
+        QVERIFY(click(setup.view(), "[data-psn-close]"));
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.hasAttribute('data-psn-account')").toBool());
+        QVERIFY(!setupRequest(setup.view(), "openSetupHelp", {"file:///private"}).value("accepted").toBool());
+        QVERIFY(!setupRequest(setup.view(), "openSetupHelp", {"https://example.com"}).value("accepted").toBool());
+        PsnBrowserOpener opener;
+        QDesktopServices::setUrlHandler("https", &opener, "open");
+        const auto resetHandler = qScopeGuard([] { QDesktopServices::unsetUrlHandler("https"); });
+        QVERIFY(setupRequest(setup.view(), "openSetupHelp", {"steam"}).value("accepted").toBool());
+        QCOMPARE(opener.url, QUrl("https://streetpea.github.io/chiaki-ng/setup/steaming/"));
+        QVERIFY(http.isEmpty());
+    }
+
+    void steamShortcutGuards()
+    {
+#if !CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
+        QSKIP("Steam shortcuts are not enabled in this build");
+#else
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        QList<QPointer<PsnReply>> http;
+        RegistrationTransport registration;
+        PsnRequests requests = registration.guardedPsn();
+        requests.networkManager = [&](QObject *parent) { return new PsnNetwork(http, parent); };
+        requests.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS;
+        };
+        requests.connect = [](StreamSession *, const QString &, bool) { return CHIAKI_ERR_CANCELED; };
+        QmlNativeServices services(&settings, requests, {}, registration.boundary(), controlledDiscovery());
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 900); setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-steam-open]')?.disabled === false").toBool());
+        setup.view()->setFocus();
+        QTest::keyClick(setup.view()->focusProxy(), Qt::Key_F1);
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-steam-form]')").toBool());
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.hasAttribute('data-steam-name')").toBool());
+        QTest::keyClick(setup.view()->focusProxy(), Qt::Key_Down);
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.hasAttribute('data-steam-options')").toBool());
+        const auto generation = QString::number(services.backend()->profileGeneration());
+        const auto form = setup.bridge()->snapshot().value("steam").toMap().value("form").toString();
+        QVERIFY(!setupRequest(setup.view(), "beginSteamShortcut", {generation}).value("accepted").toBool());
+        QVERIFY(!setupRequest(setup.view(), "submitSteamShortcut", {form, QJsonObject{{"name", "  "}}, generation}).value("accepted").toBool());
+        QVERIFY(!setupRequest(setup.view(), "submitSteamShortcut", {form, QJsonObject{{"steamDir", "C:/unauthorized"}}, generation}).value("accepted").toBool());
+        QTemporaryDir files; QVERIFY(files.isValid());
+        bool pickerSeen = false;
+        QTimer picker;
+        picker.setInterval(10);
+        connect(&picker, &QTimer::timeout, &picker, [&] {
+            for (auto *widget : QApplication::topLevelWidgets()) if (auto *dialog = qobject_cast<QFileDialog *>(widget)) {
+                if (!dialog->isVisible()) continue;
+                picker.stop(); pickerSeen = true;
+                dialog->selectFile(files.path());
+                services.backend()->qmlSettings()->setCurrentProfile(profile + "-next");
+                services.backend()->setDiscoveryEnabled(false);
+                QMetaObject::invokeMethod(dialog, "done", Qt::DirectConnection, Q_ARG(int, QDialog::Accepted));
+                return;
+            }
+        });
+        picker.start();
+        QVERIFY(click(setup.view(), "[data-steam-folder]"));
+        QTRY_VERIFY(pickerSeen);
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('[data-steam-form]')").toBool());
+        QVERIFY(!setupRequest(setup.view(), "submitSteamShortcut", {form, QJsonObject{{"name", "Stale"}}, generation}).value("accepted").toBool());
+        QVERIFY(QDir(files.path()).entryList(QDir::NoDotAndDotDot | QDir::AllEntries).isEmpty());
+        QVERIFY(click(setup.view(), "[data-steam-open]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-steam-form]')").toBool());
+        const auto next = setup.bridge()->snapshot().value("steam").toMap().value("form").toString();
+        QVERIFY(next != form);
+        emit services.backend()->steamShortcutMessage(form, "stale-path-secret", true, true);
+        QCOMPARE(setup.bridge()->snapshot().value("steam").toMap().value("phase").toString(), QString("form"));
+        services.backend()->qmlSettings()->setStreamerMode(true);
+        const auto json = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
+        QVERIFY(!json.contains(profile.toUtf8())); QVERIFY(!json.contains(files.path().toUtf8())); QVERIFY(!json.contains("stale-path-secret"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-steam-name]').type === 'password'").toBool());
+        setup.hide();
+        QVERIFY(setup.bridge()->snapshot().value("steam").toMap().value("form").toString().isEmpty());
+        setup.show();
+        QVERIFY(click(setup.view(), "[data-steam-open]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-steam-form]')").toBool());
+        const auto beforeReload = setup.bridge()->snapshot().value("steam").toMap().value("form").toString();
+        setup.view()->reload();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-steam-open]')?.disabled === false").toBool());
+        QVERIFY(!setupRequest(setup.view(), "chooseSteamFolder", {beforeReload, QString::number(services.backend()->profileGeneration())}).value("accepted").toBool());
+        QVERIFY(click(setup.view(), "[data-steam-open]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-steam-form]')").toBool());
+        // Select an isolated folder before checking cancellation of queued native work.
+        QTimer selection;
+        selection.setInterval(10);
+        connect(&selection, &QTimer::timeout, &selection, [&] {
+            for (auto *widget : QApplication::topLevelWidgets()) if (auto *dialog = qobject_cast<QFileDialog *>(widget)) {
+                if (!dialog->isVisible()) continue;
+                selection.stop(); dialog->selectFile(files.path());
+                QMetaObject::invokeMethod(dialog, "done", Qt::DirectConnection, Q_ARG(int, QDialog::Accepted));
+                return;
+            }
+        });
+        selection.start();
+        QVERIFY(click(setup.view(), "[data-steam-folder]"));
+        QTRY_VERIFY(!selection.isActive());
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-steam-path]')?.textContent").toString(), QString("Folder hidden"));
+        bool staleIgnored = false, hidden = false;
+        QMetaObject::Connection cancel;
+        cancel = connect(setup.bridge(), &SetupBridge::stateChanged, &setup, [&](const QVariantMap &state) {
+            if (state.value("steam").toMap().value("phase") != "progress") return;
+            disconnect(cancel);
+            emit services.backend()->steamShortcutMessage(beforeReload, "obsolete completion", true, true);
+            staleIgnored = setup.bridge()->snapshot().value("steam").toMap().value("phase") == "progress";
+            setup.hide(); hidden = true;
+        });
+        QTest::keyClick(setup.view()->focusProxy(), Qt::Key_Menu);
+        QTRY_VERIFY(hidden); QVERIFY(staleIgnored);
+        QTest::qWait(80);
+        QVERIFY(QDir(files.path()).entryList(QDir::NoDotAndDotDot | QDir::AllEntries).isEmpty());
+        QVERIFY(setup.bridge()->snapshot().value("steam").toMap().value("form").toString().isEmpty());
+        QVERIFY(http.isEmpty());
+#endif
+    }
+
+    void setupReminderEligibility_data()
+    {
+        QTest::addColumn<bool>("automatic");
+        QTest::addColumn<bool>("complete");
+        QTest::addColumn<bool>("steam");
+        QTest::newRow("auto-connect") << true << false << true;
+        QTest::newRow("complete-credentials") << false << true << false;
+        QTest::newRow("incomplete-credentials") << false << false << false;
+#if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
+        QTest::newRow("steam-before-complete-psn") << false << true << true;
+#endif
+    }
+
+    void setupReminderEligibility()
+    {
+        QFETCH(bool, automatic); QFETCH(bool, complete); QFETCH(bool, steam);
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(true); settings.SetAddSteamShortcutAsk(steam);
+        if (complete) {
+            settings.SetPsnAuthToken("synthetic-access"); settings.SetPsnRefreshToken("synthetic-refresh");
+            settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addDays(1).toString(settings.GetTimeFormat()));
+            settings.SetPsnAccountId("AQAAAAAAAAA=");
+        }
+        if (automatic) {
+            ChiakiRegisteredHost host = {};
+            host.target = CHIAKI_TARGET_PS5_1;
+            memcpy(host.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+            strcpy(host.server_nickname, "Auto console");
+            settings.AddRegisteredHost(RegisteredHost(host));
+            settings.SetAutoConnectHost(QByteArray::fromHex("001122334455"));
+        }
+        QList<QPointer<PsnReply>> http;
+        RegistrationTransport registration;
+        PsnRequests requests = registration.guardedPsn();
+        requests.networkManager = [&](QObject *parent) { return new PsnNetwork(http, parent); };
+        requests.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS;
+        };
+        requests.connect = [](StreamSession *, const QString &, bool) { return CHIAKI_ERR_CANCELED; };
+        QmlNativeServices services(&settings, requests, {}, registration.boundary(), controlledDiscovery());
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 900); setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        if (automatic) {
+            QVERIFY(services.backend()->autoConnect());
+            QVERIFY(!setupRequest(setup.view(), "startReminders", {QString::number(services.backend()->profileGeneration())}).value("accepted").toBool());
+            QVERIFY(script(setup.view(), "!document.querySelector('[data-reminder]')").toBool());
+            QVERIFY(settings.GetRemotePlayAsk()); QVERIFY(settings.GetAddSteamShortcutAsk());
+            services.backend()->stopAutoConnect();
+        } else if (steam) {
+            QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-reminder]')?.getAttribute('data-reminder')").toString(), QString("steam"));
+            QVERIFY(settings.GetRemotePlayAsk());
+            QVERIFY(click(setup.view(), "[data-reminder-now]"));
+            QVERIFY(click(setup.view(), "[data-steam-close]"));
+            QTRY_VERIFY(!settings.GetRemotePlayAsk());
+            QVERIFY(settings.GetAddSteamShortcutAsk());
+            QTRY_VERIFY(script(setup.view(), "!document.querySelector('[data-reminder]') && !document.querySelector('[data-steam-form]')").toBool());
+        } else if (complete) {
+            QTRY_VERIFY(!settings.GetRemotePlayAsk());
+            QVERIFY(script(setup.view(), "!document.querySelector('[data-reminder]')").toBool());
+        } else {
+            QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-reminder]')?.getAttribute('data-reminder')").toString(), QString("psn"));
+            setup.resize(2048, 1700); setup.view()->setZoomFactor(2);
+            QTRY_VERIFY(script(setup.view(), "innerWidth >= 1024 && document.documentElement.scrollWidth <= innerWidth").toBool());
+            QVERIFY(script(setup.view(), "document.querySelector('dialog').getBoundingClientRect().right <= innerWidth").toBool());
+            QVERIFY(click(setup.view(), "[data-reminder-later]"));
+            QTRY_VERIFY(script(setup.view(), "!document.querySelector('[data-reminder]')").toBool());
+            QVERIFY(settings.GetRemotePlayAsk());
+        }
     }
 
     void controllerSettings()

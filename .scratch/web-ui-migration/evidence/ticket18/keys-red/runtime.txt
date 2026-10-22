@@ -1,0 +1,2 @@
+[46004:42912:1022/185908.683:ERROR:gpu_channel_manager.cc(956)] Failed to create GLES3 context, fallback to GLES2.
+[46004:42912:1022/185908.683:ERROR:gpu_channel_manager.cc(967)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.

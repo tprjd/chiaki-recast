@@ -11,7 +11,6 @@
 #include <QObject>
 #include <QMutex>
 #include <QThread>
-#include <QJSValue>
 #include <QSet>
 #include <QUrl>
 #include <QFutureWatcher>
@@ -248,7 +247,7 @@ public:
     bool autoRegisterHost(int index);
     void autoRegister(const QVariantMap &context);
 #if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
-    Q_INVOKABLE void createSteamShortcut(QString shortcutName, QString launchOptions, const QJSValue &callback, QString steamDir);
+    void createSteamShortcut(const QString &operation, QString shortcutName, QString launchOptions, QString steamDir);
 #endif
 #ifdef CHIAKI_HAVE_WEBENGINE
     Q_INVOKABLE void setWebEngineHints(QQuickWebEngineProfile *profile);
@@ -257,6 +256,7 @@ public:
 #endif
 
 signals:
+    void steamShortcutMessage(const QString &operation, const QString &message, bool ok, bool done);
     void streamWindowRequested();
     void windowChanged();
     void sessionChanged(StreamSession *session);

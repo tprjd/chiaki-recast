@@ -59,6 +59,10 @@ if(TARGET chiaki-gui)
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
     add_test(NAME chiaki-registration-handoff COMMAND chiaki-embedded-setup-tests registrationHandoff)
     set_tests_properties(chiaki-registration-handoff PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-reminders-steam COMMAND chiaki-embedded-setup-tests
+        setupReminders setupReminderOwnership setupReminderEligibility steamShortcutWorkflow steamShortcutGuards)
+    set_tests_properties(chiaki-embedded-reminders-steam PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
     add_test(NAME chiaki-embedded-psn COMMAND chiaki-embedded-setup-tests psnAccountStatus psnSignIn psnRefreshCredentials psnEmbeddedIsolation psnAccountPresentation)
     set_tests_properties(chiaki-embedded-psn PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-psn-remote COMMAND chiaki-embedded-setup-tests psnRemoteRefresh psnRemoteRefreshOwnership psnRemoteTokenConnection)

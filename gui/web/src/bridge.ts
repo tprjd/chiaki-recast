@@ -4,6 +4,8 @@ export interface Console {
   state: string; route: 'local' | 'manual' | 'psn'; ps5?: boolean;
 }
 export interface State {
+  reminder: { id: string; kind: string; eligible: boolean };
+  steam: { supported: boolean; form: string; phase: string; name?: string; options?: string; path?: string; diagnostics?: string };
   revision: string; profileGeneration: string; consoles: Console[];
   registrations: { key: string; name: string; ps5: boolean; identifier: string }[];
   hiddenConsoles: { key: string; name: string; identifier: string }[];
@@ -37,6 +39,13 @@ export interface State {
 export interface Registration { busy: boolean; savedAccount: boolean; context?: string; id?: string; phase?: string; message?: string; diagnostics?: string; profileValid?: boolean; connectKey?: string }
 interface Reply { accepted: boolean; profileGeneration?: string; message?: string; context?: string; address?: string; ps5?: boolean; id?: string; route?: string; accountId?: string; form?: string }
 interface NativeBridge {
+  beginSteamShortcut(profile: string, callback: (reply: Reply) => void): void;
+  chooseSteamFolder(form: string, profile: string, callback: (reply: Reply) => void): void;
+  submitSteamShortcut(form: string, fields: Record<string, string>, profile: string, callback: (reply: Reply) => void): void;
+  endSteamShortcut(form: string, profile: string, callback: (reply: Reply) => void): void;
+  openSetupHelp(topic: string, callback: (reply: Reply) => void): void;
+  startReminders(profile: string, callback: (reply: Reply) => void): void;
+  reminderAction(id: string, action: string, profile: string, callback: (reply: Reply) => void): void;
   profileAction(action: string, key: string, name: string, confirmed: boolean, profile: string, callback: (reply: Reply) => void): void;
   settingsFileAction(action: string, profile: string, callback: (reply: Reply) => void): void;
   setControllerSetting(name: string, value: boolean | number | string, profile: string, callback: (reply: Reply) => void): void;
@@ -90,6 +99,13 @@ declare global {
 }
 
 export function connectSetup(receive: (state: State) => void): Promise<{
+  beginSteamShortcut(profile: string): Promise<Reply>;
+  chooseSteamFolder(form: string, profile: string): Promise<Reply>;
+  submitSteamShortcut(form: string, fields: Record<string, string>, profile: string): Promise<Reply>;
+  endSteamShortcut(form: string, profile: string): Promise<Reply>;
+  openSetupHelp(topic: string): Promise<Reply>;
+  startReminders(profile: string): Promise<Reply>;
+  reminderAction(id: string, action: string, profile: string): Promise<Reply>;
   controllerSetting(name: string, value: boolean | number | string, profile: string): Promise<Reply>;
   beginControllerMapping(reset: boolean, profile: string): Promise<Reply>;
   controllerMappingAction(action: string, operation: string, profile: string): Promise<Reply>;
@@ -165,6 +181,13 @@ export function connectSetup(receive: (state: State) => void): Promise<{
       window.addEventListener('pageshow', refresh);
       document.addEventListener('visibilitychange', resume);
       resolve({
+        beginSteamShortcut: profile => new Promise(done => setup.beginSteamShortcut(profile, done)),
+        chooseSteamFolder: (form, profile) => new Promise(done => setup.chooseSteamFolder(form, profile, done)),
+        submitSteamShortcut: (form, fields, profile) => new Promise(done => setup.submitSteamShortcut(form, fields, profile, done)),
+        endSteamShortcut: (form, profile) => new Promise(done => setup.endSteamShortcut(form, profile, done)),
+        openSetupHelp: topic => new Promise(done => setup.openSetupHelp(topic, done)),
+        startReminders: profile => new Promise(done => setup.startReminders(profile, done)),
+        reminderAction: (id, action, profile) => new Promise(done => setup.reminderAction(id, action, profile, done)),
         accountBegin: (context, source) => new Promise(done => setup.beginRegistrationAccount(context, source, done)),
         accountLookup: (context, route, username) => new Promise(done => setup.lookupRegistrationAccount(context, route, username, done)),
         accountRead: (context, route, request) => new Promise(done => setup.readRegistrationAccount(context, route, request, done)),

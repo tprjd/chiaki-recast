@@ -21,14 +21,7 @@ Pane {
             library.updateSelection();
         }
         library.restoreFocus();
-        if(!backend.autoConnect && !navigation.initialAsk && !backend.window.directStream)
-        {
-            navigation.initialAsk = true;
-            if(backend.settings.addSteamShortcutAsk && (typeof backend.createSteamShortcut === "function"))
-                navigation.showRemindDialog(qsTr("Steam shortcut"), qsTr("Create or update a non-Steam game for Chiaki Recast with the official artwork and controller layout. You can also set this up later from the console library."), false, () => navigation.showSteamShortcutDialog(true));
-            else
-                navigation.showPsnReminder();
-        }
+
     }
     function manageConsole(action, accept, cancel, consoleName) {
         if (action === "delete") {
@@ -47,13 +40,11 @@ Pane {
         profileKey: backend.settings.currentProfile
         discoveryEnabled: backend.discoveryEnabled
         psnAvailable: !!backend.settings.psnAuthToken
-        steamAvailable: typeof backend.createSteamShortcut === "function"
         applicationVersion: Qt.application.version
         playStationController: backend.controllers.some(controller => controller.playStation)
         onConnectRequested: (sourceIndex, nickname) => backend.connectToHost(sourceIndex, nickname)
         onSettingsRequested: navigation.showSettingsDialog()
         onRefreshPsnRequested: backend.refreshPsnToken()
-        onSteamShortcutRequested: navigation.showSteamShortcutDialog(false)
         onDiscoveryToggled: enabled => backend.discoveryEnabled = enabled
         onQuitRequested: navigation.showConfirmDialog(qsTr("Quit"), qsTr("Are you sure you want to quit?"), qsTr("Quit"), () => Qt.quit())
         onManagementRequested: (action, accept, cancel, consoleName) => consolePane.manageConsole(action, accept, cancel, consoleName)
