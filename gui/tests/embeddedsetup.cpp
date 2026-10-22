@@ -1568,6 +1568,45 @@ private slots:
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-console-pin]').value").toString(), QString());
     }
 
+    void registrationAddressCorrection()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        const int originalId = settings.SetManualHost(ManualHost(-1, "original.example", false, {}));
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, {}, {}, registration.boundary());
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-selected]')").toBool());
+        script(setup.view(), "document.querySelector('[data-register-selected]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
+        QVERIFY(fill(setup.view(), "[data-registration-address]", "corrected.example"));
+        QVERIFY(fill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
+        QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
+        script(setup.view(), "document.querySelector('[data-registration-submit]').click()");
+        QTRY_COMPARE(registration.requests.size(), 1);
+        registration.complete(0, false);
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-edit]')").toBool());
+        script(setup.view(), "document.querySelector('[data-registration-edit]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-address]').value").toString(), QStringLiteral("corrected.example"));
+        QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
+        script(setup.view(), "document.querySelector('[data-registration-submit]').click()");
+        QTRY_COMPARE(registration.requests.size(), 2);
+        registration.complete(1, true);
+        QTRY_COMPARE(settings.GetManualHosts().size(), 2);
+        QVERIFY(!settings.GetManualHost(originalId).GetRegistered());
+        QCOMPARE(settings.GetManualHost(originalId).GetHost(), QStringLiteral("original.example"));
+    }
+
     void registrationNativeValidation()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
