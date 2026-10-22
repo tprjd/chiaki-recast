@@ -19,10 +19,7 @@ if(APPLE)
 	enable_language(OBJCXX)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Concurrent Svg Qml Quick Widgets WebEngineWidgets WebChannel)
-if(Qt6_VERSION VERSION_GREATER_EQUAL "6.10.0")
-	find_package(Qt6 REQUIRED COMPONENTS GuiPrivate)
-endif()
+find_package(Qt6 REQUIRED COMPONENTS Core Gui GuiPrivate Concurrent Svg Qml Quick Widgets WebEngineWidgets WebChannel)
 
 find_package(Qt6 COMPONENTS WebEngineQuick)
 find_package(Qt6 COMPONENTS DBus)
