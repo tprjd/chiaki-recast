@@ -21,3 +21,19 @@
 - [ ] The hidden page stops unnecessary work and uses the supported freeze policy. Resume reads fresh native state without restarting an operation.
 - [ ] Embedded integration checks cover success, cancellation, PIN handling, failure, repeated sessions, and window visibility. A real console run confirms native playback.
 - [ ] Remove setup-only routes, resources, callback adapters, and tests replaced by this slice once no caller needs them. Preserve shared native stream components and their tests.
+
+## Comments
+
+### Ticket 02 handoff
+
+[02](02-native-stream-only-interface.md) delivers the production native
+`StreamRoot.qml`. Its `streamViewDismissed` signal requests a presentation
+change. It does not stop a session or release its resources. Complete native
+session and frame cleanup before window destruction or setup restoration.
+
+The [ticket 02 checks](../evidence/ticket02/verification.md) use controlled
+loopback sessions. They prove native root, PIN, saved geometry, settings, and
+input behavior on the recorded OpenGL and Vulkan paths. They do not prove
+real-console decoded-media playback, physical-device behavior, or accelerated
+WebEngine coexistence. These acceptance requirements remain open here and in
+[23](23-complete-web-only-acceptance.md).
