@@ -534,8 +534,7 @@ StreamSession::~StreamSession()
 	// This prevents crashes from log callbacks during shutdown
 	log.PrepareShutdown();
 
-	if(session_started)
-		chiaki_session_join(&session);
+	WaitForStop();
 	chiaki_session_fini(&session);
 	chiaki_opus_decoder_fini(&opus_decoder);
 	chiaki_opus_encoder_fini(&opus_encoder);
@@ -639,6 +638,15 @@ void StreamSession::Stop()
 {
 	mic_active.storeRelaxed(false);
 	chiaki_session_stop(&session);
+}
+
+void StreamSession::WaitForStop()
+{
+	Q_ASSERT(QThread::currentThread() == thread());
+	if(!session_started)
+		return;
+	chiaki_session_join(&session);
+	session_started = false;
 }
 
 void StreamSession::GoToBed()

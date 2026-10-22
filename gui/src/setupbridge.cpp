@@ -14,6 +14,8 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
 {
     connect(backend, &QmlBackend::hostsChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::discoveryEnabledChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::connectionAttemptChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::windowChanged, this, &SetupBridge::refresh);
     connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, &SetupBridge::refresh);
     connect(backend->qmlSettings(), &QmlSettings::currentProfileChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::psnAuthAttemptChanged, this, &SetupBridge::refresh);
@@ -140,7 +142,7 @@ void SetupBridge::refresh()
     const char *texts[] = {QT_TR_NOOP("Consoles"), QT_TR_NOOP("Search consoles"), QT_TR_NOOP("Discovery"), QT_TR_NOOP("Discovery is on"), QT_TR_NOOP("Discovery is off"),
         QT_TR_NOOP("No consoles found"), QT_TR_NOOP("No matching consoles"), QT_TR_NOOP("Turn on discovery to find consoles on your local network."),
         QT_TR_NOOP("Online"), QT_TR_NOOP("In standby"), QT_TR_NOOP("Status unknown"), QT_TR_NOOP("Not registered"), QT_TR_NOOP("Local network"), QT_TR_NOOP("Manual address"),
-        QT_TR_NOOP("Remote connection via PSN"), QT_TR_NOOP("Console"), QT_TR_NOOP("Console unavailable"), QT_TR_NOOP("Selected"), QT_TR_NOOP("Loading consoles"), QT_TR_NOOP("Setup unavailable"),
+        QT_TR_NOOP("Remote connection via PSN"), QT_TR_NOOP("Console"), QT_TR_NOOP("Console unavailable"), QT_TR_NOOP("Selected"), QT_TR_NOOP("Loading consoles"), QT_TR_NOOP("Setup unavailable"), QT_TR_NOOP("Connect"), QT_TR_NOOP("Dismiss"),
         QT_TR_NOOP("PSN account"), QT_TR_NOOP("PSN remote access"), QT_TR_NOOP("Retrieving your Account ID"), QT_TR_NOOP("Completing PSN sign-in"),
         QT_TR_NOOP("PSN remote access is ready"), QT_TR_NOOP("PSN credentials expired"), QT_TR_NOOP("Not signed in"),
         QT_TR_NOOP("Sign-in saves PSN credentials and your Account ID in the current profile. These credentials allow remote access to your consoles."),
@@ -222,8 +224,9 @@ void SetupBridge::refresh()
     addChoices("audioOutDevice", settings->availableAudioOutDevices(), settings->audioOutDevice(), true);
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
         {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
-        {"streamerMode", privateMode}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
-    emit stateChanged(state);
+        {"streamerMode", privateMode}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
+            || backend->connectionAttempt().value("cleanupPending").toBool()}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
+    if (!suspended) emit stateChanged(state);
 }
 
 bool SetupBridge::resolveConsole(const QString &key, int &index, QString &nickname) const
@@ -335,6 +338,42 @@ QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &
     else if (name == "steamDeckHaptics") settings->setSteamDeckHaptics(value.toBool());
     else if (name == "verticalDeck") settings->setVerticalDeck(value.toBool());
 #endif
+    return {{"accepted", true}};
+}
+
+void SetupBridge::setSuspended(bool value)
+{
+    suspended = value;
+    if (!suspended) refresh();
+}
+
+void SetupBridge::reportStreamError(const QString &title, const QString &text)
+{
+    streamError = {{"id", QString::number(++streamErrorGeneration)}, {"title", title}, {"text", text}};
+    refresh();
+}
+
+QVariantMap SetupBridge::dismissStreamError(const QString &id)
+{
+    if (id.isEmpty() || id != streamError.value("id").toString()) return {{"accepted", false}};
+    streamError.clear();
+    refresh();
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::connectConsole(const QString &key)
+{
+    int index;
+    QString nickname;
+    if (state.value("connectionBusy").toBool())
+        return {{"accepted", false}, {"message", tr("A connection is already active")}};
+    if (!resolveConsole(key, index, nickname))
+        return {{"accepted", false}, {"message", tr("Console unavailable")}};
+    const auto host = backend->hosts().at(index).toMap();
+    if (!host.value("registered").toBool() || !host.value("discovered").toBool() || host.value("state") != "ready")
+        return {{"accepted", false}, {"message", tr("Select an online registered local console")}};
+    selectedKey = key;
+    backend->connectToHost(index, nickname);
     return {{"accepted", true}};
 }
 

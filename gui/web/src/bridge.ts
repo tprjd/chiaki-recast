@@ -5,6 +5,8 @@ export interface Console {
 export interface State {
   revision: string; profileGeneration: string; consoles: Console[];
   selectedKey: string; discoveryEnabled: boolean; streamerMode: boolean;
+  connectionBusy: boolean;
+  streamError?: { id: string; title: string; text: string };
   mediaSettings: Record<string, boolean | number | string>;
   mediaChoices: Record<string, { label: string; value: string }[]>;
   generalSettings: Record<string, boolean | number>;
@@ -16,6 +18,8 @@ interface NativeBridge {
   snapshot(callback: (state: State) => void): void;
   setDiscoveryEnabled(value: boolean, callback: (reply: Reply) => void): void;
   selectConsole(key: string, callback: (reply: Reply) => void): void;
+  connectConsole(key: string, callback: (reply: Reply) => void): void;
+  dismissStreamError(id: string, callback: (reply: Reply) => void): void;
   openPsnSignIn(profile: string, callback: (reply: Reply) => void): void;
   openPsnExternal(profile: string, callback: (reply: Reply) => void): void;
   copyPsnSignInLink(profile: string, callback: (reply: Reply) => void): void;
@@ -35,6 +39,8 @@ declare global {
 export function connectSetup(receive: (state: State) => void): Promise<{
   discovery(enabled: boolean): Promise<Reply>;
   select(key: string): Promise<Reply>;
+  connect(key: string): Promise<Reply>;
+  dismissStreamError(id: string): Promise<Reply>;
   psnEmbedded(profile: string): Promise<Reply>;
   psnExternal(profile: string): Promise<Reply>;
   psnCopyLink(profile: string): Promise<Reply>;
@@ -56,8 +62,20 @@ export function connectSetup(receive: (state: State) => void): Promise<{
         revision = BigInt(state.revision);
         receive(state);
       };
+      let savedFocus: HTMLElement | null = null;
       const refresh = () => setup.snapshot(update);
-      const resume = () => { if (!document.hidden) refresh(); };
+      const resume = () => {
+        if (document.hidden) { savedFocus = document.activeElement as HTMLElement; return; }
+        setup.snapshot(state => {
+          update(state);
+          requestAnimationFrame(() => {
+            const target = savedFocus?.isConnected && savedFocus.tabIndex >= 0 && !savedFocus.matches(':disabled') ? savedFocus
+              : document.querySelector<HTMLElement>(`.console-card[data-console-key="${CSS.escape(state.selectedKey)}"]:enabled`)
+                ?? document.querySelector<HTMLElement>('.discovery:enabled');
+            target?.focus();
+          });
+        });
+      };
       setup.stateChanged.connect(update);
       refresh();
       window.addEventListener('pageshow', refresh);
@@ -65,6 +83,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
       resolve({
         discovery: value => new Promise(done => setup.setDiscoveryEnabled(value, done)),
         select: key => new Promise(done => setup.selectConsole(key, done)),
+        connect: key => new Promise(done => setup.connectConsole(key, done)),
+        dismissStreamError: id => new Promise(done => setup.dismissStreamError(id, done)),
         psnEmbedded: profile => new Promise(done => setup.openPsnSignIn(profile, done)),
         psnExternal: profile => new Promise(done => setup.openPsnExternal(profile, done)),
         psnCopyLink: profile => new Promise(done => setup.copyPsnSignInLink(profile, done)),

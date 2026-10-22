@@ -70,6 +70,12 @@ static bool inputDesktopAvailable()
 #include "qmlnativeservices.h"
 #include "setupwindow.h"
 #include "setupbridge.h"
+#include "applicationcontroller.h"
+#include <QTcpServer>
+#include <atomic>
+#ifdef Q_OS_WIN
+#include <stdlib.h>
+#endif
 #include "psnrequests.h"
 #include "psnsigninwindow.h"
 #include <QWebEngineProfile>
@@ -83,6 +89,33 @@ static bool inputDesktopAvailable()
 #ifdef main
 #undef main
 #endif
+
+struct DecodedBuffers
+{
+    std::atomic<int> allocated = 0;
+    std::atomic<int> released = 0;
+    struct Buffer { AVBufferRef *original; DecodedBuffers *counts; };
+    static int allocate(AVCodecContext *context, AVFrame *frame, int flags)
+    {
+        const int result = avcodec_default_get_buffer2(context, frame, flags);
+        if (result < 0) return result;
+        auto *counts = static_cast<DecodedBuffers *>(context->opaque);
+        for (auto &buffer : frame->buf) {
+            if (!buffer) continue;
+            auto *owner = new Buffer{buffer, counts};
+            auto *tracked = av_buffer_create(buffer->data, buffer->size, [](void *opaque, uint8_t *) {
+                auto *owner = static_cast<Buffer *>(opaque);
+                av_buffer_unref(&owner->original);
+                ++owner->counts->released;
+                delete owner;
+            }, owner, 0);
+            if (!tracked) { delete owner; return AVERROR(ENOMEM); }
+            buffer = tracked;
+            ++counts->allocated;
+        }
+        return result;
+    }
+};
 
 class PsnReply : public QNetworkReply
 {
@@ -207,7 +240,314 @@ class EmbeddedSetupTest : public QObject
         return {};
     }
 
+    QObject *nativeObject(const QString &name)
+    {
+        const auto find = [&](auto &&self, QQuickItem *item) -> QObject * {
+            if (item->objectName() == name) return item;
+            if (auto *object = item->findChild<QObject *>(name)) return object;
+            for (auto *child : item->childItems())
+                if (auto *object = self(self, child)) return object;
+            return nullptr;
+        };
+        for (auto *window : QGuiApplication::allWindows()) {
+            if (window->objectName() == name) return window;
+            if (auto *quick = qobject_cast<QQuickWindow *>(window))
+                if (auto *object = find(find, quick->contentItem())) return object;
+        }
+        return nullptr;
+    }
+
 private slots:
+    void suspendClosesSignIn()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(true);
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS;
+        };
+        QmlNativeServices services(&settings, transport);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-account]') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-psn-account]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-embedded]') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-psn-embedded]').click()");
+        QPointer<PsnSignInWindow> signIn;
+        QTRY_VERIFY((signIn = setup.findChild<PsnSignInWindow *>("psnSignInWindow")));
+        signIn->view()->stop();
+        auto *profilePage = signIn->view()->page();
+        profilePage->profile()->setUrlRequestInterceptor(new PsnPageRequests(profilePage->profile()));
+        profilePage->setUrl(QUrl("https://remoteplay.dl.playstation.net/remoteplay/redirect?code=suspend-fixture"));
+        QTRY_COMPARE(requests.size(), 1);
+        const auto attempt = backend->psnAuthAttempt().value("id");
+        setup.suspend();
+        QTRY_VERIFY_WITH_TIMEOUT(!signIn, 2000);
+        QTRY_COMPARE(setup.view()->page()->lifecycleState(), QWebEnginePage::LifecycleState::Frozen);
+        QCOMPARE(backend->psnAuthAttempt().value("phase").toString(), QStringLiteral("exchanging"));
+        requests[0]->finish(R"({"access_token":"suspend-access","refresh_token":"suspend-refresh","expires_in":3600})");
+        QTRY_COMPARE(requests.size(), 2);
+        requests[1]->finish(R"({"user_id":"1"})");
+        QTRY_COMPARE(backend->psnAuthAttempt().value("phase").toString(), QStringLiteral("success"));
+        setup.resume();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-status]')?.textContent").toString(), QStringLiteral("PSN remote access is ready"));
+        QCOMPARE(backend->psnAuthAttempt().value("id"), attempt);
+        QCOMPARE(requests.size(), 2);
+        QCOMPARE(settings.GetPsnAuthToken(), QStringLiteral("suspend-access"));
+        QVERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains("suspend-access"));
+    }
+
+    void decodedSessionCleanup()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetHardwareDecoder({});
+        settings.SetPlaceboPreset(PlaceboPreset::Fast);
+        settings.SetCodecLocalPS5(CHIAKI_CODEC_H264);
+        settings.SetCodecRemotePS5(CHIAKI_CODEC_H264);
+        settings.SetWindowType(WindowType::AdjustableResolution);
+        settings.SetStreamGeometry(QRect(80, 80, 960, 640));
+        settings.SetDisconnectAction(DisconnectAction::Ask);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Office console");
+        RegisteredHost paired(registered);
+        paired.SetConsolePin(paired, {});
+        settings.AddRegisteredHost(paired);
+        QTcpServer transport;
+        QVERIFY(transport.listen(QHostAddress::LocalHost, 9295));
+        QFile fixture(QFINDTESTDATA("fixtures/red.h264"));
+        QVERIFY(fixture.open(QIODevice::ReadOnly));
+        auto packet = fixture.readAll();
+        const int packetSize = packet.size();
+        packet.append(AV_INPUT_BUFFER_PADDING_SIZE, '\0');
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        auto controller = std::make_unique<ApplicationController>(&services);
+        auto *setup = controller->setupWindow();
+        setup->show();
+        DiscoveryHost host = {};
+        host.ps5 = true;
+        host.host_name = "Office console";
+        host.host_id = "001122334455";
+        host.host_addr = "127.0.0.1";
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        discover(backend, {host});
+        for (int pass = 0; pass < 2; ++pass) {
+            backend->nativeSettings()->SetRenderBackend(pass ? RenderBackend::Vulkan : RenderBackend::OpenGL);
+            QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
+            script(setup->view(), "document.querySelector('.connect-console').focus();document.querySelector('.connect-console').click();document.querySelector('.connect-console').click()");
+            QTRY_VERIFY(backend->qmlSession());
+            QPointer<StreamSession> session = backend->qmlSession();
+            QPointer<QmlMainWindow> native = backend->qmlWindow();
+            QVERIFY(native);
+            QCOMPARE(native->nativeGraphicsApi(), pass ? QSGRendererInterface::Vulkan : QSGRendererInterface::OpenGL);
+            QCOMPARE(native->videoPreset(), QmlMainWindow::VideoPreset::Fast);
+            QTRY_VERIFY(!setup->isVisible());
+            const auto attempt = backend->connectionAttempt().value("id");
+            const auto key = setup->bridge()->snapshot().value("selectedKey").toString();
+            QVERIFY(!setup->bridge()->connectConsole(key).value("accepted").toBool());
+            QCOMPARE(backend->connectionAttempt().value("id"), attempt);
+            ChiakiEvent pin = {};
+            pin.type = CHIAKI_EVENT_LOGIN_PIN_REQUEST;
+            session->Event(&pin);
+            QVERIFY2(!backend->sessionPinRequest().value("id").toString().isEmpty(), "The controlled console must request a native PIN form");
+            QTRY_VERIFY(nativeObject("consoleLoginPin"));
+            QVERIFY(native->streamInput()->blocked());
+            auto *input = nativeObject("consoleLoginPin");
+            input->setProperty("text", "0012");
+            auto *submit = nativeObject("pinSubmit");
+            QVERIFY(submit);
+            QVERIFY(QMetaObject::invokeMethod(submit, "clicked"));
+            QTRY_COMPARE(backend->sessionPinRequest().value("phase").toString(), QStringLiteral("submitting"));
+            QVERIFY(settings.GetRegisteredHost(HostMAC(registered.server_mac)).GetConsolePin().isEmpty());
+            pin.login_pin_request.pin_incorrect = true;
+            session->Event(&pin);
+            QTRY_VERIFY(nativeObject("pinHeading") && nativeObject("pinHeading")->property("text").toString().contains("Incorrect"));
+            DecodedBuffers counts;
+            const auto finishSession = qScopeGuard([&] { if (backend->qmlSession()) controller.reset(); });
+            auto *decoder = session->GetFfmpegDecoder();
+            QVERIFY(decoder);
+            decoder->codec_context->opaque = &counts;
+            decoder->codec_context->get_buffer2 = &DecodedBuffers::allocate;
+            QVERIFY(chiaki_ffmpeg_decoder_video_sample_cb(reinterpret_cast<uint8_t *>(packet.data()), packetSize, 0, false, decoder));
+            int submittedSamples = 1;
+            bool samplesValid = true;
+            QTimer samples;
+            samples.setInterval(16);
+            connect(&samples, &QTimer::timeout, &samples, [&] {
+                if (!session) { samples.stop(); return; }
+                samplesValid &= chiaki_ffmpeg_decoder_video_sample_cb(reinterpret_cast<uint8_t *>(packet.data()), packetSize, 0, false, decoder);
+                ++submittedSamples;
+            });
+            samples.start();
+            QTRY_VERIFY(native->hasVideo());
+            ChiakiEvent connected = {};
+            connected.type = CHIAKI_EVENT_CONNECTED;
+            session->Event(&connected);
+            QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("ready"));
+            QVERIFY(counts.allocated > counts.released);
+            native->menuRequested();
+            QTRY_VERIFY(native->streamInput()->blocked());
+            QTest::qWait(210);
+            native->menuRequested();
+            QTRY_VERIFY(!native->streamInput()->blocked());
+            samples.stop();
+            QVERIFY(samplesValid);
+            QVERIFY(submittedSamples >= 10);
+            QVERIFY(counts.allocated >= 10);
+            QVERIFY(chiaki_ffmpeg_decoder_video_sample_cb(reinterpret_cast<uint8_t *>(packet.data()), packetSize, 0, false, decoder));
+            // Keep GUI delivery queued while the production frame worker pulls the decoded sample.
+            QThread::msleep(30);
+            if (pass) {
+                controller.reset();
+            } else {
+                QVERIFY(!native->close());
+                auto *stop = nativeObject("streamDisconnectDialog");
+                QVERIFY(stop);
+                QTRY_VERIFY(stop->property("opened").toBool());
+                auto *dialog = stop->findChild<QObject *>("confirmationDialog");
+                QVERIFY(dialog);
+                QVERIFY(QMetaObject::invokeMethod(dialog, "choose", Q_ARG(QVariant, QVariant("secondary"))));
+                QTRY_VERIFY(!native);
+                QTRY_VERIFY(setup->isVisible());
+                QVERIFY(backend->discoveryEnabled());
+                QTRY_COMPARE(script(setup->view(), "document.querySelector('.discovery').getAttribute('aria-pressed')").toString(), QStringLiteral("true"));
+                script(setup->view(), "document.querySelector('.discovery').click()");
+                QTRY_VERIFY(!backend->discoveryEnabled());
+                discover(backend, {host});
+                QTRY_VERIFY(!script(setup->view(), "document.querySelector('.connect-console').disabled").toBool());
+                QTRY_COMPARE(script(setup->view(), "document.querySelector('.console-card.selected .console-name')?.textContent").toString(), QStringLiteral("Office console"));
+            }
+            QVERIFY(!native);
+            QVERIFY(!session);
+            QVERIFY(!backend->qmlSession());
+            QVERIFY(!backend->qmlWindow());
+            QCOMPARE(counts.released.load(), counts.allocated.load());
+            qInfo() << "Decoded buffer lifetime pass" << pass << "samples" << submittedSamples
+                << "allocated/released" << counts.allocated.load() << counts.released.load();
+            QTest::qWait(30);
+        }
+    }
+
+    void nativeInitializationFailure()
+    {
+        QCOMPARE(QGuiApplication::platformName(), QStringLiteral("offscreen"));
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRenderBackend(RenderBackend::OpenGL);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Office console");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        ApplicationController controller(&services);
+        auto *setup = controller.setupWindow();
+        setup->show();
+        DiscoveryHost host = {};
+        host.ps5 = true;
+        host.host_name = "Office console";
+        host.host_id = "001122334455";
+        host.host_addr = "127.0.0.1";
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        discover(services.backend(), {host});
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
+        script(setup->view(), "document.querySelector('.connect-console').click()");
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('.stream-error')?.textContent.includes('Failed initializing OpenGL backend')").toBool());
+        QVERIFY(setup->isVisible());
+        QVERIFY(!services.backend()->qmlSession());
+        QVERIFY(!services.backend()->qmlWindow());
+        script(setup->view(), "document.querySelector('.dismiss-stream-error').click()");
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('.stream-error') === null").toBool());
+        setup->view()->reload();
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('h1')?.textContent === 'Consoles'").toBool());
+        QVERIFY(script(setup->view(), "document.querySelector('.stream-error') === null").toBool());
+    }
+
+    void localHandoff()
+    {
+#ifdef Q_OS_WIN
+        if (qEnvironmentVariableIsSet("CHIAKI_HANDOFF_REQUIRE_FOREGROUND"))
+            QVERIFY2(inputDesktopAvailable(), "Handoff requires the active unlocked input desktop");
+#endif
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetHardwareDecoder({});
+        settings.SetPlaceboPreset(PlaceboPreset::Fast);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Office console");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        ApplicationController controller(&services);
+        auto &setup = *controller.setupWindow();
+        setup.show();
+        DiscoveryHost host = {};
+        host.ps5 = true;
+        host.host_name = "Office console";
+        host.host_id = "001122334455";
+        host.host_addr = "127.0.0.1";
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        discover(backend, {host});
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.connect-console')?.textContent.trim()").toString(), QStringLiteral("Connect"));
+        script(setup.view(), "document.querySelector('.connect-console').click()");
+        QTRY_VERIFY(backend->qmlWindow());
+        QTRY_VERIFY(backend->qmlWindow()->isExposed());
+        QTRY_VERIFY(!setup.isVisible());
+        QTRY_COMPARE(setup.view()->page()->lifecycleState(), QWebEnginePage::LifecycleState::Frozen);
+        QPointer<QmlMainWindow> native = backend->qmlWindow();
+        QPointer<StreamSession> session = backend->qmlSession();
+        QVERIFY(session);
+        native->dismissStreamView();
+        QTest::qWait(30);
+        QVERIFY(native);
+        QVERIFY(!setup.isVisible());
+        QVERIFY(backend->cancelConnection(backend->connectionAttempt().value("id").toString()));
+        QTRY_VERIFY(!session);
+        QTRY_VERIFY(!native);
+        QTRY_VERIFY(setup.isVisible());
+        QCOMPARE(setup.view()->page()->lifecycleState(), QWebEnginePage::LifecycleState::Active);
+        QVERIFY(backend->discoveryEnabled());
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.discovery').getAttribute('aria-pressed')").toString(), QStringLiteral("true"));
+    }
+
     void init()
     {
 #ifdef Q_OS_WIN
@@ -1370,6 +1710,10 @@ private slots:
 };
 int main(int argc, char **argv)
 {
+#ifdef Q_OS_WIN
+    SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+#endif
     if (chiaki_lib_init() != CHIAKI_ERR_SUCCESS) return 1;
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #ifdef CHIAKI_HAVE_WEBENGINE

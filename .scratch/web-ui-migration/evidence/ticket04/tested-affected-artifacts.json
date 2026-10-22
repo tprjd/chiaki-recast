@@ -1,0 +1,15 @@
+{
+  "sourceCommit": "7cd7ec8ec15dcc365c6d772aa6785c1764168e11",
+  "cases": [
+    "suspendClosesSignIn",
+    "windowRecreation"
+  ],
+  "artifacts": {
+    "C:/Users/david/.cache/chiaki-msvc-native/ticket04-build/gui/chiaki.exe": "E663AA2F8E38434001D063A41A0E92B45C9032E8BE01401DAB30F4EA3AC6C9A5",
+    "C:/Users/david/.cache/chiaki-msvc-native/ticket04-build/gui/tests/chiaki-embedded-setup-tests.exe": "B6FF2881FCF94A35BDFE7C4165486EB698C80CCB450FBB4EF2A02068D41769C7",
+    "C:/Users/david/.cache/chiaki-msvc-native/ticket04-build/gui/tests/chiaki-native-services-tests.exe": "5411687F82CF603A80EFA803ED603B539D8A2235EB3E1081B6D543F77DB6050E",
+    "C:/Users/david/.cache/chiaki-msvc-native/ticket04-build/gui/web/app.js": "C994C95AC7D45BB13D8EC09721ABE39C7F15AE1F0DA97E00B7610143BEF3857D",
+    "C:/Users/david/.cache/chiaki-msvc-native/ticket04-build/gui/web/app.css": "AD732A1F00C4F31C9B0C986FB8139E8E49562F3F7BE86EB41B8BC6B639A60524"
+  },
+  "sourceTree": "04077aead2c065abd159306890d34f76f897a794"
+}

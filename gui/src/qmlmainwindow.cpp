@@ -404,8 +404,13 @@ QmlMainWindow::QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, bool exit_
     , backend(backend)
     , qml_engine(engine)
 {
-    init(settings, exit_app_on_stream_exit);
-    backend->attachWindow(this);
+    try {
+        init(settings, exit_app_on_stream_exit);
+        backend->attachWindow(this);
+    } catch (const Exception &error) {
+        initialization_error = QString::fromUtf8(error.what());
+        graphics_failed.storeRelease(1);
+    }
 }
 
 QmlMainWindow::QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, const StreamSessionConnectInfo &connect_info)
@@ -413,6 +418,7 @@ QmlMainWindow::QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, const Stre
 {
     direct_stream = true;
     emit directStreamChanged();
+    if (!initialization_error.isEmpty()) return;
     backend->createSession(connect_info);
 
     if (connect_info.fullscreen || connect_info.zoom || connect_info.stretch)
@@ -426,10 +432,13 @@ QmlMainWindow::QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, const Stre
 QmlMainWindow::~QmlMainWindow()
 {
     releaseGameplayCapture();
+    if (update_timer) update_timer->stop();
+    if (quick_render) disconnect(quick_render, nullptr, this, nullptr);
+    delete quick_item;
+    quick_item = nullptr;
+    backend->detachWindow(this);
     disconnect(backend, nullptr, this, nullptr);
     session = nullptr;
-    update_timer->stop();
-    disconnect(quick_render, nullptr, this, nullptr);
     const auto invalidateQuick = [this] {
         Q_ASSERT(QThread::currentThread() == native_rhi->thread());
         endFrame();
@@ -446,10 +455,12 @@ QmlMainWindow::~QmlMainWindow()
         native_rhi->finish();
         destroySwapchain();
     };
-    if (owns_render_thread)
-        QMetaObject::invokeMethod(quick_render, invalidateQuick, Qt::BlockingQueuedConnection);
-    else
-        invalidateQuick();
+    if (native_rhi) {
+        if (owns_render_thread)
+            QMetaObject::invokeMethod(quick_render, invalidateQuick, Qt::BlockingQueuedConnection);
+        else
+            invalidateQuick();
+    }
 
     if (render_backend == RenderBackend::Vulkan)
         av_buffer_unref(&vulkan_hw_dev_ctx);
@@ -457,9 +468,7 @@ QmlMainWindow::~QmlMainWindow()
     const bool isOpenGlBackend = render_backend == RenderBackend::OpenGL;
     bool hasOpenGlContextCurrent = isOpenGlBackend && makeOpenGLContextCurrent();
 
-    delete quick_item;
-    backend->detachWindow(this);
-    qml_engine->setIncubationController(nullptr);
+    if (quick_window) qml_engine->setIncubationController(nullptr);
 
     if (pl_gpu gpu = placeboGpu()) {
         pl_tex_destroy(gpu, &quick_tex);
@@ -506,6 +515,7 @@ QmlMainWindow::~QmlMainWindow()
     if (owns_render_thread) {
         // The render control must release its QRhi pointer before the QRhi is deleted.
         connect(quick_render, &QObject::destroyed, [rhi = native_rhi] {
+            if (!rhi) return;
             Q_ASSERT(QThread::currentThread() == rhi->thread());
             delete rhi;
         });
@@ -523,7 +533,7 @@ QmlMainWindow::~QmlMainWindow()
     if (owns_render_thread)
         delete render_thread;
 
-    FILE *file = fopen(qPrintable(shader_cache_path()), "wb");
+    FILE *file = placebo_cache ? fopen(qPrintable(shader_cache_path()), "wb") : nullptr;
     if (file) {
         pl_cache_save_file(placebo_cache, file);
         fclose(file);
@@ -660,6 +670,7 @@ void QmlMainWindow::setSettings(Settings *new_settings)
 
 void QmlMainWindow::show()
 {
+    if (!initialization_error.isEmpty()) return;
     if (quick_item) {
         QWindow::show();
         return;
@@ -667,7 +678,7 @@ void QmlMainWindow::show()
     QQmlComponent component(qml_engine, QUrl(QStringLiteral("qrc:/StreamRoot.qml")));
     if (!component.isReady()) {
         qCCritical(chiakiGui) << "Component not ready\n" << component.errors();
-        QMetaObject::invokeMethod(QGuiApplication::instance(), &QGuiApplication::quit, Qt::QueuedConnection);
+        reportInitializationFailure(tr("Failed to load the native stream interface: %1").arg(component.errorString()));
         return;
     }
 
@@ -677,7 +688,7 @@ void QmlMainWindow::show()
     quick_item = qobject_cast<QQuickItem*>(component.createWithInitialProperties(props));
     if (!quick_item) {
         qCCritical(chiakiGui) << "Failed to create root item\n" << component.errors();
-        QMetaObject::invokeMethod(QGuiApplication::instance(), &QGuiApplication::quit, Qt::QueuedConnection);
+        reportInitializationFailure(tr("Failed to create the native stream interface: %1").arg(component.errorString()));
         return;
     }
     if (!pending_renderer_fallback_reason.isEmpty()) {
@@ -707,6 +718,15 @@ void QmlMainWindow::show()
             showMaximized();
         setWindowAdjustable(true);
     }
+}
+
+void QmlMainWindow::reportInitializationFailure(const QString &reason)
+{
+    if (graphics_failed.fetchAndStoreOrdered(1)) return;
+    QMetaObject::invokeMethod(this, [this, reason] {
+        initialization_error = reason;
+        emit initializationFailed(reason);
+    }, Qt::AutoConnection);
 }
 
 namespace {
@@ -1651,7 +1671,7 @@ void QmlMainWindow::init(Settings *settings, bool exit_app_on_stream_exit)
         render_backend = RenderBackend::OpenGL;
         setSurfaceType(QWindow::OpenGLSurface);
         if (!initOpenGLBackend())
-            qFatal("Failed initializing OpenGL backend");
+            throw Exception(tr("Failed initializing OpenGL backend"));
     };
 
     struct pl_log_params log_params = {
@@ -1780,7 +1800,7 @@ vulkan_setup_done:
         ;
     } else {
         if (!initOpenGLBackend())
-            qFatal("Failed initializing OpenGL backend");
+            throw Exception(tr("Failed initializing OpenGL backend"));
     }
 
     if (render_backend == RenderBackend::Vulkan) {
@@ -1942,7 +1962,8 @@ renderer_backend_ready:
     update_timer->setSingleShot(true);
     connect(update_timer, &QTimer::timeout, this, &QmlMainWindow::update);
 
-    const auto initializeQuick = [this] {
+    QString quickError;
+    const auto initializeQuick = [this, &quickError] {
         if (render_backend == RenderBackend::Vulkan) {
             QRhiVulkanInitParams params;
             params.inst = qt_vk_inst;
@@ -1956,7 +1977,10 @@ renderer_backend_ready:
                 const auto *imported = static_cast<const QRhiVulkanNativeHandles *>(native_rhi->nativeHandles());
                 if (imported->dev != handles.dev || imported->physDev != handles.physDev
                     || imported->gfxQueueFamilyIdx != handles.gfxQueueFamilyIdx || imported->gfxQueueIdx != handles.gfxQueueIdx)
-                    qFatal("Qt Quick did not import the libplacebo Vulkan device");
+                {
+                    quickError = tr("Qt Quick did not import the libplacebo Vulkan device");
+                    return;
+                }
             }
         } else {
             QRhiGles2InitParams params;
@@ -1968,27 +1992,35 @@ renderer_backend_ready:
             if (native_rhi) {
                 const auto *imported = static_cast<const QRhiGles2NativeHandles *>(native_rhi->nativeHandles());
                 if (imported->context != qt_gl_context)
-                    qFatal("Qt Quick did not import the libplacebo OpenGL context");
+                {
+                    quickError = tr("Qt Quick did not import the libplacebo OpenGL context");
+                    return;
+                }
             }
         }
-        if (!native_rhi)
-            qFatal("Failed to import the libplacebo graphics device into Qt Quick");
+        if (!native_rhi) {
+            quickError = tr("Failed to import the libplacebo graphics device into Qt Quick");
+            return;
+        }
         Q_ASSERT(QThread::currentThread() == native_rhi->thread());
         quick_window->setGraphicsDevice(QQuickGraphicsDevice::fromRhi(native_rhi));
-        if (!quick_render->initialize())
-            qFatal("Failed to initialize native Qt Quick render control");
+        if (!quick_render->initialize()) {
+            quickError = tr("Failed to initialize native Qt Quick render control");
+            return;
+        }
         qCInfo(chiakiGui) << "Native Qt Quick QRhi:" << native_rhi->backendName()
                          << "device:" << native_rhi->driverInfo().deviceName
                          << "imported libplacebo device matches";
     };
     if (render_backend == RenderBackend::OpenGL) {
         if (!makeOpenGLContextCurrent())
-            qFatal("Failed to make QOpenGLContext current for render control initialization");
+            throw Exception(tr("Failed to make QOpenGLContext current for render control initialization"));
         initializeQuick();
         doneOpenGLContextCurrent();
     } else {
         QMetaObject::invokeMethod(quick_render, initializeQuick, Qt::BlockingQueuedConnection);
     }
+    if (!quickError.isEmpty()) throw Exception(quickError);
 
     QTimer *dropped_frames_timer = new QTimer(this);
     dropped_frames_timer->setInterval(1000);
@@ -2073,6 +2105,7 @@ void QmlMainWindow::fullscreenTime()
 }
 void QmlMainWindow::update()
 {
+    if (graphics_failed.loadAcquire()) return;
     Q_ASSERT(QThread::currentThread() == QGuiApplication::instance()->thread());
 
     {
@@ -2098,6 +2131,7 @@ void QmlMainWindow::update()
 
 void QmlMainWindow::scheduleUpdate()
 {
+    if (graphics_failed.loadAcquire()) return;
     if (QThread::currentThread() != QGuiApplication::instance()->thread()) {
         QMetaObject::invokeMethod(this, &QmlMainWindow::scheduleUpdate, Qt::QueuedConnection);
         return;
@@ -2150,7 +2184,7 @@ void QmlMainWindow::createSwapchain()
         placebo_swapchain = pl_opengl_create_swapchain(placebo_opengl, &sw_params);
         doneOpenGLContextCurrent();
         if (!placebo_swapchain)
-            qCCritical(chiakiGui) << "Failed creating OpenGL swapchain";
+            reportInitializationFailure(tr("Failed creating OpenGL swapchain"));
         return;
     }
 
@@ -2184,8 +2218,10 @@ void QmlMainWindow::createSwapchain()
     err = vk_funcs.vkCreateWin32SurfaceKHR(placebo_vk_inst->instance, &surfaceInfo, nullptr, &surface);
 #endif
 
-    if (err != VK_SUCCESS)
-        qFatal("Failed to create VkSurfaceKHR");
+    if (err != VK_SUCCESS) {
+        reportInitializationFailure(tr("Failed to create VkSurfaceKHR"));
+        return;
+    }
 
     struct pl_vulkan_swapchain_params swapchain_params = {
         .surface = surface,
@@ -2204,6 +2240,7 @@ void QmlMainWindow::createSwapchain()
     if (!placebo_swapchain) {
         vk_funcs.vkDestroySurfaceKHR(placebo_vk_inst->instance, surface, nullptr);
         surface = VK_NULL_HANDLE;
+        reportInitializationFailure(tr("Failed to create the Vulkan swapchain"));
     }
 }
 
@@ -2319,6 +2356,7 @@ void QmlMainWindow::updateSwapchain()
 {
     Q_ASSERT(QThread::currentThread() == QGuiApplication::instance()->thread());
 
+    if (!quick_item || graphics_failed.loadAcquire()) return;
     quick_item->setSize(size());
     quick_window->resize(size());
 
@@ -2605,8 +2643,13 @@ void QmlMainWindow::render()
     auto close_started_frame = [this](bool present) {
         if (!pl_swapchain_submit_frame(placebo_swapchain))
             qCWarning(chiakiGui) << "Failed to submit Placebo frame!";
-        else if (present)
+        else if (present) {
             pl_swapchain_swap_buffers(placebo_swapchain);
+            if (!stream_ready) {
+                stream_ready = true;
+                emit streamWindowReady();
+            }
+        }
     };
 
     const struct pl_frame *hint_frame = nullptr;
