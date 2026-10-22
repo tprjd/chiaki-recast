@@ -63,3 +63,14 @@ export const mediaSettings: Setting[] = [
   { key: 'iDROnFECFailureEnabled', label: 'Request IDR frame on FEC failure', category: 'Audio/Wifi', group: 'Connection feedback', description: 'Request a complete video frame when forward error correction fails.', defaultLabel: 'Unchecked' },
   { key: 'showStreamStats', label: 'Show stream stats during gameplay', category: 'Audio/Wifi', group: 'Connection feedback', description: 'Show statistics in the native stream window.', defaultLabel: 'Unchecked' }
 ];
+
+export const keyboardMouseSettings: Setting[] = [
+  { key: 'mouseCameraEnabled', label: 'Enable mouse camera mode', group: 'Keyboard and mouse', description: 'During a stream, press F8 to capture or release your controls.', defaultLabel: 'Off' },
+  { key: 'mouseHorizontalSensitivity', label: 'Horizontal sensitivity', group: 'Mouse response', description: 'Set the horizontal mouse sensitivity multiplier.', defaultLabel: '1.00 ×', min: 0.05, max: 8, step: 0.05, unit: '×', requires: 'mouseCameraEnabled' },
+  { key: 'mouseVerticalSensitivity', label: 'Vertical sensitivity', group: 'Mouse response', description: 'Set the vertical mouse sensitivity multiplier.', defaultLabel: '1.00 ×', min: 0.05, max: 8, step: 0.05, unit: '×', requires: 'mouseCameraEnabled' },
+  { key: 'mouseDeadZoneCompensation', label: 'Game dead-zone compensation', group: 'Mouse response', description: 'Compensate for small movements that do not move the camera.', defaultLabel: '0%', min: 0, max: 50, step: 1, factor: 0.01, unit: '%', requires: 'mouseCameraEnabled' },
+  { key: 'mouseResponseExponent', label: 'Game response correction', group: 'Mouse response', description: 'Lower values increase small movements to compensate for a game\'s slow stick response.', defaultLabel: '1.00', min: 0.1, max: 3, step: 0.05, requires: 'mouseCameraEnabled' },
+  { key: 'mouseInvertVertical', label: 'Invert vertical camera movement', group: 'Mouse response', description: 'Invert the vertical mouse camera direction.', defaultLabel: 'Off', requires: 'mouseCameraEnabled' },
+  { key: 'keyboardEnabled', label: 'Keyboard as controller', group: 'Key assignments', description: 'Enable keyboard controller input when mouse camera mode is off.', defaultLabel: 'On' },
+  { key: 'mouseTouchEnabled', label: 'Enable Mouse Touchpad', group: 'Key assignments', description: 'Enable mouse touchpad input when mouse camera mode is off.', defaultLabel: 'On' }
+].map(field => ({ ...field, category: 'Keyboard and mouse' }));

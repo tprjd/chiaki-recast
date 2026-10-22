@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick, onMount } from 'svelte';
-  import { generalSettings, mediaSettings } from './settings';
+  import { generalSettings, mediaSettings, keyboardMouseSettings } from './settings';
+  import KeyboardMouse from './KeyboardMouse.svelte';
   import SettingField from './SettingField.svelte';
   import type { State, connectSetup } from './bridge';
   let { current, connection, close, t }: {
@@ -11,23 +12,30 @@
   let category = $state('General');
   let message = $state('');
   let pending = $state(false);
+  let keyboardMouseTarget = $state('');
   let search: HTMLInputElement;
-  const values = $derived({ ...current.generalSettings, ...current.mediaSettings });
-  const fields = $derived([...generalSettings, ...mediaSettings].filter(field => Object.hasOwn(values, field.key)).map(field => {
+  const values = $derived({ ...current.generalSettings, ...current.mediaSettings, ...current.keyboardMouse.values });
+  const fields = $derived([...generalSettings, ...mediaSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => Object.hasOwn(values, field.key)).map(field => {
     const choices = current.mediaChoices[field.key];
     if (field.key.startsWith('bitrate')) return { ...field, automatic: [0, 2, 6, 10, 15][Number(values[`resolution${field.key.slice(7)}`])] };
     return choices ? { ...field, options: choices.map(choice => choice.label), optionValues: choices.map(choice => choice.value) } : field;
   }));
-  const categories = ['General', 'Video', 'Stream', 'Audio/Wifi'];
+  const categories = ['General', 'Video', 'Stream', 'Audio/Wifi', 'Keyboard and mouse'];
   const visibleFields = $derived(fields.filter(field => (field.category ?? 'General') === category));
   const groups = $derived([...new Set(visibleFields.map(field => field.group))]);
-  const results = $derived(fields.filter(field => query.trim().toLocaleLowerCase().split(/\s+/)
+  const searchFields = $derived([...fields,
+    ...(current.keyboardMouse.supported ? [{ key: 'keyboardMouseReset', label: 'Reset defaults', category: 'Keyboard and mouse', group: 'Keyboard and mouse', description: 'Restore mouse response and bindings and turn mouse camera mode off. Confirmation is required.' },
+      ...current.keyboardMouse.bindings.flatMap(binding => [0, 1].map(slot => ({ key: `keyboardMouseBinding${binding.action}_${slot}`, label: `${binding.name} ${t(slot ? 'Alternative' : 'Primary')}`, category: 'Keyboard and mouse', group: 'Bindings', description: 'Assign or clear one key or mouse button.', requires: 'mouseCameraEnabled' })))] : []),
+    { key: 'resetAllKeys', label: 'Reset all keys', category: 'Keyboard and mouse', group: 'Key assignments', description: 'Restore all keyboard assignments to their native defaults.' },
+    ...current.keyboardMouse.keys.map(mapping => ({ key: `keyMapping${mapping.buttonValue}`, label: `${t('Key for')} ${mapping.buttonName}`, category: 'Keyboard and mouse', group: 'Key assignments', description: 'Assign a keyboard key.' }))]);
+  const results = $derived(searchFields.filter(field => query.trim().toLocaleLowerCase().split(/\s+/)
     .every(term => `${t(field.category ?? 'General')} ${t(field.group)} ${t(field.label)} ${t(field.description)}`.toLocaleLowerCase().includes(term))));
   onMount(() => { document.getElementById('disconnectAction')?.focus(); });
 
   async function reveal(key: string, requires?: string) {
     query = '';
-    category = fields.find(field => field.key === key)?.category ?? 'General';
+    category = searchFields.find(field => field.key === key)?.category ?? 'General';
+    keyboardMouseTarget = requires && !values[requires] ? requires : key;
     if (category === 'Audio/Wifi') connection.refreshAudioDevices();
     await tick();
     const field = fields.find(field => field.key === key);
@@ -46,6 +54,7 @@
     } finally { pending = false; }
   }
   function keyboard(event: KeyboardEvent) {
+    if (document.querySelector('dialog[open]')) return;
     if (event.key === 'Escape') {
       event.preventDefault();
       if (query) { query = ''; search.focus(); } else close();
@@ -80,15 +89,18 @@
         <h2>{t('Search results')}</h2>
         <p role="status">{results.length ? `${results.length} ${t('settings found')}` : t('No matching settings')}</p>
         {#each results as field}
-          <button onclick={() => reveal(field.key, field.requires)}><strong>{t(field.label)}</strong><span>{t(field.category ?? 'General')} / {t(field.group)}</span></button>
+          <button onclick={() => reveal(field.key, 'requires' in field ? field.requires : undefined)}><strong>{t(field.label)}</strong><span>{t(field.category ?? 'General')} / {t(field.group)}</span></button>
         {/each}
       </section>
     {:else}
       <h2>{t(category)}</h2>
       <p class="settings-note">{t('Changes are saved automatically.')}</p>
-      {#if category !== 'General'}<p class="settings-note">{t('Stream settings apply to the next session. Audio volume also changes the current session.')}</p>{/if}
+      {#if category !== 'General' && category !== 'Keyboard and mouse'}<p class="settings-note">{t('Stream settings apply to the next session. Audio volume also changes the current session.')}</p>{/if}
       {#if category === 'Audio/Wifi'}<button disabled={pending} onclick={() => connection.refreshAudioDevices()}>{t('Refresh audio devices')}</button>{/if}
       {#key current.profileGeneration}
+      {#if category === 'Keyboard and mouse'}
+        <KeyboardMouse {current} {connection} {t} target={keyboardMouseTarget} />
+      {:else}
       {#each groups as group}
         <section class="settings-group" aria-label={t(group)}>
           <h3>{t(group)}</h3>
@@ -102,6 +114,7 @@
           </div>
         </section>
       {/each}
+      {/if}
       {/key}
     {/if}
     <p class="settings-message" role="status">{message}</p>
