@@ -4,7 +4,7 @@
 
 **Blocked by:** 13: Configure display targets and the native renderer.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 50, 51, 52, 56, 75.
 
@@ -16,3 +16,7 @@
 - [ ] The native live color mapping page reads and changes the same settings without a second store.
 - [ ] Embedded tests verify representative dependent controls, invalid values, saved native values, and linked search navigation.
 - [ ] Remove setup-only routes, resources, callback adapters, and tests replaced by this slice once no caller needs them. Preserve shared native stream components and their tests.
+
+## Comments
+
+- Claimed after native renderer settings. Reuse the guarded native settings interface and shared fields. Preserve the native live color mapping page and renderer processing.
