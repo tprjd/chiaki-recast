@@ -32,10 +32,10 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [15: Keyboard and mouse controls](issues/15-keyboard-and-mouse-controls.md): resolved.
 - [14: Native color mapping](issues/14-color-mapping-settings.md): resolved. All 28 native controls, guarded persistence, dependent search, Back/focus, reload/restart, and corrected layout checks pass. Shared numeric callers pass. Native live QML remains. See [evidence](evidence/ticket14/verification.md). Hardware and package acceptance remains in later tickets.
 - [16: Controller setup and mapping](issues/16-controller-setup-and-mapping.md): resolved for native device updates, settings, all mapping slots, and actual SDL controller navigation through WebEngine. Mapping lifecycle and affected search checks pass. [Evidence](evidence/ticket16/verification.md) records source identities and limits. Ticket 23 retains hardware and zoom visual acceptance.
-- [17: Profiles, files and logs](issues/17-profiles-files-and-logs.md): ready after ticket 11.
-- [18: Setup reminders and Steam shortcuts](issues/18-reminders-and-steam-shortcuts.md): ready after ticket 06.
+- [17: Profiles, files and logs](issues/17-profiles-files-and-logs.md): claimed after ticket 11.
+- [18: Setup reminders and Steam shortcuts](issues/18-reminders-and-steam-shortcuts.md): claimed after ticket 06.
 - [05: Console management and manual addresses](issues/05-console-management-and-manual-addresses.md): resolved for guarded details/actions, manual saves/association, saved login PIN edits, and registered manual native handoff. Embedded validation, privacy, focus, native state, reload, and handoff checks pass. Live-console, physical access, platform, and hardware acceptance remains in 19 through 23.
-- [07: Pairing and Account ID lookup](issues/07-pairing-and-account-id.md): resolved for guided registration, native Account ID routes, guarded completion, manual association, and native connection after success. Focused web/native checks and Windows loopback handoff pass. [Verification](evidence/ticket07/verification.md) records reused source evidence and discovery limits. Live services, physical access, GPU, platforms, and performance remain in ticket 23.
+- [07: Pairing and Account ID lookup](issues/07-pairing-and-account-id.md): resolved for the verified guided registration and Account ID milestone. Focused web/native checks and Windows loopback handoff pass. The unchecked discovered-local-DUID manual context case carries into ticket 09 with the same-target two-method check. [Verification](evidence/ticket07/verification.md) records reused source evidence and discovery limits. Live services, physical access, GPU, platforms, and performance remain in ticket 23.
 - [08: PSN native streaming](issues/08-psn-native-streaming.md): resolved for native remote refresh, current opaque target connection, token-wait recovery, and guarded worker cleanup. Focused web/native and Windows worker checks pass. Live PSN playback remains hardware acceptance.
 - Tickets [19](issues/19-windows-web-native-package.md), [20](issues/20-linux-web-native-packages.md), and [21](issues/21-macos-web-native-package.md): ready after ticket 04.
 - [09: Automatic PSN registration](issues/09-automatic-psn-registration.md): claimed after ticket 08.
@@ -45,6 +45,7 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 
 ## Integration history
 
+- 915be521: merged ticket 07 commit 5b13f539 without conflicts. The complete merge tree equals the worker tree. Read-only verification passes 37 bounded comparisons, 21 source identities, and four artifact identities. The discovered-local-DUID manual context case remains unchecked and tracked in ticket 09. See the [integration audit](evidence/ticket07-integration/audit.md). No build, runtime check, or new capture was run.
 - d0e2f052: preserved current source and approved planning baseline.
 - 42bffb7d: recorded the Linux WebEngine build baseline and graphics limits.
 - 2ac4e5dc: merged ticket 01 commit 8f1bacb4 without conflicts. The merged native source matches the tested ticket tree. Reused the recorded passing checks without a build or test rerun.

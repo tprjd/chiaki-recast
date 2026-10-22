@@ -12,7 +12,8 @@
 
 - [x] The guided form retains supported console and firmware choices, broadcast registration, account identity input, saved Account ID use, and an optional console login PIN.
 - [x] The Remote Play pairing code and console login PIN remain distinct. Leading zeroes survive, and invalid fields prevent native submission.
-- [x] Registration uses a current native context for the discovered target, an existing manual entry, or an entered address. It accepts an entered address without the manual-address UI. Profile or address changes invalidate stale work.
+- [x] Registration uses a current native context for a discovered target without PSN metadata, an existing manual entry, or an entered address. It accepts an entered address without the manual-address UI. Profile or address changes invalidate stale work.
+- [ ] Ticket 09 must extend the shared context for manual pairing of a current discovered local target with a DUID. It must retain stale-target and profile guards and reject remote-only PSN rows. Check both registration methods for that same local target.
 - [x] Native completion signals replace callback-only integration where required. One activation starts one registration, and completion is delivered once.
 - [x] Progress, success, failure, diagnostics, corrected input, and retry reflect native outcomes. Dismissal does not claim an unsupported cancellation.
 - [x] Successful registration updates the correct native store and manual entry association. The console can then use the existing native connection path.
@@ -28,8 +29,16 @@
 
 ## Answer
 
+The verified pairing milestone is merged. One discovered-target case remains
+assigned to [ticket 09](09-automatic-psn-registration.md). The current
+`createRegistrationContext(index)` rejects every nonempty DUID, including a
+local discovered console with PSN metadata. The local row can still show the
+manual pairing action. Ticket 09 must extend the shared native context and
+check both methods for the same current local target. This case is not a
+passed ticket 07 result. Remote-only PSN rows must remain rejected.
+
 The compiled web setup page now has one guided registration form for a current
-discovered target, an existing manual entry, or an entered address. It supports
+discovered target without PSN metadata, an existing manual entry, or an entered address. It supports
 PS5, the three supported PS4 firmware choices, broadcast registration, saved
 Account IDs, and optional console login PINs. Pairing codes and login PINs use
 separate text fields and native validation. Leading zeroes survive.
