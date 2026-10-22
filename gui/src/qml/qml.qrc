@@ -29,7 +29,6 @@
     <file>DisplaySettingsDialog.qml</file>
     <file>PlaceboSettingsDialog.qml</file>
     <file>PlaceboColorMappingDialog.qml</file>
-    <file>ProfileDialog.qml</file>
     <file>ConsolePinContent.qml</file>
     <file>LiveConsolePinContent.qml</file>
     <file>LiveConsolePinHost.qml</file>

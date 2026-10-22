@@ -49,6 +49,8 @@ public:
     Q_INVOKABLE QVariantMap openPsnExternal(const QString &profile);
     Q_INVOKABLE QVariantMap copyPsnSignInLink(const QString &profile);
     Q_INVOKABLE QVariantMap submitPsnRedirect(const QString &profile, const QString &url);
+    Q_INVOKABLE QVariantMap profileAction(const QString &action, const QString &key, const QString &name, bool confirmed, const QString &profile);
+    Q_INVOKABLE QVariantMap settingsFileAction(const QString &action, const QString &profile);
     Q_INVOKABLE QVariantMap setGeneralSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
     Q_INVOKABLE QVariantMap setMediaSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
     Q_INVOKABLE QVariantMap refreshAudioDevices();
@@ -90,6 +92,7 @@ private:
     QString identity(const QVariantMap &host) const;
     QmlBackend *backend;
     QHash<QString, QString> keys;
+    QHash<QString, QString> profileKeys;
     quint64 generation = 0;
     quint64 revision = 0;
     QString selectedKey;

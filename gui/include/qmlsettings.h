@@ -70,7 +70,6 @@ class QmlSettings : public QObject
     Q_PROPERTY(QStringList availableAudioInDevices READ availableAudioInDevices NOTIFY audioDevicesChanged)
     Q_PROPERTY(QStringList availableAudioOutDevices READ availableAudioOutDevices NOTIFY audioDevicesChanged)
     Q_PROPERTY(QVariantList registeredHosts READ registeredHosts NOTIFY registeredHostsChanged)
-    Q_PROPERTY(QStringList profiles READ profiles NOTIFY profilesChanged)
     Q_PROPERTY(QString currentProfile READ currentProfile WRITE setCurrentProfile NOTIFY currentProfileChanged)
     Q_PROPERTY(QVariantList controllerMapping READ controllerMapping NOTIFY controllerMappingChanged)
     Q_PROPERTY(uint wifiDroppedNotif READ wifiDroppedNotif WRITE setWifiDroppedNotif NOTIFY wifiDroppedNotifChanged)
@@ -614,18 +613,16 @@ public:
     Q_INVOKABLE int normalizeKeyboardMouseKey(int input) const { return NormalizeKeyboardMouseKey(input); }
     Q_INVOKABLE QVariantMap changeKeyboardMouseBinding(int action, int slot, int input, bool move = false);
     Q_INVOKABLE void resetKeyboardMouseDefaults();
-    QStringList profiles() const;
 
     Q_INVOKABLE void deleteRegisteredHost(int index);
     Q_INVOKABLE void refreshAudioDevices();
     Q_INVOKABLE QString changeControllerKey(int button, int key);
     Q_INVOKABLE void clearKeyMapping();
-    Q_INVOKABLE void exportSettings();
+    Q_INVOKABLE QVariantMap exportSettings();
     QString chooseSteamBasePath();
     Q_INVOKABLE QVariantMap exportPlaceboSettings();
-    Q_INVOKABLE void importSettings();
+    Q_INVOKABLE QVariantMap importSettings();
     Q_INVOKABLE QVariantMap importPlaceboSettings();
-    Q_INVOKABLE void deleteProfile(QString profile);
     Q_INVOKABLE QString stringForDpadShortcut() const;
     Q_INVOKABLE QString stringForStreamMenuShortcut() const;
 

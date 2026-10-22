@@ -11,45 +11,8 @@ TestCase {
     visible: true
     when: windowShown
     Component { id: harnessComponent; SettingsHarness {} }
-    function test_actionsAndPrivacy() {
-        const harness = createTemporaryObject(harnessComponent, testCase);
-        findChild(harness, "settingsCategory8").forceActiveFocus(Qt.TabFocusReason);
-        keyClick(Qt.Key_Return);
-        const profile = findChild(harness, "configProfile");
-        verify(profile);
-        verify(profile.text.includes("Test profile"));
-        harness.settings.streamerMode = true;
-        verify(!profile.text.includes("Test profile"));
-        harness.settings.actions = [];
-        for (const action of ["exportSettings", "importSettings"]) {
-            const button = findChild(harness, action);
-            button.forceActiveFocus(Qt.TabFocusReason);
-            keyClick(Qt.Key_Return);
-        }
-        compare(harness.settings.actions.length, 2);
-        compare(harness.settings.actions[0].name, "exportSettings");
-        compare(harness.settings.actions[1].name, "importSettings");
-        findChild(harness, "manageProfiles").forceActiveFocus(Qt.TabFocusReason);
-        keyClick(Qt.Key_Return);
-        compare(harness.actions[0].name, "profiles");
-    }
-    Component {
-        id: navigationHarness
-        Item {
-            id: root
-            width: 900; height: 600
-            function closeDialog() { pages.pop(); }
-            function showProfileDialog() { pages.push(profileComponent); }
-            SettingsHarness { id: collaborators; visible: false; screenActive: false }
-            StackView {
-                id: pages
-                objectName: "settingsStack"
-                anchors.fill: parent
-                initialItem: SettingsDialog { backend: collaborators.backend; navigation: root }
-            }
-            Component { id: profileComponent; ProfileDialog { backend: collaborators.backend; navigation: root } }
-        }
-    }
+
+
     function test_loggingRefreshAndAboutCancel() {
         const harness = createTemporaryObject(harnessComponent, testCase, {screenActive: false});
         harness.settings.logSanitize = true;
@@ -71,7 +34,7 @@ TestCase {
         harness.settings.logVerbose = false;
         harness.settings.changeCount = 0;
         waitForRendering(harness);
-        verify(findChild(harness, "configProfile").text.includes("Changed profile"));
+        verify(findChild(harness, "settingsProfile").text.includes("Changed profile"));
         verify(findChild(harness, "logSanitize").checked);
         verify(!findChild(harness, "logVerbose").checked);
         const about = findChild(harness, "aboutSettings");
@@ -84,22 +47,7 @@ TestCase {
         compare(harness.settings.changeCount, 0);
         compare(harness.actions.length, 0);
     }
-    function test_backRestoresConfigOpener() {
-        const harness = createTemporaryObject(navigationHarness, testCase);
-        const pages = findChild(harness, "settingsStack");
-        findChild(harness, "settingsCategory8").forceActiveFocus(Qt.TabFocusReason);
-        keyClick(Qt.Key_Return);
-        const opener = findChild(harness, "manageProfiles");
-        opener.forceActiveFocus(Qt.TabFocusReason);
-        keyClick(Qt.Key_Return);
-        tryCompare(pages, "depth", 2);
-        tryCompare(pages, "busy", false);
-        findChild(harness, "profileSelection").forceActiveFocus(Qt.TabFocusReason);
-        keyClick(Qt.Key_Escape);
-        tryCompare(pages, "depth", 1);
-        tryCompare(pages, "busy", false);
-        tryCompare(opener, "activeFocus", true);
-    }
+
     function test_bounds_data() {
         return [{tag: "desktop", width: 1280, height: 720}, {tag: "minimum", width: 900, height: 600}];
     }
@@ -108,7 +56,7 @@ TestCase {
         findChild(harness, "settingsCategory8").forceActiveFocus(Qt.TabFocusReason);
         keyClick(Qt.Key_Return);
         waitForRendering(harness);
-        for (const name of ["manageProfiles", "exportSettings", "importSettings", "logSanitize", "logVerbose", "aboutSettings"]) {
+        for (const name of ["logSanitize", "logVerbose", "aboutSettings"]) {
             const control = findChild(harness, name);
             control.forceActiveFocus(Qt.TabFocusReason);
             wait(20);

@@ -172,3 +172,11 @@ export const colorMappingSettings: Setting[] = [
   {"key": "placeboToneMappingContrastRecovery", "label": "Contrast Recovery", "group": "Tone-mapping 3", "description": "Recover contrast after tone mapping.", "defaultLabel": "0.30", "category": "Color mapping", "min": 0.0, "max": 2.0, "step": 0.01, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]},
   {"key": "placeboToneMappingContrastSmoothness", "label": "Contrast Smoothness", "group": "Tone-mapping 3", "description": "Set contrast recovery smoothing.", "defaultLabel": "3.5", "category": "Color mapping", "min": 1.0, "max": 32.0, "step": 0.1, "when": [{"key": "videoPreset", "value": 5}, {"key": "placeboColorMappingEnabled", "value": true}, {"key": "placeboColorMappingPreset", "value": 0}]}
 ];
+
+export const profileSettings: Setting[] = [
+  { key: 'logSanitize', category: 'General', group: 'Privacy and logs', label: 'Sanitize logs', description: 'Hide private values in application logs.', defaultLabel: 'On' },
+  { key: 'logVerbose', category: 'General', group: 'Privacy and logs', label: 'Verbose logging', description: 'Include detailed messages in application logs.', defaultLabel: 'Off' },
+  { key: 'exportSettings', category: 'Profiles', group: 'Settings files', label: 'Export settings to file', description: 'Export the current profile through the native file dialog.', defaultLabel: '', action: true },
+  { key: 'importSettings', category: 'Profiles', group: 'Settings files', label: 'Import settings from file', description: 'Replace the profile named in a valid settings file. Invalid files keep your settings.', defaultLabel: '', action: true },
+  { key: 'openLogDirectory', category: 'General', group: 'Privacy and logs', label: 'Open log directory', description: 'Open the folder that contains application logs.', defaultLabel: '', action: true },
+];
