@@ -469,6 +469,10 @@ void QmlBackend::resumeFromSleep()
     }
     windows_wake_sleep->setWakeState(WindowsWakeState::Awake);
 #endif
+    if (resume_session && connection_profile_generation != profile_generation) {
+        resume_session = false;
+        return;
+    }
     if (resume_session) {
         qCInfo(chiakiGui) << "Resuming session...";
         resume_session = false;
@@ -487,7 +491,7 @@ void QmlBackend::resumeFromSleep()
                 session_info.fullscreen,
                 session_info.zoom,
                 session_info.stretch,
-            });
+            }, connection_target);
         }
         else
         {
@@ -559,6 +563,7 @@ void QmlBackend::reconnectPsn()
 
 void QmlBackend::profileChanged()
 {
+    resume_session = false;
     cancelAccountLookup(account_lookup_attempt.value("id").toString());
     ++profile_generation;
     if (!registration_attempt.isEmpty()) {
@@ -991,6 +996,7 @@ void QmlBackend::setConnectionPhase(const QString &phase)
 
 void QmlBackend::beginConnection(const StreamSessionConnectInfo &info, const QVariantMap &target, const QString &context)
 {
+    resume_session = false;
     session_pin_request.clear();
     session_pin_auto_submitted = false;
     session_pin_accepted = false;
@@ -1165,6 +1171,7 @@ bool QmlBackend::cancelConnection(const QString &attempt_id)
         return false;
     if (!pin_pending && !connection_attempt.value("cancelable", true).toBool())
         return false;
+    resume_session = false;
     connection_cancelled = true;
     if (connection_token)
         delete connection_token;

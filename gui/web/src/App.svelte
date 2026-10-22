@@ -10,6 +10,7 @@
   import ConsoleManagement from './ConsoleManagement.svelte';
 
   let current = $state<State>();
+  let profileGeneration = $derived(current?.profileGeneration);
   let connection = $state<Awaited<ReturnType<typeof connectSetup>>>();
   let query = $state('');
   let message = $state('');
@@ -31,14 +32,21 @@
   onMount(() => {
     let disposed = false;
     connectSetup(value => {
-      if (restoredProfile !== value.profileGeneration) {
+      const restore = restoredProfile !== value.profileGeneration;
+      if (restore) {
         restoredProfile = value.profileGeneration;
         query = value.viewState.search;
         settingsOpen = value.viewState.route === 'settings';
+        accountRoute = value.viewState.route === 'account';
         settingsCategory = value.viewState.category;
         settingsSearch = value.viewState.settingsSearch;
       }
       current = value;
+      if (restore) tick().then(() => {
+        if (!disposed && !settingsOpen && !document.querySelector('dialog[open]'))
+          (document.querySelector<HTMLElement>(accountRoute ? '.psn-account h2' : '.console-card.selected:enabled')
+            ?? document.querySelector<HTMLElement>('.discovery:enabled'))?.focus();
+      });
     }).then(value => {
       if (disposed) value.dispose(); else connection = value;
     }).catch(() => { message = t('Setup unavailable'); });
@@ -46,7 +54,7 @@
   });
 
   $effect(() => {
-    if (connection && current) connection.saveViewState(settingsOpen ? 'settings' : 'consoles', query, settingsCategory, settingsSearch, current.profileGeneration);
+    if (connection && profileGeneration) connection.saveViewState(settingsOpen ? 'settings' : accountRoute ? 'account' : 'consoles', query, settingsCategory, settingsSearch, profileGeneration);
   });
 
   async function discovery() {

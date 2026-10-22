@@ -4,6 +4,7 @@
 #include "psnsigninwindow.h"
 #include "keyboardmousebindings.h"
 #include <QDialog>
+#include <QFileDialog>
 #include <QLabel>
 #include <QPushButton>
 #include <QDialogButtonBox>
@@ -228,9 +229,8 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
 
 void SetupWindow::invalidatePage()
 {
-    setupBridge->invalidateControllerMapping();
-    setupBridge->invalidateKeyboardMouse();
-    setupBridge->invalidateSteamShortcut();
+    setupBridge->invalidatePage();
+    for (auto *dialog : findChildren<QFileDialog *>()) dialog->reject();
     if (signInWindow) signInWindow->close();
 }
 
@@ -249,8 +249,9 @@ void SetupWindow::resetChannel(QWebEnginePage *page)
 
 void SetupWindow::createPage()
 {
-    QPointer<QWebEnginePage> old = webView->page();
+    QPointer<QWebEnginePage> old = setupPage;
     auto *page = new SetupPage(webProfile, webView);
+    setupPage = page;
     webView->setPage(page);
     if (old) old->deleteLater();
     pageFailed = false;
@@ -302,8 +303,7 @@ bool SetupWindow::eventFilter(QObject *object, QEvent *event)
 
 void SetupWindow::suspend()
 {
-    if(signInWindow)
-        signInWindow->close();
+    invalidatePage();
     setupBridge->setSuspended(true);
     hide();
     auto *page = webView->page();

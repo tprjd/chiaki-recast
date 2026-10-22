@@ -918,7 +918,7 @@ QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &
 QVariantMap SetupBridge::saveViewState(const QString &route, const QString &search, const QString &category, const QString &settingsSearch, const QString &profile)
 {
     static const QStringList categories{"General", "Video", "Stream", "Audio/Wifi", "Display", "Renderer", "Color mapping", "Keyboard and mouse", "Controllers", "Profiles"};
-    if (!currentProfile(profile) || (route != "consoles" && route != "settings")
+    if (!currentProfile(profile) || (route != "consoles" && route != "settings" && route != "account")
             || !categories.contains(category) || search.size() > 256 || settingsSearch.size() > 256)
         return {{"accepted", false}};
     const QVariantMap next{{"route", route}, {"search", search}, {"category", category}, {"settingsSearch", settingsSearch}};
@@ -926,12 +926,18 @@ QVariantMap SetupBridge::saveViewState(const QString &route, const QString &sear
     return {{"accepted", true}};
 }
 
+void SetupBridge::invalidatePage()
+{
+    ++pageGeneration;
+    invalidateControllerMapping();
+    invalidateKeyboardMouse();
+    invalidateSteamShortcut();
+}
+
 void SetupBridge::setSuspended(bool value)
 {
     suspended = value;
-    if (suspended) invalidateControllerMapping();
-    if (suspended) invalidateKeyboardMouse();
-    if (suspended) invalidateSteamShortcut();
+    if (suspended) invalidatePage();
     if (!suspended) refresh();
 }
 
@@ -1292,7 +1298,7 @@ void SetupBridge::setKeyboardMouseAvailable(bool available)
     if (keyboardMouseAvailable == available) return;
     keyboardMouseAvailable = available;
     ++keyboardMouseWindowGeneration;
-    if (!available) { invalidateKeyboardMouse(); invalidateControllerMapping(); invalidateSteamShortcut(); }
+    if (!available) invalidatePage();
     refresh();
 }
 
@@ -2094,8 +2100,9 @@ QVariantMap SetupBridge::rendererAction(const QString &action, const QString &pr
 {
     if(!currentProfile(profileGeneration)) return {{"accepted", false}, {"message", tr("The profile changed. Try again in the current profile.")}};
     auto *settings = backend->qmlSettings();
-    if(action == "importPlaceboSettings") return settings->importPlaceboSettings();
-    if(action == "exportPlaceboSettings") return settings->exportPlaceboSettings();
+    const auto current = [this, page = pageGeneration] { return page == pageGeneration; };
+    if(action == "importPlaceboSettings") return settings->importPlaceboSettings(current);
+    if(action == "exportPlaceboSettings") return settings->exportPlaceboSettings(current);
     if(action == "openRendererDocumentation") {
         backend->openPlaceboOptionsLink();
         return {{"accepted", true}, {"message", tr("Renderer documentation opened.")}};
@@ -2289,10 +2296,11 @@ QVariantMap SetupBridge::profileAction(const QString &action, const QString &key
 QVariantMap SetupBridge::settingsFileAction(const QString &action, const QString &profile)
 {
     if(!currentProfile(profile)) return {{"accepted", false}, {"message", tr("The profile changed. Try again in the current profile.")}};
-    if(action == "exportSettings") return backend->qmlSettings()->exportSettings();
+    const auto current = [this, page = pageGeneration] { return page == pageGeneration; };
+    if(action == "exportSettings") return backend->qmlSettings()->exportSettings(current);
     if(action == "importSettings") {
         if(suspended || state.value("connectionBusy").toBool()) return {{"accepted", false}, {"message", tr("Finish the current connection before importing settings.")}};
-        auto reply = backend->qmlSettings()->importSettings();
+        auto reply = backend->qmlSettings()->importSettings(current);
         reply.insert("profileGeneration", QString::number(backend->profileGeneration()));
         refresh();
         return reply;

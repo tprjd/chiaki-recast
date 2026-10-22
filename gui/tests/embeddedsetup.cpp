@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <QPushButton>
 #include <QLabel>
+#include <QLineEdit>
 #include <QDialog>
 #include <QtTest>
 #include <SDL.h>
@@ -34,6 +35,7 @@
 #include <windows.h>
 #include <tlhelp32.h>
 #include <psapi.h>
+#include "windowswakesleep.h"
 
 static QList<PROCESSENTRY32W> testProcesses()
 {
@@ -792,8 +794,7 @@ private slots:
             QVERIFY(!script(setup.view(), "document.body.textContent").toString().contains(privateValue));
         }
         setup.view()->reload();
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
-        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-search input') !== null").toBool());
         profiles();
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-active-profile]')?.textContent.includes('Hidden')").toBool());
     }
@@ -882,6 +883,211 @@ private slots:
             QTest::newRow(mode) << QString::fromLatin1(mode);
     }
 
+    void nativeSessionRecovery_data()
+    {
+        QTest::addColumn<bool>("remote");
+        QTest::newRow("local") << false;
+        QTest::newRow("psn") << true;
+    }
+
+    void nativeSessionRecovery()
+    {
+#ifndef Q_OS_WIN
+        QSKIP("The maintained suspend notification fixture uses the Windows adapter.");
+#else
+        QFETCH(bool, remote);
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetSuspendAction(SuspendAction::Nothing);
+        settings.SetHardwareDecoder({});
+        settings.SetCodecLocalPS5(CHIAKI_CODEC_H264);
+        settings.SetCodecRemotePS5(CHIAKI_CODEC_H264);
+        settings.SetRenderBackend(RenderBackend::OpenGL);
+        settings.SetPlaceboPreset(PlaceboPreset::Fast);
+        settings.SetWindowType(WindowType::AdjustableResolution);
+        const QRect geometry(80, 80, 1100, 720);
+        settings.SetStreamGeometry(geometry);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Office console");
+        strcpy(registered.rp_regist_key, "12345678");
+        RegisteredHost paired(registered);
+        paired.SetConsolePin(paired, {});
+        settings.AddRegisteredHost(paired);
+        QList<QPointer<PsnReply>> requests;
+        auto transport = controlledPsn(requests);
+        std::atomic<int> workers = 0;
+        int starts = 0;
+        QmlBackend *backend = nullptr;
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
+            *count = 1;
+            strcpy((*devices)[0].device_name, "Office console");
+            memset((*devices)[0].device_uid, 0x12, sizeof((*devices)[0].device_uid));
+            (*devices)[0].remoteplay_enabled = true;
+            return CHIAKI_ERR_SUCCESS;
+        };
+        transport.connect = [&](StreamSession *, const QString &, bool) { ++workers; return CHIAKI_ERR_SUCCESS; };
+        transport.startSession = [&](ChiakiSession *session) {
+            if (!backend->qmlWindow() || backend->qmlWindow()->nativeGraphicsApi() != QSGRendererInterface::OpenGL) {
+                QTest::qFail("Prepare the native renderer before starting a replacement session", __FILE__, __LINE__);
+                return CHIAKI_ERR_CANCELED;
+            }
+            ++starts;
+            return chiaki_thread_create(&session->session_thread, [](void *opaque) -> void * {
+                auto *session = static_cast<ChiakiSession *>(opaque);
+                ChiakiEvent event = {};
+                event.type = CHIAKI_EVENT_CONNECTED;
+                session->event_cb(&event, session->event_cb_user);
+                chiaki_mutex_lock(&session->state_mutex);
+                while (!session->should_stop) chiaki_cond_wait(&session->state_cond, &session->state_mutex);
+                chiaki_mutex_unlock(&session->state_mutex);
+                event = {};
+                event.type = CHIAKI_EVENT_QUIT;
+                event.quit.reason = CHIAKI_QUIT_REASON_STOPPED;
+                session->event_cb(&event, session->event_cb_user);
+                return nullptr;
+            }, session);
+        };
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, transport, {}, registration.boundary(), controlledDiscovery());
+        backend = services.backend();
+        backend->stopAutoConnect();
+        DecodedBuffers counts[2];
+        auto controller = std::make_unique<ApplicationController>(&services);
+        auto *setup = controller->setupWindow();
+        setup->resize(1280, 720);
+        setup->show();
+        DiscoveryHost host = {};
+        host.ps5 = true;
+        host.host_name = "Office console";
+        host.host_id = "001122334455";
+        host.host_addr = "127.0.0.1";
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        if (remote) {
+            settings.SetPsnAuthToken("recovery-access-secret");
+            settings.SetPsnRefreshToken("recovery-refresh-secret");
+            settings.SetPsnAccountId("AQAAAAAAAAA=");
+            settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(3600).toString(settings.GetTimeFormat()));
+            backend->refreshPsnToken();
+        } else discover(backend, {host});
+        QVERIFY(click(setup->view(), ".console-card"));
+        QVERIFY(fill(setup->view(), ".library-heading input", "Office"));
+        const auto selected = setup->bridge()->snapshot().value("selectedKey").toString();
+        QVERIFY(click(setup->view(), ".connect-console"));
+        QFile fixture(QFINDTESTDATA("fixtures/red.h264"));
+        QVERIFY(fixture.open(QIODevice::ReadOnly));
+        auto packet = fixture.readAll();
+        const int size = packet.size();
+        packet.append(AV_INPUT_BUFFER_PADDING_SIZE, '\0');
+        auto *wake = backend->findChild<WindowsWakeSleep *>();
+        QVERIFY(wake);
+        QString previousAttempt;
+        for (int pass = 0; pass < 2; ++pass) {
+            QTRY_COMPARE(starts, pass + 1);
+            QPointer<StreamSession> session = backend->qmlSession();
+            QPointer<QmlMainWindow> native = backend->qmlWindow();
+            QVERIFY(session && native);
+            QCOMPARE(native->geometry(), geometry);
+            QTRY_VERIFY(!setup->isVisible());
+            QTRY_COMPARE(setup->view()->page()->lifecycleState(), QWebEnginePage::LifecycleState::Frozen);
+            auto *decoder = session->GetFfmpegDecoder();
+            QVERIFY(decoder);
+            decoder->codec_context->opaque = &counts[pass];
+            decoder->codec_context->get_buffer2 = &DecodedBuffers::allocate;
+            bool valid = true;
+            QTimer samples;
+            samples.setInterval(16);
+            connect(&samples, &QTimer::timeout, &samples, [&, decoder] {
+                valid &= chiaki_ffmpeg_decoder_video_sample_cb(reinterpret_cast<uint8_t *>(packet.data()), size, 0, false, decoder);
+            });
+            samples.start();
+            QTRY_VERIFY(native->hasVideo());
+            QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("ready"));
+            const auto attempt = backend->connectionAttempt().value("id").toString();
+            if (!previousAttempt.isEmpty()) QVERIFY(!backend->cancelConnection(previousAttempt));
+            if (!remote && !pass) {
+                qInfo().noquote() << "Owned browser processes before renderer failure"
+                    << QJsonDocument::fromVariant(browserResources()).toJson(QJsonDocument::Compact);
+                QPointer<QWebEnginePage> page = setup->view()->page();
+                QPointer<QWebChannel> channel = page->webChannel();
+                QSignalSpy terminated(page, &QWebEnginePage::renderProcessTerminated);
+                native->menuRequested();
+                QTRY_VERIFY(native->streamInput()->blocked());
+                const auto allocated = counts[pass].allocated.load(), released = counts[pass].released.load();
+                QVERIFY(terminateSetupRenderer(page));
+                QTRY_COMPARE(terminated.size(), 1);
+                QTRY_VERIFY(!channel);
+                QCOMPARE(setup->view()->page(), page.data());
+                QCOMPARE(backend->qmlSession(), session.data());
+                QCOMPARE(backend->qmlWindow(), native.data());
+                QVERIFY(native->streamInput()->blocked());
+                QTRY_VERIFY(counts[pass].allocated > allocated + 12 && counts[pass].released > released + 6);
+                QCOMPARE(starts, 1);
+                QTest::qWait(210);
+                native->menuRequested();
+                QTRY_VERIFY(!native->streamInput()->blocked());
+                qInfo().noquote() << "Native playback continued after owned setup renderer failure"
+                    << QJsonDocument::fromVariant(browserResources()).toJson(QJsonDocument::Compact);
+            }
+            samples.stop();
+            QVERIFY(valid);
+            wake->aboutToSleep();
+            QTRY_VERIFY(!session);
+            QCOMPARE(counts[pass].released.load(), counts[pass].allocated.load());
+            qInfo() << "Recovery decoded buffers" << remote << pass << counts[pass].allocated.load() << counts[pass].released.load();
+            native->dismissStreamView();
+            QTRY_VERIFY(!native);
+            QTRY_VERIFY(setup->isVisible());
+            QTRY_COMPARE(script(setup->view(), "document.querySelector('.library-heading input')?.value").toString(), QStringLiteral("Office"));
+            if (remote) QCOMPARE(setup->bridge()->snapshot().value("selectedKey").toString(), selected);
+            else {
+                discover(backend, {host});
+                QTRY_COMPARE(script(setup->view(), "document.querySelector('.console-card.selected .console-name')?.textContent").toString(), QStringLiteral("Office console"));
+            }
+            previousAttempt = attempt;
+            if (!pass) {
+                wake->awake();
+                if (remote) {
+                    QList<QTimer *> reconnect;
+                    for (auto *timer : backend->findChildren<QTimer *>())
+                        if (timer->isActive() && timer->interval() == 5000) reconnect.append(timer);
+                    QCOMPARE(reconnect.size(), 1);
+                    reconnect.first()->start(1);
+                    QTRY_COMPARE(requests.size(), 1);
+                    requests.first()->finish(R"({"access_token":"resumed-access","refresh_token":"resumed-refresh","expires_in":3600})");
+                }
+            }
+        }
+        if (remote) {
+            const auto previousWake = wake;
+            backend->qmlSettings()->setCurrentProfile(profile + "-next");
+            backend->setDiscoveryEnabled(false);
+            for (auto *candidate : backend->findChildren<WindowsWakeSleep *>())
+                if (candidate != previousWake) wake = candidate;
+            QVERIFY(wake != previousWake);
+        } else settings.RemoveRegisteredHost(paired.GetServerMAC());
+        const auto obsolete = backend->connectionAttempt().value("id");
+        wake->awake();
+        QTest::qWait(50);
+        QVERIFY(!backend->qmlSession());
+        QCOMPARE(starts, 2);
+        if (remote) QCOMPARE(backend->connectionAttempt().value("id"), obsolete);
+        QCOMPARE(workers.load(), remote ? 2 : 0);
+        QCOMPARE(requests.size(), remote ? 1 : 0);
+        QVERIFY(registration.requests.isEmpty());
+#endif
+    }
+
     void setupFileLifetime_data()
     {
         QTest::addColumn<bool>("native");
@@ -927,9 +1133,21 @@ private slots:
             if (!picker) return;
             dialog = picker;
             choose.stop();
-            picker->selectFile(output);
-            connect(setup.view()->page(), &QWebEnginePage::loadStarted, picker, [picker] {
-                QMetaObject::invokeMethod(picker, "accept", Qt::QueuedConnection);
+            connect(setup.view()->page(), &QWebEnginePage::loadStarted, picker, [picker, output] {
+                QTimer::singleShot(0, picker, [picker, output] {
+                    picker->setDirectory(QFileInfo(output).absolutePath());
+                    auto *name = picker->findChild<QLineEdit *>("fileNameEdit");
+                    if (!name) { picker->reject(); return; }
+                    name->setText(QFileInfo(output).fileName());
+                    const auto selected = picker->selectedFiles();
+                    qInfo() << "File lifetime selected/owned output" << selected << output;
+                    if (selected.size() != 1 || QFileInfo(selected.first()).absoluteFilePath() != QFileInfo(output).absoluteFilePath()) {
+                        QTest::qFail("The picker must select only the owned temporary output", __FILE__, __LINE__);
+                        picker->reject();
+                        return;
+                    }
+                    QMetaObject::invokeMethod(picker, "done", Qt::DirectConnection, Q_ARG(int, QDialog::Accepted));
+                });
             });
             setup.view()->reload();
         });
@@ -1025,6 +1243,15 @@ private slots:
         SetupWindow setup(services.backend());
         setup.resize(1280, 720);
         setup.show();
+        DiscoveryHost host = {};
+        host.ps5 = true;
+        host.host_name = "Office console";
+        host.host_id = "001122334455";
+        host.host_addr = "127.0.0.1";
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        discover(services.backend(), {host});
+        QVERIFY(click(setup.view(), ".console-card"));
+        const auto selected = setup.bridge()->snapshot().value("selectedKey").toString();
         QVERIFY(click(setup.view(), "[data-psn-refresh]"));
         QTRY_COMPARE(requests.size(), 1);
         const auto request = requests.first();
@@ -1032,6 +1259,7 @@ private slots:
         QVERIFY(fill(setup.view(), ".library-heading input", "Office"));
         QVERIFY(click(setup.view(), ".open-settings"));
         QVERIFY(fill(setup.view(), ".settings-search input", "suspend"));
+        QTRY_COMPARE(setup.bridge()->snapshot().value("viewState").toMap().value("settingsSearch").toString(), QStringLiteral("suspend"));
         QPointer<QWebEnginePage> oldPage = setup.view()->page();
         QPointer<QWebChannel> oldChannel = oldPage->webChannel();
         auto *browserProfile = oldPage->profile();
@@ -1060,6 +1288,12 @@ private slots:
         QTRY_COMPARE(script(setup.view(), "document.querySelector('.library-heading input')?.value").toString(), QStringLiteral("Office"));
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-refresh-status]')?.textContent.includes('Sign in')").toBool());
         QVERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains("reload-refresh-secret"));
+        QCOMPARE(requests.size(), 1);
+        QCOMPARE(setup.bridge()->snapshot().value("selectedKey").toString(), selected);
+        QTRY_COMPARE(setup.bridge()->snapshot().value("viewState").toMap().value("route").toString(), QStringLiteral("consoles"));
+        setup.view()->reload();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.library-heading input')?.value").toString(), QStringLiteral("Office"));
+        QTRY_COMPARE(script(setup.view(), "document.activeElement?.dataset.consoleKey").toString(), selected);
         QCOMPARE(requests.size(), 1);
     }
 
@@ -1761,11 +1995,13 @@ private slots:
         settings.SetDiscoveryEnabled(false);
         settings.SetRemotePlayAsk(false);
         settings.SetAddSteamShortcutAsk(false);
-        PsnRequests transport;
+        QList<QPointer<PsnReply>> controlledNetwork;
+        RegistrationTransport controlledRegistration;
+        auto transport = controlledPsn(controlledNetwork);
         transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
             *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS;
         };
-        QmlNativeServices services(&settings, transport, {}, {}, controlledDiscovery());
+        QmlNativeServices services(&settings, transport, {}, controlledRegistration.boundary(), controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
         SDL_VirtualJoystickDesc description = {};
@@ -1884,7 +2120,7 @@ private slots:
         setup.view()->reload();
         QTRY_VERIFY(!backend->controllerMappingInProgress());
         QTRY_VERIFY(setup.bridge()->snapshot().value("controllerSetup").toMap().value("operation").toString().isEmpty());
-        QVERIFY(click(setup.view(), ".open-settings"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-search input') !== null").toBool());
         script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Controllers').click()");
         QVERIFY(click(setup.view(), "#controllerMappingChange"));
         tap(0);
@@ -3026,7 +3262,9 @@ private slots:
         MouseResponse nextResponse;
         nextResponse.horizontalSensitivity = 2.25;
         QVERIFY(next.SetMouseResponse(nextResponse));
-        QmlNativeServices services(&settings);
+        QList<QPointer<PsnReply>> controlledNetwork;
+        RegistrationTransport controlledRegistration;
+        QmlNativeServices services(&settings, controlledPsn(controlledNetwork), {}, controlledRegistration.boundary(), controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
         SetupWindow setup(backend);
@@ -3074,8 +3312,6 @@ private slots:
         setup.view()->reload();
         QTRY_VERIFY(capture.isNull());
 #ifdef Q_OS_WIN
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
-        script(setup.view(), "document.querySelector('.open-settings').click()");
         QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
         script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
         QTRY_VERIFY(script(setup.view(), "document.querySelector('#mouseCameraEnabled')?.disabled === false").toBool());
@@ -4566,9 +4802,13 @@ private slots:
         });
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
         settings.SetAudioOutDevice("Missing output <device>");
         settings.SetAudioInDevice("Missing input <device>");
-        QmlNativeServices services(&settings);
+        QList<QPointer<PsnReply>> controlledNetwork;
+        RegistrationTransport controlledRegistration;
+        QmlNativeServices services(&settings, controlledPsn(controlledNetwork), {}, controlledRegistration.boundary(), controlledDiscovery());
         auto *backend = services.backend();
         auto *native = backend->qmlSettings();
         backend->stopAutoConnect();
@@ -4689,8 +4929,7 @@ private slots:
         QCOMPARE(settings.GetBitrateLocalPS5(), 10000u);
         QVERIFY(settings.GetPsnAuthToken().isEmpty());
         setup.view()->reload();
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
-        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-search input') !== null").toBool());
         category("Audio/Wifi");
         QTRY_COMPARE(script(setup.view(), "document.querySelector('#audioBufferSize')?.value").toString(), QStringLiteral("70"));
         QCOMPARE(script(setup.view(), "document.querySelector('#audioVolume').value").toString(), QStringLiteral("64"));
@@ -4953,7 +5192,11 @@ private slots:
         QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
-        QmlNativeServices services(&settings);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        QList<QPointer<PsnReply>> controlledNetwork;
+        RegistrationTransport controlledRegistration;
+        QmlNativeServices services(&settings, controlledPsn(controlledNetwork), {}, controlledRegistration.boundary(), controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
         backend->setDiscoveryEnabled(false);
@@ -5067,8 +5310,7 @@ private slots:
         script(setup.view(), "window.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
         QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("openPlaceboColorMapping"));
         setup.view()->reload();
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
-        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-search input') !== null").toBool());
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.settings-search input')").toBool());
         search("perceptual deadzone");
         QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboGamutMappingPerceptualDeadzone')?.value").toString(), QStringLiteral("0.42"));
@@ -5161,7 +5403,11 @@ private slots:
         QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
-        QmlNativeServices services(&settings, {}, [](const QString &, const QStringList &) { return false; });
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        QList<QPointer<PsnReply>> controlledNetwork;
+        RegistrationTransport controlledRegistration;
+        QmlNativeServices services(&settings, controlledPsn(controlledNetwork), [](const QString &, const QStringList &) { return false; }, controlledRegistration.boundary(), controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
         backend->setDiscoveryEnabled(false);
@@ -5241,8 +5487,7 @@ private slots:
         QVERIFY(changed.count() > 0);
         QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboDebandThreshold')?.value").toString(), QStringLiteral("4.5"));
         setup.view()->reload();
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
-        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-search input') !== null").toBool());
         category("Renderer");
         QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboUpscaler')?.value").toString(), QStringLiteral("13"));
         Settings restarted(profile);
@@ -5475,7 +5720,11 @@ private slots:
         });
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
-        QmlNativeServices services(&settings);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        QList<QPointer<PsnReply>> controlledNetwork;
+        RegistrationTransport controlledRegistration;
+        QmlNativeServices services(&settings, controlledPsn(controlledNetwork), {}, controlledRegistration.boundary(), controlledDiscovery());
         services.backend()->stopAutoConnect();
         services.backend()->setDiscoveryEnabled(false);
         SetupWindow setup(services.backend());
@@ -5488,9 +5737,7 @@ private slots:
         script(setup.view(), "const field=document.querySelector('#disconnectAction');field.value='1';field.dispatchEvent(new Event('change',{bubbles:true}))");
         QTRY_COMPARE(settings.GetDisconnectAction(), DisconnectAction::AlwaysSleep);
         setup.view()->reload();
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
-        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-search input') !== null").toBool());
         QTRY_COMPARE(script(setup.view(), "document.querySelector('#disconnectAction')?.value").toString(), QStringLiteral("1"));
         Settings restarted(profile);
         QCOMPARE(restarted.GetDisconnectAction(), DisconnectAction::AlwaysSleep);

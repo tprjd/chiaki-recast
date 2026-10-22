@@ -44,6 +44,7 @@ public:
     Q_INVOKABLE QVariantMap saveManualAddress(const QString &address, const QString &registrationKey, const QString &profile);
     Q_INVOKABLE QVariantMap manageConsole(const QString &action, const QString &key, const QString &pin);
     void setSuspended(bool suspended);
+    void invalidatePage();
     void reportStreamError(const QString &title, const QString &text);
     Q_INVOKABLE QVariantMap dismissStreamError(const QString &id);
     Q_INVOKABLE QVariantMap openPsnSignIn(const QString &profile);
@@ -98,6 +99,7 @@ private:
     quint64 revision = 0;
     QString selectedKey;
     QVariantMap viewState{{"route", "consoles"}, {"search", ""}, {"category", "General"}, {"settingsSearch", ""}};
+    quint64 pageGeneration = 0;
     QVariantMap state;
     bool suspended = false;
     QVariantMap streamError;

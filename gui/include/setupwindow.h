@@ -37,6 +37,7 @@ private:
     QWebEngineView *webView;
     SetupBridge *setupBridge;
     QWebEngineProfile *webProfile = nullptr;
+    QWebEnginePage *setupPage = nullptr;
     bool pageFailed = false;
     PsnSignInWindow *signInWindow = nullptr;
 };
