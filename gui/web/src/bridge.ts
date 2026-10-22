@@ -5,6 +5,7 @@ export interface Console {
 export interface State {
   revision: string; profileGeneration: string; consoles: Console[];
   selectedKey: string; discoveryEnabled: boolean; streamerMode: boolean;
+  generalSettings: Record<string, boolean | number>;
   capabilities: { discovery: boolean }; strings: Record<string, string>;
   psn: { status: 'signedOut' | 'ready' | 'expired'; id?: string; phase?: string; message?: string; profileValid?: boolean };
 }
@@ -17,6 +18,7 @@ interface NativeBridge {
   openPsnExternal(profile: string, callback: (reply: Reply) => void): void;
   copyPsnSignInLink(profile: string, callback: (reply: Reply) => void): void;
   submitPsnRedirect(profile: string, url: string, callback: (reply: Reply) => void): void;
+  setGeneralSetting(name: string, value: boolean | number, profileGeneration: string, callback: (reply: Reply) => void): void;
   stateChanged: { connect(callback: (state: State) => void): void; disconnect(callback: (state: State) => void): void };
 }
 declare global {
@@ -33,6 +35,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
   psnExternal(profile: string): Promise<Reply>;
   psnCopyLink(profile: string): Promise<Reply>;
   psnSubmit(profile: string, url: string): Promise<Reply>;
+  generalSetting(name: string, value: boolean | number, profileGeneration: string): Promise<Reply>;
   dispose(): void;
 }> {
   return new Promise((resolve, reject) => {
@@ -60,6 +63,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
         psnExternal: profile => new Promise(done => setup.openPsnExternal(profile, done)),
         psnCopyLink: profile => new Promise(done => setup.copyPsnSignInLink(profile, done)),
         psnSubmit: (profile, url) => new Promise(done => setup.submitPsnRedirect(profile, url, done)),
+        generalSetting: (name, value, generation) => new Promise(done => setup.setGeneralSetting(name, value, generation, done)),
         dispose() {
           setup.stateChanged.disconnect(update);
           window.removeEventListener('pageshow', refresh);

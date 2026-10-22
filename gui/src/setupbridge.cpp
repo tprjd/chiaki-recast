@@ -7,6 +7,7 @@
 #include <limits>
 #include <QGuiApplication>
 #include <QClipboard>
+#include <cmath>
 
 SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     : QObject(parent), backend(backend)
@@ -24,6 +25,19 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     connect(backend->qmlSettings(), &QmlSettings::psnAccountIdChanged, this, &SetupBridge::refresh);
     accountExpiry.setSingleShot(true);
     connect(&accountExpiry, &QTimer::timeout, this, &SetupBridge::refresh);
+    auto *settings = backend->qmlSettings();
+    connect(settings, &QmlSettings::disconnectActionChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::suspendActionChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::audioVideoDisabledChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::streamMenuEnabledChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::streamMenuShortcut1Changed, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::streamMenuShortcut2Changed, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::streamMenuShortcut3Changed, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::streamMenuShortcut4Changed, this, &SetupBridge::refresh);
+#ifdef CHIAKI_GUI_ENABLE_STEAMDECK_NATIVE
+    connect(settings, &QmlSettings::steamDeckHapticsChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::verticalDeckChanged, this, &SetupBridge::refresh);
+#endif
     refresh();
 }
 
@@ -99,10 +113,10 @@ void SetupBridge::refresh()
         QT_TR_NOOP("Sign-in redirect URL"), QT_TR_NOOP("Retry"), QT_TR_NOOP("Complete sign-in"), QT_TR_NOOP("Close"),
         QT_TR_NOOP("Use the same PlayStation account as your console. The Sony sign-in page and your external browser can show account details.")};
     for (const auto *text : texts) strings.insert(QString::fromUtf8(text), tr(text));
-    const auto *settings = backend->nativeSettings();
-    const bool configured = !settings->GetPsnAuthToken().isEmpty() && !settings->GetPsnRefreshToken().isEmpty()
-        && !settings->GetPsnAccountId().isEmpty();
-    const auto expiry = QDateTime::fromString(settings->GetPsnAuthTokenExpiry(), settings->GetTimeFormat());
+    const auto *native = backend->nativeSettings();
+    const bool configured = !native->GetPsnAuthToken().isEmpty() && !native->GetPsnRefreshToken().isEmpty()
+        && !native->GetPsnAccountId().isEmpty();
+    const auto expiry = QDateTime::fromString(native->GetPsnAuthTokenExpiry(), native->GetTimeFormat());
     const auto remaining = QDateTime::currentDateTime().msecsTo(expiry);
     const bool expired = configured && (credentialsRejected || !expiry.isValid() || remaining <= 0);
     accountExpiry.stop();
@@ -112,9 +126,19 @@ void SetupBridge::refresh()
     // Keep the bridge allowlist explicit: the native attempt also contains an Account ID.
     for (const auto &field : {"id", "phase", "message", "profileValid"})
         if (attempt.contains(field)) psn.insert(field, attempt.value(field));
+    auto *settings = backend->qmlSettings();
+    QVariantMap general{{"disconnectAction", settings->disconnectAction()}, {"suspendAction", settings->suspendAction()},
+        {"audioVideoDisabled", settings->audioVideoDisabled()}, {"streamerMode", privateMode},
+        {"streamMenuEnabled", settings->streamMenuEnabled()}, {"streamMenuShortcut1", settings->streamMenuShortcut1()},
+        {"streamMenuShortcut2", settings->streamMenuShortcut2()}, {"streamMenuShortcut3", settings->streamMenuShortcut3()},
+        {"streamMenuShortcut4", settings->streamMenuShortcut4()}};
+#ifdef CHIAKI_GUI_ENABLE_STEAMDECK_NATIVE
+    general.insert("steamDeckHaptics", settings->steamDeckHaptics());
+    general.insert("verticalDeck", settings->verticalDeck());
+#endif
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
         {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
-        {"streamerMode", privateMode}, {"psn", psn}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
+        {"streamerMode", privateMode}, {"psn", psn}, {"generalSettings", general}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
     emit stateChanged(state);
 }
 
@@ -186,4 +210,46 @@ QVariantMap SetupBridge::submitPsnRedirect(const QString &profile, const QString
     if (!currentProfile(profile)) return {{"accepted", false}};
     const auto id = backend->startPsnAuth(QUrl(url));
     return {{"accepted", !id.isEmpty()}};
+}
+QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &value, const QString &profileGeneration)
+{
+    const auto reject = [this](const char *message) { return QVariantMap{{"accepted", false}, {"message", tr(message)}}; };
+    if (profileGeneration != QString::number(backend->profileGeneration()))
+        return reject(QT_TR_NOOP("The profile changed. Try again in the current profile."));
+    auto *settings = backend->qmlSettings();
+    const bool boolean = name == "streamerMode" || name == "streamMenuEnabled"
+#ifdef CHIAKI_GUI_ENABLE_STEAMDECK_NATIVE
+        || name == "steamDeckHaptics" || name == "verticalDeck"
+#endif
+        ;
+    int maximum = -1;
+    if (name == "disconnectAction") maximum = 2;
+    else if (name == "suspendAction") maximum = 1;
+    else if (name == "audioVideoDisabled") maximum = 3;
+    else if (name == "streamMenuShortcut1" || name == "streamMenuShortcut2" || name == "streamMenuShortcut3" || name == "streamMenuShortcut4") maximum = 16;
+    if (!boolean && maximum < 0) return reject(QT_TR_NOOP("This setting is not available."));
+    if (boolean) {
+        if (value.metaType().id() != QMetaType::Bool) return reject(QT_TR_NOOP("Choose a valid setting value."));
+    } else {
+        const auto type = value.metaType().id();
+        if (type != QMetaType::Double && type != QMetaType::Int && type != QMetaType::UInt && type != QMetaType::LongLong)
+            return reject(QT_TR_NOOP("Choose a valid setting value."));
+        const double number = value.toDouble();
+        if (!std::isfinite(number) || std::floor(number) != number || number < 0 || number > maximum)
+            return reject(QT_TR_NOOP("Choose a valid setting value."));
+    }
+    if (name == "disconnectAction") settings->setDisconnectAction(value.toInt());
+    else if (name == "suspendAction") settings->setSuspendAction(value.toInt());
+    else if (name == "audioVideoDisabled") settings->setAudioVideoDisabled(value.toInt());
+    else if (name == "streamerMode") settings->setStreamerMode(value.toBool());
+    else if (name == "streamMenuEnabled") settings->setStreamMenuEnabled(value.toBool());
+    else if (name == "streamMenuShortcut1") settings->setStreamMenuShortcut1(value.toUInt());
+    else if (name == "streamMenuShortcut2") settings->setStreamMenuShortcut2(value.toUInt());
+    else if (name == "streamMenuShortcut3") settings->setStreamMenuShortcut3(value.toUInt());
+    else if (name == "streamMenuShortcut4") settings->setStreamMenuShortcut4(value.toUInt());
+#ifdef CHIAKI_GUI_ENABLE_STEAMDECK_NATIVE
+    else if (name == "steamDeckHaptics") settings->setSteamDeckHaptics(value.toBool());
+    else if (name == "verticalDeck") settings->setVerticalDeck(value.toBool());
+#endif
+    return {{"accepted", true}};
 }

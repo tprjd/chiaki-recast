@@ -19,6 +19,7 @@ public:
     Q_INVOKABLE QVariantMap openPsnExternal(const QString &profile);
     Q_INVOKABLE QVariantMap copyPsnSignInLink(const QString &profile);
     Q_INVOKABLE QVariantMap submitPsnRedirect(const QString &profile, const QString &url);
+    Q_INVOKABLE QVariantMap setGeneralSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
     // Native callers resolve immediately before dispatch; no row index crosses WebChannel.
     bool resolveConsole(const QString &key, int &index, QString &nickname) const;
 
