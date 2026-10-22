@@ -35,7 +35,8 @@
   async function reveal(key: string, requires?: string) {
     query = '';
     category = searchFields.find(field => field.key === key)?.category ?? 'General';
-    keyboardMouseTarget = requires && !values[requires] ? requires : key;
+    keyboardMouseTarget = requires && !values[requires] ? requires
+      : category === 'Keyboard and mouse' && values.mouseCameraEnabled && (key.startsWith('keyMapping') || ['keyboardEnabled', 'mouseTouchEnabled', 'resetAllKeys'].includes(key)) ? 'mouseCameraEnabled' : key;
     if (category === 'Audio/Wifi') connection.refreshAudioDevices();
     await tick();
     const field = fields.find(field => field.key === key);

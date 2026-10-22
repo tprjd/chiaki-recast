@@ -491,7 +491,7 @@ private slots:
         script(setup.view(), "document.querySelector('.open-settings').click()");
         QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
         script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('#keyboardEnabled') !== null").toBool());
+        QTRY_VERIFY(script(setup.view(), "(document.querySelector('#keyboardMouseReset') ?? document.querySelector('#keyboardEnabled'))?.disabled === false").toBool());
         const QString generation = setup.bridge()->snapshot().value("profileGeneration").toString();
         const auto begun = setupRequest(setup.view(), "beginKeyboardMouse", {generation});
         QVERIFY(begun.value("accepted").toBool());
@@ -533,6 +533,7 @@ private slots:
         QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 2.0);
 #endif
         backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#keyboardEnabled')?.disabled === false").toBool());
         QVERIFY(!setupRequest(setup.view(), "resetKeyboardMouse", {nextForm, generation}).value("accepted").toBool());
         QVERIFY(!setupRequest(setup.view(), "setKeyboardMouseSetting", {"mouseCameraEnabled", true, nextForm, generation}).value("accepted").toBool());
         QVERIFY(!setupRequest(setup.view(), "captureKeyboardMouse", {0, 0, false, nextForm, generation}).value("accepted").toBool());
@@ -637,6 +638,69 @@ private slots:
         QVERIFY(backend->nativeSettings()->GetMouseCameraEnabled());
         QCOMPARE(backend->nativeSettings()->GetMouseResponse().horizontalSensitivity, 2.25);
 #endif
+    }
+
+    void keyboardMousePresentation()
+    {
+#ifndef Q_OS_WIN
+        QSKIP("Mouse camera mode is available on Windows.");
+#endif
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetMouseCameraEnabled(true);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
+        script(setup.view(), "{const e=document.querySelector('.settings-search input');e.value='Cross Primary';e.dispatchEvent(new Event('input',{bubbles:true}));}");
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 1);
+        script(setup.view(), "document.querySelector('.settings-results button').click()");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("keyboardMouseBinding4_0"));
+        QVERIFY(!setup.findChild<QDialog *>("setupBindingCapture"));
+        QVERIFY(script(setup.view(), "document.querySelector('[role=tab][aria-selected=true]').textContent === 'Bindings'").toBool());
+        script(setup.view(), "document.querySelector('[role=tab][aria-selected=true]').dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true,cancelable:true}))");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[role=tab][aria-selected=true]').textContent === 'Mouse response' && document.activeElement.getAttribute('role') === 'tab'").toBool());
+        const QDir evidence(qEnvironmentVariable("CHIAKI_KEYBOARD_MOUSE_EVIDENCE", "."));
+        const auto screenshot = [&](const QString &name, int width, int height, qreal zoom, bool bindings) {
+            setup.resize(width, height);
+            setup.view()->setZoomFactor(zoom);
+            script(setup.view(), QString("Array.from(document.querySelectorAll('[role=tab]')).find(e => e.textContent === '%1').click()").arg(bindings ? "Bindings" : "Mouse response"));
+            script(setup.view(), bindings ? "document.querySelector('[role=tablist]').scrollIntoView({block:'start'})" : "document.querySelector('.settings-content').scrollIntoView({block:'start'})");
+            QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+            QTest::qWait(80);
+            QVERIFY(setup.view()->grab().save(evidence.filePath(name)));
+        };
+        screenshot("response-1280.png", 1280, 900, 1, false);
+        screenshot("bindings-390.png", 390, 720, 1, true);
+        screenshot("response-200-percent.png", 800, 900, 2, false);
+        screenshot("bindings-200-percent.png", 800, 900, 2, true);
+        setup.view()->setZoomFactor(1);
+        setup.resize(390, 720);
+        script(setup.view(), "document.querySelector('#keyboardMouseBinding4_1').click()");
+        QPointer<QDialog> capture;
+        QTRY_VERIFY(capture = setup.findChild<QDialog *>("setupBindingCapture"));
+        QVERIFY(capture->width() <= setup.width());
+        const auto before = settings.GetKeyboardMouseBindings();
+        script(setup.view(), "window.dispatchEvent(new KeyboardEvent('keydown',{key:'Y',code:'KeyY',bubbles:true}));window.dispatchEvent(new KeyboardEvent('keyup',{key:'Y',code:'KeyY',bubbles:true}));");
+        QVERIFY(settings.GetKeyboardMouseBindings() == before);
+        QVERIFY(capture->grab().save(evidence.filePath("native-capture-390.png")));
+        capture->reject();
+        QTRY_VERIFY(capture.isNull());
+        script(setup.view(), "document.querySelector('#keyboardMouseReset').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').open").toBool());
+        QVERIFY(setup.view()->grab().save(evidence.filePath("reset-390.png")));
+        script(setup.view(), "document.querySelector('dialog').dispatchEvent(new Event('cancel',{cancelable:true}))");
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('dialog').open && document.activeElement.id === 'keyboardMouseReset'").toBool());
     }
 
     void suspendClosesSignIn()

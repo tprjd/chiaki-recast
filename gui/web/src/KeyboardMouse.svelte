@@ -78,6 +78,12 @@
     const reply = await connection.resetKeyboardKeys(form, generation);
     message = reply.accepted ? t('Saved') : t('The setting could not be saved.');
   }
+  function tabKey(event: KeyboardEvent) {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    tab = event.key === 'Home' ? 'Mouse response' : event.key === 'End' ? 'Bindings' : tab === 'Bindings' ? 'Mouse response' : 'Bindings';
+    tick().then(() => document.getElementById(tab === 'Bindings' ? 'keyboard-mouse-bindings' : 'keyboard-mouse-response')?.focus());
+  }
 </script>
 
 <div data-keyboard-mouse>
@@ -86,12 +92,12 @@
       <SettingField field={fields[0]} value={values.mouseCameraEnabled} disabled={!form || pending} {generation} change={value => change('mouseCameraEnabled', value)} {t} />
       <button id="keyboardMouseReset" disabled={!form || pending} onclick={openReset}>{t('Reset defaults')}</button>
       <p>{t('During a stream, press F8 to capture or release your controls.')}</p>
-      <div class="keyboard-mouse-tabs" role="tablist" aria-label={t('Keyboard and mouse')}>
+      <div class="keyboard-mouse-tabs" role="tablist" tabindex="-1" aria-label={t('Keyboard and mouse')} onkeydown={tabKey}>
         {#each ['Mouse response', 'Bindings'] as item}
-          <button role="tab" id={`keyboard-mouse-${item}`} aria-selected={tab === item} aria-controls="keyboard-mouse-tab" onclick={() => tab = item}>{t(item)}</button>
+          <button role="tab" id={item === 'Bindings' ? 'keyboard-mouse-bindings' : 'keyboard-mouse-response'} tabindex={tab === item ? 0 : -1} aria-selected={tab === item} aria-controls="keyboard-mouse-tab" onclick={() => tab = item}>{t(item)}</button>
         {/each}
       </div>
-      <div id="keyboard-mouse-tab" role="tabpanel" tabindex="0" aria-labelledby={`keyboard-mouse-${tab}`}>
+      <div id="keyboard-mouse-tab" role="tabpanel" tabindex="0" aria-labelledby={tab === 'Bindings' ? 'keyboard-mouse-bindings' : 'keyboard-mouse-response'}>
         {#if tab === 'Mouse response'}
           {#each fields.slice(1, 6) as field (field.key)}
             <SettingField {field} value={values[field.key]} disabled={!form || pending || !enabled} {generation} change={(value, editGeneration) => change(field.key, value, editGeneration)} {t} />
