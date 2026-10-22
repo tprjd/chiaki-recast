@@ -37,7 +37,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [05: Console management and manual addresses](issues/05-console-management-and-manual-addresses.md): resolved for guarded details/actions, manual saves/association, saved login PIN edits, and registered manual native handoff. Embedded validation, privacy, focus, native state, reload, and handoff checks pass. Live-console, physical access, platform, and hardware acceptance remains in 19 through 23.
 - [07: Pairing and Account ID lookup](issues/07-pairing-and-account-id.md): resolved for the verified guided registration and Account ID milestone. Focused web/native checks and Windows loopback handoff pass. The unchecked discovered-local-DUID manual context case carries into ticket 09 with the same-target two-method check. [Verification](evidence/ticket07/verification.md) records reused source evidence and discovery limits. Live services, physical access, GPU, platforms, and performance remain in ticket 23.
 - [08: PSN native streaming](issues/08-psn-native-streaming.md): resolved for native remote refresh, current opaque target connection, token-wait recovery, and guarded worker cleanup. Focused web/native and Windows worker checks pass. Live PSN playback remains hardware acceptance.
-- Tickets [19](issues/19-windows-web-native-package.md), [20](issues/20-linux-web-native-packages.md), and [21](issues/21-macos-web-native-package.md): ready after ticket 04.
+- [19: Windows package](issues/19-windows-web-native-package.md): claimed after ticket 04.
+- Tickets [20](issues/20-linux-web-native-packages.md) and [21](issues/21-macos-web-native-package.md): ready after ticket 04.
 - [09: Automatic PSN registration](issues/09-automatic-psn-registration.md): claimed after ticket 08.
 - [10: Wake and auto-connect](issues/10-wake-and-auto-connect.md): claimed after ticket 08.
 - [22: Session and setup recovery](issues/22-session-and-setup-recovery.md): ready after ticket 08.
