@@ -15,7 +15,7 @@
     if (form !== current.steam.form) {
       form = current.steam.form; profile = current.profileGeneration;
       name = current.steam.name ?? ''; options = current.steam.options ?? '';
-      nameEdited = false; optionsEdited = false; message = '';
+      nameEdited = false; optionsEdited = false; message = ''; pending = false;
     }
   });
   $effect(() => {
@@ -27,31 +27,51 @@
   });
   $effect(() => {
     const phase = current.steam.phase;
-    if (phase === 'success' || phase === 'failure') tick().then(() => document.querySelector<HTMLElement>(phase === 'success' ? '[data-steam-close]' : '[data-steam-name]')?.focus());
+    const activeForm = current.steam.form;
+    if (phase === 'success' || phase === 'failure') tick().then(() => {
+      if (current.steam.form === activeForm && current.steam.phase === phase)
+        document.querySelector<HTMLElement>(phase === 'success' ? '[data-steam-close]' : '[data-steam-name]')?.focus();
+    });
   });
   async function submit(event: SubmitEvent) {
     event.preventDefault();
     if (busy || success || !validName) return;
+    const activeForm = form, activeProfile = profile;
     pending = true; message = '';
     try {
       const fields: Record<string, string> = {};
       if (nameEdited) fields.name = name;
       if (optionsEdited) fields.options = options;
-      const reply = await connection.submitSteamShortcut(form, fields, profile);
+      const reply = await connection.submitSteamShortcut(activeForm, fields, activeProfile);
+      if (form !== activeForm || profile !== activeProfile) return;
       if (!reply.accepted) message = reply.message ?? t('The shortcut could not be created. Check the Steam folder and try again.');
-    } finally { pending = false; }
+    } finally { if (form === activeForm && profile === activeProfile) pending = false; }
   }
   async function chooseFolder() {
     if (busy || success) return;
+    const activeForm = form, activeProfile = profile;
     pending = true;
-    try { await connection.chooseSteamFolder(form, profile); }
-    finally { pending = false; await tick(); document.querySelector<HTMLElement>('[data-steam-folder]')?.focus(); }
+    try { await connection.chooseSteamFolder(activeForm, activeProfile); }
+    finally {
+      if (form === activeForm && profile === activeProfile) {
+        pending = false; await tick();
+        if (form === activeForm) document.querySelector<HTMLElement>('[data-steam-folder]')?.focus();
+      }
+    }
   }
   function close() { if (!busy) connection.endSteamShortcut(form, profile); }
 </script>
 <svelte:window onkeydown={event => {
   const panel = document.querySelector<HTMLElement>('[data-steam-form]');
-  if (panel) moveFocus(event, panel);
+  if (!panel) return;
+  if (event.key === 'ContextMenu') {
+    event.preventDefault();
+    if (!event.repeat && !busy && !success && validName) panel.querySelector<HTMLFormElement>('form')?.requestSubmit();
+  } else if ((event.target as HTMLElement).matches('input') && ['ArrowUp', 'ArrowDown'].includes(event.key)) {
+    const fields = [...panel.querySelectorAll<HTMLElement>('input:enabled, button:enabled')].filter(field => field.getClientRects().length);
+    const next = fields[fields.indexOf(event.target as HTMLElement) + (event.key === 'ArrowDown' ? 1 : -1)];
+    if (next) { event.preventDefault(); next.focus(); next.scrollIntoView({ block: 'nearest' }); }
+  } else moveFocus(event, panel);
 }} />
 <button data-steam-open disabled={!current.steam.supported || current.connectionBusy || !!current.steam.form}
   onclick={event => { event.currentTarget.focus(); connection.beginSteamShortcut(current.profileGeneration); }}>{t('Steam shortcut')}</button>

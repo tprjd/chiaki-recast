@@ -14,7 +14,6 @@
 #include <cmath>
 #include <QHostAddress>
 #include <QRegularExpression>
-#include <QDesktopServices>
 
 SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     : QObject(parent), backend(backend)
@@ -407,7 +406,7 @@ void SetupBridge::refresh()
         QT_TR_NOOP("PSN sign-in"),
         QT_TR_NOOP("Set up now"),
         QT_TR_NOOP("Don't ask again"),
-        QT_TR_NOOP("Later"),
+        QT_TR_NOOP("Later"), QT_TR_NOOP("Done"),
         QT_TR_NOOP("Add to Steam"),
         QT_TR_NOOP("Create or update a non-Steam game for the selected profile."),
         QT_TR_NOOP("Steam game name"),

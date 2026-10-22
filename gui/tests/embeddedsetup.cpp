@@ -1278,8 +1278,13 @@ private slots:
         QmlNativeServices services(&settings, requests, {}, registration.boundary(), controlledDiscovery());
         SetupWindow setup(services.backend());
         setup.resize(1280, 900); setup.show();
-        QVERIFY(click(setup.view(), "[data-steam-open]"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-steam-open]')?.disabled === false").toBool());
+        setup.view()->setFocus();
+        QTest::keyClick(setup.view()->focusProxy(), Qt::Key_F1);
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-steam-form]')").toBool());
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.hasAttribute('data-steam-name')").toBool());
+        QTest::keyClick(setup.view()->focusProxy(), Qt::Key_Down);
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.hasAttribute('data-steam-options')").toBool());
         const auto generation = QString::number(services.backend()->profileGeneration());
         const auto form = setup.bridge()->snapshot().value("steam").toMap().value("form").toString();
         QVERIFY(!setupRequest(setup.view(), "beginSteamShortcut", {generation}).value("accepted").toBool());
@@ -1351,7 +1356,7 @@ private slots:
             staleIgnored = setup.bridge()->snapshot().value("steam").toMap().value("phase") == "progress";
             setup.hide(); hidden = true;
         });
-        QVERIFY(click(setup.view(), "[data-steam-create]"));
+        QTest::keyClick(setup.view()->focusProxy(), Qt::Key_Menu);
         QTRY_VERIFY(hidden); QVERIFY(staleIgnored);
         QTest::qWait(80);
         QVERIFY(QDir(files.path()).entryList(QDir::NoDotAndDotDot | QDir::AllEntries).isEmpty());

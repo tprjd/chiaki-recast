@@ -47,7 +47,12 @@
   }
   async function navigate(event: KeyboardEvent) {
     const target = event.target as HTMLElement;
-    if (settingsOpen || target.closest('[data-setup-panel]')) return;
+    if (settingsOpen || target.closest('[data-setup-panel]') || document.querySelector('dialog[open]')) return;
+    if (event.key === 'F1') {
+      event.preventDefault();
+      if (!event.repeat) document.querySelector<HTMLButtonElement>('[data-steam-open]:enabled')?.click();
+      return;
+    }
     if (event.key === 'ContextMenu') { event.preventDefault(); settingsOpen = true; return; }
     if (event.key === 'Escape') {
       event.preventDefault();

@@ -9,9 +9,11 @@
   $effect(() => { if (current.reminder.eligible) connection.startReminders(current.profileGeneration); });
   async function choose(action: string) {
     if (pending) return;
+    const profile = current.profileGeneration;
     pending = true;
     try {
-      const reply = await connection.reminderAction(current.reminder.id, action, current.profileGeneration);
+      const reply = await connection.reminderAction(current.reminder.id, action, profile);
+      if (current.profileGeneration !== profile) return;
       if (reply.accepted && reply.route) { await tick(); setup(reply.route); }
     } finally { pending = false; }
   }
