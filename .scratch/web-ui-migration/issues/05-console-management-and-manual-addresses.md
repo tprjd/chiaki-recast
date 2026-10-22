@@ -4,7 +4,7 @@
 
 **Blocked by:** 04: Connect locally from web setup to native playback.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 10, 13, 14, 15, 23, 35, 36, 37, 38, 39, 69, 70.
 

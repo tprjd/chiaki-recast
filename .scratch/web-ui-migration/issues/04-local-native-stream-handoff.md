@@ -118,3 +118,18 @@ foreground/focus, physical input and held-input release, console sleep, native
 video-disabled operation, hardware decoding, default and other presets,
 supported platforms/packages, and matched performance. Milestone closure does
 not mark those conditions as passed.
+
+Integration merge `53295e54` contains worker commit `3e5bc93b` without conflicts.
+The merged tree matches the worker tree. GUI source matches final build source
+`effd472a`. All 45 final source, artifact, lock, and vendor-patch hashes match.
+The merger independently confirmed all 29 recorded source comparisons and read
+the focused runtime logs. Native lifetime source and the affected test bodies
+remain equal to the passing source at `7cd7ec8e` after the additive media merge.
+
+Setup closes the optional sign-in window before hide/freeze. The bridge retains
+its suspended emission guard and ticket 12's media fields and validated setter.
+Ticket 15 remains claimed. Passing evidence was reused without builds or test
+reruns. Source-only whitespace checks pass. The earlier initialization and
+decoded-cleanup binaries were overwritten before hashing. Their exact binary
+digests remain unavailable; source comparisons do not replace those digests.
+The unchecked hardware and live acceptance criteria above remain open.
