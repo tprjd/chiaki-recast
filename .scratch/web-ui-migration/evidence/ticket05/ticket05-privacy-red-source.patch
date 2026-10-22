@@ -1,0 +1,68 @@
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 10f9e3c7..53c7b230 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -2010,6 +2010,63 @@ private slots:
+         QCOMPARE(restarted.exitCode(), 0);
+     }
+ 
++    void consoleManagementPrivacy()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto removeSettings = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        settings.SetStreamerMode(true);
++        ChiakiRegisteredHost registered = {};
++        registered.target = CHIAKI_TARGET_PS5_1;
++        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
++        strcpy(registered.server_nickname, "PRIVATE.EXAMPLE");
++        settings.AddRegisteredHost(RegisteredHost(registered));
++        settings.SetManualHost(ManualHost(-1, "private.example", true, HostMAC(registered.server_mac)));
++        settings.AddHiddenHost(HiddenHost(HostMAC(registered.server_mac), "192.0.2.77"));
++        QmlNativeServices services(&settings);
++        services.backend()->stopAutoConnect();
++        SetupWindow setup(services.backend());
++        setup.show();
++        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
++        const auto json = QJsonDocument::fromVariant(consoleRequest(setup.view(), "snapshot", {})).toJson();
++        QVERIFY(!json.contains("PRIVATE.EXAMPLE"));
++        QVERIFY(!json.contains("private.example"));
++        QVERIFY(!json.contains("192.0.2.77"));
++        QVERIFY(!json.contains("001122334455"));
++        QVERIFY(click(setup.view(), ".console-details"));
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').textContent.includes('hidden')").toBool());
++        setup.view()->grab().save(qEnvironmentVariable("CHIAKI_DETAILS_PREVIEW", "embedded-details.png"));
++        QVERIFY(click(setup.view(), "[data-console-action=deleteManual]"));
++        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-confirm-management]')").toBool());
++        QVERIFY(!script(setup.view(), "document.querySelector('dialog').textContent.toLowerCase().includes('private.example')").toBool());
++        QVERIFY(click(setup.view(), "[data-cancel-management]"));
++        QVERIFY(click(setup.view(), "[data-manage-consoles]"));
++        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-delete-registration]')").toBool());
++        QVERIFY(!script(setup.view(), "document.querySelector('dialog').textContent.includes('192.0.2.77')").toBool());
++        QVERIFY(click(setup.view(), "[data-delete-registration]"));
++        QVERIFY(!script(setup.view(), "document.querySelector('dialog').textContent.toLowerCase().includes('private.example')").toBool());
++        QVERIFY(click(setup.view(), "[data-cancel-management]"));
++        QVERIFY(click(setup.view(), ".console-details"));
++        QVERIFY(click(setup.view(), "[data-console-action=pin]"));
++        QVERIFY(fill(setup.view(), "[data-saved-pin]", "0123"));
++        QCOMPARE(script(setup.view(), "document.querySelector('[data-saved-pin]').type").toString(), QStringLiteral("password"));
++        QVERIFY(script(setup.view(), "document.querySelector('.reveal input').disabled").toBool());
++        QVERIFY(click(setup.view(), "[data-close-management]"));
++        QVERIFY(click(setup.view(), "[data-add-manual]"));
++        QVERIFY(fill(setup.view(), "[data-manual-address]", "private-input.example"));
++        QVERIFY(fill(setup.view(), "[data-manual-registration]", "later"));
++        setup.view()->grab().save(qEnvironmentVariable("CHIAKI_MANUAL_WIDE_PREVIEW", "embedded-manual-wide.png"));
++        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
++        const auto invalid = consoleRequest(setup.view(), "saveManualAddress", {"https://private-input.example", "later", generation});
++        QVERIFY(!invalid.value("accepted").toBool());
++        QVERIFY(!invalid.value("message").toString().contains("private-input.example"));
++        QVERIFY(!script(setup.view(), "document.querySelector('dialog').textContent.includes('private-input.example')").toBool());
++    }
++
+     void consoleManagement()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);

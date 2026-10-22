@@ -33,7 +33,7 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [14: Native color mapping](issues/14-color-mapping-settings.md): claimed after ticket 13.
 - Tickets [16](issues/16-controller-setup-and-mapping.md) and [17](issues/17-profiles-files-and-logs.md): ready after ticket 11.
 - [18: Setup reminders and Steam shortcuts](issues/18-reminders-and-steam-shortcuts.md): ready after ticket 06.
-- [05: Console management and manual addresses](issues/05-console-management-and-manual-addresses.md): claimed after ticket 04.
+- [05: Console management and manual addresses](issues/05-console-management-and-manual-addresses.md): resolved for guarded details/actions, manual saves/association, saved login PIN edits, and registered manual native handoff. Embedded validation, privacy, focus, native state, reload, and handoff checks pass. Live-console, physical access, platform, and hardware acceptance remains in 19 through 23.
 - [07: Pairing and Account ID lookup](issues/07-pairing-and-account-id.md): claimed. Tickets 04 and 06 are integrated; the isolated worktree and native dependencies are prepared.
 - [08: PSN native streaming](issues/08-psn-native-streaming.md): claimed after tickets 04 and 06. The isolated worktree is being prepared.
 - Tickets [19](issues/19-windows-web-native-package.md), [20](issues/20-linux-web-native-packages.md), and [21](issues/21-macos-web-native-package.md): ready after ticket 04.
@@ -57,6 +57,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - 7f202b35: merged ticket 15 commit 48427a70 without conflicts. GUI source matches tested settings merge 280989cf. All 26 recorded normalized source/lock/application/harness/asset/image/patch hashes and 45 independent preserved-source comparisons with hashes pass. Inspected all six layout captures. Read and reused valid focused evidence, including shared settings 5/0, capture/presentation 4/0, and current GNU numeric response 10/0. No build or test was repeated. Renderer 13, native lifetime 04, and media 12 behavior remain. Physical calibration, Raw Input, actual focus, live console, GPU, package, and platform desktop acceptance remain open. Numeric defaults remain provisional.
 
 ## Decisions
+
+- [Ticket 05](issues/05-console-management-and-manual-addresses.md) adds current opaque target keys for console actions, hidden consoles, and registration choices. Manual entries retain their native identity and address. [Verification](evidence/ticket05/verification.md) records native saves and association, deletion distinctions, PIN leading zeroes, secret-free replies, streamer masking, stale target/profile rejection, focus, reload, and registered manual handoff. Native connection state remains in QmlBackend. Ticket 03/04 graphics and decoder evidence is reused. Ticket 07 owns pairing; tickets 19 through 23 retain physical, platform, hardware, and performance acceptance.
 
 - [Ticket 04](issues/04-local-native-stream-handoff.md) adds one application window controller while the backend retains connection state. [Verification](evidence/ticket04/verification.md) records real bridge handoff, native PIN/menu/disconnect, initialization recovery, decoded buffer cleanup (GL 51/51 and Vulkan 54/54), fresh page resume and merged sign-in closure. Ticket 03 graphics evidence is reused. Full live-console, foreground/focus, native video-disabled, default-preset, hardware/platform and performance acceptance stays open in 23; production presets are unchanged.
 
