@@ -1,18 +1,10 @@
 <script lang="ts">
   import type { connectSetup, State } from './bridge';
-  let { current, connection }: { current?: State; connection?: Awaited<ReturnType<typeof connectSetup>> } = $props();
+  let { current, connection, optionsOnly = false }: { current?: State; connection?: Awaited<ReturnType<typeof connectSetup>>; optionsOnly?: boolean } = $props();
   let pending = $state(false);
   let message = $state('');
   const t = (text: string) => current?.strings[text] ?? text;
   let selected = $derived(current?.consoles.find(console => console.key === current.selectedKey));
-  async function connect() {
-    if (!connection || !selected || pending || current?.connectionBusy) return;
-    pending = true;
-    try {
-      const reply = await connection.connect(selected.key);
-      message = reply.accepted ? '' : reply.message ?? t('Console unavailable');
-    } finally { pending = false; }
-  }
   async function autoConnectTarget(key: string) {
     if (!connection || !current || pending) return;
     pending = true;
@@ -39,6 +31,7 @@
   }
 </script>
 
+{#if !optionsOnly}
 {#if current?.streamError?.id}
   <section class="stream-error" role="alert">
     <h2>{current.streamError.title}</h2>
@@ -79,7 +72,11 @@
     {/if}
   </section>
 {/if}
+{/if}
+{#if optionsOnly}
+<details class="connection-options"><summary>{t('Connection options')}</summary>
 <div class="connect-action">
+  {#if selected}<p class="selected-target">{t('Selected')}: {selected.name}</p>{/if}
   {#if current}
     <label class="setting-control">{t('Auto-connect at startup')}
       <select data-auto-connect-target value={current.autoConnectKey} disabled={!connection || pending || current.connectionBusy}
@@ -89,9 +86,6 @@
       </select>
     </label>
   {/if}
-  <button class="connect-console" disabled={!connection || pending || current?.connectionBusy || !selected?.available
-    || !selected.registered || (selected.route === 'local' && !['ready', 'standby'].includes(selected.state))} onclick={connect}>
-    {t(selected?.route === 'local' && selected.state === 'standby' ? 'Wake and connect' : 'Connect')}</button>
   {#if selected?.registered && selected.route !== 'psn'}
     <button data-wake-console disabled={!connection || pending || current?.connectionBusy || !selected.available} onclick={wake}>{t('Wake console')}</button>
   {/if}
@@ -101,9 +95,14 @@
   {/if}
   <span role="status">{message}</span>
 </div>
+</details>
+{/if}
 
 <style>
-  .connect-action { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 0 0 26px; }
+  .connection-options { margin-top: 18px; color: var(--muted); font-size: 12px; }
+  summary { cursor: pointer; width: max-content; }
+  .selected-target { width: 100%; }
+  .connect-action { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 16px 0 0; }
   button { min-height: 44px; padding: 9px 24px; background: var(--accent); color: #102033; border: 1px solid var(--accent); border-radius: 8px; }
   span { color: var(--muted); }
   .stream-error { border: 1px solid var(--accent); border-radius: 8px; padding: 16px; margin-bottom: 26px; }

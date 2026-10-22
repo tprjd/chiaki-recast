@@ -44,13 +44,19 @@
 
 <section class="settings-group" aria-label={t('Available controllers')}>
   <h3>{t('Available controllers')}</h3>
+  <div class="setting-rows">
+  <div class="setting-row controller-devices">
   {#if !mapping.devices.length}<p data-controller-empty role="status">{t('No controllers connected.')}</p>{/if}
   <ul data-controller-devices>{#each mapping.devices as device}<li>{device.name} · {device.type}{device.steamVirtual ? ` · ${t('Managed by Steam')}` : ''}</li>{/each}</ul>
+  </div>
+  <div class="setting-row controller-actions">
   <button id="controllerMappingChange" disabled={pending || !mapping.devices.length || current.connectionBusy || !!mapping.operation}
     onclick={() => run(() => connection.beginControllerMapping(false, current.profileGeneration))}>{t('Change controller mapping')}</button>
   <button id="controllerMappingReset" disabled={pending || !mapping.devices.length || current.connectionBusy || !!mapping.operation}
     onclick={() => run(() => connection.beginControllerMapping(true, current.profileGeneration))}>{t('Reset controller mapping')}</button>
-  <p role="status" data-controller-status>{message || mapping.message}</p>
+  </div>
+  </div>
+  <p class="controller-status" role="status" data-controller-status>{message || mapping.message}</p>
 </section>
 
 {#if mapping.operation}
@@ -60,16 +66,16 @@
       <p role="status">{t('Choose the controller by pressing any button on the controller.')}</p>
     {:else}
       <p>{mapping.type}</p>
-      <label><input id="enableAnalogStickMapping" type="checkbox" checked={mapping.analog} disabled={pending || mapping.phase === 'capture'}
-        onchange={event => command(event.currentTarget.checked ? 'analogOn' : 'analogOff')} />{t('Allow mapping analog sticks and L2/R2')}</label>
+      <div class="setting-rows"><div class="setting-row"><div class="setting-copy"><label for="enableAnalogStickMapping">{t('Allow mapping analog sticks and L2/R2')}</label></div><div class="setting-control"><input id="enableAnalogStickMapping" type="checkbox" role="switch" checked={mapping.analog} disabled={pending || mapping.phase === 'capture'}
+        onchange={event => command(event.currentTarget.checked ? 'analogOn' : 'analogOff')} /></div></div></div>
       <p>{t('Select a primary or alternate input to capture a controller button. A conflicting input moves to the new mapping.')}</p>
       {#if mapping.phase === 'capture'}
         <p role="status" data-controller-capture>{t('Press a controller input, or cancel capture.')}</p>
         <button id="controllerCaptureCancel" onclick={() => command('cancelCapture')}>{t('Cancel capture')}</button>
       {/if}
-      <div class="controller-mappings">
+      <div class="controller-mappings setting-rows">
         {#each mapping.mappings as row (row.buttonValue)}
-          <div><span>{row.buttonName}</span>
+          <div class="setting-row"><span>{row.buttonName}</span>
             {#each [0, 1] as slot}
               <button id={`controllerMap${row.buttonValue}Slot${slot}`} disabled={pending || mapping.phase === 'capture'} aria-label={`${row.buttonName} ${t(slot ? 'alternate input' : 'primary input')}`}
                 onclick={() => { focus = `controllerMap${row.buttonValue}Slot${slot}`; run(() => connection.captureControllerMapping(row.buttonValue, slot, mapping.operation, current.profileGeneration)); }}>
@@ -88,9 +94,16 @@
 {/if}
 
 <style>
-  label { display: flex; gap: 10px; align-items: center; }
-  label input { width: 20px; }
-  .controller-mappings { display: grid; gap: 8px; margin-block: 16px; }
+  .controller-devices { display:block; color:var(--muted); font-size:12px; }
+  .controller-devices ul { list-style:none; padding:0; margin:0; }
+  .controller-devices li + li { margin-top:8px; }
+  .controller-actions { justify-content:flex-end; flex-wrap:wrap; gap:8px; }
+  .controller-actions button { min-height:36px; color:var(--accent); font-size:12px; }
+  .controller-status { color:var(--muted); font-size:12px; }
+  .controller-status:not(:empty) { margin-top:12px; }
+  .setting-copy label { font-size:13px; font-weight:500; }
+  .controller-mappings { margin-block:16px; }
   .controller-mappings > div { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; align-items: center; }
+  .controller-mappings button { min-width:0; overflow-wrap:anywhere; font-size:12px; }
   small { display: block; opacity: .7; }
 </style>

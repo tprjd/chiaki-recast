@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick, onMount } from 'svelte';
+  import Icon from './Icon.svelte';
   import KeyboardMouse from './KeyboardMouse.svelte';
   import Controllers from './Controllers.svelte';
   import Profiles from './Profiles.svelte';
@@ -18,13 +19,29 @@
   let controllerTarget = $state('');
   let search: HTMLInputElement;
   const values = $derived({ ...current.generalSettings, ...current.mediaSettings, ...current.rendererSettings, ...current.keyboardMouse.values, ...current.controllerSetup.values });
-  const fields = $derived([...profileSettings, ...generalSettings, ...mediaSettings, ...rendererSettings, ...colorMappingSettings, ...controllerSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
+  const fields = $derived([...generalSettings, ...profileSettings, ...mediaSettings, ...rendererSettings, ...colorMappingSettings, ...controllerSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
     const choices = current.mediaChoices[field.key];
     if (field.key.startsWith('bitrate')) return { ...field, automatic: [0, 2, 6, 10, 15][Number(values[`resolution${field.key.slice(7)}`])] };
     return choices ? { ...field, options: choices.map(choice => choice.label), optionValues: choices.map(choice => choice.value) } : field;
   }));
+  const categoryIcons: Record<string, string> = { General: 'settings', Video: 'video', Stream: 'remote', 'Audio/Wifi': 'audio', Display: 'display', Renderer: 'settings', 'Color mapping': 'video', 'Keyboard and mouse': 'keyboard', Controllers: 'consoles', Profiles: 'profile' };
+  const categoryDescriptions: Record<string, string> = {
+    General: 'Session behavior, privacy and shortcuts',
+    Video: 'Decoder, stream window and rendering',
+    Stream: 'Local and remote quality for each console type',
+    'Audio/Wifi': 'Devices, microphone and connection feedback',
+    Display: 'Display resolution, brightness and color',
+    Renderer: 'Native rendering and video processing',
+    'Color mapping': 'Gamut and tone mapping',
+    'Keyboard and mouse': 'Keyboard controls, mouse response and bindings',
+    Controllers: 'Controller input, mapping, touchpad and haptics',
+    Profiles: 'Profiles and settings files'
+  };
   const categories = ['General', 'Video', 'Stream', 'Audio/Wifi', 'Display', 'Renderer', 'Color mapping', 'Keyboard and mouse', 'Controllers', 'Profiles'];
-  const visibleFields = $derived(fields.filter(field => (field.category ?? 'General') === category));
+  const visibleFields = $derived(fields.filter(field => (field.category ?? 'General') === category
+    && (!field.requires || values[field.requires])
+    && (!field.requiresValue || values[field.requiresValue.key] === field.requiresValue.value)
+    && (!field.when || field.when.every(condition => settingConditionMet(condition, values)))));
   const groups = $derived([...new Set(visibleFields.map(field => field.group))]);
   const searchFields = $derived([...fields,
     { key: 'profileSelection', label: 'Create or switch profile', category: 'Profiles', group: 'Profiles', description: 'Select a profile, then use the explicit action.' },
@@ -94,16 +111,18 @@
 <svelte:window onkeydown={keyboard} />
 <section data-setup-panel aria-label={t('Settings')}>
 <div class="settings-heading">
-  <h1>{t('Settings')}</h1>
-  <button class="back-consoles" onclick={close}>{t('Back to consoles')}</button>
+  <div><p class="breadcrumb">{t('Preferences')}</p><h1>{t('Settings')}</h1></div>
+  <div class="profile-chip"><span class="profile-avatar"><Icon name="profile" size={17} /></span><span><small>{t('Current profile')}</small><strong>{current.profiles.current}</strong></span></div>
 </div>
-<label class="search settings-search">{t('Find a setting')}
-  <input bind:this={search} type="search" maxlength="256" bind:value={query} aria-label={t('Find a setting')} />
-</label>
+<div class="settings-tools">
+  <label class="search settings-search"><Icon name="search" size={17} /><input bind:this={search} type="search" maxlength="256" bind:value={query} placeholder={t('Find a setting')} aria-label={t('Find a setting')} /></label>
+  <span>{t('Changes are saved automatically.')}</span>
+</div>
 <div class="settings-layout">
   <nav class="category-nav" aria-label={t('Settings categories')}>
+    <span class="nav-label">{t('Preferences')}</span>
     {#each categories as item}
-      <button aria-current={category === item ? 'page' : undefined} onclick={() => { category = item; query = ''; controllerTarget = ''; if (item === 'Audio/Wifi') connection.refreshAudioDevices(); }}>{t(item)}</button>
+      <button aria-current={category === item ? 'page' : undefined} onclick={() => { category = item; query = ''; controllerTarget = ''; if (item === 'Audio/Wifi') connection.refreshAudioDevices(); }}><Icon name={categoryIcons[item]} size={17} />{t(item)}</button>
     {/each}
   </nav>
   <div class="settings-content">
@@ -116,8 +135,10 @@
         {/each}
       </section>
     {:else}
-      <h2>{t(category)}</h2>
-      <p class="settings-note">{t('Changes are saved automatically.')}</p>
+      <div class="category-heading">
+        <div><h2>{t(category)}</h2><p class="category-description">{t(categoryDescriptions[category] ?? 'Configure your Remote Play experience.')}</p></div>
+        {#if category === 'Audio/Wifi'}<button class="category-action" disabled={pending} onclick={() => connection.refreshAudioDevices()}><Icon name="refresh" size={15} />{t('Refresh audio devices')}</button>{/if}
+      </div>
       {#if category === 'Color mapping'}
         <button class="back-consoles" id="backRenderer" onclick={() => reveal('openPlaceboColorMapping')}>{t('Back to Renderer')}</button>
         {#if values.videoPreset !== 5 || !values.placeboColorMappingEnabled || values.placeboColorMappingPreset !== 0}
@@ -133,9 +154,7 @@
           <button disabled={pending} onclick={() => change('restartRenderer', true)}>{t('Restart application')}</button>
         {/if}
       {/if}
-      {#if category === 'Audio/Wifi'}<button disabled={pending} onclick={() => connection.refreshAudioDevices()}>{t('Refresh audio devices')}</button>{/if}
       {#if category === 'Profiles'}<Profiles {current} {connection} {t} />{/if}
-      {#if category === 'General'}<p data-log-directory>{current.profiles.logDirectory}</p>{/if}
       {#key current.profileGeneration}
       {#if category === 'Keyboard and mouse'}
         <KeyboardMouse {current} {connection} {t} target={keyboardMouseTarget} />
@@ -146,18 +165,26 @@
           <h3>{t(group)}</h3>
           <div class="setting-rows">
             {#each visibleFields.filter(field => field.group === group) as field (field.key)}
-              {#if (!field.requires || values[field.requires]) && (!field.requiresValue || values[field.requiresValue.key] === field.requiresValue.value) && (!field.when || field.when.every(condition => settingConditionMet(condition, values)))}
                 <SettingField {field} value={values[field.key] ?? false} disabled={pending}
                   generation={current.profileGeneration} change={(value, generation) => change(field.key, value, generation)} {t} />
-              {/if}
             {/each}
           </div>
         </section>
       {/each}
       {/if}
       {/key}
+      {#if category === 'General'}<details class="log-location"><summary>{t('Log directory')}</summary><p data-log-directory>{current.profiles.logDirectory}</p></details>{/if}
     {/if}
     <p class="settings-message" role="status">{message}</p>
   </div>
 </div>
 </section>
+
+<style>
+  .settings-heading h1 { font-size:34px; }
+  .settings-search { padding:10px 13px; }
+  .category-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:22px; }
+  .category-description { margin-top:4px; color:var(--muted); font-size:13px; }
+  .category-action { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:36px; padding:8px 11px; color:var(--accent); font-size:12px; }
+  .log-location p { margin-top:8px; }
+</style>

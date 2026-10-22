@@ -35,22 +35,44 @@
 </script>
 <section class="settings-group" aria-label={t('Profiles')}>
   <h3>{t('Profiles')}</h3>
-  <p data-active-profile>{t('Current profile')}: {current.profiles.current}</p>
-  <label for="profileSelection">{t('User profile')}</label>
+  <div class="setting-rows">
+  <div class="setting-row">
+    <div class="setting-copy"><label for="profileSelection">{t('User profile')}</label><p data-active-profile>{t('Current profile')}: {current.profiles.current}</p></div>
+    <div class="setting-control">
   <select id="profileSelection" bind:value={selected} disabled={pending || current.connectionBusy} onchange={() => { deleting = false; name = ''; }}>
     {#each current.profiles.items as profile}<option value={profile.key}>{profile.label}</option>{/each}
     <option value="create">{t('Create new profile')}</option>
   </select>
+    </div>
+  </div>
   {#if creating}
-    <label for="newProfileName">{t('New profile name')}</label>
-    <input id="newProfileName" type={current.streamerMode ? 'password' : 'text'} bind:value={name} disabled={pending} autocomplete="off" />
+    <div class="setting-row">
+      <div class="setting-copy"><label for="newProfileName">{t('New profile name')}</label></div>
+      <div class="setting-control"><input id="newProfileName" type={current.streamerMode ? 'password' : 'text'} bind:value={name} disabled={pending} autocomplete="off" /></div>
+    </div>
   {/if}
   {#if item?.deletable}
-    <label><input id="deleteProfile" type="checkbox" bind:checked={deleting} disabled={pending} />{t('Delete selected profile')}</label>
+    <div class="setting-row">
+      <div class="setting-copy"><label for="deleteProfile">{t('Delete selected profile')}</label></div>
+      <div class="setting-control"><input id="deleteProfile" type="checkbox" bind:checked={deleting} disabled={pending} /></div>
+    </div>
   {/if}
+  <div class="setting-row profile-action">
   <p>{t('The default and current profiles cannot be deleted.')}</p>
   <button id="profileAction" disabled={pending || current.connectionBusy || (creating ? !name.trim() : !item || item.active)} onclick={apply}>
     {t(deleting ? 'Delete Profile' : creating ? 'Create Profile' : 'Switch Profile')}
   </button>
-  <p data-profile-message role="status">{message}</p>
+  </div>
+  </div>
+  <p class="profile-message" data-profile-message role="status">{message}</p>
 </section>
+
+<style>
+  .setting-copy label { display:block; }
+  .setting-control input:not([type=checkbox]) { width:100%; min-height:38px; padding:8px 11px; }
+  .setting-control input[type=checkbox] { appearance:auto; width:16px; height:16px; accent-color:var(--accent); }
+  .setting-control input[type=checkbox]::after { display:none; }
+  .profile-action p,.profile-message { color:var(--muted); font-size:12px; }
+  .profile-action button { min-height:36px; font-size:12px; color:var(--accent); flex-shrink:0; }
+  .profile-message:not(:empty) { margin-top:12px; }
+</style>

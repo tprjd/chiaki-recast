@@ -4,7 +4,7 @@
 
 **Blocked by:** 05: Manage consoles and manual addresses from the web library; 07: Pair PS4 and PS5 consoles and retrieve an Account ID; 09: Register a console automatically through PSN; 10: Wake consoles and auto-connect from web startup; 12: Configure stream profiles and audio devices; 14: Configure native color mapping from web setup; 15: Configure keyboard and mouse bindings, response, and reset; 16: Configure controllers and their mappings; 17: Manage profiles, settings files, and logs; 18: Complete setup reminders and Steam shortcuts; 19: Ship the Windows web and native application; 20: Ship the Linux web and native application; 21: Ship the macOS web and native application; 22: Resume interrupted sessions and recover web setup.
 
-**Status:** claimed
+**Status:** resolved
 
 **Source:** [Web setup UI specification](../spec.md). Stories 3, 48, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95.
 
@@ -89,3 +89,30 @@ and A guided setup prototypes. Keep all actions connected to existing native
 services, preserve controller/keyboard semantics, and review the visual result
 at 1024 CSS pixels or wider. Necessary frontend preview builds are separate from
 the skipped release build and performance qualification.
+
+## Answer
+
+The production Svelte UI now follows the selected B library, A Settings
+sidebar, and A guided setup prototypes. The app rail, per-card actions,
+artwork/status treatment, search/refresh toolbar, category rows, compact
+controls, current profile chip, pairing form, and instruction column match
+the selected layouts. Related profile, controller, and keyboard controls use
+the same groups and rows. Native handlers, target identities, capability
+checks, privacy controls, and connection progress remain in use.
+
+The manual and automatic registration routes share one chooser. Navigation
+closes the pairing account route and clears PIN drafts before changing the
+page. Auto-connect still supports Off and the existing saved native target.
+The maintained embedded fixture selectors follow the new card and chooser
+layout, but their runtime suites were not run.
+
+The frontend check passes with zero errors and warnings. The frontend build
+passes for the visual changes. The last pairing navigation guard passes a
+direct Svelte compile and focused async assertions. The short visual review
+uses real Svelte components with a local-only
+fixture adapter. See [verification](../evidence/ticket23/verification.md).
+
+This resolves the requested source and visual milestone under the user's
+priority update. The remaining native, package, platform, hardware,
+HighQuality, and performance acceptance is user-skipped and remains
+unverified. The unchecked historical criteria above do not claim passes.
