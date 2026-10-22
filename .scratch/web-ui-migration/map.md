@@ -31,7 +31,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [13: Display and native renderer settings](issues/13-display-and-renderer-settings.md): claimed after ticket 11.
 - [15: Keyboard and mouse controls](issues/15-keyboard-and-mouse-controls.md): claimed after ticket 11.
 - Tickets [16](issues/16-controller-setup-and-mapping.md) and [17](issues/17-profiles-files-and-logs.md): ready after ticket 11.
-- [18: Setup reminders and Steam shortcuts](issues/18-reminders-and-steam-shortcuts.md): ready after ticket 06. Tickets 07 and 08 still require ticket 04.
+- [18: Setup reminders and Steam shortcuts](issues/18-reminders-and-steam-shortcuts.md): ready after ticket 06.
+- Tickets [05](issues/05-console-management-and-manual-addresses.md), [07](issues/07-pairing-and-account-id.md), [08](issues/08-psn-native-streaming.md), [19](issues/19-windows-web-native-package.md), [20](issues/20-linux-web-native-packages.md), and [21](issues/21-macos-web-native-package.md): ready after ticket 04.
 - Other tickets 05 through 23: waiting for their declared blockers.
 
 ## Integration history
@@ -45,6 +46,7 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - 322c486b: merged ticket 11 commit ceae3eb7 without conflicts. The merged tree and all 14 recorded source, lock, executable, JavaScript, and CSS hashes match the tested artifacts. Reused save/reload 3/0 and validation/restart 4/0 without builds or test reruns. The checks used offscreen rendering and a test-only GPU-disable flag. Physical focus, visual layout, Deck hardware, live session effects, platform packages, and GPU acceptance remain open. Ticket 03 graphics evidence is unchanged.
 - abd776d6: merged ticket 06 commit a75ebe09 without conflicts. The merged source matches tested source d1f643d7. All 32 recorded source, lock, executable, asset, and capture hashes match. Read the five focused case results and inspected all four captures. Reused passing evidence without builds or test reruns. Ticket 11 settings and shared keyboard guards remain. No live PSN, physical focus, or GPU claim is made. Ticket 03 graphics evidence is unchanged. Ticket 04 must close the optional sign-in window in SetupWindow::suspend before setup hides or freezes.
 - fd41b8d2: merged ticket 12 commit cca37231 without conflicts. The merged source matches tested source 3f19a3c6; production source matches b3dbb435. All 16 recorded source/artifact/patch hashes and four compared capture hashes match. Reused expanded 3/0, state/restart/general 5/0, restart child 3/0, and controlled SDL dummy device/layout 4/0 without builds or test reruns. Ticket 06 account and ticket 11 general controls remain. Physical audio, hotplug, GPU, live playback, and platform acceptance remain open.
+- 53295e54: merged ticket 04 commit 3e5bc93b without conflicts. GUI source matches final build effd472a. All 45 final source/artifact/lock/patch hashes and 29 independent source comparisons pass. Read and reused the focused handoff, initialization, decoded-cleanup, sign-in suspend, and direct-native results without builds or test reruns. Earlier initialization/decoded binary digests remain unavailable. Ticket 06 sign-in closure, suspended bridge emission guard, ticket 12 media fields, and ticket 15 claim remain. Closure covers the local handoff and native lifetime milestone. Unchecked real-console, actual focus, video-disabled, default/full-preset, supported-platform GPU, hardware, and performance acceptance remains in ticket 23.
 
 ## Decisions
 
