@@ -2967,7 +2967,6 @@ QString QmlBackend::openPlaceboOptionsLink()
 {
     QUrl url = QUrl("https://libplacebo.org/options/");
     QDesktopServices::openUrl(url);
-    url = psnLoginUrl();
     return QString(url.toEncoded());
 }
 

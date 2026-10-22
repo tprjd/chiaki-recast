@@ -620,9 +620,9 @@ public:
     Q_INVOKABLE void clearKeyMapping();
     Q_INVOKABLE void exportSettings();
     Q_INVOKABLE QString chooseSteamBasePath();
-    Q_INVOKABLE void exportPlaceboSettings();
+    Q_INVOKABLE QVariantMap exportPlaceboSettings();
     Q_INVOKABLE void importSettings();
-    Q_INVOKABLE void importPlaceboSettings();
+    Q_INVOKABLE QVariantMap importPlaceboSettings();
     Q_INVOKABLE void deleteProfile(QString profile);
     Q_INVOKABLE QString stringForDpadShortcut() const;
     Q_INVOKABLE QString stringForStreamMenuShortcut() const;
@@ -783,6 +783,8 @@ signals:
 
 private:
     Settings *settings = {};
+    quint64 settingsGeneration = 0;
+    bool rendererFilePending = false;
     QStringList audio_in_devices;
     QStringList audio_out_devices;
 };

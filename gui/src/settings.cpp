@@ -4,6 +4,12 @@
 #include <SDL.h>
 #include <QFile>
 #include <QFileInfo>
+#include <QTemporaryFile>
+#include <QSaveFile>
+#include <QScopeGuard>
+extern "C" {
+#include <libplacebo/options.h>
+}
 #include <QUrl>
 #include <QKeySequence>
 #include <QCoreApplication>
@@ -218,22 +224,26 @@ void Settings::ExportSettings(QString filepath)
 }
 
 
-void Settings::ExportPlaceboSettings(QString filepath)
+bool Settings::ExportPlaceboSettings(QString filepath)
 {
-	// append ini if not already added
-	QFileInfo info(filepath);
-	if(info.suffix().isEmpty())
-		filepath += ".ini";
-	// create file if it doesn't exist
-	QFile file(filepath);
-	file.open(QIODevice::ReadWrite);
-	file.close();
-	QSettings settings_backup(filepath, QSettings::IniFormat);
-    QStringList keys = placebo_settings.allKeys();
-    for( QStringList::iterator i = keys.begin(); i != keys.end(); i++ )
-    {
-        settings_backup.setValue( *i, placebo_settings.value( *i ) );
-    }
+	if(QFileInfo(filepath).suffix().isEmpty()) filepath += ".ini";
+	QTemporaryFile temporary(QFileInfo(filepath).absolutePath() + "/.chiaki-renderer-XXXXXX");
+	if(!temporary.open()) return false;
+	const auto temporaryPath = temporary.fileName();
+	temporary.close();
+	{
+		QSettings backup(temporaryPath, QSettings::IniFormat);
+		for(const auto &key : placebo_settings.allKeys())
+			backup.setValue(key, placebo_settings.value(key));
+		backup.sync();
+		if(backup.status() != QSettings::NoError) return false;
+	}
+	QFile source(temporaryPath);
+	if(!source.open(QIODevice::ReadOnly)) return false;
+	const auto bytes = source.readAll();
+	if(source.error() != QFileDevice::NoError) return false;
+	QSaveFile output(filepath);
+	return output.open(QIODevice::WriteOnly) && output.write(bytes) == bytes.size() && output.commit();
 }
 
 QMap<QString, QString> Settings::GetPlaceboValues()
@@ -289,15 +299,42 @@ void Settings::ImportSettings(QString filepath)
 	}
 }
 
-void Settings::ImportPlaceboSettings(QString filepath)
+bool Settings::ImportPlaceboSettings(QString filepath)
 {
-	QSettings settings_backup(filepath, QSettings::IniFormat);
-	placebo_settings.clear();
-	QStringList keys = settings_backup.allKeys();
-	for( QStringList::iterator i = keys.begin(); i != keys.end(); i++ )
-	{
-		placebo_settings.setValue( *i, settings_backup.value( *i ) );
+	QFile source(filepath);
+	if(!source.open(QIODevice::ReadOnly)) return false;
+	QSettings backup(filepath, QSettings::IniFormat);
+	backup.setFallbacksEnabled(false);
+	const auto keys = backup.allKeys();
+	if(backup.status() != QSettings::NoError || keys.isEmpty()
+		|| backup.value("placebo_settings/version").toString() != "0") return false;
+	pl_options options = pl_options_alloc(nullptr);
+	if(!options) return false;
+	const auto freeOptions = qScopeGuard([&] { pl_options_free(&options); });
+	QVariantMap imported;
+	for(const auto &key : keys) {
+		if(!key.startsWith("placebo_settings/")) return false;
+		const auto name = key.mid(17);
+		const auto value = backup.value(key);
+		if(name != "version") {
+			const auto text = value.toString();
+			const bool customUpscaler = (name == "upscaler" || name == "plane_upscaler")
+				&& (text == "fsr" || text == "fsrcnnx_x2_8_0_4_1" || text == "fsrcnnx_x2_16_0_4_1");
+			if(!customUpscaler && !pl_options_set_str(options, name.toUtf8().constData(), text.toUtf8().constData())) return false;
+		}
+		imported.insert(key, value);
 	}
+	if(backup.status() != QSettings::NoError) return false;
+	QVariantMap previous;
+	for(const auto &key : placebo_settings.allKeys()) previous.insert(key, placebo_settings.value(key));
+	placebo_settings.clear();
+	for(auto it = imported.cbegin(); it != imported.cend(); ++it) placebo_settings.setValue(it.key(), it.value());
+	placebo_settings.sync();
+	if(placebo_settings.status() == QSettings::NoError) return true;
+	placebo_settings.clear();
+	for(auto it = previous.cbegin(); it != previous.cend(); ++it) placebo_settings.setValue(it.key(), it.value());
+	placebo_settings.sync();
+	return false;
 }
 
 uint32_t Settings::GetLogLevelMask()

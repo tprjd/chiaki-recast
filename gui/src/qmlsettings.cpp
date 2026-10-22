@@ -11,6 +11,7 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include <QProcess>
+#include <QScopeGuard>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -1944,6 +1945,7 @@ QString QmlSettings::changeControllerKey(int button, int key)
 void QmlSettings::setSettings(Settings *new_settings)
 {
     settings = new_settings;
+    ++settingsGeneration;
     connect(settings, &Settings::RegisteredHostsUpdated, this, &QmlSettings::registeredHostsChanged);
     connect(settings, &Settings::ProfilesUpdated, this, &QmlSettings::profilesChanged);
     refreshAllKeys();
@@ -2145,27 +2147,32 @@ QString QmlSettings::chooseSteamBasePath()
     return fileName;
 }
 
-void QmlSettings::exportPlaceboSettings()
+QVariantMap QmlSettings::exportPlaceboSettings()
 {
+    if(rendererFilePending) return {{"accepted", false}, {"message", tr("A renderer file action is already open.")}};
+    rendererFilePending = true;
+    const auto resetPending = qScopeGuard([this] { rendererFilePending = false; });
+    const auto generation = settingsGeneration;
     QString fileName = QFileDialog::getSaveFileName(QApplication::focusWidget(), tr("Export Placebo Renderer Settings To File"),
-                                                    QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + "/chiaki-ng-placebo",
-                                                    tr("Settings files (*.ini)"),
-                                                    nullptr,
-                                                    QFileDialog::DontUseNativeDialog | QFileDialog::DontConfirmOverwrite);
-    if(fileName.isEmpty())
-        return;
-    settings->ExportPlaceboSettings(std::move(fileName));
+        QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + "/chiaki-ng-placebo",
+        tr("Settings files (*.ini)"), nullptr, QFileDialog::DontUseNativeDialog);
+    if(generation != settingsGeneration) return {{"accepted", false}, {"message", tr("The profile changed. No file action was applied.")}};
+    if(fileName.isEmpty()) return {{"accepted", false}, {"cancelled", true}, {"message", tr("Export cancelled.")}};
+    const bool saved = settings->ExportPlaceboSettings(std::move(fileName));
+    return {{"accepted", saved}, {"message", saved ? tr("Renderer settings exported.") : tr("Renderer settings could not be exported. Check the file permissions and free space.")}};
 }
 
-void QmlSettings::importPlaceboSettings()
+QVariantMap QmlSettings::importPlaceboSettings()
 {
+    if(rendererFilePending) return {{"accepted", false}, {"message", tr("A renderer file action is already open.")}};
+    rendererFilePending = true;
+    const auto resetPending = qScopeGuard([this] { rendererFilePending = false; });
+    const auto generation = settingsGeneration;
     QString fileName = QFileDialog::getOpenFileName(QApplication::focusWidget(), tr("Import Placebo Renderer Settings From File"),
-                                                    QStandardPaths::writableLocation(QStandardPaths::DownloadLocation),
-                                                    tr("Settings files (*.ini)"),
-                                                    nullptr,
-                                                    QFileDialog::DontUseNativeDialog);
-    if(fileName.isEmpty())
-        return;
-    settings->ImportPlaceboSettings(std::move(fileName));;
-    refreshAllPlaceboKeys();
+        QStandardPaths::writableLocation(QStandardPaths::DownloadLocation), tr("Settings files (*.ini)"), nullptr, QFileDialog::DontUseNativeDialog);
+    if(generation != settingsGeneration) return {{"accepted", false}, {"message", tr("The profile changed. No file action was applied.")}};
+    if(fileName.isEmpty()) return {{"accepted", false}, {"cancelled", true}, {"message", tr("Import cancelled.")}};
+    const bool loaded = settings->ImportPlaceboSettings(std::move(fileName));
+    if(loaded) refreshAllPlaceboKeys();
+    return {{"accepted", loaded}, {"message", loaded ? tr("Renderer settings imported.") : tr("Renderer settings could not be imported. Choose a valid renderer settings file.")}};
 }

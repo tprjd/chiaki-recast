@@ -673,6 +673,25 @@ private slots:
         }
     }
 
+    void rendererSettings()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+            QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        services.backend()->setDiscoveryEnabled(false);
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "[...document.querySelectorAll('.category-nav button')].some(e=>e.textContent==='Renderer')").toBool());
+    }
     void generalSettings()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
