@@ -28,6 +28,55 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
+#include <tlhelp32.h>
+#include <psapi.h>
+
+static QList<PROCESSENTRY32W> testProcesses()
+{
+    QList<PROCESSENTRY32W> result;
+    const auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE) return result;
+    PROCESSENTRY32W entry = {};
+    entry.dwSize = sizeof(entry);
+    if (Process32FirstW(snapshot, &entry)) do { result.append(entry); } while (Process32NextW(snapshot, &entry));
+    CloseHandle(snapshot);
+    return result;
+}
+
+static QVariantMap browserResources()
+{
+    const auto processes = testProcesses();
+    QSet<DWORD> owned{GetCurrentProcessId()};
+    bool added;
+    do {
+        added = false;
+        for (const auto &process : processes)
+            if (owned.contains(process.th32ParentProcessID) && !owned.contains(process.th32ProcessID)) {
+                owned.insert(process.th32ProcessID);
+                added = true;
+            }
+    } while (added);
+    quint64 workingSet = 0, privateBytes = 0, cpu100ns = 0;
+    int helpers = 0;
+    for (const auto &process : processes) {
+        const bool app = process.th32ProcessID == GetCurrentProcessId();
+        if (!owned.contains(process.th32ProcessID) || (!app && QString::fromWCharArray(process.szExeFile).compare("QtWebEngineProcess.exe", Qt::CaseInsensitive))) continue;
+        HANDLE handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ, FALSE, process.th32ProcessID);
+        if (!handle) continue;
+        PROCESS_MEMORY_COUNTERS_EX memory = {};
+        if (K32GetProcessMemoryInfo(handle, reinterpret_cast<PROCESS_MEMORY_COUNTERS *>(&memory), sizeof(memory))) {
+            workingSet += memory.WorkingSetSize;
+            privateBytes += memory.PrivateUsage;
+        }
+        FILETIME created, exited, kernel, user;
+        if (GetProcessTimes(handle, &created, &exited, &kernel, &user))
+            cpu100ns += (quint64(kernel.dwHighDateTime) << 32 | kernel.dwLowDateTime)
+                + (quint64(user.dwHighDateTime) << 32 | user.dwLowDateTime);
+        CloseHandle(handle);
+        if (!app) ++helpers;
+    }
+    return {{"helpers", helpers}, {"workingSet", workingSet}, {"privateBytes", privateBytes}, {"cpu100ns", cpu100ns}};
+}
 
 static QString windowProcess(HWND window)
 {
@@ -411,6 +460,91 @@ private slots:
         QTest::addColumn<QString>("mode");
         for (const auto &mode : {"local-ready", "local-wake", "psn-ready", "psn-late-list", "psn-ps4", "psn-ps4-ambiguous", "psn-cancel", "psn-profile", "psn-removed", "psn-replaced"})
             QTest::newRow(mode) << QString::fromLatin1(mode);
+    }
+
+    void setupResourceUse()
+    {
+#ifndef Q_OS_WIN
+        QSKIP("The maintained process resource probe uses the Windows process API.");
+#else
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        QList<QPointer<PsnReply>> requests;
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, controlledPsn(requests), {}, registration.boundary(), controlledDiscovery());
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 720);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        const auto sample = [&](const char *phase) {
+            const auto before = browserResources();
+            QElapsedTimer elapsed;
+            elapsed.start();
+            QTest::qWait(1000);
+            auto after = browserResources();
+            after["cpuMs"] = (after.value("cpu100ns").toULongLong() - before.value("cpu100ns").toULongLong()) / 10000.0;
+            after["elapsedMs"] = elapsed.elapsed();
+            after["phase"] = phase;
+            qInfo().noquote() << "Setup process resources, application plus owned browser helpers"
+                << QJsonDocument::fromVariant(after).toJson(QJsonDocument::Compact);
+        };
+        sample("active");
+        setup.suspend();
+        QTRY_COMPARE(setup.view()->page()->lifecycleState(), QWebEnginePage::LifecycleState::Frozen);
+        sample("frozen");
+        setup.resume();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        sample("resumed");
+        QCOMPARE(requests.size(), 0);
+        QCOMPARE(registration.requests.size(), 0);
+#endif
+    }
+
+    void setupReload()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        QList<QPointer<PsnReply>> requests;
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, controlledPsn(requests), {}, registration.boundary(), controlledDiscovery());
+        services.backend()->stopAutoConnect();
+        settings.SetPsnRefreshToken("reload-refresh-secret");
+        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(-60).toString(settings.GetTimeFormat()));
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 720);
+        setup.show();
+        QVERIFY(click(setup.view(), "[data-psn-refresh]"));
+        QTRY_COMPARE(requests.size(), 1);
+        const auto request = requests.first();
+        const auto refresh = setup.bridge()->snapshot().value("psn").toMap().value("refresh").toMap();
+        QVERIFY(fill(setup.view(), ".library-heading input", "Office"));
+        QVERIFY(click(setup.view(), ".open-settings"));
+        QVERIFY(fill(setup.view(), ".settings-search input", "suspend"));
+        setup.view()->reload();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.settings-search input')?.value").toString(), QStringLiteral("suspend"));
+        QCOMPARE(requests.size(), 1);
+        QCOMPARE(setup.bridge()->snapshot().value("psn").toMap().value("refresh").toMap(), refresh);
+        request->finish({}, QNetworkReply::AuthenticationRequiredError, 401);
+        QVERIFY(click(setup.view(), ".back-consoles"));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.library-heading input')?.value").toString(), QStringLiteral("Office"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-refresh-status]')?.textContent.includes('Sign in')").toBool());
+        QVERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains("reload-refresh-secret"));
+        QCOMPARE(requests.size(), 1);
     }
 
     void startupNativeConnection()
