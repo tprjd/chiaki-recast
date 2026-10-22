@@ -230,7 +230,7 @@ need the full application and the relevant hardware or account. Native display
 scaling also needs a separate full-application check. A passing build alone
 does not verify any of these behaviors.
 
-## Confirmation and registration method tests
+## Confirmation tests
 
 `ConfirmationHarness.qml` loads production `MainView.qml` or `SettingsDialog.qml`
 with the production `ConfirmDialog.qml`. Tests supply the backend and navigation.
@@ -239,9 +239,7 @@ action label. Cancel and Escape call only `cancel` after the popup closes.
 
 `Confirmations` checks labels, visible initial Cancel focus, keyboard navigation,
 disabled actions, repeated input, focus return, and current console targets.
-`RegistrationMethod` checks automatic, manual, and cancelled outcomes through
-production `RegistrationMethodDialog.qml`. Both suites check long text at
-900 by 600 and 1280 by 720. Backend commands are controlled test observations.
+The suite checks long text at 900 by 600 and 1280 by 720. Backend commands are controlled test observations.
 Real registration and native input capture require separate acceptance checks.
 
 ## Startup reminder tests
@@ -371,8 +369,23 @@ ctest --test-dir build -R "^chiaki-embedded-pairing$" --output-on-failure
 ```
 
 The replaced QML registration and Account ID lookup screens, callback adapter,
-and their screen fixtures are removed. Automatic registration keeps its
-`RegistrationMethod` checks until that route migrates.
+and their screen fixtures are removed. The automatic method now uses the
+embedded application check below.
+
+`automaticRegistration` runs the compiled setup page, real WebChannel, bridge,
+native renderer, and native registration-only connection. Controlled HTTP,
+discovery, PSN workers, registration callbacks, and raw session starts prevent
+console traffic. Successful starts create a real native thread that sends
+registration and quit events through the session callback and is joined during
+cleanup. The check covers save-once completion, retry, cancellation limits,
+profile and target changes, wrong results, the PS4 nickname guard, request
+exclusion, hidden resource cleanup, and a later controlled playback handoff.
+Its context row also checks manual pairing for a discovered console with PSN
+metadata, changed addresses, duplicate targets, and rejection of remote rows.
+Run `ctest --test-dir build -R "^chiaki-embedded-automatic-registration$"` on
+a desktop platform with native graphics support. The Windows offscreen plug-in
+cannot create the required OpenGL context. These controlled checks do not prove
+live PSN registration, physical input, GPU coexistence, or playback performance.
 
 ## Disconnect checks
 

@@ -1,0 +1,862 @@
+diff --git a/gui/include/qmlbackend.h b/gui/include/qmlbackend.h
+index e597c905..8ab4704e 100644
+--- a/gui/include/qmlbackend.h
++++ b/gui/include/qmlbackend.h
+@@ -243,7 +243,8 @@ public:
+     Q_INVOKABLE void controllerMappingQuit();
+     Q_INVOKABLE void controllerMappingButtonQuit();
+     Q_INVOKABLE void controllerMappingApply();
+-    Q_INVOKABLE void autoRegister(const QVariantMap &context);
++    bool autoRegisterHost(int index);
++    void autoRegister(const QVariantMap &context);
+ #if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
+     Q_INVOKABLE void createSteamShortcut(QString shortcutName, QString launchOptions, const QJSValue &callback, QString steamDir);
+ #endif
+@@ -289,7 +290,6 @@ signals:
+     void sessionError(const QString &title, const QString &text);
+     void sessionPinDialogRequested(bool incorrect);
+     void sessionStopDialogRequested();
+-    void registDialogRequested(const QString &host, bool ps5, const QString &duid, const QVariantMap &context);
+ 
+ private:
+     struct DisplayServer {
+diff --git a/gui/include/setupbridge.h b/gui/include/setupbridge.h
+index cf239f1c..c7837ba4 100644
+--- a/gui/include/setupbridge.h
++++ b/gui/include/setupbridge.h
+@@ -16,6 +16,7 @@ public:
+     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
+     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
+     Q_INVOKABLE QVariantMap connectConsole(const QString &key);
++    Q_INVOKABLE QVariantMap autoRegisterConsole(const QString &key, const QString &profile);
+     Q_INVOKABLE QVariantMap openRegistration(const QString &key, const QString &profile);
+     Q_INVOKABLE QVariantMap submitRegistration(const QString &context, const QVariantMap &fields);
+     Q_INVOKABLE QVariantMap connectRegistration(const QString &attempt);
+diff --git a/gui/src/applicationcontroller.cpp b/gui/src/applicationcontroller.cpp
+index 91ab4b5c..2582cf96 100644
+--- a/gui/src/applicationcontroller.cpp
++++ b/gui/src/applicationcontroller.cpp
+@@ -22,10 +22,11 @@ ApplicationController::~ApplicationController() = default;
+ void ApplicationController::prepareStreamWindow()
+ {
+     if (stream) return;
+-    returnRequested = false;
++    const bool registrationOnly = services->backend()->connectionAttempt().value("registrationOnly").toBool();
++    returnRequested = registrationOnly;
+     stream = std::make_unique<QmlMainWindow>(services->backend(), services->engine(), exitOnStreamEnd);
+     if (!stream->initializationError().isEmpty()) {
+-        setup.bridge()->reportStreamError(tr("Stream window is unavailable"), stream->initializationError());
++        if (!registrationOnly) setup.bridge()->reportStreamError(tr("Stream window is unavailable"), stream->initializationError());
+         returnRequested = true;
+         returnToSetup();
+         return;
+@@ -50,7 +51,7 @@ void ApplicationController::prepareStreamWindow()
+         returnRequested = true;
+         returnToSetup();
+     });
+-    stream->show();
++    if (!registrationOnly) stream->show();
+ }
+ 
+ bool ApplicationController::eventFilter(QObject *object, QEvent *event)
+@@ -75,6 +76,6 @@ void ApplicationController::returnToSetup()
+                 || services->backend()->connectionAttempt().value("cleanupPending").toBool()) return;
+         stream.reset();
+         returnRequested = false;
+-        setup.resume();
++        if (!setup.isVisible()) setup.resume();
+     });
+ }
+diff --git a/gui/src/qml/RegistrationMethodDialog.qml b/gui/src/qml/RegistrationMethodDialog.qml
+deleted file mode 100644
+index 1e9025ea..00000000
+--- a/gui/src/qml/RegistrationMethodDialog.qml
++++ /dev/null
+@@ -1,18 +0,0 @@
+-import QtQuick
+-import org.streetpea.chiaking
+-
+-ConfirmDialog {
+-    id: dialog
+-    property var backend: Chiaki
+-    title: qsTr("Registration method")
+-    actionText: qsTr("Automatic registration")
+-    secondaryActionText: qsTr("Manual registration")
+-    function chooseRegistration(host, ps5, context, opener) {
+-        text = ps5 ? qsTr("Choose how to register this console for Remote Play.")
+-            : qsTr("Choose how to register this console for Remote Play. Automatic registration requires your main PS4 console registered to your PSN account.");
+-        callback = () => backend.autoRegister(context);
+-        secondaryCallback = () => navigation.showRegistDialog(host, ps5, context);
+-        restoreFocusItem = opener;
+-        open();
+-    }
+-}
+diff --git a/gui/src/qml/qml.qrc b/gui/src/qml/qml.qrc
+index 6eb1856a..bbe44b08 100644
+--- a/gui/src/qml/qml.qrc
++++ b/gui/src/qml/qml.qrc
+@@ -19,7 +19,6 @@
+     <file>StreamActionNotice.qml</file>
+     <file>ConfirmDialog.qml</file>
+     <file>RendererFallbackDialog.qml</file>
+-    <file>RegistrationMethodDialog.qml</file>
+     <file>RemindDialog.qml</file>
+     <file>DialogView.qml</file>
+     <file>SteamShortcutDialog.qml</file>
+diff --git a/gui/src/qmlbackend.cpp b/gui/src/qmlbackend.cpp
+index ce5fd328..2d581bef 100644
+--- a/gui/src/qmlbackend.cpp
++++ b/gui/src/qmlbackend.cpp
+@@ -904,6 +904,9 @@ int QmlBackend::resolveConnectionTarget() const
+         const auto host = listed.at(i).toMap();
+         if (!host.value("display").toBool()
+                 || (!connection_attempt.value("registrationOnly").toBool() && !host.value("registered").toBool())
++                || (connection_attempt.value("registrationOnly").toBool()
++                    && (host.value("duid").toString() != session_info.duid
++                        || host.value("ps5").toBool() != chiaki_target_is_ps5(session_info.target)))
+                 || connectionTargetKey(host) != connection_target)
+             continue;
+         if (found != -1)
+@@ -1082,7 +1085,8 @@ void QmlBackend::failConnection(const QString &title, const QString &text)
+ 
+ bool QmlBackend::retryConnection(const QString &attempt_id)
+ {
+-    if (attempt_id != connection_attempt.value("id").toString() || connection_dismissed || session
++    if (attempt_id != connection_attempt.value("id").toString() || connection_dismissed || session || registration_active
++            || (connection_attempt.value("registrationOnly").toBool() && window)
+             || connection_attempt.value("cleanupPending").toBool() || connection_attempt.value("phase") != "failure"
+             || !connectionTargetValid())
+         return false;
+@@ -1203,17 +1207,13 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
+         failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
+         return;
+     }
+-    if (!window && !connect_info.auto_regist)
++    if (!window)
+         emit streamWindowRequested();
+-    if ((!window || !window->initializationError().isEmpty()) && !connect_info.auto_regist) {
++    if (!window || !window->initializationError().isEmpty()) {
+         failConnection(tr("Stream window is unavailable"), window ? window->initializationError()
+             : tr("Prepare the native stream window before connecting."));
+         return;
+     }
+-    if (!window) {
+-        session_info.hw_decoder.clear();
+-        session_info.hw_device_ctx = nullptr;
+-    }
+     connection_attempt["cleanupPending"] = true;
+     psn_session_started = false;
+     disable_zero_copy = !settings->GetUseZeroCopy();
+@@ -1585,13 +1585,13 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
+     }
+     else
+     {
+-        setDiscoveryEnabled(false);
++        if (!connect_info.auto_regist) setDiscoveryEnabled(false);
+         emit showPsnView();
+         setConnectState(PsnConnectState::InitiatingConnection);
+         psn_worker_pending = true;
+         emit psnConnect(session, session_info.duid, chiaki_target_is_ps5(session_info.target), connection_generation);
+     }
+-    if (window && window->windowState() != Qt::WindowFullScreen)
++    if (window && !connect_info.auto_regist && window->windowState() != Qt::WindowFullScreen)
+     {
+         if(settings->GetWindowType() == WindowType::CustomResolution)
+         {
+@@ -1744,7 +1744,7 @@ QVariantMap QmlBackend::createRegistrationContext(int index) const
+         {"discovered", false}, {"manualId", -1}, {"manualAddress", QString()}};
+     if (index < 0) return context;
+     const auto server = displayServerAt(index);
+-    if (!server.valid || !server.duid.isEmpty()) return {};
++    if (!server.valid || (!server.discovered && !server.duid.isEmpty())) return {};
+     context["address"] = server.GetHostAddr();
+     context["ps5"] = server.IsPS5();
+     context["discovered"] = server.discovered;
+@@ -1783,7 +1783,7 @@ bool QmlBackend::registrationContextCurrent(const QVariantMap &context, const QS
+ 
+ bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QVariantMap &original_context)
+ {
+-    if (registration_active) return false;
++    if (registration_active || session || window || connection_token || connection_attempt.value("cleanupPending").toBool()) return false;
+     QVariantMap context = original_context;
+     // An entered address can use an existing manual entry, but must never guess between duplicates.
+     if (!context.value("discovered").toBool() && context.value("manualId", -1).toInt() < 0) {
+@@ -1886,6 +1886,21 @@ bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const
+     return true;
+ }
+ 
++bool QmlBackend::autoRegisterHost(int index)
++{
++    if (registration_active || session || window || connection_token || connection_attempt.value("cleanupPending").toBool())
++        return false;
++    const auto server = displayServerAt(index);
++    if (!server.valid || server.registered || !server.discovered || server.duid.isEmpty()) return false;
++    regist_dialog_server = server;
++    regist_dialog_generation = profile_generation;
++    auto context = createRegistrationContext(index);
++    context["automaticRequest"] = QVariant::fromValue(++automatic_registration_request);
++    const auto attempt = connection_generation;
++    autoRegister(context);
++    return connection_generation != attempt;
++}
++
+ void QmlBackend::autoRegister(const QVariantMap &context)
+ {
+     if (regist_dialog_generation != profile_generation || session || connection_token
+@@ -1917,9 +1932,19 @@ void QmlBackend::autoRegister(const QVariantMap &context)
+ void QmlBackend::finishAutoRegister(const ChiakiRegisteredHost &host)
+ {
+     if (!session || !connection_attempt.value("registrationOnly").toBool()
+-            || connection_attempt.value("phase") == "registered" || connection_attempt.value("phase") == "failure"
+-            || !connectionTargetValid())
++            || connection_attempt.value("phase") == "registered" || connection_attempt.value("phase") == "failure")
++        return;
++    if (!connectionTargetValid()) {
++        failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
++        session->Stop();
+         return;
++    }
++    if (RegisteredHost(host).GetServerMAC() != regist_dialog_server.discovery_host.GetHostMAC()
++            || chiaki_target_is_ps5(host.target) != regist_dialog_server.discovery_host.ps5) {
++        failConnection(tr("Registration failed"), tr("The registration result does not match the selected console."));
++        session->Stop();
++        return;
++    }
+     QString nickname(host.server_nickname);
+     if(!regist_dialog_server.discovery_host.ps5 && regist_dialog_server.discovery_host.host_name != nickname)
+     {
+@@ -1982,28 +2007,13 @@ void QmlBackend::setWebEngineHints(QWebEngineProfile *profile) { applyWebEngineH
+ 
+ void QmlBackend::connectToHost(int index, QString nickname)
+ {
+-    if (session || connection_token || connection_attempt.value("cleanupPending").toBool())
++    if (registration_active || session || connection_token || connection_attempt.value("cleanupPending").toBool())
+         return;
+     if (window)
+         window->setWindowAdjustable(false);
+     auto server = displayServerAt(index);
+-    if (!server.valid)
+-        return;
+-
+-    if (!server.registered) {
+-        regist_dialog_server = server;
+-        regist_dialog_generation = profile_generation;
+-        auto context = createRegistrationContext();
+-        context["automaticRequest"] = QVariant::fromValue(++automatic_registration_request);
+-        context["discovered"] = server.discovered;
+-        if(!server.discovered)
+-        {
+-            context["manualId"] = server.manual_host.GetID();
+-            context["manualAddress"] = server.manual_host.GetHost();
+-        }
+-        emit registDialogRequested(server.GetHostAddr(), server.IsPS5(), server.duid, context);
++    if (!server.valid || !server.registered)
+         return;
+-    }
+ 
+     const auto listed = hosts();
+     if (index < 0 || index >= listed.size() || !listed.at(index).toMap().value("display").toBool())
+diff --git a/gui/src/setupbridge.cpp b/gui/src/setupbridge.cpp
+index 9201288e..c5dc4126 100644
+--- a/gui/src/setupbridge.cpp
++++ b/gui/src/setupbridge.cpp
+@@ -187,6 +187,7 @@ void SetupBridge::refresh()
+         for (const auto &field : {"app", "titleId"}) console.insert(field, host.value(field).toString());
+         QStringList actions;
+         if (host.value("registered").toBool()) actions.append("pin");
++        if (host.value("discovered").toBool() && !host.value("registered").toBool() && !host.value("duid").toString().isEmpty()) actions.append("autoRegister");
+         if (host.value("manual").toBool()) actions.append("deleteManual");
+         if (host.value("discovered").toBool() && !host.value("registered").toBool() && !host.value("manual").toBool()) actions.append("hide");
+         console.insert("actions", actions);
+@@ -328,6 +329,9 @@ void SetupBridge::refresh()
+         QT_TR_NOOP("Use the same PlayStation account as your console. The Sony sign-in page and your external browser can show account details."),
+         QT_TR_NOOP("Refresh remote consoles"), QT_TR_NOOP("Refreshing PSN credentials"), QT_TR_NOOP("Finding remote consoles"),
+         QT_TR_NOOP("Connecting through PSN"), QT_TR_NOOP("Connection cancelled"), QT_TR_NOOP("Waiting for connection cleanup"),
++        QT_TR_NOOP("Automatic registration"), QT_TR_NOOP("Registering through PSN"), QT_TR_NOOP("Console registered"),
++        QT_TR_NOOP("Waiting for internet"), QT_TR_NOOP("Starting PSN connection"), QT_TR_NOOP("Registering console"),
++        QT_TR_NOOP("Automatic registration requires your main PS4 console registered to your PSN account."),
+         QT_TR_NOOP("Could not start Remote Play"), QT_TR_NOOP("Cancel"), QT_TR_NOOP("Back to consoles")};
+     const char *managementTexts[] = {
+         QT_TR_NOOP("Add console"),
+@@ -613,9 +617,10 @@ void SetupBridge::refresh()
+     }
+     const auto nativeAttempt = backend->connectionAttempt();
+     QVariantMap connection;
+-    if (nativeAttempt.value("route") == "psn" && !backend->qmlWindow() && nativeAttempt.value("presented").toBool()) {
+-        for (const auto &field : {"id", "phase", "cancelable", "cleanupPending", "targetValid"})
++    if (nativeAttempt.value("route") == "psn" && (!backend->qmlWindow() || nativeAttempt.value("registrationOnly").toBool()) && nativeAttempt.value("presented").toBool()) {
++        for (const auto &field : {"id", "phase", "cancelable", "cleanupPending", "targetValid", "registrationOnly"})
+             connection.insert(field, nativeAttempt.value(field));
++        if (nativeAttempt.value("registrationOnly").toBool() && backend->qmlWindow()) connection["cleanupPending"] = true;
+         connection.insert("errorTitle", privateMode ? tr("Could not start Remote Play") : nativeAttempt.value("errorTitle"));
+         connection.insert("errorText", privateMode ? QString() : nativeAttempt.value("errorText"));
+     }
+@@ -624,7 +629,7 @@ void SetupBridge::refresh()
+         && phase != "failure" && phase != "cancelled" && phase != "registered";
+     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
+         {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
+-        {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
++        {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->registrationBusy() || backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
+             || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
+     if (!suspended) emit stateChanged(state);
+ }
+@@ -779,9 +784,21 @@ QVariantMap SetupBridge::connectConsole(const QString &key)
+     return {{"accepted", true}};
+ }
+ 
++QVariantMap SetupBridge::autoRegisterConsole(const QString &key, const QString &profile)
++{
++    int index;
++    QString nickname;
++    if (!currentProfile(profile) || state.value("connectionBusy").toBool() || !resolveConsole(key, index, nickname))
++        return {{"accepted", false}, {"message", tr("Console unavailable")}};
++    selectedKey = key;
++    const bool accepted = backend->autoRegisterHost(index);
++    return {{"accepted", accepted}, {"message", accepted ? QString() : tr("Automatic registration is unavailable for this console.")}};
++}
++
+ QVariantMap SetupBridge::openRegistration(const QString &key, const QString &profile)
+ {
+     if (!currentProfile(profile)) return {{"accepted", false}, {"message", tr("The profile changed. Open registration again.")}};
++    if (state.value("connectionBusy").toBool() && !backend->registrationBusy()) return {{"accepted", false}, {"message", tr("A connection is already active")}};
+     if (backend->registrationBusy()) {
+         if (registrationContextId.isEmpty() || registrationContext.value("profileGeneration").toULongLong() != backend->profileGeneration())
+             return {{"accepted", false}, {"message", tr("Wait for the current registration to finish before starting another request.")}};
+diff --git a/gui/tests/CMakeLists.txt b/gui/tests/CMakeLists.txt
+index a88ab579..ee54ba82 100644
+--- a/gui/tests/CMakeLists.txt
++++ b/gui/tests/CMakeLists.txt
+@@ -57,6 +57,8 @@ if(TARGET chiaki-gui)
+         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+     add_test(NAME chiaki-remote-native-connection COMMAND chiaki-embedded-setup-tests remoteNativeConnection)
+     set_tests_properties(chiaki-remote-native-connection PROPERTIES LABELS desktop)
++    add_test(NAME chiaki-embedded-automatic-registration COMMAND chiaki-embedded-setup-tests automaticRegistration)
++    set_tests_properties(chiaki-embedded-automatic-registration PROPERTIES LABELS desktop)
+     add_test(NAME chiaki-embedded-settings COMMAND chiaki-embedded-setup-tests generalSettings settingsValidation settingsRestart)
+     set_tests_properties(chiaki-embedded-settings PROPERTIES LABELS desktop)
+     add_test(NAME chiaki-embedded-video-audio COMMAND chiaki-embedded-setup-tests videoAudioSettings videoAudioState videoAudioRestart videoAudioDevices)
+diff --git a/gui/tests/README.md b/gui/tests/README.md
+index 60fc2c38..ffcaf909 100644
+--- a/gui/tests/README.md
++++ b/gui/tests/README.md
+@@ -230,7 +230,7 @@ need the full application and the relevant hardware or account. Native display
+ scaling also needs a separate full-application check. A passing build alone
+ does not verify any of these behaviors.
+ 
+-## Confirmation and registration method tests
++## Confirmation tests
+ 
+ `ConfirmationHarness.qml` loads production `MainView.qml` or `SettingsDialog.qml`
+ with the production `ConfirmDialog.qml`. Tests supply the backend and navigation.
+@@ -239,9 +239,7 @@ action label. Cancel and Escape call only `cancel` after the popup closes.
+ 
+ `Confirmations` checks labels, visible initial Cancel focus, keyboard navigation,
+ disabled actions, repeated input, focus return, and current console targets.
+-`RegistrationMethod` checks automatic, manual, and cancelled outcomes through
+-production `RegistrationMethodDialog.qml`. Both suites check long text at
+-900 by 600 and 1280 by 720. Backend commands are controlled test observations.
++The suite checks long text at 900 by 600 and 1280 by 720. Backend commands are controlled test observations.
+ Real registration and native input capture require separate acceptance checks.
+ 
+ ## Startup reminder tests
+@@ -371,8 +369,23 @@ ctest --test-dir build -R "^chiaki-embedded-pairing$" --output-on-failure
+ ```
+ 
+ The replaced QML registration and Account ID lookup screens, callback adapter,
+-and their screen fixtures are removed. Automatic registration keeps its
+-`RegistrationMethod` checks until that route migrates.
++and their screen fixtures are removed. The automatic method now uses the
++embedded application check below.
++
++`automaticRegistration` runs the compiled setup page, real WebChannel, bridge,
++native renderer, and native registration-only connection. Controlled HTTP,
++discovery, PSN workers, registration callbacks, and raw session starts prevent
++console traffic. Successful starts create a real native thread that sends
++registration and quit events through the session callback and is joined during
++cleanup. The check covers save-once completion, retry, cancellation limits,
++profile and target changes, wrong results, the PS4 nickname guard, request
++exclusion, hidden resource cleanup, and a later controlled playback handoff.
++Its context row also checks manual pairing for a discovered console with PSN
++metadata, changed addresses, duplicate targets, and rejection of remote rows.
++Run `ctest --test-dir build -R "^chiaki-embedded-automatic-registration$"` on
++a desktop platform with native graphics support. The Windows offscreen plug-in
++cannot create the required OpenGL context. These controlled checks do not prove
++live PSN registration, physical input, GPU coexistence, or playback performance.
+ 
+ ## Disconnect checks
+ 
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index f3e0585b..6a1e7c87 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -514,6 +514,270 @@ private slots:
+         QCOMPARE(starts.load(), 0);
+     }
+ 
++    void automaticRegistration_data()
++    {
++        QTest::addColumn<QString>("outcome");
++        for (const auto &outcome : {"success", "retry", "cancel", "profile", "removed", "duid", "mac", "ps4", "context", "concurrent"})
++            QTest::newRow(outcome) << QString(outcome);
++    }
++
++    void automaticRegistration()
++    {
++        QFETCH(QString, outcome);
++        const bool ps5 = outcome != "ps4";
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto removeSettings = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        settings.SetRemotePlayAsk(false);
++        settings.SetAddSteamShortcutAsk(false);
++        settings.SetHardwareDecoder({});
++        settings.SetRenderBackend(RenderBackend::OpenGL);
++        settings.SetPlaceboPreset(PlaceboPreset::Fast);
++        settings.SetWindowType(WindowType::AdjustableResolution);
++        const QRect geometry(70, 90, 1100, 720);
++        settings.SetStreamGeometry(geometry);
++        settings.SetPsnAuthToken("registration-access-secret");
++        settings.SetPsnRefreshToken("registration-refresh-secret");
++        settings.SetPsnAccountId("AQAAAAAAAAA=");
++        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(3600).toString(settings.GetTimeFormat()));
++        QList<QPointer<PsnReply>> requests;
++        std::atomic<int> connects = 0, starts = 0, producers = 0;
++        std::atomic<int> deviceUid = 0x12;
++        std::atomic<ChiakiErrorCode> workerResult = outcome == "retry" ? CHIAKI_ERR_HOST_UNREACH : CHIAKI_ERR_SUCCESS;
++        QSemaphore worker, completion;
++        struct Producer {
++            ChiakiSession *session = nullptr;
++            QSemaphore *completion;
++            std::atomic<int> *count;
++            ChiakiRegisteredHost host = {};
++            static void *run(void *opaque) {
++                auto *self = static_cast<Producer *>(opaque);
++                self->completion->acquire();
++                ChiakiEvent event = {};
++                event.type = CHIAKI_EVENT_REGIST;
++                event.host = self->host;
++                self->session->event_cb(&event, self->session->event_cb_user);
++                self->session->event_cb(&event, self->session->event_cb_user);
++                event = {};
++                event.type = CHIAKI_EVENT_QUIT;
++                event.quit.reason = CHIAKI_QUIT_REASON_STOPPED;
++                self->session->event_cb(&event, self->session->event_cb_user);
++                ++*self->count;
++                return nullptr;
++            }
++        } producer{nullptr, &completion, &producers};
++        producer.host.target = CHIAKI_TARGET_PS5_1;
++        if (!ps5) producer.host.target = CHIAKI_TARGET_PS4_10;
++        memcpy(producer.host.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
++        strcpy(producer.host.server_nickname, "Office");
++        if (outcome == "mac") producer.host.server_mac[5] = 0x66;
++        if (!ps5) strcpy(producer.host.server_nickname, "Other PS4");
++        PsnRequests transport;
++        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
++        transport.listDevices = [&](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
++            *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
++            *count = 1;
++            strcpy((*devices)[0].device_name, ps5 ? "Office" : "Other PS5");
++            memset((*devices)[0].device_uid, deviceUid.load(), sizeof((*devices)[0].device_uid));
++            (*devices)[0].remoteplay_enabled = true;
++            return CHIAKI_ERR_SUCCESS;
++        };
++        transport.connect = [&](StreamSession *, const QString &duid, bool requestedPs5) {
++            const auto expected = ps5 ? QStringLiteral("1212121212121212121212121212121212121212121212121212121212121212")
++                : QStringLiteral("4141414141414141414141414141414141414141414141414141414141414141");
++            if (duid != expected || requestedPs5 != ps5) return CHIAKI_ERR_INVALID_DATA;
++            ++connects;
++            worker.acquire();
++            return workerResult.load();
++        };
++        transport.startSession = [&](ChiakiSession *session) {
++            ++starts;
++            if (!session->auto_regist) return CHIAKI_ERR_CANCELED;
++            producer.session = session;
++            return chiaki_thread_create(&session->session_thread, Producer::run, &producer);
++        };
++        RegistrationTransport manual;
++        QmlNativeServices services(&settings, transport, {}, manual.boundary(), controlledDiscovery());
++        auto *backend = services.backend();
++        backend->stopAutoConnect();
++        ApplicationController controller(&services);
++        const auto unblock = qScopeGuard([&] { worker.release(100); completion.release(100); });
++        auto *setup = controller.setupWindow();
++        setup->resize(1200, 800);
++        setup->show();
++        DiscoveryHost host = {};
++        host.ps5 = ps5;
++        host.target = ps5 ? CHIAKI_TARGET_PS5_1 : CHIAKI_TARGET_PS4_10;
++        host.host_name = "Office";
++        host.host_id = "001122334455";
++        host.host_addr = "192.0.2.10";
++        host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
++        discover(backend, {host});
++        QTRY_COMPARE(script(setup->view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
++        QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-automatic-register]')?.disabled === false").toBool());
++        const auto initialKey = setup->bridge()->snapshot().value("selectedKey").toString();
++        const auto initialProfile = setup->bridge()->snapshot().value("profileGeneration").toString();
++        QString manualContext;
++        if (outcome == "concurrent")
++            manualContext = setupRequest(setup->view(), "openRegistration", {initialKey, initialProfile}).value("context").toString();
++        if (outcome == "context") {
++            script(setup->view(), "document.querySelector('[data-register-selected]').click()");
++            QTRY_COMPARE(script(setup->view(), "document.querySelector('[data-registration-address]')?.value").toString(), QStringLiteral("192.0.2.10"));
++            QVERIFY(fill(setup->view(), "[data-registration-account]", "AQAAAAAAAAA="));
++            QVERIFY(fill(setup->view(), "[data-registration-pin]", "00123456"));
++            host.host_addr = "192.0.2.99";
++            discover(backend, {host});
++            QTRY_COMPARE(backend->hosts().first().toMap().value("address").toString(), QStringLiteral("192.0.2.99"));
++            script(setup->view(), "document.querySelector('[data-registration-submit]').click()");
++            QTRY_VERIFY(script(setup->view(), "document.querySelector('.pairing').textContent.includes('The console or profile can have changed.')").toBool());
++            QCOMPARE(manual.requests.size(), 0);
++            script(setup->view(), "document.querySelector('[data-registration-close]').click()");
++            host.host_addr = "192.0.2.10";
++            discover(backend, {host, host});
++            QTRY_COMPARE(script(setup->view(), "document.querySelectorAll('.console-card:disabled').length").toInt(), 2);
++            QVERIFY(!setupRequest(setup->view(), "openRegistration", {initialKey, initialProfile}).value("accepted").toBool());
++            QVERIFY(!setupRequest(setup->view(), "autoRegisterConsole", {initialKey, initialProfile}).value("accepted").toBool());
++            discover(backend, {host});
++            QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-register-selected]') !== null").toBool());
++            script(setup->view(), "document.querySelector('[data-register-selected]').click()");
++            QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-registration-form]') !== null").toBool());
++            QVERIFY(fill(setup->view(), "[data-registration-account]", "AQAAAAAAAAA="));
++            QVERIFY(fill(setup->view(), "[data-registration-pin]", "00123456"));
++            script(setup->view(), "document.querySelector('[data-registration-submit]').click()");
++            QTRY_COMPARE(manual.requests.size(), 1);
++            const auto request = manual.requests.first();
++            ChiakiRegistEvent event{CHIAKI_REGIST_EVENT_TYPE_FINISHED_SUCCESS, &producer.host};
++            request.callback(&event, request.user);
++            QTRY_COMPARE(settings.GetRegisteredHosts().size(), 1);
++            QTRY_VERIFY(script(setup->view(), "document.querySelector('.pairing').textContent.includes('Console registered')").toBool());
++            discover(backend, {});
++            backend->refreshPsnToken();
++            QTRY_VERIFY(!setup->bridge()->snapshot().value("consoles").toList().isEmpty());
++            QTRY_COMPARE(setup->bridge()->snapshot().value("consoles").toList().first().toMap().value("route").toString(), QStringLiteral("psn"));
++            const auto remoteKey = setup->bridge()->snapshot().value("selectedKey").toString();
++            QVERIFY(!setupRequest(setup->view(), "openRegistration", {remoteKey, initialProfile}).value("accepted").toBool());
++            QVERIFY(!setupRequest(setup->view(), "autoRegisterConsole", {remoteKey, initialProfile}).value("accepted").toBool());
++            backend->qmlSettings()->setCurrentProfile(profile + "-next");
++            QVERIFY(!setupRequest(setup->view(), "openRegistration", {remoteKey, initialProfile}).value("accepted").toBool());
++            QVERIFY(!setupRequest(setup->view(), "autoRegisterConsole", {remoteKey, initialProfile}).value("accepted").toBool());
++            QVERIFY(!backend->qmlSession() && !backend->qmlWindow());
++            QCOMPARE(connects.load(), 0);
++            QCOMPARE(starts.load(), 0);
++            return;
++        }
++        QSignalSpy saved(&settings, &Settings::RegisteredHostsUpdated);
++        script(setup->view(), "document.querySelector('[data-automatic-register]').click();document.querySelector('[data-automatic-register]').click()");
++        QTRY_COMPARE(connects.load(), 1);
++        QPointer<QmlMainWindow> native = backend->qmlWindow();
++        QPointer<StreamSession> session = backend->qmlSession();
++        QVERIFY(native && session);
++        QVERIFY(!native->isVisible());
++        QVERIFY(!nativeObject("connectionRoute"));
++        QVERIFY(setup->isVisible());
++        QVERIFY(backend->connectionAttempt().value("registrationOnly").toBool());
++        const auto oldAttempt = backend->connectionAttempt().value("id").toString();
++        const auto key = setup->bridge()->snapshot().value("selectedKey").toString();
++        const auto generation = setup->bridge()->snapshot().value("profileGeneration").toString();
++        QVERIFY(!setup->bridge()->autoRegisterConsole(key, generation).value("accepted").toBool());
++        if (outcome == "concurrent") {
++            QVERIFY(!manualContext.isEmpty());
++            QVERIFY(!setupRequest(setup->view(), "submitRegistration", {manualContext,
++                QJsonObject{{"address", "192.0.2.10"}, {"account", "AQAAAAAAAAA="}, {"pin", "00123456"}, {"consolePin", ""}, {"target", 1000100}}}).value("accepted").toBool());
++            QCOMPARE(manual.requests.size(), 0);
++        }
++        if (outcome == "cancel" || outcome == "profile") {
++            if (outcome == "profile") backend->qmlSettings()->setCurrentProfile(profile + "-next");
++            else script(setup->view(), "document.querySelector('[data-connection-cancel]').click()");
++            QTRY_VERIFY(backend->connectionAttempt().value("phase") == "cancelling" || backend->connectionAttempt().value("phase") == "failure");
++            worker.release();
++            QTRY_VERIFY(!session);
++            QTRY_VERIFY(!native);
++            QCOMPARE(starts.load(), 0);
++            QCOMPARE(saved.size(), 0);
++            QVERIFY(settings.GetRegisteredHosts().isEmpty());
++            QVERIFY(backend->nativeSettings()->GetRegisteredHosts().isEmpty());
++            QVERIFY(setup->isVisible());
++            QCOMPARE(manual.requests.size(), 0);
++            return;
++        }
++        worker.release();
++        if (outcome == "retry") {
++            QTRY_VERIFY(!session);
++            QTRY_VERIFY(!native);
++            QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-connection-retry]')?.disabled === false").toBool());
++            QVERIFY(script(setup->view(), "document.querySelector('[data-psn-connection]').textContent.includes('Console is unreachable')").toBool());
++            workerResult = CHIAKI_ERR_SUCCESS;
++            script(setup->view(), "document.querySelector('[data-connection-retry]').click();document.querySelector('[data-connection-retry]').click()");
++            QTRY_COMPARE(connects.load(), 2);
++            session = backend->qmlSession();
++            native = backend->qmlWindow();
++            QVERIFY(session && native && !native->isVisible());
++            QVERIFY(backend->connectionAttempt().value("id").toString() != oldAttempt);
++            QVERIFY(!setup->bridge()->cancelConnection(oldAttempt).value("accepted").toBool());
++            worker.release();
++        }
++        QTRY_COMPARE(starts.load(), 1);
++        QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-connection-cancel]')?.disabled === true").toBool());
++        QTRY_COMPARE(script(setup->view(), "document.querySelector('[data-registration-phase]')?.textContent").toString(), QStringLiteral("Registering console"));
++        QVERIFY(!setup->bridge()->cancelConnection(backend->connectionAttempt().value("id").toString()).value("accepted").toBool());
++        if (outcome == "removed") {
++            discover(backend, {});
++            QTRY_VERIFY(!backend->connectionAttempt().value("targetValid").toBool());
++        } else if (outcome == "duid") {
++            deviceUid = 0x34;
++            backend->refreshPsnToken();
++            QTRY_COMPARE(backend->hosts().first().toMap().value("duid").toString(), QStringLiteral("3434343434343434343434343434343434343434343434343434343434343434"));
++        }
++        completion.release();
++        QTRY_VERIFY(!session);
++        QTRY_VERIFY(!native);
++        QTRY_COMPARE(producers.load(), 1);
++        if (outcome == "removed" || outcome == "duid" || outcome == "mac" || outcome == "ps4") {
++            QCOMPARE(saved.size(), 0);
++            QVERIFY(settings.GetRegisteredHosts().isEmpty());
++            if (outcome == "ps4")
++                QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-psn-connection]')?.textContent.includes('PS4 Console Not Main')").toBool());
++            QVERIFY(setup->isVisible());
++            QCOMPARE(manual.requests.size(), 0);
++            return;
++        }
++        QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-psn-connection]')?.textContent.includes('Console registered')").toBool());
++        QCOMPARE(settings.GetRegisteredHosts().size(), 1);
++        QCOMPARE(settings.GetRegisteredHosts().first().GetServerNickname(), QStringLiteral("Office"));
++        QCOMPARE(saved.size(), 1);
++        Settings reopened(profile);
++        QCOMPARE(reopened.GetRegisteredHosts().size(), 1);
++        QCOMPARE(settings.GetStreamGeometry(), geometry);
++        QCOMPARE(requests.size(), 0);
++        QVERIFY(!backend->connectionAttempt().value("cleanupPending").toBool());
++        QVERIFY(setup->isVisible());
++        script(setup->view(), "document.querySelector('[data-connection-back]').click()");
++        QTRY_VERIFY(script(setup->view(), "!document.querySelector('[data-psn-connection]')").toBool());
++        QCOMPARE(connects.load(), outcome == "retry" ? 2 : 1);
++        QCOMPARE(starts.load(), 1);
++        QCOMPARE(manual.requests.size(), 0);
++        if (outcome == "success") {
++            QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
++            script(setup->view(), "document.querySelector('.connect-console').click()");
++            QTRY_VERIFY(backend->qmlWindow());
++            QPointer<QmlMainWindow> playback = backend->qmlWindow();
++            QTRY_VERIFY(playback->isVisible());
++            QTRY_COMPARE(starts.load(), 2);
++            QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("failure"));
++            QTRY_VERIFY(!setup->isVisible());
++            QVERIFY(nativeObject("connectionRoute"));
++            playback->dismissStreamView();
++            QTRY_VERIFY(!playback);
++            QTRY_VERIFY(setup->isVisible());
++            QVERIFY(!backend->qmlSession());
++        }
++    }
++
+     void psnRemoteRefreshOwnership()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+diff --git a/gui/tests/qml/tst_RegistrationMethod.qml b/gui/tests/qml/tst_RegistrationMethod.qml
+deleted file mode 100644
+index 6a4ad6af..00000000
+--- a/gui/tests/qml/tst_RegistrationMethod.qml
++++ /dev/null
+@@ -1,72 +0,0 @@
+-import QtQuick
+-import QtQuick.Controls
+-import QtTest
+-import "../../src/qml"
+-
+-TestCase {
+-    id: tests
+-    name: "RegistrationMethod"
+-    width: 1280; height: 720
+-    visible: true
+-    when: windowShown
+-    property var automatic: []
+-    property var manual: []
+-    Button { id: opener; text: "Register" }
+-    Component { id: dialogComponent; RegistrationMethodDialog {} }
+-    function test_choice_data() {
+-        return ["automatic", "manual", "cancel", "escape"].map(choice => ({tag: choice, choice: choice}));
+-    }
+-    function test_choice(data) {
+-        automatic = []; manual = [];
+-        const dialog = createTemporaryObject(dialogComponent, tests, {
+-            backend: {autoRegister: context => automatic = automatic.concat([context])},
+-            navigation: {showRegistDialog: (host, ps5, context) => manual = manual.concat([{host: host, ps5: ps5, context: context}])}
+-        });
+-        const context = {profileGeneration: 7, automaticRequest: 4};
+-        dialog.chooseRegistration("192.0.2.1", false, context, opener);
+-        tryCompare(dialog, "opened", true);
+-        compare(findChild(dialog.footer, "confirmationAction").text, "Automatic registration");
+-        compare(findChild(dialog.footer, "confirmationSecondaryAction").text, "Manual registration");
+-        verify(dialog.text.includes("main PS4"));
+-        tryCompare(findChild(dialog.footer, "confirmationCancel"), "activeFocus", true);
+-        verify(findChild(dialog.footer, "confirmationCancel").visualFocus);
+-        if (data.choice === "automatic") keyClick(Qt.Key_Down);
+-        else if (data.choice === "manual") keyClick(Qt.Key_Up);
+-        keyClick(data.choice === "escape" ? Qt.Key_Escape : Qt.Key_Return);
+-        dialog.accept();
+-        tryCompare(dialog, "visible", false);
+-        compare(automatic.length, data.choice === "automatic" ? 1 : 0);
+-        compare(manual.length, data.choice === "manual" ? 1 : 0);
+-        if (automatic.length) compare(automatic[0], context);
+-        if (manual.length) {
+-            compare(manual[0].host, "192.0.2.1");
+-            compare(manual[0].ps5, false);
+-            compare(manual[0].context, context);
+-        }
+-        tryCompare(opener, "activeFocus", true);
+-    }
+-    function test_longTextAtSupportedSizes_data() {
+-        return [{tag: "900", width: 900, height: 600}, {tag: "1280", width: 1280, height: 720}];
+-    }
+-    function test_longTextAtSupportedSizes(data) {
+-        tests.width = data.width; tests.height = data.height;
+-        const dialog = createTemporaryObject(dialogComponent, tests, {backend: ({}), navigation: ({})});
+-        dialog.chooseRegistration("192.0.2.1", true, {}, opener);
+-        tryCompare(dialog, "opened", true);
+-        verify(!dialog.text.includes("PS4"));
+-        dialog.text = "Long registration instructions. ".repeat(90);
+-        dialog.actionText = "Automatically register the selected console for Remote Play";
+-        dialog.secondaryActionText = "Manually register the selected console for Remote Play";
+-        waitForRendering(tests);
+-        for (const name of ["confirmationCancel", "confirmationAction", "confirmationSecondaryAction"]) {
+-            const button = findChild(dialog.footer, name);
+-            button.forceActiveFocus(Qt.TabFocusReason);
+-            const position = button.mapToItem(tests, 0, 0);
+-            verify(button.visualFocus);
+-            verify(position.x >= 0 && position.x + button.width <= tests.width);
+-            verify(position.y >= 0 && position.y + button.height <= tests.height);
+-        }
+-        keyClick(Qt.Key_Escape);
+-        tryCompare(dialog, "visible", false);
+-    }
+-}
+diff --git a/gui/web/src/ConnectAction.svelte b/gui/web/src/ConnectAction.svelte
+index 97457aee..30858fd4 100644
+--- a/gui/web/src/ConnectAction.svelte
++++ b/gui/web/src/ConnectAction.svelte
+@@ -13,6 +13,14 @@
+       message = reply.accepted ? '' : reply.message ?? t('Console unavailable');
+     } finally { pending = false; }
+   }
++  async function register() {
++    if (!connection || !selected || pending || !current || current.connectionBusy) return;
++    pending = true;
++    try {
++      const reply = await connection.autoRegister(selected.key, current.profileGeneration);
++      message = reply.accepted ? '' : reply.message ?? t('Console unavailable');
++    } finally { pending = false; }
++  }
+ </script>
+ 
+ {#if current?.streamError?.id}
+@@ -25,17 +33,23 @@
+ {#if current?.connection.id}
+   <section class="stream-error" data-psn-connection aria-live="polite">
+     <h2>{current.connection.phase === 'failure' ? current.connection.errorTitle : current.connection.phase === 'cancelled'
+-      ? t('Connection cancelled') : t('Connecting through PSN')}</h2>
++      ? t('Connection cancelled') : current.connection.phase === 'registered' ? t('Console registered')
++      : current.connection.registrationOnly ? t('Registering through PSN') : t('Connecting through PSN')}</h2>
++    {#if current.connection.registrationOnly && !['failure', 'cancelled', 'registered'].includes(current.connection.phase ?? '')}
++      <p data-registration-phase>{t(current.connection.phase === 'internet' ? 'Waiting for internet'
++        : current.connection.phase === 'initiating' ? 'Starting PSN connection'
++        : current.connection.phase === 'registering' ? 'Registering console' : 'Waiting for connection cleanup')}</p>
++    {/if}
+     <p>{current.connection.errorText || (current.connection.cleanupPending && ['failure', 'cancelled'].includes(current.connection.phase ?? '')
+       ? t('Waiting for connection cleanup') : '')}</p>
+     {#if current.connection.phase === 'failure'}
+       <button data-connection-retry disabled={current.connection.cleanupPending || !current.connection.targetValid}
+         onclick={() => connection?.retryConnection(current!.connection.id!)}>{t('Retry')}</button>
+-    {:else if current.connection.phase !== 'cancelled'}
++    {:else if !['cancelled', 'registered'].includes(current.connection.phase ?? '')}
+       <button data-connection-cancel disabled={!current.connection.cancelable || current.connection.phase === 'cancelling'}
+         onclick={() => connection?.cancelConnection(current!.connection.id!)}>{t('Cancel')}</button>
+     {/if}
+-    {#if ['failure', 'cancelled'].includes(current.connection.phase ?? '')}
++    {#if ['failure', 'cancelled', 'registered'].includes(current.connection.phase ?? '')}
+       <button data-connection-back disabled={current.connection.cleanupPending}
+         onclick={() => connection?.dismissConnection(current!.connection.id!)}>{t('Back to consoles')}</button>
+     {/if}
+@@ -44,6 +58,10 @@
+ <div class="connect-action">
+   <button class="connect-console" disabled={!connection || pending || current?.connectionBusy || !selected?.available
+     || !selected.registered || (selected.route === 'local' && selected.state !== 'ready')} onclick={connect}>{t('Connect')}</button>
++  {#if selected?.actions.includes('autoRegister')}
++    <button data-automatic-register disabled={!connection || pending || current?.connectionBusy || !selected.available} onclick={register}>{t('Automatic registration')}</button>
++    {#if selected.ps5 === false}<span>{t('Automatic registration requires your main PS4 console registered to your PSN account.')}</span>{/if}
++  {/if}
+   <span role="status">{message}</span>
+ </div>
+ 
+diff --git a/gui/web/src/Pairing.svelte b/gui/web/src/Pairing.svelte
+index dd30f3e4..f03ecaa8 100644
+--- a/gui/web/src/Pairing.svelte
++++ b/gui/web/src/Pairing.svelte
+@@ -100,7 +100,7 @@
+   }
+   async function submit(event: SubmitEvent) {
+     event.preventDefault();
+-    if (!valid || submitting || current.registration.busy || invalidProfile) return;
++    if (!valid || submitting || current.registration.busy || current.connectionBusy || invalidProfile) return;
+     submitting = true; editing = false; message = ''; diagnostics = false;
+     const fields = { address, target: Number(target), account: legacy ? onlineId : account, pin, consolePin };
+     pin = ''; consolePin = '';
+@@ -166,7 +166,7 @@
+           {/if}
+           <label>{t('Remote Play pairing code')}<input data-registration-pin type="password" inputmode="numeric" bind:value={pin} autocomplete="off" /></label>
+           <label>{t('Console login PIN, optional')}<input data-registration-console-pin type="password" inputmode="numeric" bind:value={consolePin} autocomplete="off" /></label>
+-          <button data-registration-submit type="submit" disabled={!valid || submitting || current.registration.busy || invalidProfile}>{t('Register console')}</button>
++          <button data-registration-submit type="submit" disabled={!valid || submitting || current.registration.busy || current.connectionBusy || invalidProfile}>{t('Register console')}</button>
+         </form>
+         <aside>
+           <h3>{t('Get your pairing code')}</h3>
+diff --git a/gui/web/src/bridge.ts b/gui/web/src/bridge.ts
+index 99af940d..0ca18448 100644
+--- a/gui/web/src/bridge.ts
++++ b/gui/web/src/bridge.ts
+@@ -11,7 +11,7 @@ export interface State {
+   connectionBusy: boolean;
+   registration: Registration;
+   accountLookup: { route?: string; id?: string; phase?: string; message?: string };
+-  connection: { id?: string; phase?: string; cancelable?: boolean; cleanupPending?: boolean; targetValid?: boolean; errorTitle?: string; errorText?: string };
++  connection: { id?: string; phase?: string; cancelable?: boolean; cleanupPending?: boolean; targetValid?: boolean; registrationOnly?: boolean; errorTitle?: string; errorText?: string };
+   streamError?: { id: string; title: string; text: string };
+   mediaSettings: Record<string, boolean | number | string>;
+   mediaChoices: Record<string, { label: string; value: string }[]>;
+@@ -43,6 +43,7 @@ interface NativeBridge {
+   setDiscoveryEnabled(value: boolean, callback: (reply: Reply) => void): void;
+   selectConsole(key: string, callback: (reply: Reply) => void): void;
+   connectConsole(key: string, callback: (reply: Reply) => void): void;
++  autoRegisterConsole(key: string, profile: string, callback: (reply: Reply) => void): void;
+   refreshPsnConsoles(profile: string, callback: (reply: Reply) => void): void;
+   cancelConnection(attempt: string, callback: (reply: Reply) => void): void;
+   retryConnection(attempt: string, callback: (reply: Reply) => void): void;
+@@ -83,6 +84,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
+   discovery(enabled: boolean): Promise<Reply>;
+   select(key: string): Promise<Reply>;
+   connect(key: string): Promise<Reply>;
++  autoRegister(key: string, profile: string): Promise<Reply>;
+   refreshPsnConsoles(profile: string): Promise<Reply>;
+   cancelConnection(attempt: string): Promise<Reply>;
+   retryConnection(attempt: string): Promise<Reply>;
+@@ -148,6 +150,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
+         discovery: value => new Promise(done => setup.setDiscoveryEnabled(value, done)),
+         select: key => new Promise(done => setup.selectConsole(key, done)),
+         connect: key => new Promise(done => setup.connectConsole(key, done)),
++        autoRegister: (key, profile) => new Promise(done => setup.autoRegisterConsole(key, profile, done)),
+         refreshPsnConsoles: profile => new Promise(done => setup.refreshPsnConsoles(profile, done)),
+         cancelConnection: attempt => new Promise(done => setup.cancelConnection(attempt, done)),
+         retryConnection: attempt => new Promise(done => setup.retryConnection(attempt, done)),
+diff --git a/third-party/gf-complete b/third-party/gf-complete
+--- a/third-party/gf-complete
++++ b/third-party/gf-complete
+@@ -1 +1 @@
+-Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478
++Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478-dirty

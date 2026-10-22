@@ -17,6 +17,7 @@ public:
     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
     Q_INVOKABLE QVariantMap connectConsole(const QString &key);
+    Q_INVOKABLE QVariantMap autoRegisterConsole(const QString &key, const QString &profile);
     Q_INVOKABLE QVariantMap openRegistration(const QString &key, const QString &profile);
     Q_INVOKABLE QVariantMap submitRegistration(const QString &context, const QVariantMap &fields);
     Q_INVOKABLE QVariantMap connectRegistration(const QString &attempt);
