@@ -131,3 +131,5 @@ The current work is visual fidelity to the selected B card library, A settings
 sidebar, and A guided setup. Retain native behavior and bridge contracts.
 Keep the minimum design width at 1024 CSS pixels. Build only what is needed to
 preview UI changes, and use short visual reviews instead of validation matrices.
+
+- [23: Prototype fidelity](issues/23-complete-web-only-acceptance.md): claimed after all source milestones. Match the selected library, Settings, and guided setup prototypes. The user has skipped remaining build qualification and performance tests; retain those limits without further test work.

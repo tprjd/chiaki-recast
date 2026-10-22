@@ -4,7 +4,7 @@
 
 **Blocked by:** 05: Manage consoles and manual addresses from the web library; 07: Pair PS4 and PS5 consoles and retrieve an Account ID; 09: Register a console automatically through PSN; 10: Wake consoles and auto-connect from web startup; 12: Configure stream profiles and audio devices; 14: Configure native color mapping from web setup; 15: Configure keyboard and mouse bindings, response, and reset; 16: Configure controllers and their mappings; 17: Manage profiles, settings files, and logs; 18: Complete setup reminders and Steam shortcuts; 19: Ship the Windows web and native application; 20: Ship the Linux web and native application; 21: Ship the macOS web and native application; 22: Resume interrupted sessions and recover web setup.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 3, 48, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95.
 
