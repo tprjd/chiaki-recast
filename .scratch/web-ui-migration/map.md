@@ -24,8 +24,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [01: Application-owned native services](issues/01-application-owned-native-services.md): resolved for the native ownership milestone. Required graphics, live playback, cleanup, and performance acceptance remains assigned to tickets 03, 04, and 23.
 - [02: Native stream-only interface](issues/02-native-stream-only-interface.md): resolved for the native stream-root milestone. OpenGL and Vulkan production root/input checks pass. Live media and combined graphics acceptance remains with tickets 03, 04, and 23.
 - [03: Accelerated web console library](issues/03-accelerated-web-console-library.md): resolved for the library and graphics foundation milestone. Real bridge/package checks and Windows hardware Chromium plus native Fast-preset GL/Vulkan/recreation/fallback pass. HighQuality/default processing and full hardware acceptance remain in 04 and 23.
-- [04: Local native stream handoff](issues/04-local-native-stream-handoff.md): ready. Tickets 02 and 03 are integrated.
-- [06: PSN sign-in](issues/06-psn-sign-in.md) and [11: General and stream settings](issues/11-general-and-stream-settings.md): ready after ticket 03.
+- [04: Local native stream handoff](issues/04-local-native-stream-handoff.md): claimed. Tickets 02 and 03 are integrated.
+- [06: PSN sign-in](issues/06-psn-sign-in.md) and [11: General and stream settings](issues/11-general-and-stream-settings.md): claimed after ticket 03.
 - Other tickets 05 through 23: waiting for their declared blockers.
 
 ## Integration history

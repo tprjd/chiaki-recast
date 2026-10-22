@@ -4,7 +4,7 @@
 
 **Blocked by:** 03: Show live consoles in the GPU-accelerated web UI.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 48, 50, 51, 52.
 

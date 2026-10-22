@@ -4,7 +4,7 @@
 
 **Blocked by:** 02: Run native playback with a stream-only interface; 03: Show live consoles in the GPU-accelerated web UI.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 31, 33, 34, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83.
 
