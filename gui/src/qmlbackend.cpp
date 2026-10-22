@@ -211,7 +211,7 @@ QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests
     connect(settings, &Settings::ManualHostsUpdated, this, &QmlBackend::hostsChanged);
     connect(settings, &Settings::CurrentProfileChanged, this, &QmlBackend::profileChanged);
     connect(this, &QmlBackend::hostsChanged, this, [this] {
-        if (connection_target.value("kind") == "auto" && connection_attempt.value("phase") == "waiting"
+        if (connection_attempt.value("waitingForWake").toBool()
                 && !connection_cancelled && !connection_dismissed && !connectionTargetValid()) {
             clearWakeWait();
             failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
@@ -245,7 +245,7 @@ QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests
     connect(psn_reconnect_timer, &QTimer::timeout, this, &QmlBackend::reconnectPsn);
     connect(wakeup_start_timer, &QTimer::timeout, this, [this]
     {
-        if (!wakeup_start || connection_cancelled || connection_dismissed
+        if (wakeup_nickname.isEmpty() || connection_cancelled || connection_dismissed
                 || connection_profile_generation != profile_generation || connection_attempt.value("phase") != "waking")
             return;
         clearWakeWait();
@@ -1098,7 +1098,9 @@ bool QmlBackend::retryConnection(const QString &attempt_id)
     const int index = resolveConnectionTarget();
     if (!connection_target.isEmpty()) {
         const auto host = hosts().at(index).toMap();
-        if (connection_attempt.value("registrationOnly").toBool()) {
+        if (connection_attempt.value("context") == "wakeOnly")
+            return wakeUpHost(index, host.value("name").toString());
+        else if (connection_attempt.value("registrationOnly").toBool()) {
             auto info = session_info;
             info.settings = settings;
             startPsnConnection(info, connection_target);
@@ -1653,11 +1655,26 @@ void QmlBackend::deleteHost(int index)
     settings->RemoveManualHost(id);
 }
 
-void QmlBackend::wakeUpHost(int index, QString nickname)
+bool QmlBackend::wakeUpHost(int index, QString nickname)
 {
-    auto server = displayServerAt(index);
-    if (!server.valid)
-        return;
+    const auto server = displayServerAt(index);
+    const auto listed = hosts();
+    if (session || connection_token || !server.valid || !server.registered || !server.duid.isEmpty()
+            || index < 0 || index >= listed.size() || !listed.at(index).toMap().value("display").toBool())
+        return false;
+    if (nickname.isEmpty()) nickname = server.registered_host.GetServerNickname();
+    wakeup_nickname = nickname;
+    session_info = StreamSessionConnectInfo(settings, server.registered_host.GetTarget(), server.GetHostAddr(), nickname,
+        server.registered_host.GetRPRegistKey(), server.registered_host.GetRPKey(), {}, {}, false, false, false, false);
+    beginConnection(session_info, connectionTargetKey(listed.at(index).toMap()), QStringLiteral("wakeOnly"));
+    connection_attempt["cleanupPending"] = false;
+    if (!connectionTargetValid()) {
+        clearWakeWait();
+        failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
+        return false;
+    }
+    if (!sendWakeup(server)) return false;
+    wakeup_start_timer->start(WAKEUP_WAIT_SECONDS * 1000);
     if (!nickname.isEmpty())
     {
         waking_sleeping_nicknames.append(nickname);
@@ -1668,7 +1685,8 @@ void QmlBackend::wakeUpHost(int index, QString nickname)
             emit hostsChanged();
         });
     }
-    sendWakeup(server);
+    emit connectionAttemptChanged();
+    return true;
 }
 
 bool QmlBackend::setConsolePin(int index, QString console_pin)
@@ -2196,12 +2214,16 @@ void QmlBackend::clearWakeWait()
     emit autoConnectChanged();
 }
 
-void QmlBackend::stopAutoConnect()
+bool QmlBackend::stopAutoConnect(const QString &attempt_id)
 {
-    if (connection_attempt.value("waitingForWake").toBool())
-        cancelConnection(connection_attempt.value("id").toString());
-    else
+    if (attempt_id.isEmpty() && autoConnect() && connection_attempt.isEmpty()) {
         clearWakeWait();
+        return true;
+    }
+    const auto current = connection_attempt.value("id").toString();
+    if (connection_attempt.value("context") != "startup" || (!attempt_id.isEmpty() && attempt_id != current))
+        return false;
+    return cancelConnection(current);
 }
 
 void QmlBackend::beginAutoConnect(const HostMAC &mac)
@@ -2331,7 +2353,7 @@ bool QmlBackend::sendWakeup(const QString &host, const QByteArray &regist_key, b
     } catch (const Exception &e) {
         const auto title = tr("Wake-up failed");
         const auto text = tr("Failed to send wake-up packet:\n%1").arg(e.what());
-        if (wakeup_start) {
+        if (connection_attempt.value("waitingForWake").toBool()) {
             clearWakeWait();
             failConnection(title, text);
         } else
@@ -2824,7 +2846,7 @@ void QmlBackend::controllerMappingApply()
 
 void QmlBackend::updateDiscoveryHosts()
 {
-    if (session && !connection_cancelled && !connection_dismissed && connection_profile_generation == profile_generation
+    if ((session || connection_attempt.value("context") == "wakeOnly") && !connection_cancelled && !connection_dismissed && connection_profile_generation == profile_generation
             && connection_attempt.value("phase") != "failure") {
         // Only the current profile and selected console can finish this wake wait.
         for (const auto &host : discovery_manager.GetHosts()) {
@@ -2839,6 +2861,13 @@ void QmlBackend::updateDiscoveryHosts()
             if (registered.GetRPRegistKey() != session_info.regist_key)
                 continue;
             if (!wakeup_nickname.isEmpty() && host.host_name == wakeup_nickname && host.state == CHIAKI_DISCOVERY_HOST_STATE_READY) {
+                if (connection_attempt.value("context") == "wakeOnly") {
+                    if (!connectionTargetValid()) break;
+                    clearWakeWait();
+                    connection_attempt["waitingForWake"] = false;
+                    setConnectionPhase(QStringLiteral("woken"));
+                    break;
+                }
                 const QPointer<StreamSession> owned_session(session);
                 const auto attempt_id = connection_generation;
                 const bool start_session = wakeup_start;
