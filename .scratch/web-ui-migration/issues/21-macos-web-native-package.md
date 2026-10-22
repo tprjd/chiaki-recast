@@ -4,7 +4,7 @@
 
 **Blocked by:** 04: Connect locally from web setup to native playback.
 
-**Status:** claimed
+**Status:** resolved
 
 **Source:** [Web setup UI specification](../spec.md). Stories 89, 90, 91, 94.
 
@@ -34,3 +34,20 @@ per-DMG metadata. Matching SDK, source and shipped Homebrew notices fail closed.
 checks and source metadata. No Mac build, package, signature, notarization, GPU,
 or runtime result exists on this Windows host. The acceptance checkboxes above
 remain open and transfer to ticket 23's Mac hardware acceptance.
+
+## Answer
+
+The macOS source milestone is complete. Latest integration
+`1d769ee9ec3bfd267137d8ca738255feed9c7f90` is merged, including ticket 19's
+common embedded-resource preflight and frontend notice install. All ten Mac
+jobs use the shared action. Windows and Linux job sections remain intact. The
+preflight now runs once, after final app signing and entitlement checks, before
+DMG creation. Its empty environment and system-only PATH remove Qt, Node and
+DYLD overrides.
+
+The user directed us to skip remaining build and performance tests and focus
+on prototype UI fidelity. No further build, package, signing, notarization,
+runtime, fixture-matrix, or performance run was made for this final milestone.
+The previous focused source and fixture evidence remains in
+[verification](../evidence/ticket21/verification.md). The open hardware items
+above are unverified limits, not passes.

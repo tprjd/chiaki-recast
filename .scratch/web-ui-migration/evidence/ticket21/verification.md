@@ -64,3 +64,21 @@ expose SDK archive/layout, native dependency, notice, deployment or signing
 issues. Ticket 23 retains both architecture package builds and clean-machine
 normal/direct startup, actual Chromium GPU/sandbox evidence, native playback,
 scaling, keyboard/controller input, focus, microphone, and setup restoration.
+
+## Final source milestone
+
+Merged integration `1d769ee9ec3bfd267137d8ca738255feed9c7f90`, including ticket
+19's common QCore `--check-package` implementation and frontend notice install.
+The merge had no conflicts. It retained Windows and Linux workflow sections.
+Moved the single preflight from deployment to after final app signing and
+entitlement verification, before DMG creation. It uses `env -i` and a
+system-only PATH, so inherited Qt, DYLD, Node and SDK overrides cannot supply
+package dependencies. The preflight remains read-only and starts no GUI.
+
+User direction supersedes the remaining test plan: skip the rest of the build
+and performance tests and focus on bringing the UI to prototype standards.
+No new build, package, signing, notarization, runtime, performance, or repeated
+fixture-matrix check was run for this final source correction. Previous
+completed fixture/static results above remain recorded. No actual Mac package
+or hardware acceptance is claimed. Ticket 21 is resolved as the source
+milestone under this user-directed scope.

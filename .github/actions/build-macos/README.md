@@ -9,8 +9,9 @@ The executable contains the frontend. The package does not install Node.
 
 The action retains native Qt Quick deployment, SDL fixups, MoltenVK 1.2.9,
 the helper Frameworks link, and microphone permission. It checks the bundle
-layout, matching SDK locale files, V8 snapshot, library paths, native architecture,
-and the shared read-only `--check-package` command before signing.
+layout, matching SDK locale files, V8 snapshot, library paths, and native architecture
+before signing. The shared read-only `--check-package` command checks the final
+signed bundle with an empty environment and a system-only PATH before DMG creation.
 
 `macos-notices.py` copies the matching SDK SPDX records with Chromium license
 texts, Qt license files, project and source dependency notices, and notices from

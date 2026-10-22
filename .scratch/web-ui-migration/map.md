@@ -111,5 +111,9 @@ changes, failures, or unresolved concerns. Record hardware limitations.
   and explicit conditional Developer ID signing and notarization.
   [Verification](evidence/ticket21/verification.md) records local fixture, shell,
   YAML, partial-signing rejection, and source checks. No Mac build or runtime
-  result is claimed. The ticket remains claimed for the unavailable Mac package
-  and hardware acceptance carried in ticket 23.
+  result is claimed. The source milestone is resolved after merging integration
+  `1d769ee9ec3bfd267137d8ca738255feed9c7f90`, including ticket 19 common notices
+  and preflight. The preflight checks the final signed app with no inherited Qt
+  or DYLD environment. The user skipped remaining build and performance tests
+  to focus on prototype UI fidelity. Mac package and hardware checks remain
+  unverified.

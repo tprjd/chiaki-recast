@@ -56,6 +56,4 @@ while IFS= read -r -d '' binary; do
     fi
   fi
 done < <(find "$app" -type f -print0)
-# This QCore-only command checks the RCC before SDL, GUI, settings, and services.
-env -u QT_PLUGIN_PATH -u QML2_IMPORT_PATH -u DYLD_LIBRARY_PATH -u QTWEBENGINEPROCESS_PATH -u QTWEBENGINE_RESOURCES_PATH -u QTWEBENGINE_LOCALES_PATH "$app/Contents/MacOS/chiaki" --check-package
 bash scripts/sign-macos.sh "$app" "$helper" "$MACOS_DMG"

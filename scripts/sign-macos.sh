@@ -70,6 +70,8 @@ expected, helper, app = [plistlib.load(open(p, 'rb')) for p in sys.argv[1:]]
 assert all(helper.get(k) == v for k, v in expected.items()), 'Signed helper lacks matching SDK entitlements'
 assert app.get('com.apple.security.device.audio-input') is True, 'Signed app lacks microphone entitlement'
 PY
+# Check the final signed RCC without SDK, Node, Qt, or DYLD environment overrides.
+env -i PATH=/usr/bin:/bin:/usr/sbin:/sbin "$app/Contents/MacOS/chiaki" --check-package
 # Signing is the last bundle mutation. Notarization staples the sealed DMG only.
 hdiutil create -srcfolder "$app" -volname 'Chiaki Recast' -format UDZO "$dmg"
 codesign --force --sign "$identity" "${sign_options[@]}" "$dmg"
