@@ -98,8 +98,13 @@ private:
         QVERIFY(QMetaObject::invokeMethod(root, "openDisplaySettings"));
         QVERIFY(input->blocked());
         QVERIFY(root->property("streamSettingsOpen").toBool());
+        QVERIFY(QMetaObject::invokeMethod(root, "showRendererFallbackDialog", Q_ARG(QVariant, "Test fallback")));
+        auto *fallback = root->findChild<QObject *>("rendererInformationDialog");
+        QVERIFY(fallback && fallback->property("visible").toBool());
         QVERIFY(QMetaObject::invokeMethod(root, "closeDialog"));
-        QVERIFY(!input->blocked());
+        QVERIFY(input->blocked());
+        QVERIFY(QMetaObject::invokeMethod(fallback, "choose", Q_ARG(QVariant, "cancel")));
+        QTRY_VERIFY(!input->blocked());
         QVERIFY(settingsOpener.hasFocus());
         QVERIFY(QMetaObject::invokeMethod(root, "openPlaceboSettings"));
         QVERIFY(QMetaObject::invokeMethod(root, "showPlaceboColorMappingDialog", Q_ARG(QVariant, QVariant())));
