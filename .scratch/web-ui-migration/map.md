@@ -33,7 +33,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - Tickets [16](issues/16-controller-setup-and-mapping.md) and [17](issues/17-profiles-files-and-logs.md): ready after ticket 11.
 - [18: Setup reminders and Steam shortcuts](issues/18-reminders-and-steam-shortcuts.md): ready after ticket 06.
 - [05: Console management and manual addresses](issues/05-console-management-and-manual-addresses.md): claimed after ticket 04.
-- Tickets [07](issues/07-pairing-and-account-id.md), [08](issues/08-psn-native-streaming.md), [19](issues/19-windows-web-native-package.md), [20](issues/20-linux-web-native-packages.md), and [21](issues/21-macos-web-native-package.md): ready after ticket 04.
+- [07: Pairing and Account ID lookup](issues/07-pairing-and-account-id.md): claimed for worktree preparation; implementation follows the next free worker slot.
+- Tickets [08](issues/08-psn-native-streaming.md), [19](issues/19-windows-web-native-package.md), [20](issues/20-linux-web-native-packages.md), and [21](issues/21-macos-web-native-package.md): ready after ticket 04.
 - Other tickets 05 through 23: waiting for their declared blockers.
 
 ## Integration history
