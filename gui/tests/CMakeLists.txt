@@ -55,7 +55,7 @@ if(TARGET chiaki-gui)
     add_test(NAME chiaki-embedded-graphics COMMAND chiaki-embedded-setup-tests graphicsCoexistence)
     set_tests_properties(chiaki-embedded-graphics PROPERTIES LABELS "desktop;gpu")
     add_test(NAME chiaki-embedded-console-management COMMAND chiaki-embedded-setup-tests
-        manualAddress manualAddressValidation consoleManagement consoleTargetGuards)
+        manualAddress manualAddressValidation consoleManagement consoleTargetGuards consoleManagementPrivacy)
     set_tests_properties(chiaki-embedded-console-management PROPERTIES
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
     add_test(NAME chiaki-manual-handoff COMMAND chiaki-embedded-setup-tests manualHandoff)

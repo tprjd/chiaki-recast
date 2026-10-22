@@ -150,6 +150,8 @@ zeroes, secret-free replies, focus return, cancelled confirmations, and the
 distinction between manual address and registration deletion.
 `consoleTargetGuards` checks discovery reorder, ambiguous or removed targets,
 changed manual addresses, privacy masking, and narrow or zoomed forms.
+`consoleManagementPrivacy` checks address aliases with different letter case,
+masked details, confirmations, registration choices, PIN entry, and errors.
 `manualHandoff` uses the application controller to connect a registered manual
 address, hide and freeze setup, wait for native cleanup, and restore setup.
 The handoff case does not prove real console playback, physical focus, or GPU

@@ -133,11 +133,12 @@ void SetupBridge::refresh()
     };
     const bool privateMode = backend->qmlSettings()->streamerMode();
     const auto safeName = [&](QString name, const QString &address, const QString &identifier) {
-        bool sensitive = name == address || name == identifier || QHostAddress().setAddress(name);
+        bool sensitive = name.compare(address, Qt::CaseInsensitive) == 0
+            || name.compare(identifier, Qt::CaseInsensitive) == 0 || QHostAddress().setAddress(name);
         for (const auto &value : hosts) {
             const auto host = value.toMap();
             for (const auto &field : {"address", "mac", "duid"})
-                sensitive = sensitive || (!name.isEmpty() && name == host.value(field).toString());
+                sensitive = sensitive || (!name.isEmpty() && name.compare(host.value(field).toString(), Qt::CaseInsensitive) == 0);
         }
         if (privateMode && sensitive) name = tr("Console");
         return name.isEmpty() ? tr("Console") : name;
