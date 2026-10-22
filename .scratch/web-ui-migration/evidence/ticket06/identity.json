@@ -1,0 +1,46 @@
+{
+  "sourceCommit": "d1f643d7e4810c296e59141a9f0074d05b1ad233",
+  "integrationTip": "0b813edee3605615db197b5e49136cabe9261373",
+  "worktree": "C:\\Users\\david\\.codex\\worktrees\\web-ui-ticket-06\\chiaki-ng-ui",
+  "build": "C:/Users/david/.cache/chiaki-msvc-native/ticket06-build",
+  "artifacts": {
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket06-build\\gui\\chiaki.exe": "182c7dd8ede7adb6a608114cb331bd937c48781a58b55c8d96c1dae5e9ed988e",
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket06-build\\gui\\tests\\chiaki-embedded-setup-tests.exe": "8fd6f032b97ee6906046971ca9e767e2a9e217535388135b734ecc0c2b23763a",
+    "gui\\web\\package-lock.json": "59e9bbe871ea16981ea1fd5beb0913760e66d684de0e3de8c15f2fed0a6b31e6",
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket06-build\\gui\\web\\app.js": "90ce25561204944e5504b195b39c322a19984f1f16a9ab6093ed6cd60de50fe3",
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket06-build\\gui\\web\\app.css": "e7cb3b6206d16cf32a42f8e27f2187aa984cb4a15270817879d563280d13ae1c"
+  },
+  "changedGuiFiles": {
+    "gui/CMakeLists.txt": "4ad090ce3f7298263d792b15f820a33a5d63ac6d164298303ee5d5b144401782",
+    "gui/include/jsonrequester.h": "e90514f52a29a0216d8d5fd71006945e141bf691b74e600d1199255fbf63f05b",
+    "gui/include/psnaccountid.h": "ef3c9c58e0fa96cde2e43db9a5eec5859f3bea75c2923d77cfaa7b5c852f3405",
+    "gui/include/psnrequests.h": "7c9538296b65c2f539449de1aee219df8f3d907e9f516181f4a4b11294313ff1",
+    "gui/include/psnsigninwindow.h": "74fbf4e898849046264cd3536e77a3e60eb2ea180dde64d7bf0906b84ea090ad",
+    "gui/include/psntoken.h": "a007328d7c47ed4736f2c4d750fd6b5eb86f59955352c7a23ff212214816ad71",
+    "gui/include/qmlbackend.h": "96f3b8171f968d0a3f1d1818ad0993e1fdd0fbb1de1ef06fffb61fbec8e9e449",
+    "gui/include/qmlnativeservices.h": "26561842b5ad6736a9ec59efc4372054b40c155d564b3137aeffa6e9f23b23f8",
+    "gui/include/setupbridge.h": "a2cefe453dfcb10d25bfcf67ac05f5f8e0adaef03d69a89c248c6fb5695cad83",
+    "gui/include/setupwindow.h": "d35a9995b3c34f16d08fdb566373854f910032dafff4ee29d398806e2335527d",
+    "gui/src/jsonrequester.cpp": "161b5644bb4d04e960c93d5b338af92573d8695871794b091a49be9f304b1c70",
+    "gui/src/psnaccountid.cpp": "b630da283b1913bf0b2e209aa1ce7dba9f5bf54a5a38e6e743fa9631c5a14fe3",
+    "gui/src/psnsigninwindow.cpp": "b69aea37ac34914ccfba6c517103912171f35ce52923bb0effc3a182bda3cd4a",
+    "gui/src/psntoken.cpp": "d461516d761eb3028634c840c9561a34fdea720eb23dddd7603ee149e37c20d1",
+    "gui/src/qmlbackend.cpp": "1400b7824c5a936df17eefd50c8c3eabd8912402ae09ee6cd05a2fcfd7069b7a",
+    "gui/src/qmlnativeservices.cpp": "dda4bd36e9b38647383729dacbaa3c75d02ef1b5529257ac17df8b24deb30111",
+    "gui/src/setupbridge.cpp": "e3fc672d0fe46c3e0dafc04e3c0590bb2a1b9bea838918bdcd73f7549a5c5905",
+    "gui/src/setupwindow.cpp": "8100034e0993c2239b0b8c075014453157742fe50f0a2f84b9d61436482b5bc8",
+    "gui/tests/CMakeLists.txt": "c158bcd8e64a19293f84598569d86d84c8367d204e1b56cb7ef6366c8eab28ad",
+    "gui/tests/embeddedsetup.cpp": "a4b65d820f6335f6be99af27ffebeb03276c490b324c5d18b0d9adffedc47b1b",
+    "gui/web/src/App.svelte": "e962686ac7cb21a4a3bb84b1597edbdcd7e71c3107adae166133f35a2b95ce78",
+    "gui/web/src/PsnAccount.svelte": "9bb2492151b7846f13783310013034c8642204b28f2537002edda1364d2ce4a2",
+    "gui/web/src/bridge.ts": "05273328c15ed82178b21f2fd1c1a34c58c5d41c25bc338b6030471dc844a2f7"
+  },
+  "vendorPatchExcluded": "scripts/windows-vc/gf-complete.patch",
+  "vendorPatchSha256": "9ed4f490f718ecdb5f49177738036503b894b015d33cc2f993925894dc53554e",
+  "captures": {
+    "account-1280.png": "5ee8ff1ddeae2495b3cbf344e9fc811d1b63095fef4cde3120cc7bb1910455de",
+    "account-200-percent.png": "7f874a6bbc4bd70470660c60cbf02daed87ae0f44307500d780a1b5733204518",
+    "account-390-form.png": "34496828db84ebcaa632d45380e8b0841f723a380d88385272e87165b1ca7a7e",
+    "account-390.png": "20f820d75722a3db188d886053ae074ba6a78179fd027ed9efce49a7d1a4863c"
+  }
+}

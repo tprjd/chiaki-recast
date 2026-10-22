@@ -140,10 +140,11 @@ void QmlRegist::regist_cb(ChiakiRegistEvent *event, void *user)
     }
 }
 
-QmlBackend::QmlBackend(Settings *settings, QObject *parent)
+QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests)
     : QObject(parent)
     , settings(settings)
     , settings_qml(new QmlSettings(settings, this))
+    , psn_requests(std::move(requests))
 {
     qt_msg_handler = qInstallMessageHandler(msg_handler);
 
@@ -312,10 +313,6 @@ QmlBackend::~QmlBackend()
     psn_hosts_future.waitForFinished();
     releaseSession();
     qInstallMessageHandler(qt_msg_handler);
-#ifdef CHIAKI_HAVE_WEBENGINE
-    if(request_interceptor)
-        request_interceptor->deleteLater();
-#endif
     frame_thread->quit();
     frame_thread->wait();
     psn_connection_thread.quit();
@@ -496,7 +493,7 @@ void QmlBackend::reconnectPsn()
         setConnectState(PsnConnectState::ConnectFailed);
         return;
     }
-    PSNToken *psnToken = new PSNToken(this->settings, this);
+    PSNToken *psnToken = new PSNToken(this->settings, this, psn_requests.networkManager);
     watchConnectionToken(psnToken);
     connect(psnToken, &PSNToken::PSNTokenError, this, [this, owned](const QString &error) {
         if (!owned()) return;
@@ -1005,7 +1002,7 @@ void QmlBackend::startPsnConnection(const StreamSessionConnectInfo &info, const 
         createSession(info, target, true);
         return;
     }
-    auto *token = new PSNToken(settings, this);
+    auto *token = new PSNToken(settings, this, psn_requests.networkManager);
     watchConnectionToken(token);
     connect(token, &PSNToken::PSNTokenError, this, [this, owned](const QString &error) {
         if (owned()) failConnection(tr("Could not reach PlayStation Network"), error);
@@ -1877,7 +1874,8 @@ void QmlBackend::clearCookies(QQuickWebEngineProfile *profile)
     cookieStore->deleteAllCookies();
 }
 
-void QmlBackend::setWebEngineHints(QQuickWebEngineProfile *profile)
+template<class Profile>
+static void applyWebEngineHints(Profile *profile)
 {
     QDate starting_release_date(2025, 02, 18);
     QDate today = QDate::currentDate();
@@ -1906,9 +1904,11 @@ void QmlBackend::setWebEngineHints(QQuickWebEngineProfile *profile)
     fullVersionList.insert("Chromium", QString("%1.0.0.0").arg(chrome_version));
     hints->setFullVersionList(fullVersionList);
 #endif
-    request_interceptor = new SecUaRequestInterceptor(chrome_version);
-    profile->setUrlRequestInterceptor(request_interceptor);
+    profile->setUrlRequestInterceptor(new SecUaRequestInterceptor(chrome_version, profile));
 }
+
+void QmlBackend::setWebEngineHints(QQuickWebEngineProfile *profile) { applyWebEngineHints(profile); }
+void QmlBackend::setWebEngineHints(QWebEngineProfile *profile) { applyWebEngineHints(profile); }
 #endif
 
 void QmlBackend::connectToHost(int index, QString nickname)
@@ -2110,26 +2110,6 @@ QUrl QmlBackend::psnLoginUrl() const
     char duid[duid_size];
     chiaki_holepunch_generate_client_device_uid(duid, &duid_size);
     return QUrl(PSNAuth::LOGIN_URL + "duid=" + QString(duid) + "&");
-}
-
-bool QmlBackend::handlePsnLoginRedirect(const QUrl &url)
-{
-    const auto id = startPsnAuth(url);
-    if (id.isEmpty() || psn_auth_attempt.value("phase") == "failure") {
-        emit psnLoginAccountIdError(id.isEmpty() ? tr("PSN sign-in is already in progress.") : psn_auth_attempt.value("message").toString());
-        return false;
-    }
-    const auto generation = profile_generation;
-    auto connection = std::make_shared<QMetaObject::Connection>();
-    *connection = connect(this, &QmlBackend::psnAuthAttemptChanged, this, [this, id, generation, connection] {
-        if (psn_auth_attempt.value("id") != id || generation != profile_generation) { disconnect(*connection); return; }
-        const auto phase = psn_auth_attempt.value("phase").toString();
-        if (phase != "success" && phase != "failure") return;
-        disconnect(*connection);
-        if (phase == "success") emit psnLoginAccountIdDone(psn_auth_attempt.value("accountId").toString());
-        else emit psnLoginAccountIdError(psn_auth_attempt.value("message").toString());
-    });
-    return true;
 }
 
 void QmlBackend::clearWakeWait()
@@ -3014,7 +2994,7 @@ QString QmlBackend::startPsnAuth(const QUrl &url)
     psn_auth_pending = true;
     const auto generation = profile_generation;
     auto owned = [this, id, generation] { return psn_auth_pending && profile_generation == generation && psn_auth_attempt.value("id") == id; };
-    auto *request = new PSNAccountID(settings, this);
+    auto *request = new PSNAccountID(settings, this, psn_requests.networkManager);
     connect(request, &PSNAccountID::Progress, this, [this, owned] {
         if (!owned()) return;
         psn_auth_attempt["phase"] = "account";
@@ -3054,29 +3034,10 @@ QString QmlBackend::startPsnAuth(const QUrl &url)
     return id;
 }
 
-void QmlBackend::initPsnAuth(const QUrl &url, const QJSValue &callback)
-{
-    const auto id = startPsnAuth(url);
-    if (!callback.isCallable()) return;
-    if (id.isEmpty() || psn_auth_attempt.value("phase") == "failure") {
-        callback.call({id.isEmpty() ? tr("PSN sign-in is already in progress.") : psn_auth_attempt.value("message").toString(), false, true});
-        return;
-    }
-    const auto generation = profile_generation;
-    auto connection = std::make_shared<QMetaObject::Connection>();
-    *connection = connect(this, &QmlBackend::psnAuthAttemptChanged, this, [this, id, generation, callback, connection] {
-        if (psn_auth_attempt.value("id") != id || generation != profile_generation) { disconnect(*connection); return; }
-        const auto phase = psn_auth_attempt.value("phase").toString();
-        if (phase != "success" && phase != "failure") return;
-        disconnect(*connection);
-        callback.call({phase == "success" ? tr("PSN remote access is ready.") : psn_auth_attempt.value("message").toString(), phase == "success", true});
-    });
-}
-
 void QmlBackend::refreshAuth()
 {
     const auto generation = profile_generation;
-    PSNToken *psnToken = new PSNToken(settings, this);
+    PSNToken *psnToken = new PSNToken(settings, this, psn_requests.networkManager);
     connect(psnToken, &PSNToken::PSNTokenError, this, [this](const QString &error) {
         qCWarning(chiakiGui) << "Could not refresh token. Automatic PSN Connection Unavailable!" << error;
     });
@@ -3084,7 +3045,11 @@ void QmlBackend::refreshAuth()
     connect(psnToken, &PSNToken::PSNTokenSuccess, this, []() {
         qCWarning(chiakiGui) << "PSN Remote Connection Tokens Refreshed.";
     });
-    connect(psnToken, &PSNToken::PSNTokenSuccess, this, [this, generation] { if (generation == profile_generation) updatePsnHosts(); });
+    connect(psnToken, &PSNToken::PSNTokenSuccess, this, [this, generation] {
+        if (generation != profile_generation) return;
+        emit psnTokenChanged();
+        if (generation == profile_generation) updatePsnHosts();
+    });
     connect(psnToken, &PSNToken::Finished, psnToken, &QObject::deleteLater);
     QString refresh_token = settings->GetPsnRefreshToken();
     psnToken->RefreshPsnToken(std::move(refresh_token));
@@ -3119,7 +3084,7 @@ void QmlBackend::updatePsnHostsThread(QString psn_token, uint32_t log_mask, QStr
     chiaki_log_init(&backend_log, log_mask, chiaki_log_cb_print, nullptr);
     for(int i = 0; i < PSN_DEVICES_TRIES; i++)
     {
-        ChiakiErrorCode err = chiaki_holepunch_list_devices(psn_token.toUtf8().constData(), CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &backend_log);
+        ChiakiErrorCode err = psn_requests.listDevices(psn_token.toUtf8().constData(), CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &backend_log);
         if (err != CHIAKI_ERR_SUCCESS)
         {
             if(PSN_DEVICES_TRIES - i > 1)

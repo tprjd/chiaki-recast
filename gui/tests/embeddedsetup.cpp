@@ -69,9 +69,87 @@ static bool inputDesktopAvailable()
 #include "qmlnativeservices.h"
 #include "setupwindow.h"
 #include "setupbridge.h"
+#include "psnrequests.h"
+#include "psnsigninwindow.h"
+#include <QWebEngineProfile>
+#include <QDesktopServices>
+#include <QUrlQuery>
+#include <QWebEngineCookieStore>
+#include <QNetworkCookie>
+#include <QProcess>
+#include <QWebEngineUrlRequestInfo>
+#include <QWebEngineUrlRequestInterceptor>
 #ifdef main
 #undef main
 #endif
+
+class PsnReply : public QNetworkReply
+{
+    QByteArray payload;
+    qint64 offset = 0;
+public:
+    PsnReply(const QNetworkRequest &request, QObject *parent) : QNetworkReply(parent)
+    {
+        setRequest(request);
+        setUrl(request.url());
+        open(QIODevice::ReadOnly | QIODevice::Unbuffered);
+    }
+    void finish(QByteArray json, NetworkError error = NoError)
+    {
+        if (isFinished()) return;
+        payload = std::move(json);
+        if (error != NoError) setError(error, "credential-bearing-network-error");
+        setFinished(true);
+        emit readyRead();
+        emit finished();
+    }
+    void abort() override { finish({}, OperationCanceledError); }
+    qint64 bytesAvailable() const override { return payload.size() - offset + QNetworkReply::bytesAvailable(); }
+protected:
+    qint64 readData(char *data, qint64 size) override
+    {
+        const auto count = qMin(size, qint64(payload.size()) - offset);
+        if (!count) return -1;
+        memcpy(data, payload.constData() + offset, size_t(count));
+        offset += count;
+        return count;
+    }
+};
+
+class PsnNetwork : public QNetworkAccessManager
+{
+    QList<QPointer<PsnReply>> &requests;
+public:
+    PsnNetwork(QList<QPointer<PsnReply>> &requests, QObject *parent) : QNetworkAccessManager(parent), requests(requests) {}
+protected:
+    QNetworkReply *createRequest(Operation, const QNetworkRequest &request, QIODevice *) override
+    {
+        auto *reply = new PsnReply(request, this);
+        requests.append(reply);
+        return reply;
+    }
+};
+
+class PsnBrowserOpener : public QObject
+{
+    Q_OBJECT
+public:
+    QUrl url;
+public slots:
+    void open(const QUrl &value) { url = value; }
+};
+
+class PsnPageRequests : public QWebEngineUrlRequestInterceptor
+{
+public:
+    using QWebEngineUrlRequestInterceptor::QWebEngineUrlRequestInterceptor;
+    QAtomicInteger<int> count = 0;
+    void interceptRequest(QWebEngineUrlRequestInfo &request) override
+    {
+        count.fetchAndAddRelaxed(1);
+        request.block(true);
+    }
+};
 
 class EmbeddedSetupTest : public QObject
 {
@@ -85,6 +163,19 @@ class EmbeddedSetupTest : public QObject
         timeout.start();
         while (!*finished && timeout.elapsed() < 5000) QTest::qWait(10);
         return *result;
+    }
+
+    QVariantMap cookieMetadata(const QString &path, const QByteArray &name)
+    {
+        QProcess probe;
+        probe.start(QStringLiteral(CHIAKI_TEST_PYTHON), {"-c",
+            "import sqlite3,sys,json,time; from pathlib import Path; "
+            "db=sqlite3.connect(Path(sys.argv[1]).as_uri()+'?mode=ro',uri=True); "
+            "r=db.execute('SELECT COUNT(*),SUM(is_persistent),MAX(expires_utc) FROM cookies WHERE name=?',(sys.argv[2],)).fetchone(); "
+            "print(json.dumps(dict(count=r[0],persistent=r[1] or 0,future=bool(r[2] and r[2]/1000000-11644473600>time.time()))))",
+            QDir(path).filePath("Cookies"), QString::fromUtf8(name)});
+        if (!probe.waitForFinished(5000) || probe.exitCode() != 0) return {};
+        return QJsonDocument::fromJson(probe.readAllStandardOutput()).toVariant().toMap();
     }
 
     void discover(QmlBackend *backend, const QList<DiscoveryHost> &hosts)
@@ -116,6 +207,326 @@ class EmbeddedSetupTest : public QObject
     }
 
 private slots:
+    void init()
+    {
+#ifdef Q_OS_WIN
+        if (QString::fromLatin1(QTest::currentTestFunction()).startsWith("psn") && QGuiApplication::platformName() != "offscreen") {
+            QVERIFY(inputDesktopAvailable());
+            QVERIFY(!protectedWindowVisible());
+        }
+#endif
+    }
+
+    void psnAccountPresentation()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 900);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-account]') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-psn-account]').click()");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.tagName").toString(), QStringLiteral("H2"));
+        QVERIFY(script(setup.view(), "const e=new KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true,cancelable:true});document.querySelector('[data-psn-redirect]').dispatchEvent(e);!e.defaultPrevented").toBool());
+        const QDir evidence(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE", "."));
+        const auto capture = [&](const QString &name, int width, int height, qreal zoom, bool form) {
+            setup.resize(width, height);
+            setup.view()->setZoomFactor(zoom);
+            QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+            script(setup.view(), form ? "document.querySelector('form').scrollIntoView({block:'start'})"
+                : "document.querySelector('.account-panel').scrollIntoView({block:'start'})");
+            QTest::qWait(80);
+            QVERIFY(setup.view()->grab().save(evidence.filePath(name)));
+        };
+        capture("account-1280.png", 1280, 900, 1, false);
+        capture("account-390.png", 390, 720, 1, false);
+        capture("account-390-form.png", 390, 720, 1, true);
+        capture("account-200-percent.png", 800, 900, 2, true);
+        PsnBrowserOpener opener;
+        QDesktopServices::setUrlHandler("https", &opener, "open");
+        const auto resetOpener = qScopeGuard([] { QDesktopServices::unsetUrlHandler("https"); });
+        script(setup.view(), "document.querySelector('[data-psn-redirect]').value='temporary-private-url';document.querySelector('[data-psn-redirect]').dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('[data-psn-external]').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-redirect]').value").toString(), QString());
+        script(setup.view(), "document.querySelector('[data-psn-redirect]').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}))");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.account-panel') === null && document.activeElement.hasAttribute('data-psn-account')").toBool());
+    }
+
+    void psnEmbeddedIsolation()
+    {
+        const QString profileName = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profileName).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profileName);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(true);
+        settings.SetAddSteamShortcutAsk(false);
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = nullptr;
+            *count = 0;
+            return CHIAKI_ERR_SUCCESS;
+        };
+        QmlNativeServices services(&settings, transport);
+        services.backend()->stopAutoConnect();
+        QString retainedPath;
+        QByteArray retainedName;
+        for (bool complete : {false, true}) {
+            PsnSignInWindow signIn(services.backend());
+            auto *page = signIn.view()->page();
+            auto *profile = page->profile();
+            QVERIFY(!page->webChannel());
+            QVERIFY(!profile->isOffTheRecord());
+            QCOMPARE(profile->storageName(), QStringLiteral("psn-token"));
+            QVERIFY(profile->persistentCookiesPolicy() != QWebEngineProfile::NoPersistentCookies);
+            QCOMPARE(script(signIn.view(), "typeof window.qt").toString(), QStringLiteral("undefined"));
+            QSignalSpy added(profile->cookieStore(), &QWebEngineCookieStore::cookieAdded);
+            QSignalSpy removed(profile->cookieStore(), &QWebEngineCookieStore::cookieRemoved);
+            QSignalSpy cacheCleared(profile, &QWebEngineProfile::clearHttpCacheCompleted);
+            const auto cookieName = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+            const auto hasCookie = [&] {
+                for (const auto &arguments : added)
+                    if (qvariant_cast<QNetworkCookie>(arguments.at(0)).name() == cookieName) return true;
+                return false;
+            };
+            QNetworkCookie cookie(cookieName, "private-fixture");
+            cookie.setSecure(true);
+            cookie.setExpirationDate(QDateTime::currentDateTime().addDays(1));
+            profile->cookieStore()->setCookie(cookie, QUrl("https://fixture.invalid"));
+            QTRY_VERIFY(hasCookie());
+            if (complete) {
+                retainedPath = profile->persistentStoragePath();
+                retainedName = cookieName;
+                qInfo() << "Owned PSN cookie profile" << profile->persistentStoragePath()
+                    << "fixture name" << cookieName << "before success" << cookieMetadata(retainedPath, cookieName);
+                auto *http = new PsnPageRequests(profile);
+                profile->setUrlRequestInterceptor(http);
+                QSignalSpy loadFinished(page, &QWebEnginePage::loadFinished);
+                page->setUrl(QUrl("https://remoteplay.dl.playstation.net/remoteplay/redirect?code=embedded-fixture"));
+                QTRY_COMPARE(requests.size(), 1);
+                QTRY_VERIFY(loadFinished.count() > 0);
+                QVERIFY(!loadFinished.last().at(0).toBool());
+                QCOMPARE(http->count.loadRelaxed(), 0);
+                requests[0]->finish(R"({"access_token":"embedded-access","refresh_token":"embedded-refresh","expires_in":3600})");
+                QTRY_COMPARE(requests.size(), 2);
+                requests[1]->finish(R"({"user_id":"1"})");
+                QTRY_COMPARE(settings.GetPsnAccountId(), QStringLiteral("AQAAAAAAAAA="));
+                QTRY_VERIFY(cacheCleared.count() > 0);
+                QCOMPARE(removed.count(), 0);
+            } else {
+                signIn.close();
+                QTRY_VERIFY(cacheCleared.count() > 0);
+                QTRY_VERIFY(removed.count() > 0);
+            }
+        }
+        // The profile flushes persistent cookies on destruction; post-cache replay emits no cookies here.
+        QTRY_COMPARE(cookieMetadata(retainedPath, retainedName).value("count").toInt(), 1);
+        const auto retained = cookieMetadata(retainedPath, retainedName);
+        QCOMPARE(retained.value("persistent").toInt(), 1);
+        QVERIFY(retained.value("future").toBool());
+        qInfo() << "Owned PSN cookie after success and profile destruction" << retained;
+    }
+
+    void psnRefreshCredentials()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetPsnAuthToken("saved-access");
+        settings.SetPsnRefreshToken("saved-refresh");
+        settings.SetPsnAccountId("AQAAAAAAAAA=");
+        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(-60).toString(settings.GetTimeFormat()));
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = nullptr;
+            *count = 0;
+            return CHIAKI_ERR_SUCCESS;
+        };
+        QmlNativeServices services(&settings, transport);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_COMPARE(requests.size(), 1);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-account]') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-psn-account]').click()");
+        requests[0]->finish(R"({"access_token":"invalid-access","expires_in":-1})");
+        QTest::qWait(30);
+        QCOMPARE(settings.GetPsnAuthToken(), QStringLiteral("saved-access"));
+        QCOMPARE(settings.GetPsnRefreshToken(), QStringLiteral("saved-refresh"));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-status]').textContent").toString(), QStringLiteral("PSN credentials expired"));
+        backend->refreshPsnToken();
+        QTRY_COMPARE(requests.size(), 2);
+        requests[1]->finish({}, QNetworkReply::ProtocolInvalidOperationError);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-status]').textContent").toString(), QStringLiteral("PSN credentials expired"));
+        QVERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains("credential-bearing-network-error"));
+        backend->refreshPsnToken();
+        QTRY_COMPARE(requests.size(), 3);
+        requests[2]->finish(R"({"access_token":"renewed-access","refresh_token":"renewed-refresh","expires_in":3600})");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-status]').textContent").toString(), QStringLiteral("PSN remote access is ready"));
+        QCOMPARE(settings.GetPsnAuthToken(), QStringLiteral("renewed-access"));
+        QCOMPARE(settings.GetPsnRefreshToken(), QStringLiteral("renewed-refresh"));
+    }
+
+    void psnSignIn()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(true);
+        settings.SetAddSteamShortcutAsk(false);
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = nullptr;
+            *count = 0;
+            return CHIAKI_ERR_SUCCESS;
+        };
+        QmlNativeServices services(&settings, transport);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
+        script(setup.view(), "document.querySelector('[data-psn-account]')?.click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-redirect]') !== null").toBool());
+        PsnBrowserOpener opener;
+        QDesktopServices::setUrlHandler("https", &opener, "open");
+        const auto resetOpener = qScopeGuard([] { QDesktopServices::unsetUrlHandler("https"); });
+        script(setup.view(), "document.querySelector('[data-psn-external]').click()");
+        QTRY_COMPARE(opener.url.host(), QStringLiteral("auth.api.sonyentertainmentnetwork.com"));
+        QCOMPARE(opener.url.scheme(), QStringLiteral("https"));
+        QCOMPARE(opener.url.path(), QStringLiteral("/2.0/oauth/authorize"));
+        QCOMPARE(QUrlQuery(opener.url).queryItemValue("redirect_uri"), QStringLiteral("https://remoteplay.dl.playstation.net/remoteplay/redirect"));
+        QVERIFY(!QUrlQuery(opener.url).queryItemValue("duid").isEmpty());
+        const auto submit = [&](const QString &url) {
+            if (backend->psnAuthAttempt().value("phase") != "exchanging" && backend->psnAuthAttempt().value("phase") != "account")
+                QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-psn-redirect]').disabled").toBool());
+            const auto literal = QString::fromUtf8(QJsonDocument(QJsonArray{url}).toJson(QJsonDocument::Compact));
+            script(setup.view(), "document.querySelector('[data-psn-redirect]').value=" + literal + "[0];document.querySelector('[data-psn-redirect]').dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('[data-psn-submit]').form.requestSubmit()");
+        };
+        submit("https://remoteplay.dl.playstation.net/remoteplay/redirect?code=fixture-code");
+        QTRY_COMPARE(requests.size(), 1);
+        QCOMPARE(backend->psnAuthAttempt().value("phase").toString(), QStringLiteral("exchanging"));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-redirect]').value").toString(), QString());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-submit]').disabled").toBool());
+        requests[0]->finish(R"({"access_token":"fixture-access-secret","refresh_token":"fixture-refresh-secret","expires_in":3600})");
+        QTRY_COMPARE(requests.size(), 2);
+        QTRY_VERIFY(script(setup.view(), "document.body.textContent.includes('Retrieving your Account ID')").toBool());
+        requests[1]->finish(R"({"user_id":"1"})");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-status]').textContent").toString(), QStringLiteral("PSN remote access is ready"));
+        QCOMPARE(settings.GetPsnAccountId(), QStringLiteral("AQAAAAAAAAA="));
+        QCOMPARE(settings.GetPsnAuthToken(), QStringLiteral("fixture-access-secret"));
+        QCOMPARE(settings.GetPsnRefreshToken(), QStringLiteral("fixture-refresh-secret"));
+        QVERIFY(!settings.GetRemotePlayAsk());
+        Settings persisted(profile);
+        QCOMPARE(persisted.GetPsnAccountId(), QStringLiteral("AQAAAAAAAAA="));
+        const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
+        QVERIFY(!snapshot.contains("fixture-access-secret"));
+        QVERIFY(!snapshot.contains("fixture-refresh-secret"));
+        QVERIFY(!snapshot.contains("fixture-code"));
+        QVERIFY(!snapshot.contains("AQAAAAAAAAA="));
+        QVERIFY(script(setup.view(), "localStorage.length === 0 && sessionStorage.length === 0").toBool());
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-psn-redirect]').type").toString(), QStringLiteral("password"));
+        submit("https://remoteplay.dl.playstation.net.evil.invalid/remoteplay/redirect?code=private-code");
+        QTRY_COMPARE(backend->psnAuthAttempt().value("phase").toString(), QStringLiteral("failure"));
+        QCOMPARE(requests.size(), 2);
+        submit("https://remoteplay.dl.playstation.net/remoteplay/redirect?code=one&code=two");
+        QTRY_VERIFY(backend->psnAuthAttempt().value("inputRejected").toBool());
+        QCOMPARE(requests.size(), 2);
+        submit("https://remoteplay.dl.playstation.net/remoteplay/redirect?code=retry");
+        QTRY_COMPARE(requests.size(), 3);
+        const auto attempt = backend->psnAuthAttempt().value("id");
+        submit("https://remoteplay.dl.playstation.net/remoteplay/redirect?code=duplicate");
+        QTest::qWait(30);
+        QCOMPARE(requests.size(), 3);
+        QCOMPARE(backend->psnAuthAttempt().value("id"), attempt);
+        requests[2]->finish({}, QNetworkReply::AuthenticationRequiredError);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[role=alert]')?.textContent.includes('expired')").toBool());
+        QVERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains("credential-bearing-network-error"));
+        submit("https://remoteplay.dl.playstation.net/remoteplay/redirect?code=incomplete");
+        QTRY_COMPARE(requests.size(), 4);
+        requests[3]->finish(R"({"access_token":"discarded-access","expires_in":3600})");
+        QTRY_COMPARE(backend->psnAuthAttempt().value("phase").toString(), QStringLiteral("failure"));
+        QCOMPARE(settings.GetPsnAuthToken(), QStringLiteral("fixture-access-secret"));
+        submit("https://remoteplay.dl.playstation.net/remoteplay/redirect?code=late");
+        QTRY_COMPARE(requests.size(), 5);
+        requests[4]->finish(R"({"access_token":"late-access","refresh_token":"late-refresh","expires_in":3600})");
+        QTRY_COMPARE(requests.size(), 6);
+        const auto oldGeneration = QString::number(backend->profileGeneration());
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        backend->setDiscoveryEnabled(false);
+        if (requests[5]) requests[5]->finish(R"({"user_id":"2"})");
+        QTest::qWait(30);
+        QVERIFY(backend->nativeSettings()->GetPsnAuthToken().isEmpty());
+        QVERIFY(backend->nativeSettings()->GetPsnAccountId().isEmpty());
+        QVERIFY(!setup.bridge()->submitPsnRedirect(oldGeneration, "https://remoteplay.dl.playstation.net/remoteplay/redirect?code=old-profile").value("accepted").toBool());
+        QCOMPARE(requests.size(), 6);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-redirect]').value").toString(), QString());
+        script(setup.view(), "document.querySelector('[data-psn-redirect]').value='temporary-private-url';document.querySelector('[data-psn-redirect]').dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('[data-psn-close]').click()");
+        script(setup.view(), "document.querySelector('[data-psn-account]').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-redirect]').value").toString(), QString());
+    }
+
+    void psnAccountStatus()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
+        script(setup.view(), "document.querySelector('[data-psn-account]')?.click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-status]')?.textContent").toString(), QStringLiteral("Not signed in"));
+        backend->qmlSettings()->setPsnAuthToken("fixture-access-secret");
+        backend->qmlSettings()->setPsnRefreshToken("fixture-refresh-secret");
+        backend->qmlSettings()->setPsnAccountId("AQAAAAAAAAA=");
+        backend->qmlSettings()->setPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(-60).toString(settings.GetTimeFormat()));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-status]')?.textContent").toString(), QStringLiteral("PSN credentials expired"));
+        backend->qmlSettings()->setPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(3600).toString(settings.GetTimeFormat()));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-status]')?.textContent").toString(), QStringLiteral("PSN remote access is ready"));
+        const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
+        QVERIFY(!snapshot.contains("fixture-access-secret"));
+        QVERIFY(!snapshot.contains("fixture-refresh-secret"));
+        QVERIFY(!snapshot.contains("AQAAAAAAAAA="));
+        QVERIFY(script(setup.view(), "localStorage.length === 0 && sessionStorage.length === 0").toBool());
+    }
+
     void graphicsCoexistence()
     {
 #ifdef Q_OS_WIN

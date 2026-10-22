@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QHash>
 #include <QVariantMap>
+#include <QTimer>
 
 class QmlBackend;
 
@@ -14,6 +15,10 @@ public:
     Q_INVOKABLE QVariantMap snapshot() const { return state; }
     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
+    Q_INVOKABLE QVariantMap openPsnSignIn(const QString &profile);
+    Q_INVOKABLE QVariantMap openPsnExternal(const QString &profile);
+    Q_INVOKABLE QVariantMap copyPsnSignInLink(const QString &profile);
+    Q_INVOKABLE QVariantMap submitPsnRedirect(const QString &profile, const QString &url);
     Q_INVOKABLE QVariantMap setGeneralSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
     Q_INVOKABLE QVariantMap setMediaSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
     Q_INVOKABLE QVariantMap refreshAudioDevices();
@@ -22,6 +27,7 @@ public:
 
 signals:
     void stateChanged(const QVariantMap &state);
+    void psnSignInRequested();
 
 private:
     void refresh();
@@ -33,4 +39,7 @@ private:
     QString selectedKey;
     QVariantMap state;
     QStringList decoders;
+    QTimer accountExpiry;
+    bool credentialsRejected = false;
+    bool currentProfile(const QString &profile) const;
 };

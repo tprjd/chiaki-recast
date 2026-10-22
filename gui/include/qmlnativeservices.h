@@ -6,7 +6,7 @@
 class QmlNativeServices
 {
 public:
-    explicit QmlNativeServices(Settings *settings);
+    explicit QmlNativeServices(Settings *settings, PsnRequests requests = {});
     QmlBackend *backend() { return &backend_; }
     QQmlEngine *engine() { return &engine_; }
 

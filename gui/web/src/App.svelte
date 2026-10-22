@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { connectSetup, type State, type Console } from './bridge';
+  import PsnAccount from './PsnAccount.svelte';
   import Settings from './Settings.svelte';
 
   let current = $state<State>();
@@ -107,6 +108,7 @@
       {#if !query}<p>{t('Turn on discovery to find consoles on your local network.')}</p>{/if}
     </section>
   {/if}
+  {#if current && connection}<PsnAccount {current} {connection} />{/if}
   <div class="console-grid">
     {#each consoles as console, index (console.key || `unavailable-${index}`)}
       <button class="console-card" class:selected={current?.selectedKey === console.key && !!console.key}

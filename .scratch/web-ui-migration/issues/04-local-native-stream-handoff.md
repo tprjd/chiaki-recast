@@ -59,3 +59,24 @@ failure. A controller cannot catch `qFatal` to restore setup. Assess graceful
 initialization failure at the real native boundary while implementing handoff.
 Actual foreground ownership and focus return still need handoff acceptance;
 the GPU observer can render a visible native window without foreground focus.
+
+### Minimal native HighQuality control
+
+The later [native control evidence](../evidence/native-highquality-control/pure-libplacebo-mix-control/verification.md)
+reproduces wrong HighQuality pixels with `pl_render_image_mix` without Qt Quick,
+QRhi, WebEngine, or WebChannel. The same executable passes with compute disabled.
+Each input has a fresh signature. Direct rendering produces a correct second
+frame; continuous native application input advances signatures but still has
+wrong colors. Uploaded YUV values remain correct.
+
+This is a concrete native dependency/control failure independent of the web UI
+and the graphics import. It is not a full old-application baseline or a live
+console result. Preserve the user's preset and production defaults. Full
+HighQuality and hardware acceptance remains open in this ticket and 23.
+
+### Ticket 06 sign-in window merge requirement
+
+[06](06-psn-sign-in.md) adds an optional native `signInWindow` to `SetupWindow`.
+When this ticket adds `SetupWindow::suspend`, close that window before setup
+hides or its page freezes. Retain the sign-in profile cleanup rules. This is
+required when the handoff source merges with the integrated sign-in source.

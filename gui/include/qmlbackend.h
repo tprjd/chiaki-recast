@@ -5,6 +5,7 @@
 #include "qmlmainwindow.h"
 #include "qmlcontroller.h"
 #include "qmlsettings.h"
+#include "psnrequests.h"
 
 #include <QObject>
 #include <QMutex>
@@ -18,6 +19,7 @@
 #include <QPointer>
 #ifdef CHIAKI_HAVE_WEBENGINE
 #include <QQuickWebEngineProfile>
+#include <QWebEngineProfile>
 #include <QWebEngineUrlRequestInterceptor>
 #endif
 
@@ -118,7 +120,7 @@ public:
         ConnectFailedConsoleUnreachable,
     };
     Q_ENUM(PsnConnectState);
-    explicit QmlBackend(Settings *settings, QObject *parent = nullptr);
+    explicit QmlBackend(Settings *settings, QObject *parent = nullptr, PsnRequests requests = {});
     ~QmlBackend();
 
     QmlMainWindow *qmlWindow() const;
@@ -210,14 +212,12 @@ public:
     Q_INVOKABLE bool dismissSessionPin(const QString &request_id);
     Q_INVOKABLE QUrl psnLoginUrl() const;
     Q_INVOKABLE bool checkPsnRedirectURL(const QUrl &url) const;
-    Q_INVOKABLE bool handlePsnLoginRedirect(const QUrl &url);
     QVariantMap psnAuthAttempt() const { return psn_auth_attempt; }
     Q_INVOKABLE QString startPsnAuth(const QUrl &url);
     Q_INVOKABLE void stopAutoConnect();
     Q_INVOKABLE bool setConsolePin(int index, QString console_pin);
     Q_INVOKABLE QString openPsnLink();
     Q_INVOKABLE QString openPlaceboOptionsLink();
-    Q_INVOKABLE void initPsnAuth(const QUrl &url, const QJSValue &callback);
     Q_INVOKABLE void psnCancel(bool stop_thread);
     Q_INVOKABLE void refreshPsnToken();
     Q_INVOKABLE void beginControllerMapping(bool reset_mapping);
@@ -234,6 +234,7 @@ public:
 #endif
 #ifdef CHIAKI_HAVE_WEBENGINE
     Q_INVOKABLE void setWebEngineHints(QQuickWebEngineProfile *profile);
+    void setWebEngineHints(QWebEngineProfile *profile);
     Q_INVOKABLE void clearCookies(QQuickWebEngineProfile *profile);
 #endif
 
@@ -270,8 +271,6 @@ signals:
     void sessionPinDialogRequested(bool incorrect);
     void sessionStopDialogRequested();
     void registDialogRequested(const QString &host, bool ps5, const QString &duid, const QVariantMap &context);
-    void psnLoginAccountIdDone(const QString &accountId);
-    void psnLoginAccountIdError(const QString &error);
 
 private:
     struct DisplayServer {
@@ -370,6 +369,7 @@ private:
     bool controller_mapping_altered = false;
     bool updating_psn_hosts = false;
     bool psn_hosts_refresh_pending = false;
+    PsnRequests psn_requests;
     QFutureWatcher<void> psn_hosts_watcher;
     QFuture<void> psn_hosts_future;
     bool disable_zero_copy = false;
@@ -398,7 +398,4 @@ private:
     bool wakeup_start = false;
     QMap<QString, PsnHost> psn_hosts = {};
     QMap<QString, PsnHost> psn_nickname_hosts = {};
-#ifdef CHIAKI_HAVE_WEBENGINE
-    SecUaRequestInterceptor * request_interceptor = {};
-#endif
 };
