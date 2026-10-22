@@ -250,6 +250,7 @@ void SetupBridge::refresh()
         for (const auto &field : {"app", "titleId"}) console.insert(field, host.value(field).toString());
         QStringList actions;
         if (host.value("registered").toBool()) actions.append("pin");
+        if (host.value("discovered").toBool() && !host.value("registered").toBool() && !host.value("duid").toString().isEmpty()) actions.append("autoRegister");
         if (host.value("manual").toBool()) actions.append("deleteManual");
         if (host.value("discovered").toBool() && !host.value("registered").toBool() && !host.value("manual").toBool()) actions.append("hide");
         console.insert("actions", actions);
@@ -391,6 +392,9 @@ void SetupBridge::refresh()
         QT_TR_NOOP("Use the same PlayStation account as your console. The Sony sign-in page and your external browser can show account details."),
         QT_TR_NOOP("Refresh remote consoles"), QT_TR_NOOP("Refreshing PSN credentials"), QT_TR_NOOP("Finding remote consoles"),
         QT_TR_NOOP("Connecting through PSN"), QT_TR_NOOP("Connection cancelled"), QT_TR_NOOP("Waiting for connection cleanup"),
+        QT_TR_NOOP("Automatic registration"), QT_TR_NOOP("Registering through PSN"), QT_TR_NOOP("Console registered"),
+        QT_TR_NOOP("Waiting for internet"), QT_TR_NOOP("Starting PSN connection"), QT_TR_NOOP("Registering console"),
+        QT_TR_NOOP("Automatic registration requires your main PS4 console registered to your PSN account."),
         QT_TR_NOOP("Could not start Remote Play"), QT_TR_NOOP("Cancel"), QT_TR_NOOP("Back to consoles")};
     const char *managementTexts[] = {
         QT_TR_NOOP("Add console"),
@@ -696,9 +700,10 @@ void SetupBridge::refresh()
     }
     const auto nativeAttempt = backend->connectionAttempt();
     QVariantMap connection;
-    if (nativeAttempt.value("route") == "psn" && !backend->qmlWindow() && nativeAttempt.value("presented").toBool()) {
-        for (const auto &field : {"id", "phase", "cancelable", "cleanupPending", "targetValid"})
+    if (nativeAttempt.value("route") == "psn" && (!backend->qmlWindow() || nativeAttempt.value("registrationOnly").toBool()) && nativeAttempt.value("presented").toBool()) {
+        for (const auto &field : {"id", "phase", "cancelable", "cleanupPending", "targetValid", "registrationOnly"})
             connection.insert(field, nativeAttempt.value(field));
+        if (nativeAttempt.value("registrationOnly").toBool() && backend->qmlWindow()) connection["cleanupPending"] = true;
         connection.insert("errorTitle", privateMode ? tr("Could not start Remote Play") : nativeAttempt.value("errorTitle"));
         connection.insert("errorText", privateMode ? QString() : nativeAttempt.value("errorText"));
     }
@@ -723,7 +728,7 @@ void SetupBridge::refresh()
         {"logDirectory", privateMode ? tr("Log directory hidden") : backend->qmlSettings()->logDirectory()}};
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
         {"profiles", profileState}, {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
-        {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
+        {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->registrationBusy() || backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
             || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
     if (!suspended) emit stateChanged(state);
 }
@@ -882,9 +887,21 @@ QVariantMap SetupBridge::connectConsole(const QString &key)
     return {{"accepted", true}};
 }
 
+QVariantMap SetupBridge::autoRegisterConsole(const QString &key, const QString &profile)
+{
+    int index;
+    QString nickname;
+    if (!currentProfile(profile) || state.value("connectionBusy").toBool() || !resolveConsole(key, index, nickname))
+        return {{"accepted", false}, {"message", tr("Console unavailable")}};
+    selectedKey = key;
+    const bool accepted = backend->autoRegisterHost(index);
+    return {{"accepted", accepted}, {"message", accepted ? QString() : tr("Automatic registration is unavailable for this console.")}};
+}
+
 QVariantMap SetupBridge::openRegistration(const QString &key, const QString &profile)
 {
     if (!currentProfile(profile)) return {{"accepted", false}, {"message", tr("The profile changed. Open registration again.")}};
+    if (state.value("connectionBusy").toBool() && !backend->registrationBusy()) return {{"accepted", false}, {"message", tr("A connection is already active")}};
     if (backend->registrationBusy()) {
         if (registrationContextId.isEmpty() || registrationContext.value("profileGeneration").toULongLong() != backend->profileGeneration())
             return {{"accepted", false}, {"message", tr("Wait for the current registration to finish before starting another request.")}};

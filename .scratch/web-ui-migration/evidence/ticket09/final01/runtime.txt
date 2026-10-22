@@ -1,0 +1,44 @@
+[36080:36776:1022/181124.566:ERROR:gpu_channel_manager.cc(956)] Failed to create GLES3 context, fallback to GLES2.
+[36080:36776:1022/181124.566:ERROR:gpu_channel_manager.cc(967)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-11-24-889889.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Updated PSN hosts
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-11-25-610610.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-11-26-932932.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-11-26-932932.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Updated PSN hosts
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-11-28-453453.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Canceling establishing connection over PSN
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-11-29-233233.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Canceling establishing connection over PSN
+[38;5;31m[E] [0mCurrent Profile:  "<redacted-uuid>-next"
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-11-30-339339.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-11-31-323323.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Updated PSN hosts
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-11-32-318318.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-11-33-298298.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_18-12-12-285285.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Updated PSN hosts
+[I] Regist waiting for response
+[I] Regist waiting for response

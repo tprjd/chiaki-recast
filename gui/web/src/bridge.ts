@@ -11,7 +11,7 @@ export interface State {
   connectionBusy: boolean;
   registration: Registration;
   accountLookup: { route?: string; id?: string; phase?: string; message?: string };
-  connection: { id?: string; phase?: string; cancelable?: boolean; cleanupPending?: boolean; targetValid?: boolean; errorTitle?: string; errorText?: string };
+  connection: { id?: string; phase?: string; cancelable?: boolean; cleanupPending?: boolean; targetValid?: boolean; registrationOnly?: boolean; errorTitle?: string; errorText?: string };
   streamError?: { id: string; title: string; text: string };
   mediaSettings: Record<string, boolean | number | string>;
   mediaChoices: Record<string, { label: string; value: string }[]>;
@@ -56,6 +56,7 @@ interface NativeBridge {
   setDiscoveryEnabled(value: boolean, callback: (reply: Reply) => void): void;
   selectConsole(key: string, callback: (reply: Reply) => void): void;
   connectConsole(key: string, callback: (reply: Reply) => void): void;
+  autoRegisterConsole(key: string, profile: string, callback: (reply: Reply) => void): void;
   refreshPsnConsoles(profile: string, callback: (reply: Reply) => void): void;
   cancelConnection(attempt: string, callback: (reply: Reply) => void): void;
   retryConnection(attempt: string, callback: (reply: Reply) => void): void;
@@ -100,6 +101,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
   discovery(enabled: boolean): Promise<Reply>;
   select(key: string): Promise<Reply>;
   connect(key: string): Promise<Reply>;
+  autoRegister(key: string, profile: string): Promise<Reply>;
   refreshPsnConsoles(profile: string): Promise<Reply>;
   cancelConnection(attempt: string): Promise<Reply>;
   retryConnection(attempt: string): Promise<Reply>;
@@ -167,6 +169,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
         discovery: value => new Promise(done => setup.setDiscoveryEnabled(value, done)),
         select: key => new Promise(done => setup.selectConsole(key, done)),
         connect: key => new Promise(done => setup.connectConsole(key, done)),
+        autoRegister: (key, profile) => new Promise(done => setup.autoRegisterConsole(key, profile, done)),
         refreshPsnConsoles: profile => new Promise(done => setup.refreshPsnConsoles(profile, done)),
         cancelConnection: attempt => new Promise(done => setup.cancelConnection(attempt, done)),
         retryConnection: attempt => new Promise(done => setup.retryConnection(attempt, done)),

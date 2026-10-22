@@ -1059,6 +1059,270 @@ private slots:
         QCOMPARE(starts.load(), 0);
     }
 
+    void automaticRegistration_data()
+    {
+        QTest::addColumn<QString>("outcome");
+        for (const auto &outcome : {"success", "retry", "cancel", "profile", "removed", "duid", "mac", "ps4", "context", "concurrent"})
+            QTest::newRow(outcome) << QString(outcome);
+    }
+
+    void automaticRegistration()
+    {
+        QFETCH(QString, outcome);
+        const bool ps5 = outcome != "ps4";
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetHardwareDecoder({});
+        settings.SetRenderBackend(RenderBackend::OpenGL);
+        settings.SetPlaceboPreset(PlaceboPreset::Fast);
+        settings.SetWindowType(WindowType::AdjustableResolution);
+        const QRect geometry(70, 90, 1100, 720);
+        settings.SetStreamGeometry(geometry);
+        settings.SetPsnAuthToken("registration-access-secret");
+        settings.SetPsnRefreshToken("registration-refresh-secret");
+        settings.SetPsnAccountId("AQAAAAAAAAA=");
+        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(3600).toString(settings.GetTimeFormat()));
+        QList<QPointer<PsnReply>> requests;
+        std::atomic<int> connects = 0, starts = 0, producers = 0;
+        std::atomic<int> deviceUid = 0x12;
+        std::atomic<ChiakiErrorCode> workerResult = outcome == "retry" ? CHIAKI_ERR_HOST_UNREACH : CHIAKI_ERR_SUCCESS;
+        QSemaphore worker, completion;
+        struct Producer {
+            ChiakiSession *session = nullptr;
+            QSemaphore *completion;
+            std::atomic<int> *count;
+            ChiakiRegisteredHost host = {};
+            static void *run(void *opaque) {
+                auto *self = static_cast<Producer *>(opaque);
+                self->completion->acquire();
+                ChiakiEvent event = {};
+                event.type = CHIAKI_EVENT_REGIST;
+                event.host = self->host;
+                self->session->event_cb(&event, self->session->event_cb_user);
+                self->session->event_cb(&event, self->session->event_cb_user);
+                event = {};
+                event.type = CHIAKI_EVENT_QUIT;
+                event.quit.reason = CHIAKI_QUIT_REASON_STOPPED;
+                self->session->event_cb(&event, self->session->event_cb_user);
+                ++*self->count;
+                return nullptr;
+            }
+        } producer{nullptr, &completion, &producers};
+        producer.host.target = CHIAKI_TARGET_PS5_1;
+        if (!ps5) producer.host.target = CHIAKI_TARGET_PS4_10;
+        memcpy(producer.host.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(producer.host.server_nickname, "Office");
+        if (outcome == "mac") producer.host.server_mac[5] = 0x66;
+        if (!ps5) strcpy(producer.host.server_nickname, "Other PS4");
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [&](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
+            *count = 1;
+            strcpy((*devices)[0].device_name, ps5 ? "Office" : "Other PS5");
+            memset((*devices)[0].device_uid, deviceUid.load(), sizeof((*devices)[0].device_uid));
+            (*devices)[0].remoteplay_enabled = true;
+            return CHIAKI_ERR_SUCCESS;
+        };
+        transport.connect = [&](StreamSession *, const QString &duid, bool requestedPs5) {
+            const auto expected = ps5 ? QStringLiteral("1212121212121212121212121212121212121212121212121212121212121212")
+                : QStringLiteral("4141414141414141414141414141414141414141414141414141414141414141");
+            if (duid != expected || requestedPs5 != ps5) return CHIAKI_ERR_INVALID_DATA;
+            ++connects;
+            worker.acquire();
+            return workerResult.load();
+        };
+        transport.startSession = [&](ChiakiSession *session) {
+            ++starts;
+            if (!session->auto_regist) return CHIAKI_ERR_CANCELED;
+            producer.session = session;
+            return chiaki_thread_create(&session->session_thread, Producer::run, &producer);
+        };
+        RegistrationTransport manual;
+        QmlNativeServices services(&settings, transport, {}, manual.boundary(), controlledDiscovery());
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        ApplicationController controller(&services);
+        const auto unblock = qScopeGuard([&] { worker.release(100); completion.release(100); });
+        auto *setup = controller.setupWindow();
+        setup->resize(1200, 800);
+        setup->show();
+        DiscoveryHost host = {};
+        host.ps5 = ps5;
+        host.target = ps5 ? CHIAKI_TARGET_PS5_1 : CHIAKI_TARGET_PS4_10;
+        host.host_name = "Office";
+        host.host_id = "001122334455";
+        host.host_addr = "192.0.2.10";
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        discover(backend, {host});
+        QTRY_COMPARE(script(setup->view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-automatic-register]')?.disabled === false").toBool());
+        const auto initialKey = setup->bridge()->snapshot().value("selectedKey").toString();
+        const auto initialProfile = setup->bridge()->snapshot().value("profileGeneration").toString();
+        QString manualContext;
+        if (outcome == "concurrent")
+            manualContext = setupRequest(setup->view(), "openRegistration", {initialKey, initialProfile}).value("context").toString();
+        if (outcome == "context") {
+            script(setup->view(), "document.querySelector('[data-register-selected]').click()");
+            QTRY_COMPARE(script(setup->view(), "document.querySelector('[data-registration-address]')?.value").toString(), QStringLiteral("192.0.2.10"));
+            QVERIFY(fill(setup->view(), "[data-registration-account]", "AQAAAAAAAAA="));
+            QVERIFY(fill(setup->view(), "[data-registration-pin]", "00123456"));
+            host.host_addr = "192.0.2.99";
+            discover(backend, {host});
+            QTRY_COMPARE(backend->hosts().first().toMap().value("address").toString(), QStringLiteral("192.0.2.99"));
+            script(setup->view(), "document.querySelector('[data-registration-submit]').click()");
+            QTRY_VERIFY(script(setup->view(), "document.querySelector('.pairing').textContent.includes('The console or profile can have changed.')").toBool());
+            QCOMPARE(manual.requests.size(), 0);
+            script(setup->view(), "document.querySelector('[data-registration-close]').click()");
+            host.host_addr = "192.0.2.10";
+            discover(backend, {host, host});
+            QTRY_COMPARE(script(setup->view(), "document.querySelectorAll('.console-card:disabled').length").toInt(), 2);
+            QVERIFY(!setupRequest(setup->view(), "openRegistration", {initialKey, initialProfile}).value("accepted").toBool());
+            QVERIFY(!setupRequest(setup->view(), "autoRegisterConsole", {initialKey, initialProfile}).value("accepted").toBool());
+            discover(backend, {host});
+            QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-register-selected]') !== null").toBool());
+            script(setup->view(), "document.querySelector('[data-register-selected]').click()");
+            QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-registration-form]') !== null").toBool());
+            QVERIFY(fill(setup->view(), "[data-registration-account]", "AQAAAAAAAAA="));
+            QVERIFY(fill(setup->view(), "[data-registration-pin]", "00123456"));
+            script(setup->view(), "document.querySelector('[data-registration-submit]').click()");
+            QTRY_COMPARE(manual.requests.size(), 1);
+            const auto request = manual.requests.first();
+            ChiakiRegistEvent event{CHIAKI_REGIST_EVENT_TYPE_FINISHED_SUCCESS, &producer.host};
+            request.callback(&event, request.user);
+            QTRY_COMPARE(settings.GetRegisteredHosts().size(), 1);
+            QTRY_VERIFY(script(setup->view(), "document.querySelector('.pairing').textContent.includes('Console registered')").toBool());
+            discover(backend, {});
+            backend->refreshPsnToken();
+            QTRY_VERIFY(!setup->bridge()->snapshot().value("consoles").toList().isEmpty());
+            QTRY_COMPARE(setup->bridge()->snapshot().value("consoles").toList().first().toMap().value("route").toString(), QStringLiteral("psn"));
+            const auto remoteKey = setup->bridge()->snapshot().value("selectedKey").toString();
+            QVERIFY(!setupRequest(setup->view(), "openRegistration", {remoteKey, initialProfile}).value("accepted").toBool());
+            QVERIFY(!setupRequest(setup->view(), "autoRegisterConsole", {remoteKey, initialProfile}).value("accepted").toBool());
+            backend->qmlSettings()->setCurrentProfile(profile + "-next");
+            QVERIFY(!setupRequest(setup->view(), "openRegistration", {remoteKey, initialProfile}).value("accepted").toBool());
+            QVERIFY(!setupRequest(setup->view(), "autoRegisterConsole", {remoteKey, initialProfile}).value("accepted").toBool());
+            QVERIFY(!backend->qmlSession() && !backend->qmlWindow());
+            QCOMPARE(connects.load(), 0);
+            QCOMPARE(starts.load(), 0);
+            return;
+        }
+        QSignalSpy saved(&settings, &Settings::RegisteredHostsUpdated);
+        script(setup->view(), "document.querySelector('[data-automatic-register]').click();document.querySelector('[data-automatic-register]').click()");
+        QTRY_COMPARE(connects.load(), 1);
+        QPointer<QmlMainWindow> native = backend->qmlWindow();
+        QPointer<StreamSession> session = backend->qmlSession();
+        QVERIFY(native && session);
+        QVERIFY(!native->isVisible());
+        QVERIFY(!nativeObject("connectionRoute"));
+        QVERIFY(setup->isVisible());
+        QVERIFY(backend->connectionAttempt().value("registrationOnly").toBool());
+        const auto oldAttempt = backend->connectionAttempt().value("id").toString();
+        const auto key = setup->bridge()->snapshot().value("selectedKey").toString();
+        const auto generation = setup->bridge()->snapshot().value("profileGeneration").toString();
+        QVERIFY(!setup->bridge()->autoRegisterConsole(key, generation).value("accepted").toBool());
+        if (outcome == "concurrent") {
+            QVERIFY(!manualContext.isEmpty());
+            QVERIFY(!setupRequest(setup->view(), "submitRegistration", {manualContext,
+                QJsonObject{{"address", "192.0.2.10"}, {"account", "AQAAAAAAAAA="}, {"pin", "00123456"}, {"consolePin", ""}, {"target", 1000100}}}).value("accepted").toBool());
+            QCOMPARE(manual.requests.size(), 0);
+        }
+        if (outcome == "cancel" || outcome == "profile") {
+            if (outcome == "profile") backend->qmlSettings()->setCurrentProfile(profile + "-next");
+            else script(setup->view(), "document.querySelector('[data-connection-cancel]').click()");
+            QTRY_VERIFY(backend->connectionAttempt().value("phase") == "cancelling" || backend->connectionAttempt().value("phase") == "failure");
+            worker.release();
+            QTRY_VERIFY(!session);
+            QTRY_VERIFY(!native);
+            QCOMPARE(starts.load(), 0);
+            QCOMPARE(saved.size(), 0);
+            QVERIFY(settings.GetRegisteredHosts().isEmpty());
+            QVERIFY(backend->nativeSettings()->GetRegisteredHosts().isEmpty());
+            QVERIFY(setup->isVisible());
+            QCOMPARE(manual.requests.size(), 0);
+            return;
+        }
+        worker.release();
+        if (outcome == "retry") {
+            QTRY_VERIFY(!session);
+            QTRY_VERIFY(!native);
+            QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-connection-retry]')?.disabled === false").toBool());
+            QVERIFY(script(setup->view(), "document.querySelector('[data-psn-connection]').textContent.includes('Console is unreachable')").toBool());
+            workerResult = CHIAKI_ERR_SUCCESS;
+            script(setup->view(), "document.querySelector('[data-connection-retry]').click();document.querySelector('[data-connection-retry]').click()");
+            QTRY_COMPARE(connects.load(), 2);
+            session = backend->qmlSession();
+            native = backend->qmlWindow();
+            QVERIFY(session && native && !native->isVisible());
+            QVERIFY(backend->connectionAttempt().value("id").toString() != oldAttempt);
+            QVERIFY(!setup->bridge()->cancelConnection(oldAttempt).value("accepted").toBool());
+            worker.release();
+        }
+        QTRY_COMPARE(starts.load(), 1);
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-connection-cancel]')?.disabled === true").toBool());
+        QTRY_COMPARE(script(setup->view(), "document.querySelector('[data-registration-phase]')?.textContent").toString(), QStringLiteral("Registering console"));
+        QVERIFY(!setup->bridge()->cancelConnection(backend->connectionAttempt().value("id").toString()).value("accepted").toBool());
+        if (outcome == "removed") {
+            discover(backend, {});
+            QTRY_VERIFY(!backend->connectionAttempt().value("targetValid").toBool());
+        } else if (outcome == "duid") {
+            deviceUid = 0x34;
+            backend->refreshPsnToken();
+            QTRY_COMPARE(backend->hosts().first().toMap().value("duid").toString(), QStringLiteral("3434343434343434343434343434343434343434343434343434343434343434"));
+        }
+        completion.release();
+        QTRY_VERIFY(!session);
+        QTRY_VERIFY(!native);
+        QTRY_COMPARE(producers.load(), 1);
+        if (outcome == "removed" || outcome == "duid" || outcome == "mac" || outcome == "ps4") {
+            QCOMPARE(saved.size(), 0);
+            QVERIFY(settings.GetRegisteredHosts().isEmpty());
+            if (outcome == "ps4")
+                QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-psn-connection]')?.textContent.includes('PS4 Console Not Main')").toBool());
+            QVERIFY(setup->isVisible());
+            QCOMPARE(manual.requests.size(), 0);
+            return;
+        }
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-psn-connection]')?.textContent.includes('Console registered')").toBool());
+        QCOMPARE(settings.GetRegisteredHosts().size(), 1);
+        QCOMPARE(settings.GetRegisteredHosts().first().GetServerNickname(), QStringLiteral("Office"));
+        QCOMPARE(saved.size(), 1);
+        Settings reopened(profile);
+        QCOMPARE(reopened.GetRegisteredHosts().size(), 1);
+        QCOMPARE(settings.GetStreamGeometry(), geometry);
+        QCOMPARE(requests.size(), 0);
+        QVERIFY(!backend->connectionAttempt().value("cleanupPending").toBool());
+        QVERIFY(setup->isVisible());
+        script(setup->view(), "document.querySelector('[data-connection-back]').click()");
+        QTRY_VERIFY(script(setup->view(), "!document.querySelector('[data-psn-connection]')").toBool());
+        QCOMPARE(connects.load(), outcome == "retry" ? 2 : 1);
+        QCOMPARE(starts.load(), 1);
+        QCOMPARE(manual.requests.size(), 0);
+        if (outcome == "success") {
+            QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
+            script(setup->view(), "document.querySelector('.connect-console').click()");
+            QTRY_VERIFY(backend->qmlWindow());
+            QPointer<QmlMainWindow> playback = backend->qmlWindow();
+            QTRY_VERIFY(playback->isVisible());
+            QTRY_COMPARE(starts.load(), 2);
+            QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("failure"));
+            QTRY_VERIFY(!setup->isVisible());
+            QVERIFY(nativeObject("connectionRoute"));
+            playback->dismissStreamView();
+            QTRY_VERIFY(!playback);
+            QTRY_VERIFY(setup->isVisible());
+            QVERIFY(!backend->qmlSession());
+        }
+    }
+
     void psnRemoteRefreshOwnership()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);

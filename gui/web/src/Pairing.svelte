@@ -100,7 +100,7 @@
   }
   async function submit(event: SubmitEvent) {
     event.preventDefault();
-    if (!valid || submitting || current.registration.busy || invalidProfile) return;
+    if (!valid || submitting || current.registration.busy || current.connectionBusy || invalidProfile) return;
     submitting = true; editing = false; message = ''; diagnostics = false;
     const fields = { address, target: Number(target), account: legacy ? onlineId : account, pin, consolePin };
     pin = ''; consolePin = '';
@@ -166,7 +166,7 @@
           {/if}
           <label>{t('Remote Play pairing code')}<input data-registration-pin type="password" inputmode="numeric" bind:value={pin} autocomplete="off" /></label>
           <label>{t('Console login PIN, optional')}<input data-registration-console-pin type="password" inputmode="numeric" bind:value={consolePin} autocomplete="off" /></label>
-          <button data-registration-submit type="submit" disabled={!valid || submitting || current.registration.busy || invalidProfile}>{t('Register console')}</button>
+          <button data-registration-submit type="submit" disabled={!valid || submitting || current.registration.busy || current.connectionBusy || invalidProfile}>{t('Register console')}</button>
         </form>
         <aside>
           <h3>{t('Get your pairing code')}</h3>

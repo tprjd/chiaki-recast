@@ -1,0 +1,25 @@
+
+Algorithm : SHA256
+Hash      : 6D1270C53950768D2EFFA4BE1F7FD7CE936725BDA877A2D119A4893849B99111
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket09-build\gui\chiaki.exe
+
+Algorithm : SHA256
+Hash      : 5DC0B58AE94EAA0B6B2F8130124F070B7E1A9B53F5700DD1EAD634109886C035
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket09-build\gui\tests\chiaki-embedded-setup-tests.exe
+
+Algorithm : SHA256
+Hash      : 85E5E3C9DBF87114E31BC07A446D17F29489E8E23D56DC8208DB8A63BE098E0B
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket09-build\gui\web\app.js
+
+Algorithm : SHA256
+Hash      : 0FF905CD7DDBF2181823D32C26192B07363D4F5526F7A93C416CE0E1F193EF03
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket09-build\gui\web\app.css
+
+Algorithm : SHA256
+Hash      : 83231C8155E6809612B2B808259E4AEC880059A7D985710E3ED6AAE40F07BF0C
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket09-build\gui\web\index.html
+
+Algorithm : SHA256
+Hash      : 59E9BBE871EA16981EA1FD5BEB0913760E66D684DE0E3DE8C15F2FED0A6B31E6
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-09\chiaki-ng-ui\gui\web\package-lock.json
+

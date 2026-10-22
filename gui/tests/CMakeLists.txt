@@ -60,6 +60,8 @@ if(TARGET chiaki-gui)
     add_test(NAME chiaki-embedded-profiles COMMAND chiaki-embedded-setup-tests profileImportValidation profileSettingsPage profileFiles)
     set_tests_properties(chiaki-embedded-profiles PROPERTIES
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-embedded-automatic-registration COMMAND chiaki-embedded-setup-tests automaticRegistration)
+    set_tests_properties(chiaki-embedded-automatic-registration PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-settings COMMAND chiaki-embedded-setup-tests generalSettings settingsValidation settingsRestart)
     set_tests_properties(chiaki-embedded-settings PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-video-audio COMMAND chiaki-embedded-setup-tests videoAudioSettings videoAudioState videoAudioRestart videoAudioDevices)

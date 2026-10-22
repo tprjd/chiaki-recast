@@ -918,6 +918,9 @@ int QmlBackend::resolveConnectionTarget() const
         const auto host = listed.at(i).toMap();
         if (!host.value("display").toBool()
                 || (!connection_attempt.value("registrationOnly").toBool() && !host.value("registered").toBool())
+                || (connection_attempt.value("registrationOnly").toBool()
+                    && (host.value("duid").toString() != session_info.duid
+                        || host.value("ps5").toBool() != chiaki_target_is_ps5(session_info.target)))
                 || connectionTargetKey(host) != connection_target)
             continue;
         if (found != -1)
@@ -1096,7 +1099,8 @@ void QmlBackend::failConnection(const QString &title, const QString &text)
 
 bool QmlBackend::retryConnection(const QString &attempt_id)
 {
-    if (attempt_id != connection_attempt.value("id").toString() || connection_dismissed || session
+    if (attempt_id != connection_attempt.value("id").toString() || connection_dismissed || session || registration_active
+            || (connection_attempt.value("registrationOnly").toBool() && window)
             || connection_attempt.value("cleanupPending").toBool() || connection_attempt.value("phase") != "failure"
             || !connectionTargetValid())
         return false;
@@ -1217,16 +1221,12 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
         failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
         return;
     }
-    if (!window && !connect_info.auto_regist)
+    if (!window)
         emit streamWindowRequested();
-    if ((!window || !window->initializationError().isEmpty()) && !connect_info.auto_regist) {
+    if (!window || !window->initializationError().isEmpty()) {
         failConnection(tr("Stream window is unavailable"), window ? window->initializationError()
             : tr("Prepare the native stream window before connecting."));
         return;
-    }
-    if (!window) {
-        session_info.hw_decoder.clear();
-        session_info.hw_device_ctx = nullptr;
     }
     connection_attempt["cleanupPending"] = true;
     psn_session_started = false;
@@ -1599,13 +1599,13 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
     }
     else
     {
-        setDiscoveryEnabled(false);
+        if (!connect_info.auto_regist) setDiscoveryEnabled(false);
         emit showPsnView();
         setConnectState(PsnConnectState::InitiatingConnection);
         psn_worker_pending = true;
         emit psnConnect(session, session_info.duid, chiaki_target_is_ps5(session_info.target), connection_generation);
     }
-    if (window && window->windowState() != Qt::WindowFullScreen)
+    if (window && !connect_info.auto_regist && window->windowState() != Qt::WindowFullScreen)
     {
         if(settings->GetWindowType() == WindowType::CustomResolution)
         {
@@ -1758,7 +1758,7 @@ QVariantMap QmlBackend::createRegistrationContext(int index) const
         {"discovered", false}, {"manualId", -1}, {"manualAddress", QString()}};
     if (index < 0) return context;
     const auto server = displayServerAt(index);
-    if (!server.valid || !server.duid.isEmpty()) return {};
+    if (!server.valid || (!server.discovered && !server.duid.isEmpty())) return {};
     context["address"] = server.GetHostAddr();
     context["ps5"] = server.IsPS5();
     context["discovered"] = server.discovered;
@@ -1797,7 +1797,7 @@ bool QmlBackend::registrationContextCurrent(const QVariantMap &context, const QS
 
 bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QVariantMap &original_context)
 {
-    if (registration_active) return false;
+    if (registration_active || session || window || connection_token || connection_attempt.value("cleanupPending").toBool()) return false;
     QVariantMap context = original_context;
     // An entered address can use an existing manual entry, but must never guess between duplicates.
     if (!context.value("discovered").toBool() && context.value("manualId", -1).toInt() < 0) {
@@ -1900,6 +1900,21 @@ bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const 
     return true;
 }
 
+bool QmlBackend::autoRegisterHost(int index)
+{
+    if (registration_active || session || window || connection_token || connection_attempt.value("cleanupPending").toBool())
+        return false;
+    const auto server = displayServerAt(index);
+    if (!server.valid || server.registered || !server.discovered || server.duid.isEmpty()) return false;
+    regist_dialog_server = server;
+    regist_dialog_generation = profile_generation;
+    auto context = createRegistrationContext(index);
+    context["automaticRequest"] = QVariant::fromValue(++automatic_registration_request);
+    const auto attempt = connection_generation;
+    autoRegister(context);
+    return connection_generation != attempt;
+}
+
 void QmlBackend::autoRegister(const QVariantMap &context)
 {
     if (regist_dialog_generation != profile_generation || session || connection_token
@@ -1931,9 +1946,19 @@ void QmlBackend::autoRegister(const QVariantMap &context)
 void QmlBackend::finishAutoRegister(const ChiakiRegisteredHost &host)
 {
     if (!session || !connection_attempt.value("registrationOnly").toBool()
-            || connection_attempt.value("phase") == "registered" || connection_attempt.value("phase") == "failure"
-            || !connectionTargetValid())
+            || connection_attempt.value("phase") == "registered" || connection_attempt.value("phase") == "failure")
         return;
+    if (!connectionTargetValid()) {
+        failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
+        session->Stop();
+        return;
+    }
+    if (RegisteredHost(host).GetServerMAC() != regist_dialog_server.discovery_host.GetHostMAC()
+            || chiaki_target_is_ps5(host.target) != regist_dialog_server.discovery_host.ps5) {
+        failConnection(tr("Registration failed"), tr("The registration result does not match the selected console."));
+        session->Stop();
+        return;
+    }
     QString nickname(host.server_nickname);
     if(!regist_dialog_server.discovery_host.ps5 && regist_dialog_server.discovery_host.host_name != nickname)
     {
@@ -1996,28 +2021,13 @@ void QmlBackend::setWebEngineHints(QWebEngineProfile *profile) { applyWebEngineH
 
 void QmlBackend::connectToHost(int index, QString nickname)
 {
-    if (session || connection_token || connection_attempt.value("cleanupPending").toBool())
+    if (registration_active || session || connection_token || connection_attempt.value("cleanupPending").toBool())
         return;
     if (window)
         window->setWindowAdjustable(false);
     auto server = displayServerAt(index);
-    if (!server.valid)
+    if (!server.valid || !server.registered)
         return;
-
-    if (!server.registered) {
-        regist_dialog_server = server;
-        regist_dialog_generation = profile_generation;
-        auto context = createRegistrationContext();
-        context["automaticRequest"] = QVariant::fromValue(++automatic_registration_request);
-        context["discovered"] = server.discovered;
-        if(!server.discovered)
-        {
-            context["manualId"] = server.manual_host.GetID();
-            context["manualAddress"] = server.manual_host.GetHost();
-        }
-        emit registDialogRequested(server.GetHostAddr(), server.IsPS5(), server.duid, context);
-        return;
-    }
 
     const auto listed = hosts();
     if (index < 0 || index >= listed.size() || !listed.at(index).toMap().value("display").toBool())
