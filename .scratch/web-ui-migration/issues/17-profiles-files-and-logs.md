@@ -4,7 +4,7 @@
 
 **Blocked by:** 11: Open settings and change general session options.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 4, 46, 48, 50, 51, 52, 53, 54, 55, 60.
 
@@ -17,3 +17,7 @@
 - [ ] Log directory and supported file or help actions retain their native behavior and streamer mode masking.
 - [ ] Embedded tests verify native stores across profile changes, restarts, import and export outcomes, cancellation, and pending operations from an old profile.
 - [ ] Remove setup-only routes, resources, callback adapters, and tests replaced by this slice once no caller needs them. Preserve shared native stream components and their tests.
+
+## Comments
+
+- Claimed after the settings shell. Prepare native profile/file actions and repair the common general settings import/export failure boundary. Validate before replacing stores and preserve data on failure. Use the current 1024 CSS pixel design scope.
