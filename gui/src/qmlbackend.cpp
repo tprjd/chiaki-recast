@@ -218,6 +218,7 @@ QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests
         }
         emit connectionAttemptChanged();
     });
+    connect(this, &QmlBackend::hiddenHostsChanged, this, &QmlBackend::hostsChanged);
     connect(&discovery_manager, &DiscoveryManager::HostsUpdated, this, &QmlBackend::updateDiscoveryHosts);
     discovery_manager.SetSettings(settings);
     setDiscoveryEnabled(true);
@@ -929,6 +930,9 @@ int QmlBackend::resolveConnectionTarget() const
 bool QmlBackend::connectionTargetValid() const
 {
     if (connection_profile_generation != profile_generation)
+        return false;
+    const auto mac = QByteArray::fromHex(connection_target.value("mac").toString().toLatin1());
+    if (mac.size() == 6 && settings->GetHiddenHostHidden(HostMAC(reinterpret_cast<const uint8_t *>(mac.constData()))))
         return false;
     if (connection_target.value("kind") == "auto") {
         for (const auto &host : settings->GetRegisteredHosts())
