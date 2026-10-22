@@ -1,0 +1,4 @@
+source=b44a13e6
+executable_sha256=610A1A5AE8D5BC367DDB3A70E7FDE1CE823542DBDC6FBAF4C65E2DAFECF3C701
+Qt=6.9.3 MSVC clang-cl19.1.7 QPA=offscreen Chromium=--disable-gpu
+New unbuilt guard test edits are excluded.

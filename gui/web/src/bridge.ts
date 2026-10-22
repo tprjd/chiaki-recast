@@ -1,9 +1,12 @@
 export interface Console {
   key: string; name: string; available: boolean; registered: boolean;
+  address: string; identifier: string; app: string; titleId: string; actions: string[];
   state: string; route: 'local' | 'manual' | 'psn'; ps5?: boolean;
 }
 export interface State {
   revision: string; profileGeneration: string; consoles: Console[];
+  registrations: { key: string; name: string; ps5: boolean; identifier: string }[];
+  hiddenConsoles: { key: string; name: string; identifier: string }[];
   selectedKey: string; discoveryEnabled: boolean; streamerMode: boolean;
   connectionBusy: boolean;
   registration: Registration;
@@ -12,13 +15,18 @@ export interface State {
   mediaSettings: Record<string, boolean | number | string>;
   mediaChoices: Record<string, { label: string; value: string }[]>;
   generalSettings: Record<string, boolean | number>;
+  keyboardMouse: {
+    supported: boolean; windowGeneration: string; values: Record<string, boolean | number>; limits: Record<string, number>;
+    bindings: { action: number; name: string; group: number; primaryName: string; alternativeName: string }[];
+    keys: { buttonName: string; buttonValue: number; keyName: string }[];
+  };
   rendererSettings: Record<string, boolean | number>;
   rendererStatus: { restartRequired: boolean; runtimeBackend?: number };
   capabilities: { discovery: boolean }; strings: Record<string, string>;
   psn: { status: 'signedOut' | 'ready' | 'expired'; id?: string; phase?: string; message?: string; profileValid?: boolean };
 }
 export interface Registration { busy: boolean; savedAccount: boolean; context?: string; id?: string; phase?: string; message?: string; diagnostics?: string; profileValid?: boolean; connectKey?: string }
-interface Reply { accepted: boolean; message?: string; context?: string; address?: string; ps5?: boolean; id?: string; route?: string; accountId?: string }
+interface Reply { accepted: boolean; message?: string; context?: string; address?: string; ps5?: boolean; id?: string; route?: string; accountId?: string; form?: string }
 interface NativeBridge {
   beginRegistrationAccount(context: string, source: string, callback: (reply: Reply) => void): void;
   lookupRegistrationAccount(context: string, route: string, username: string, callback: (reply: Reply) => void): void;
@@ -33,6 +41,8 @@ interface NativeBridge {
   setDiscoveryEnabled(value: boolean, callback: (reply: Reply) => void): void;
   selectConsole(key: string, callback: (reply: Reply) => void): void;
   connectConsole(key: string, callback: (reply: Reply) => void): void;
+  saveManualAddress(address: string, registrationKey: string, profile: string, callback: (reply: Reply) => void): void;
+  manageConsole(action: string, key: string, pin: string, callback: (reply: Reply) => void): void;
   dismissStreamError(id: string, callback: (reply: Reply) => void): void;
   openPsnSignIn(profile: string, callback: (reply: Reply) => void): void;
   openPsnExternal(profile: string, callback: (reply: Reply) => void): void;
@@ -41,6 +51,12 @@ interface NativeBridge {
   setGeneralSetting(name: string, value: boolean | number, profileGeneration: string, callback: (reply: Reply) => void): void;
   setMediaSetting(name: string, value: boolean | number | string, profileGeneration: string, callback: (reply: Reply) => void): void;
   refreshAudioDevices(callback: (reply: Reply) => void): void;
+  beginKeyboardMouse(profile: string, callback: (reply: Reply) => void): void;
+  endKeyboardMouse(form: string, callback: (reply: Reply) => void): void;
+  setKeyboardMouseSetting(name: string, value: boolean | number, form: string, profile: string, callback: (reply: Reply) => void): void;
+  captureKeyboardMouse(action: number, slot: number, legacy: boolean, form: string, profile: string, callback: (reply: Reply) => void): void;
+  resetKeyboardMouse(form: string, profile: string, callback: (reply: Reply) => void): void;
+  resetKeyboardKeys(form: string, profile: string, callback: (reply: Reply) => void): void;
   stateChanged: { connect(callback: (state: State) => void): void; disconnect(callback: (state: State) => void): void };
 }
 declare global {
@@ -61,6 +77,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
   discovery(enabled: boolean): Promise<Reply>;
   select(key: string): Promise<Reply>;
   connect(key: string): Promise<Reply>;
+  saveManual(address: string, registrationKey: string, profile: string): Promise<Reply>;
+  manage(action: string, key: string, pin?: string): Promise<Reply>;
   dismissStreamError(id: string): Promise<Reply>;
   psnEmbedded(profile: string): Promise<Reply>;
   psnExternal(profile: string): Promise<Reply>;
@@ -69,6 +87,12 @@ export function connectSetup(receive: (state: State) => void): Promise<{
   generalSetting(name: string, value: boolean | number, profileGeneration: string): Promise<Reply>;
   mediaSetting(name: string, value: boolean | number | string, profileGeneration: string): Promise<Reply>;
   refreshAudioDevices(): Promise<Reply>;
+  beginKeyboardMouse(profile: string): Promise<Reply>;
+  endKeyboardMouse(form: string): Promise<Reply>;
+  keyboardMouseSetting(name: string, value: boolean | number, form: string, profile: string): Promise<Reply>;
+  captureKeyboardMouse(action: number, slot: number, legacy: boolean, form: string, profile: string): Promise<Reply>;
+  resetKeyboardMouse(form: string, profile: string): Promise<Reply>;
+  resetKeyboardKeys(form: string, profile: string): Promise<Reply>;
   rendererSetting(name: string, value: boolean | number | string, profileGeneration: string): Promise<Reply>;
   rendererAction(action: string, profileGeneration: string): Promise<Reply>;
   dispose(): void;
@@ -114,6 +138,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
         discovery: value => new Promise(done => setup.setDiscoveryEnabled(value, done)),
         select: key => new Promise(done => setup.selectConsole(key, done)),
         connect: key => new Promise(done => setup.connectConsole(key, done)),
+        saveManual: (address, registrationKey, profile) => new Promise(done => setup.saveManualAddress(address, registrationKey, profile, done)),
+        manage: (action, key, pin = '') => new Promise(done => setup.manageConsole(action, key, pin, done)),
         dismissStreamError: id => new Promise(done => setup.dismissStreamError(id, done)),
         psnEmbedded: profile => new Promise(done => setup.openPsnSignIn(profile, done)),
         psnExternal: profile => new Promise(done => setup.openPsnExternal(profile, done)),
@@ -122,6 +148,12 @@ export function connectSetup(receive: (state: State) => void): Promise<{
         generalSetting: (name, value, generation) => new Promise(done => setup.setGeneralSetting(name, value, generation, done)),
         mediaSetting: (name, value, generation) => new Promise(done => setup.setMediaSetting(name, value, generation, done)),
         refreshAudioDevices: () => new Promise(done => setup.refreshAudioDevices(done)),
+        beginKeyboardMouse: profile => new Promise(done => setup.beginKeyboardMouse(profile, done)),
+        endKeyboardMouse: form => new Promise(done => setup.endKeyboardMouse(form, done)),
+        keyboardMouseSetting: (name, value, form, profile) => new Promise(done => setup.setKeyboardMouseSetting(name, value, form, profile, done)),
+        captureKeyboardMouse: (action, slot, legacy, form, profile) => new Promise(done => setup.captureKeyboardMouse(action, slot, legacy, form, profile, done)),
+        resetKeyboardMouse: (form, profile) => new Promise(done => setup.resetKeyboardMouse(form, profile, done)),
+        resetKeyboardKeys: (form, profile) => new Promise(done => setup.resetKeyboardKeys(form, profile, done)),
         rendererSetting: (name, value, generation) => new Promise(done => setup.setRendererSetting(name, value, generation, done)),
         rendererAction: (action, generation) => new Promise(done => setup.rendererAction(action, generation, done)),
         dispose() {

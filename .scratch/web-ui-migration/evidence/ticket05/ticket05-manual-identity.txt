@@ -1,0 +1,19 @@
+
+Algorithm : SHA256
+Hash      : 0DF009038D4038D550C066EA219DC28FE1749D5B96AEDFBB71586B74631DCCF0
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket05-build\gui\tests\chiaki-embedded-setup-tests.exe
+
+
+Algorithm : SHA256
+Hash      : E47300EDF75427B32994AFE2821AD15F2B59657D736555CDA26735771218F14C
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-05\chiaki-ng-ui\gui\web\src\ConsoleManagement.svelte
+
+Algorithm : SHA256
+Hash      : 2D107236BF6F57158012709626DFA1C054C2E99981BE28D460F5F2C0A74DB760
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-05\chiaki-ng-ui\gui\web\src\Dialog.svelte
+
+Algorithm : SHA256
+Hash      : 57984CAFF9FF507E5480959FBF1C43EDFD56CD76A764C974FBD95CA319E72AB3
+Path      : C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\ticket05-manual-source.patch
+
+c5c35627f596d751aaba39ef5a1a7b6d81b1f1b7

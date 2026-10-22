@@ -1,0 +1,11 @@
+
+Algorithm : SHA256
+Hash      : 55BBD2D4A3631E41E124A5DCCD6361F702E3D57C83727410A63248E395287621
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket05-build\gui\tests\chiaki-embedded-setup-tests.exe
+
+
+Algorithm : SHA256
+Hash      : 22BC8CC9025185E38457C4ECF4F334F73D4B523EA0BF101145AED86A559C454C
+Path      : C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\ticket05-result-focus-green-source.patch
+
+aa95d91d493488995ddc4945f610b6976b915a4d

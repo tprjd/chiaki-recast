@@ -1,3 +1,8 @@
+#include "keyboardmousebindings.h"
+#include <QKeyEvent>
+#include <QPushButton>
+#include <QLabel>
+#include <QDialog>
 #include <QtTest>
 #include <SDL.h>
 #include <QApplication>
@@ -272,7 +277,12 @@ class EmbeddedSetupTest : public QObject
 
     QVariantMap settingRequest(QWebEngineView *view, const QString &name, const QVariant &value, const QString &generation, const QString &method = "setGeneralSetting")
     {
-        const QString arguments = QString::fromUtf8(QJsonDocument(QJsonArray{name, QJsonValue::fromVariant(value), generation}).toJson(QJsonDocument::Compact));
+        return setupRequest(view, method, QJsonArray{name, QJsonValue::fromVariant(value), generation});
+    }
+
+    QVariantMap setupRequest(QWebEngineView *view, const QString &method, const QJsonArray &args)
+    {
+        const QString arguments = QString::fromUtf8(QJsonDocument(args).toJson(QJsonDocument::Compact));
         // A second real WebChannel client checks rejected public commands, then restores the UI client's receiver.
         script(view, QString(R"(
             window.settingsReply = null;
@@ -291,26 +301,49 @@ class EmbeddedSetupTest : public QObject
         return {};
     }
 
-    bool registrationFill(QWebEngineView *view, const QString &selector, const QString &value)
+    bool click(QWebEngineView *view, const QString &selector)
     {
-        const auto arguments = QString::fromUtf8(QJsonDocument(QJsonArray{selector, value}).toJson(QJsonDocument::Compact));
-        return script(view, "((selector,value)=>{const element=document.querySelector(selector);if(!element)return false;element.value=value;element.dispatchEvent(new Event(element.tagName==='SELECT'?'change':'input',{bubbles:true}));return true;})(..." + arguments + ")").toBool();
+        const auto args = QString::fromUtf8(QJsonDocument(QJsonArray{selector}).toJson(QJsonDocument::Compact));
+        const auto source = QString(R"((() => {
+            const field = document.querySelector(%1[0]);
+            if (!field || field.disabled) return false;
+            field.click(); return true;
+        })())").arg(args);
+        QElapsedTimer timeout;
+        timeout.start();
+        while (timeout.elapsed() < 5000) {
+            if (script(view, source).toBool()) return true;
+            QTest::qWait(10);
+        }
+        return false;
     }
 
-    QVariantMap registrationCommand(QWebEngineView *view, const QString &method, const QJsonArray &arguments)
+    bool fill(QWebEngineView *view, const QString &selector, const QString &value)
+    {
+        const auto args = QString::fromUtf8(QJsonDocument(QJsonArray{selector, value}).toJson(QJsonDocument::Compact));
+        return script(view, QString(R"((() => {
+            const [selector, value] = %1, field = document.querySelector(selector);
+            if (!field) return false;
+            field.value = value;
+            field.dispatchEvent(new Event(field.tagName === 'SELECT' ? 'change' : 'input', {bubbles:true}));
+            return true;
+        })())").arg(args)).toBool();
+    }
+
+    QVariantMap consoleRequest(QWebEngineView *view, const QString &method, const QJsonArray &arguments)
     {
         const auto args = QString::fromUtf8(QJsonDocument(arguments).toJson(QJsonDocument::Compact));
         script(view, QString(R"(
-            window.registrationReply = null;
-            { const transport=window.qt.webChannelTransport, receive=transport.onmessage;
+            window.consoleReply = null;
+            { const transport = window.qt.webChannelTransport, receive = transport.onmessage;
               new QWebChannel(transport, channel => channel.objects.setup.%1(...%2, reply => {
-                window.registrationReply=reply; transport.onmessage=receive;
+                window.consoleReply = reply; transport.onmessage = receive;
               })); }
         )").arg(method, args));
         QElapsedTimer timeout;
         timeout.start();
         while (timeout.elapsed() < 5000) {
-            const auto reply = script(view, "window.registrationReply").toMap();
+            const auto reply = script(view, "window.consoleReply").toMap();
             if (!reply.isEmpty()) return reply;
             QTest::qWait(10);
         }
@@ -335,6 +368,441 @@ class EmbeddedSetupTest : public QObject
     }
 
 private slots:
+    void keyboardMouseSettings()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings') !== null").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).some(e => e.textContent === 'Keyboard and mouse')").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#keyboardEnabled')?.disabled === false").toBool());
+#ifndef Q_OS_WIN
+        QVERIFY(script(setup.view(), "!document.querySelector('#mouseCameraEnabled')").toBool());
+        return;
+#endif
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#mouseCameraEnabled')?.disabled === false").toBool());
+        QVERIFY(script(setup.view(), "document.querySelector('#mouseHorizontalSensitivity').disabled").toBool());
+        script(setup.view(), "document.querySelector('#mouseCameraEnabled').click()");
+        QTRY_VERIFY(settings.GetMouseCameraEnabled());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#mouseHorizontalSensitivity')?.disabled === false").toBool());
+        QVERIFY(script(setup.view(), "document.querySelector('#keyboardEnabled').disabled && document.querySelector('#mouseTouchEnabled').disabled").toBool());
+        const auto numeric = [&](const QString &key, const QString &value) {
+            QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled === false").arg(key)).toBool());
+            script(setup.view(), QString("{const e=document.getElementById('%1');e.value='%2';e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));}").arg(key, value));
+        };
+        numeric("mouseHorizontalSensitivity", "2.37");
+        QTRY_COMPARE(settings.GetMouseResponse().horizontalSensitivity, 2.37);
+        numeric("mouseVerticalSensitivity", "0.75");
+        QTRY_COMPARE(settings.GetMouseResponse().verticalSensitivity, 0.75);
+        numeric("mouseDeadZoneCompensation", "20");
+        QTRY_COMPARE(settings.GetMouseResponse().deadZoneCompensation, 0.2);
+        numeric("mouseResponseExponent", "0.55");
+        QTRY_COMPARE(settings.GetMouseResponse().responseExponent, 0.55);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#mouseInvertVertical')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('#mouseInvertVertical').click()");
+        QTRY_VERIFY(settings.GetMouseResponse().invertVertical);
+        QCOMPARE(services.backend()->qmlSettings()->mouseHorizontalSensitivity(), 2.37);
+        QCOMPARE(script(setup.view(), "document.querySelector('#mouseHorizontalSensitivity').min").toString(), QStringLiteral("0.05"));
+        QCOMPARE(script(setup.view(), "document.querySelector('#mouseHorizontalSensitivity').max").toString(), QStringLiteral("8"));
+        QCOMPARE(script(setup.view(), "document.querySelector('#mouseDeadZoneCompensation').max").toString(), QStringLiteral("50"));
+        QCOMPARE(script(setup.view(), "document.querySelector('#mouseResponseExponent').min").toString(), QStringLiteral("0.1"));
+        numeric("mouseHorizontalSensitivity", "9");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-keyboard-mouse] [role=status]').textContent").toString(), QStringLiteral("Choose a valid setting value."));
+        QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 2.37);
+        services.backend()->qmlSettings()->setMouseHorizontalSensitivity(3.25);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#mouseHorizontalSensitivity').value").toString(), QStringLiteral("3.25"));
+        Settings restarted(profile);
+        QCOMPARE(restarted.GetMouseResponse().horizontalSensitivity, 3.25);
+        QCOMPARE(restarted.GetMouseResponse().verticalSensitivity, 0.75);
+        QCOMPARE(restarted.GetMouseResponse().deadZoneCompensation, 0.2);
+        QCOMPARE(restarted.GetMouseResponse().responseExponent, 0.55);
+        QVERIFY(restarted.GetMouseResponse().invertVertical);
+        QVERIFY(restarted.GetMouseCameraEnabled());
+        services.backend()->qmlSettings()->changeKeyboardMouseBinding(0, 1, Qt::Key_B);
+        const auto changedBindings = settings.GetKeyboardMouseBindings();
+        const auto legacyBindings = settings.GetControllerMapping();
+        const auto originalKeyboard = settings.GetKeyboardEnabled();
+        const auto originalTouch = settings.GetMouseTouchEnabled();
+        script(setup.view(), "document.querySelector('#keyboardMouseReset').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').open").toBool());
+        QVERIFY(script(setup.view(), "document.activeElement.closest('dialog') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-keyboard-reset-cancel]').click()");
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('dialog').open && document.activeElement.id === 'keyboardMouseReset'").toBool());
+        QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 3.25);
+        QVERIFY(settings.GetKeyboardMouseBindings() == changedBindings);
+        script(setup.view(), "Array.from(document.querySelectorAll('[role=tab]')).find(e => e.textContent === 'Bindings').click();document.querySelector('#keyboardMouseReset').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').open").toBool());
+        script(setup.view(), "document.querySelector('[data-keyboard-reset-confirm]').click()");
+        QTRY_VERIFY(!settings.GetMouseCameraEnabled());
+        QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 1.0);
+        QCOMPARE(settings.GetMouseResponse().verticalSensitivity, 1.0);
+        QCOMPARE(settings.GetMouseResponse().deadZoneCompensation, 0.0);
+        QCOMPARE(settings.GetMouseResponse().responseExponent, 1.0);
+        QVERIFY(!settings.GetMouseResponse().invertVertical);
+        QVERIFY(settings.GetKeyboardMouseBindings() == DefaultKeyboardMouseBindings());
+        QCOMPARE(settings.GetControllerMapping(), legacyBindings);
+        QCOMPARE(settings.GetKeyboardEnabled(), originalKeyboard);
+        QCOMPARE(settings.GetMouseTouchEnabled(), originalTouch);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#keyboardMouseBinding0_0').textContent.trim()").toString(), QStringLiteral("PrimaryW"));
+        QCOMPARE(services.backend()->qmlSettings()->keyboardMouseBindings().at(0).toMap().value("primary").toInt(), int(Qt::Key_W));
+    }
+
+    void keyboardMouseCapture()
+    {
+#ifndef Q_OS_WIN
+        QSKIP("Mouse camera mode is available on Windows.");
+#endif
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetMouseCameraEnabled(true);
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#mouseCameraEnabled')?.disabled === false").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('[role=tab]')).find(e => e.textContent === 'Bindings').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.binding-row button').length").toInt(), 44);
+        const auto capture = [&](int action, int slot) -> QDialog * {
+            script(setup.view(), QString("document.getElementById('keyboardMouseBinding%1_%2').click()").arg(action).arg(slot));
+            QElapsedTimer timeout;
+            timeout.start();
+            while (timeout.elapsed() < 5000) {
+                auto *dialog = setup.findChild<QDialog *>("setupBindingCapture");
+                if (dialog && dialog->isVisible()) return dialog;
+                QTest::qWait(10);
+            }
+            return nullptr;
+        };
+        QPointer<QDialog> dialog = capture(0, 1);
+        QVERIFY(dialog);
+        auto *prompt = dialog->findChild<QLabel *>("setupBindingPrompt");
+        QVERIFY(prompt);
+        QTRY_VERIFY(prompt->hasFocus());
+        QTest::keyPress(prompt, Qt::Key_B);
+        QCOMPARE(settings.GetKeyboardMouseBindings()[0][1], 0);
+        QTest::keyRelease(prompt, Qt::Key_B);
+        QTRY_VERIFY(dialog.isNull());
+        QCOMPARE(settings.GetKeyboardMouseBindings()[0][1], int(Qt::Key_B));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#keyboardMouseBinding0_1').textContent.trim()").toString(), QStringLiteral("AlternativeB"));
+        Settings restarted(profile);
+        QCOMPARE(restarted.GetKeyboardMouseBindings()[0][1], int(Qt::Key_B));
+
+        dialog = capture(0, 1);
+        QVERIFY(dialog);
+        prompt = dialog->findChild<QLabel *>("setupBindingPrompt");
+        QTest::keyClick(prompt, Qt::Key_F8);
+        QVERIFY(dialog->isVisible());
+        QVERIFY(dialog->findChild<QLabel *>("setupBindingStatus")->text().contains("F8"));
+        QCOMPARE(settings.GetKeyboardMouseBindings()[0][1], int(Qt::Key_B));
+        QTest::keyClick(prompt, Qt::Key_Enter);
+        QVERIFY(dialog->findChild<QLabel *>("setupBindingStatus")->text().contains("Options"));
+        QTest::mouseClick(dialog->findChild<QPushButton *>("setupBindingMove"), Qt::LeftButton);
+        QTRY_VERIFY(dialog.isNull());
+        QCOMPARE(settings.GetKeyboardMouseBindings()[0][1], int(Qt::Key_Return));
+        QCOMPARE(settings.GetKeyboardMouseBindings()[18][0], 0);
+
+        dialog = capture(1, 1);
+        QVERIFY(dialog);
+        QTest::mouseClick(dialog->findChild<QLabel *>("setupBindingPrompt"), Qt::MiddleButton);
+        QTRY_VERIFY(dialog.isNull());
+        QCOMPARE(settings.GetKeyboardMouseBindings()[1][1], -int(Qt::MiddleButton));
+        dialog = capture(1, 1);
+        QVERIFY(dialog);
+        QTest::mouseClick(dialog->findChild<QPushButton *>("setupBindingClear"), Qt::LeftButton);
+        QTRY_VERIFY(dialog.isNull());
+        QCOMPARE(settings.GetKeyboardMouseBindings()[1][1], 0);
+        dialog = capture(1, 1);
+        QVERIFY(dialog);
+        QTest::mouseClick(dialog->findChild<QPushButton *>("setupBindingTab"), Qt::LeftButton);
+        QVERIFY(dialog->findChild<QLabel *>("setupBindingStatus")->text().contains("Touchpad"));
+        QTest::mouseClick(dialog->findChild<QPushButton *>("setupBindingMove"), Qt::LeftButton);
+        QTRY_VERIFY(dialog.isNull());
+        QCOMPARE(settings.GetKeyboardMouseBindings()[1][1], int(Qt::Key_Tab));
+        QCOMPARE(settings.GetKeyboardMouseBindings()[20][0], 0);
+
+        dialog = capture(2, 1);
+        QVERIFY(dialog);
+        prompt = dialog->findChild<QLabel *>("setupBindingPrompt");
+        QKeyEvent press(QEvent::KeyPress, Qt::Key_Control, Qt::ControlModifier, 29, 0, 0);
+        QKeyEvent otherRelease(QEvent::KeyRelease, Qt::Key_Control, Qt::NoModifier, 285, 0, 0);
+        QApplication::sendEvent(prompt, &press);
+        QApplication::sendEvent(prompt, &otherRelease);
+        QCOMPARE(settings.GetKeyboardMouseBindings()[2][1], 0);
+        QTest::keyClick(prompt, Qt::Key_Escape);
+        QTRY_VERIFY(dialog.isNull());
+        QCOMPARE(settings.GetKeyboardMouseBindings()[2][1], 0);
+        dialog = capture(2, 1);
+        QVERIFY(dialog);
+        setup.suspend();
+        QTRY_VERIFY(dialog.isNull());
+        setup.resume();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#keyboardMouseBinding2_1')?.disabled === false").toBool());
+        dialog = capture(2, 1);
+        QVERIFY(dialog);
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        QTRY_VERIFY(dialog.isNull());
+        QVERIFY(backend->nativeSettings()->GetKeyboardMouseBindings() == DefaultKeyboardMouseBindings());
+    }
+
+    void keyboardMouseGuards()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetMouseCameraEnabled(true);
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
+        QTRY_VERIFY(script(setup.view(), "(document.querySelector('#keyboardMouseReset') ?? document.querySelector('#keyboardEnabled'))?.disabled === false").toBool());
+        const QString generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+        const auto begun = setupRequest(setup.view(), "beginKeyboardMouse", {generation});
+        QVERIFY(begun.value("accepted").toBool());
+        const auto form = begun.value("form").toString();
+        QVERIFY(!form.isEmpty());
+        for (const auto &input : QList<QPair<QString, QVariant>>{{"mouseHorizontalSensitivity", -0.05}, {"mouseHorizontalSensitivity", 8.01},
+                {"mouseVerticalSensitivity", 0}, {"mouseDeadZoneCompensation", -0.01}, {"mouseDeadZoneCompensation", 0.51},
+                {"mouseResponseExponent", 0.09}, {"mouseResponseExponent", 3.01}, {"mouseCameraEnabled", 1}, {"mouseInvertVertical", "true"},
+                {"mouseHorizontalSensitivity", "2"}, {"psnAuthToken", "forbidden"}, {"keyboardEnabled", 1}, {"mouseTouchEnabled", 1}}) {
+            const auto reply = setupRequest(setup.view(), "setKeyboardMouseSetting", {input.first, QJsonValue::fromVariant(input.second), form, generation});
+            QVERIFY(reply.contains("accepted"));
+            QVERIFY(!reply.value("accepted").toBool());
+        }
+        for (const auto &args : QList<QJsonArray>{{-1, 0, false, form, generation}, {0.5, 0, false, form, generation},
+                 {22, 0, false, form, generation}, {0, 2, false, form, generation}, {0, 0.5, false, form, generation},
+                 {0, 0, true, form, generation}, {0, 0, false, "obsolete", generation}}) {
+            const auto reply = setupRequest(setup.view(), "captureKeyboardMouse", args);
+            QVERIFY(reply.contains("accepted"));
+            QVERIFY(!reply.value("accepted").toBool());
+        }
+#ifdef Q_OS_WIN
+        for (const auto &input : QList<QPair<QString, double>>{{"mouseHorizontalSensitivity", 0.05}, {"mouseHorizontalSensitivity", 8},
+                {"mouseVerticalSensitivity", 0.05}, {"mouseVerticalSensitivity", 8}, {"mouseDeadZoneCompensation", 0},
+                {"mouseDeadZoneCompensation", 0.5}, {"mouseResponseExponent", 0.1}, {"mouseResponseExponent", 3}}) {
+            const auto reply = setupRequest(setup.view(), "setKeyboardMouseSetting", {input.first, input.second, form, generation});
+            QVERIFY(reply.value("accepted").toBool());
+        }
+        QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 8.0);
+        QCOMPARE(settings.GetMouseResponse().verticalSensitivity, 8.0);
+        QCOMPARE(settings.GetMouseResponse().deadZoneCompensation, 0.5);
+        QCOMPARE(settings.GetMouseResponse().responseExponent, 3.0);
+#endif
+        const auto nextForm = setupRequest(setup.view(), "beginKeyboardMouse", {generation}).value("form").toString();
+        QVERIFY(!nextForm.isEmpty() && nextForm != form);
+        QVERIFY(setupRequest(setup.view(), "endKeyboardMouse", {form}).value("accepted").toBool());
+        QVERIFY(!setupRequest(setup.view(), "resetKeyboardMouse", {form, generation}).value("accepted").toBool());
+#ifdef Q_OS_WIN
+        QVERIFY(setupRequest(setup.view(), "setKeyboardMouseSetting", {"mouseHorizontalSensitivity", 2, nextForm, generation}).value("accepted").toBool());
+        QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 2.0);
+#endif
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#keyboardEnabled')?.disabled === false").toBool());
+        QVERIFY(!setupRequest(setup.view(), "resetKeyboardMouse", {nextForm, generation}).value("accepted").toBool());
+        QVERIFY(!setupRequest(setup.view(), "setKeyboardMouseSetting", {"mouseCameraEnabled", true, nextForm, generation}).value("accepted").toBool());
+        QVERIFY(!setupRequest(setup.view(), "captureKeyboardMouse", {0, 0, false, nextForm, generation}).value("accepted").toBool());
+        QVERIFY(!backend->nativeSettings()->GetMouseCameraEnabled());
+        QVERIFY(backend->nativeSettings()->GetKeyboardMouseBindings() == DefaultKeyboardMouseBindings());
+        QCOMPARE(backend->nativeSettings()->GetMouseResponse().horizontalSensitivity, 1.0);
+    }
+
+    void keyboardMouseLegacyAndLifetime()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        Settings next(profile + "-next");
+        next.SetDiscoveryEnabled(false);
+        next.SetMouseCameraEnabled(true);
+        MouseResponse nextResponse;
+        nextResponse.horizontalSensitivity = 2.25;
+        QVERIFY(next.SetMouseResponse(nextResponse));
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#keyboardEnabled')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('#keyboardEnabled').click()");
+        QTRY_VERIFY(!settings.GetKeyboardEnabled());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#mouseTouchEnabled')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('#mouseTouchEnabled').click()");
+        QTRY_VERIFY(!settings.GetMouseTouchEnabled());
+        const int button = settings.GetControllerMapping().firstKey();
+        script(setup.view(), QString("document.getElementById('keyMapping%1').click()").arg(button));
+        QPointer<QDialog> capture;
+        QTRY_VERIFY(capture = setup.findChild<QDialog *>("setupBindingCapture"));
+        QSignalSpy mappingChanged(backend->qmlSettings(), &QmlSettings::controllerMappingChanged);
+        QTest::keyClick(capture->findChild<QLabel *>("setupBindingPrompt"), Qt::Key_B);
+        QTRY_VERIFY(capture.isNull());
+        QCOMPARE(settings.GetControllerMapping().value(button), Qt::Key_B);
+        QCOMPARE(mappingChanged.count(), 1);
+        QTRY_COMPARE(script(setup.view(), QString("document.getElementById('keyMapping%1').textContent").arg(button)).toString(), QStringLiteral("B"));
+        Settings reopened(profile);
+        QCOMPARE(reopened.GetControllerMapping().value(button), Qt::Key_B);
+        script(setup.view(), "document.querySelector('#resetAllKeys').click()");
+        QTRY_VERIFY(settings.GetControllerMapping().value(button) != Qt::Key_B);
+        script(setup.view(), QString("document.getElementById('keyMapping%1').click()").arg(button));
+        QTRY_VERIFY(capture = setup.findChild<QDialog *>("setupBindingCapture"));
+        QEvent deactivate(QEvent::WindowDeactivate);
+        QApplication::sendEvent(capture, &deactivate);
+        QTRY_VERIFY(capture.isNull());
+        script(setup.view(), QString("document.getElementById('keyMapping%1').click()").arg(button));
+        QTRY_VERIFY(capture = setup.findChild<QDialog *>("setupBindingCapture"));
+        script(setup.view(), "document.querySelector('.back-consoles').click()");
+        QTRY_VERIFY(capture.isNull());
+        QVERIFY(!backend->qmlSession());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#keyboardEnabled')?.disabled === false").toBool());
+        script(setup.view(), QString("document.getElementById('keyMapping%1').click()").arg(button));
+        QTRY_VERIFY(capture = setup.findChild<QDialog *>("setupBindingCapture"));
+        setup.view()->reload();
+        QTRY_VERIFY(capture.isNull());
+#ifdef Q_OS_WIN
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#mouseCameraEnabled')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('#mouseCameraEnabled').click()");
+        QTRY_VERIFY(settings.GetMouseCameraEnabled());
+        backend->qmlSettings()->setMouseHorizontalSensitivity(3.5);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#mouseHorizontalSensitivity').value").toString(), QStringLiteral("3.5"));
+        script(setup.view(), "document.querySelector('#keyboardMouseReset').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').open && document.activeElement.hasAttribute('data-keyboard-reset-cancel')").toBool());
+        setup.suspend();
+        setup.resume();
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('dialog').open && document.querySelector('#keyboardMouseReset')?.disabled === false").toBool());
+        QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 3.5);
+        script(setup.view(), "document.querySelector('#keyboardMouseReset').click();document.querySelector('[data-keyboard-reset-confirm]').click()");
+        QTRY_VERIFY(!settings.GetMouseCameraEnabled());
+        QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 1.0);
+        QVERIFY(!settings.GetKeyboardEnabled());
+        QVERIFY(!settings.GetMouseTouchEnabled());
+        script(setup.view(), "document.querySelector('#mouseCameraEnabled').click()");
+        QTRY_VERIFY(settings.GetMouseCameraEnabled());
+        script(setup.view(), "{const e=document.querySelector('#mouseHorizontalSensitivity');window.oldMouseDraft=e;e.value='7.25';e.dispatchEvent(new Event('input',{bubbles:true}));}document.querySelector('#keyboardMouseReset').click();window.oldMouseReset=document.querySelector('[data-keyboard-reset-confirm]');");
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('dialog').open").toBool());
+        script(setup.view(), "window.oldMouseDraft.dispatchEvent(new Event('change',{bubbles:true}));window.oldMouseReset.click()");
+        QTest::qWait(50);
+        QVERIFY(backend->nativeSettings()->GetMouseCameraEnabled());
+        QCOMPARE(backend->nativeSettings()->GetMouseResponse().horizontalSensitivity, 2.25);
+#endif
+    }
+
+    void keyboardMousePresentation()
+    {
+#ifndef Q_OS_WIN
+        QSKIP("Mouse camera mode is available on Windows.");
+#endif
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetMouseCameraEnabled(true);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
+        script(setup.view(), "{const e=document.querySelector('.settings-search input');e.value='Cross Primary';e.dispatchEvent(new Event('input',{bubbles:true}));}");
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 1);
+        script(setup.view(), "document.querySelector('.settings-results button').click()");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("keyboardMouseBinding4_0"));
+        QVERIFY(!setup.findChild<QDialog *>("setupBindingCapture"));
+        QVERIFY(script(setup.view(), "document.querySelector('[role=tab][aria-selected=true]').textContent === 'Bindings'").toBool());
+        script(setup.view(), "document.querySelector('[role=tab][aria-selected=true]').dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true,cancelable:true}))");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[role=tab][aria-selected=true]').textContent === 'Mouse response' && document.activeElement.getAttribute('role') === 'tab'").toBool());
+        const QDir evidence(qEnvironmentVariable("CHIAKI_KEYBOARD_MOUSE_EVIDENCE", "."));
+        const auto screenshot = [&](const QString &name, int width, int height, qreal zoom, bool bindings) {
+            setup.resize(width, height);
+            setup.view()->setZoomFactor(zoom);
+            script(setup.view(), QString("Array.from(document.querySelectorAll('[role=tab]')).find(e => e.textContent === '%1').click()").arg(bindings ? "Bindings" : "Mouse response"));
+            script(setup.view(), bindings ? "document.querySelector('[role=tablist]').scrollIntoView({block:'start'})" : "document.querySelector('.settings-content').scrollIntoView({block:'start'})");
+            QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+            QTest::qWait(80);
+            QVERIFY(setup.view()->grab().save(evidence.filePath(name)));
+        };
+        screenshot("response-1280.png", 1280, 900, 1, false);
+        screenshot("bindings-390.png", 390, 720, 1, true);
+        screenshot("response-200-percent.png", 800, 900, 2, false);
+        screenshot("bindings-200-percent.png", 800, 900, 2, true);
+        setup.view()->setZoomFactor(1);
+        setup.resize(390, 720);
+        script(setup.view(), "document.querySelector('#keyboardMouseBinding4_1').click()");
+        QPointer<QDialog> capture;
+        QTRY_VERIFY(capture = setup.findChild<QDialog *>("setupBindingCapture"));
+        QVERIFY(capture->width() <= setup.width());
+        const auto before = settings.GetKeyboardMouseBindings();
+        script(setup.view(), "window.dispatchEvent(new KeyboardEvent('keydown',{key:'Y',code:'KeyY',bubbles:true}));window.dispatchEvent(new KeyboardEvent('keyup',{key:'Y',code:'KeyY',bubbles:true}));");
+        QVERIFY(settings.GetKeyboardMouseBindings() == before);
+        QVERIFY(capture->grab().save(evidence.filePath("native-capture-390.png")));
+        capture->reject();
+        QTRY_VERIFY(capture.isNull());
+        script(setup.view(), "document.querySelector('#keyboardMouseReset').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').open").toBool());
+        QVERIFY(setup.view()->grab().save(evidence.filePath("reset-390.png")));
+        script(setup.view(), "document.querySelector('dialog').dispatchEvent(new Event('cancel',{cancelable:true}))");
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('dialog').open && document.activeElement.id === 'keyboardMouseReset'").toBool());
+    }
+
     void suspendClosesSignIn()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -625,6 +1093,67 @@ private slots:
         QTRY_COMPARE(script(setup.view(), "document.querySelector('.discovery').getAttribute('aria-pressed')").toString(), QStringLiteral("true"));
     }
 
+    void manualHandoff()
+    {
+#ifdef Q_OS_WIN
+        if (qEnvironmentVariableIsSet("CHIAKI_HANDOFF_REQUIRE_FOREGROUND"))
+            QVERIFY2(inputDesktopAvailable(), "Handoff requires the active unlocked input desktop");
+#endif
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetHardwareDecoder({});
+        settings.SetPlaceboPreset(PlaceboPreset::Fast);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Office console");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        ApplicationController controller(&services);
+        auto &setup = *controller.setupWindow();
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-add-manual]')").toBool());
+        script(setup.view(), "document.querySelector('[data-add-manual]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-manual-address]')").toBool());
+        QVERIFY(fill(setup.view(), "[data-manual-address]", "127.0.0.1"));
+        const auto registrationKey = script(setup.view(), "document.querySelector('[data-manual-registration]').options[1].value").toString();
+        QVERIFY(fill(setup.view(), "[data-manual-registration]", registrationKey));
+        script(setup.view(), "document.querySelector('[data-save-manual]').click()");
+        QTRY_COMPARE(settings.GetManualHosts().size(), 1);
+        QVERIFY(settings.GetManualHosts().first().GetRegistered());
+        script(setup.view(), "document.querySelector('[data-close-management]').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.connect-console')?.textContent.trim()").toString(), QStringLiteral("Connect"));
+        script(setup.view(), "document.querySelector('.connect-console').click()");
+        QTRY_VERIFY(backend->qmlWindow());
+        QTRY_VERIFY(backend->qmlWindow()->isExposed());
+        QTRY_VERIFY(!setup.isVisible());
+        QTRY_COMPARE(setup.view()->page()->lifecycleState(), QWebEnginePage::LifecycleState::Frozen);
+        QPointer<QmlMainWindow> native = backend->qmlWindow();
+        QPointer<StreamSession> session = backend->qmlSession();
+        QVERIFY(session);
+        native->dismissStreamView();
+        QTest::qWait(30);
+        QVERIFY(native);
+        QVERIFY(!setup.isVisible());
+        QVERIFY(backend->cancelConnection(backend->connectionAttempt().value("id").toString()));
+        QTRY_VERIFY(!session);
+        QTRY_VERIFY(!native);
+        QTRY_VERIFY(setup.isVisible());
+        QCOMPARE(setup.view()->page()->lifecycleState(), QWebEnginePage::LifecycleState::Active);
+        QVERIFY(backend->discoveryEnabled());
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.discovery').getAttribute('aria-pressed')").toString(), QStringLiteral("true"));
+    }
+
     void init()
     {
 #ifdef Q_OS_WIN
@@ -657,25 +1186,25 @@ private slots:
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-target]').options.length").toInt(), 4);
         QVERIFY(script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
-        QVERIFY(registrationFill(setup.view(), "[data-registration-account]", "not-base64"));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
+        QVERIFY(fill(setup.view(), "[data-registration-account]", "not-base64"));
+        QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
         QVERIFY(script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
-        QVERIFY(registrationFill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
+        QVERIFY(fill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
         QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
         for (const auto &value : {"1234", "1234567", "123456789", "abcdefgh"}) {
-            QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", value));
+            QVERIFY(fill(setup.view(), "[data-registration-pin]", value));
             QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
         }
-        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-console-pin]", "007"));
+        QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
+        QVERIFY(fill(setup.view(), "[data-registration-console-pin]", "007"));
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
-        QVERIFY(registrationFill(setup.view(), "[data-registration-console-pin]", "0007"));
+        QVERIFY(fill(setup.view(), "[data-registration-console-pin]", "0007"));
         QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-pin]').value").toString(), QStringLiteral("00123456"));
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-console-pin]').value").toString(), QStringLiteral("0007"));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-target]", "800"));
+        QVERIFY(fill(setup.view(), "[data-registration-target]", "800"));
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-online-id]')").toBool());
-        QVERIFY(registrationFill(setup.view(), "[data-registration-online-id]", "LegacyUser"));
+        QVERIFY(fill(setup.view(), "[data-registration-online-id]", "LegacyUser"));
         QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
         services.backend()->qmlSettings()->setStreamerMode(true);
         QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-registration-address]').type").toString(), QStringLiteral("password"));
@@ -722,7 +1251,7 @@ private slots:
         QCOMPARE(registration.requests[0].pin, uint32_t(123456));
         QVERIFY(registration.requests[0].broadcast);
         const auto context = setup.bridge()->snapshot().value("registration").toMap().value("context").toString();
-        const auto duplicate = registrationCommand(setup.view(), "submitRegistration", {context, QJsonObject{{"address", "255.255.255.255"}, {"target", 1000100}, {"account", "AQAAAAAAAAA="}, {"pin", "00123456"}}});
+        const auto duplicate = consoleRequest(setup.view(), "submitRegistration", {context, QJsonObject{{"address", "255.255.255.255"}, {"target", 1000100}, {"account", "AQAAAAAAAAA="}, {"pin", "00123456"}}});
         QVERIFY(!duplicate.value("accepted").toBool());
         QCOMPARE(registration.requests.size(), 1);
         chiaki_log(registration.requests[0].log, CHIAKI_LOG_INFO, "Regist waiting for response");
@@ -734,10 +1263,10 @@ private slots:
         // A closed progress screen does not cancel native work. A fresh attempt can correct its fields.
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
-        QVERIFY(registrationFill(setup.view(), "[data-registration-address]", "127.0.0.1"));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-console-pin]", "0007"));
+        QVERIFY(fill(setup.view(), "[data-registration-address]", "127.0.0.1"));
+        QVERIFY(fill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
+        QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
+        QVERIFY(fill(setup.view(), "[data-registration-console-pin]", "0007"));
         script(setup.view(), "document.querySelector('[data-registration-submit]').click()");
         QTRY_COMPARE(registration.requests.size(), 2);
         QVERIFY(!registration.requests[1].broadcast);
@@ -790,14 +1319,14 @@ private slots:
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
         QVERIFY2(script(setup.view(), "document.querySelector('[data-registration-lookup]') !== null").toBool(), "Registration must offer native public Account ID lookup.");
-        QVERIFY(registrationFill(setup.view(), "[data-registration-address]", "pair.example"));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-console-pin]", "0007"));
+        QVERIFY(fill(setup.view(), "[data-registration-address]", "pair.example"));
+        QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
+        QVERIFY(fill(setup.view(), "[data-registration-console-pin]", "0007"));
         script(setup.view(), "document.querySelector('[data-registration-lookup]').click()");
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-lookup-explanation]')?.textContent.includes('psn.flipscreen.games')").toBool());
         QVERIFY(script(setup.view(), "document.querySelector('[data-lookup-explanation]').textContent.includes('anyone') && document.querySelector('[data-lookup-explanation]').textContent.includes('credentials')").toBool());
         QCOMPARE(requests.size(), 0);
-        QVERIFY(registrationFill(setup.view(), "[data-lookup-username]", "  Public User+  "));
+        QVERIFY(fill(setup.view(), "[data-lookup-username]", "  Public User+  "));
         script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
         QTRY_COMPARE(requests.size(), 1);
         QCOMPARE(QUrlQuery(requests[0]->url()).queryItemValue("username", QUrl::FullyDecoded), QStringLiteral("Public User+"));
@@ -833,7 +1362,7 @@ private slots:
         // An external reply can arrive after an abort. It cannot complete a replacement route.
         script(setup.view(), "document.querySelector('[data-registration-lookup]').click()");
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-lookup-username]')").toBool());
-        QVERIFY(registrationFill(setup.view(), "[data-lookup-username]", "old-user"));
+        QVERIFY(fill(setup.view(), "[data-lookup-username]", "old-user"));
         script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
         QTRY_COMPARE(requests.size(), 8);
         auto obsolete = requests.last();
@@ -842,7 +1371,7 @@ private slots:
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-account]')").toBool());
         script(setup.view(), "document.querySelector('[data-registration-lookup]').click()");
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-lookup-username]')").toBool());
-        QVERIFY(registrationFill(setup.view(), "[data-lookup-username]", "new-user"));
+        QVERIFY(fill(setup.view(), "[data-lookup-username]", "new-user"));
         script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
         QTRY_COMPARE(requests.size(), 9);
         obsolete->finish(R"({"encoded_id":"AAAAAAAAAAA="})");
@@ -883,7 +1412,7 @@ private slots:
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
         script(setup.view(), "document.querySelector('[data-registration-lookup]').click()");
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-lookup-username]')").toBool());
-        QVERIFY(registrationFill(setup.view(), "[data-lookup-username]", "timeout-user"));
+        QVERIFY(fill(setup.view(), "[data-lookup-username]", "timeout-user"));
         script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
         QTRY_COMPARE(requests.size(), 1);
         QTRY_VERIFY_WITH_TIMEOUT(script(setup.view(), "document.querySelector('[data-lookup-error]')?.textContent.includes('timed out')").toBool(), 35000);
@@ -925,16 +1454,16 @@ private slots:
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
-        QVERIFY(registrationFill(setup.view(), "[data-registration-address]", "original-console.example"));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-console-pin]", "0007"));
+        QVERIFY(fill(setup.view(), "[data-registration-address]", "original-console.example"));
+        QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
+        QVERIFY(fill(setup.view(), "[data-registration-console-pin]", "0007"));
         script(setup.view(), "document.querySelector('[data-registration-saved]').click()");
         QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-registration-account]')?.value").toString(), QStringLiteral("AQAAAAAAAAA="));
         QCOMPARE(requests.size(), 0);
         script(setup.view(), "document.querySelector('[data-registration-sign-in]').click()");
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.pairing [data-psn-redirect]')").toBool());
         QVERIFY(script(setup.view(), "document.querySelector('.pairing .psn-account').textContent.includes('Sign-in saves PSN credentials')").toBool());
-        QVERIFY(registrationFill(setup.view(), ".pairing [data-psn-redirect]", "https://remoteplay.dl.playstation.net/remoteplay/redirect?code=pairing-sign-in"));
+        QVERIFY(fill(setup.view(), ".pairing [data-psn-redirect]", "https://remoteplay.dl.playstation.net/remoteplay/redirect?code=pairing-sign-in"));
         script(setup.view(), "document.querySelector('.pairing [data-psn-submit]').click()");
         QTRY_COMPARE(requests.size(), 1);
         requests[0]->finish(R"({"access_token":"pairing-access-secret","refresh_token":"pairing-refresh-secret","expires_in":3600})");
@@ -947,7 +1476,7 @@ private slots:
         QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-registration-account')").toBool());
         script(setup.view(), "document.querySelector('[data-registration-sign-in]').click()");
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.pairing [data-psn-redirect]')").toBool());
-        QVERIFY(registrationFill(setup.view(), ".pairing [data-psn-redirect]", "https://remoteplay.dl.playstation.net/remoteplay/redirect?code=obsolete-sign-in"));
+        QVERIFY(fill(setup.view(), ".pairing [data-psn-redirect]", "https://remoteplay.dl.playstation.net/remoteplay/redirect?code=obsolete-sign-in"));
         script(setup.view(), "document.querySelector('.pairing [data-psn-submit]').click()");
         QTRY_COMPARE(requests.size(), 3);
         script(setup.view(), "document.querySelector('.pairing [data-psn-close]').click()");
@@ -993,7 +1522,7 @@ private slots:
         setup.show();
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-new]')").toBool());
         const auto generation = QString::number(services.backend()->profileGeneration());
-        const auto context = registrationCommand(setup.view(), "openRegistration", {"", generation}).value("context").toString();
+        const auto context = consoleRequest(setup.view(), "openRegistration", {"", generation}).value("context").toString();
         QVERIFY(!context.isEmpty());
         const QJsonObject valid{{"address", "console.example"}, {"target", 1000100}, {"account", "AQAAAAAAAAA="}, {"pin", "00123456"}, {"consolePin", "0007"}};
         for (const auto &input : QList<QPair<QString, QJsonValue>>{{"address", "https://private.example/"}, {"address", "192.0.2.999"},
@@ -1001,16 +1530,16 @@ private slots:
                 {"pin", "1234"}, {"pin", "123456789"}, {"pin", 12345678}, {"consolePin", "123"}}) {
             auto fields = valid;
             fields[input.first] = input.second;
-            const auto reply = registrationCommand(setup.view(), "submitRegistration", {context, fields});
+            const auto reply = consoleRequest(setup.view(), "submitRegistration", {context, fields});
             QVERIFY2(!reply.value("accepted").toBool(), qPrintable(input.first));
         }
         QCOMPARE(registration.requests.size(), 0);
         for (const int target : {800, 900, 1000, 1000100}) {
-            const auto next = registrationCommand(setup.view(), "openRegistration", {"", generation}).value("context").toString();
+            const auto next = consoleRequest(setup.view(), "openRegistration", {"", generation}).value("context").toString();
             auto fields = valid;
             fields["target"] = target;
             if (target == 800) fields["account"] = "LegacyUser";
-            const auto reply = registrationCommand(setup.view(), "submitRegistration", {next, fields});
+            const auto reply = consoleRequest(setup.view(), "submitRegistration", {next, fields});
             QVERIFY(reply.value("accepted").toBool());
             QCOMPARE(int(registration.requests.last().target), target);
             QCOMPARE(registration.requests.last().onlineId, target == 800 ? QStringLiteral("LegacyUser") : QString());
@@ -1018,8 +1547,8 @@ private slots:
             QTRY_VERIFY(!services.backend()->registrationBusy());
         }
         registration.startResult = CHIAKI_ERR_NETWORK;
-        const auto failedContext = registrationCommand(setup.view(), "openRegistration", {"", generation}).value("context").toString();
-        QVERIFY(!registrationCommand(setup.view(), "submitRegistration", {failedContext, valid}).value("accepted").toBool());
+        const auto failedContext = consoleRequest(setup.view(), "openRegistration", {"", generation}).value("context").toString();
+        QVERIFY(!consoleRequest(setup.view(), "submitRegistration", {failedContext, valid}).value("accepted").toBool());
         QCOMPARE(services.backend()->registrationAttempt().value("phase").toString(), QStringLiteral("failure"));
         QVERIFY(!services.backend()->registrationBusy());
         QVERIFY(settings.GetRegisteredHosts().isEmpty());
@@ -1063,8 +1592,8 @@ private slots:
         script(setup.view(), "document.querySelector('[data-register-selected]').click()");
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-address]').value").toString(), QStringLiteral("192.0.2.10"));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
-        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
+        QVERIFY(fill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
+        QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
         script(setup.view(), "document.querySelector('[data-registration-submit]').click()");
         QTRY_COMPARE(registration.requests.size(), 1);
         if (change == "manualAddress") settings.SetManualHost(ManualHost(manualId, "192.0.2.20", false, {}));
@@ -2417,6 +2946,343 @@ private slots:
         qInfo().noquote() << restarted.readAllStandardError();
         QCOMPARE(restarted.exitStatus(), QProcess::NormalExit);
         QCOMPARE(restarted.exitCode(), 0);
+    }
+
+    void consoleManagementPrivacy()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetStreamerMode(true);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "PRIVATE.EXAMPLE");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        settings.SetManualHost(ManualHost(-1, "private.example", true, HostMAC(registered.server_mac)));
+        settings.AddHiddenHost(HiddenHost(HostMAC(registered.server_mac), "192.0.2.77"));
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+        const auto json = QJsonDocument::fromVariant(consoleRequest(setup.view(), "snapshot", {})).toJson();
+        QVERIFY(!json.contains("PRIVATE.EXAMPLE"));
+        QVERIFY(!json.contains("private.example"));
+        QVERIFY(!json.contains("192.0.2.77"));
+        QVERIFY(!json.contains("001122334455"));
+        QVERIFY(click(setup.view(), ".console-details"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').textContent.includes('hidden')").toBool());
+        setup.view()->grab().save(qEnvironmentVariable("CHIAKI_DETAILS_PREVIEW", "embedded-details.png"));
+        QVERIFY(click(setup.view(), "[data-console-action=deleteManual]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-confirm-management]')").toBool());
+        QVERIFY(!script(setup.view(), "document.querySelector('dialog').textContent.toLowerCase().includes('private.example')").toBool());
+        QVERIFY(click(setup.view(), "[data-cancel-management]"));
+        QVERIFY(click(setup.view(), "[data-manage-consoles]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-delete-registration]')").toBool());
+        QVERIFY(!script(setup.view(), "document.querySelector('dialog').textContent.includes('192.0.2.77')").toBool());
+        QVERIFY(click(setup.view(), "[data-delete-registration]"));
+        QVERIFY(!script(setup.view(), "document.querySelector('dialog').textContent.toLowerCase().includes('private.example')").toBool());
+        QVERIFY(click(setup.view(), "[data-cancel-management]"));
+        QVERIFY(click(setup.view(), ".console-details"));
+        QVERIFY(click(setup.view(), "[data-console-action=pin]"));
+        QVERIFY(fill(setup.view(), "[data-saved-pin]", "0123"));
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-saved-pin]').type").toString(), QStringLiteral("password"));
+        QVERIFY(script(setup.view(), "document.querySelector('.reveal input').disabled").toBool());
+        QVERIFY(click(setup.view(), "[data-close-management]"));
+        QVERIFY(click(setup.view(), "[data-add-manual]"));
+        QVERIFY(fill(setup.view(), "[data-manual-address]", "private-input.example"));
+        QVERIFY(fill(setup.view(), "[data-manual-registration]", "later"));
+        setup.view()->grab().save(qEnvironmentVariable("CHIAKI_MANUAL_WIDE_PREVIEW", "embedded-manual-wide.png"));
+        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+        const auto invalid = consoleRequest(setup.view(), "saveManualAddress", {"https://private-input.example", "later", generation});
+        QVERIFY(!invalid.value("accepted").toBool());
+        QVERIFY(!invalid.value("message").toString().contains("private-input.example"));
+        QVERIFY(!script(setup.view(), "document.querySelector('dialog').textContent.includes('private-input.example')").toBool());
+    }
+
+    void consoleManagement()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Office console");
+        memcpy(registered.rp_regist_key, "PRIVATEKEY", 10);
+        RegisteredHost paired(registered);
+        paired.SetConsolePin(paired, "0091");
+        settings.AddRegisteredHost(paired);
+        const auto manualId = settings.SetManualHost(ManualHost(-1, "console.example", true, HostMAC(registered.server_mac)));
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+        script(setup.view(), "document.querySelector('.console-details').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog')?.textContent.includes('PlayStation 5')").toBool());
+        QVERIFY(script(setup.view(), "document.querySelector('dialog').textContent.includes('console.example')").toBool());
+        script(setup.view(), "document.querySelector('[data-console-action=pin]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-saved-pin]')").toBool());
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-saved-pin]').value").toString(), QString());
+        QVERIFY(fill(setup.view(), "[data-saved-pin]", "12"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-save-pin]').disabled").toBool());
+        const auto key = setup.bridge()->snapshot().value("selectedKey").toString();
+        QVERIFY(!consoleRequest(setup.view(), "manageConsole", {"pin", key, "12"}).value("accepted").toBool());
+        QVERIFY(fill(setup.view(), "[data-saved-pin]", "0012"));
+        script(setup.view(), "document.querySelector('[data-save-pin]').click()");
+        QTRY_COMPARE(settings.GetRegisteredHost(HostMAC(registered.server_mac)).GetConsolePin(), QStringLiteral("0012"));
+        QTRY_VERIFY(!script(setup.view(), "!!document.querySelector('[data-saved-pin]')").toBool());
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-close-management')").toBool());
+        const auto json = QJsonDocument::fromVariant(consoleRequest(setup.view(), "snapshot", {})).toJson();
+        QVERIFY(!json.contains("\"0012\""));
+        QVERIFY(!json.contains("\"0091\""));
+        QVERIFY(!json.contains("PRIVATEKEY"));
+        QVERIFY(!json.contains("rp_key"));
+        script(setup.view(), "document.querySelector('[data-close-management]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.classList.contains('console-details')").toBool());
+        QVERIFY(click(setup.view(), ".console-details"));
+        QVERIFY(click(setup.view(), "[data-console-action=deleteManual]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-cancel-management]')").toBool());
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-cancel-management')").toBool());
+        script(setup.view(), "document.querySelector('[data-cancel-management]').click()");
+        QCOMPARE(settings.GetManualHosts().size(), 1);
+        QCOMPARE(settings.GetRegisteredHosts().size(), 1);
+        QVERIFY(click(setup.view(), ".console-details"));
+        QVERIFY(click(setup.view(), "[data-console-action=deleteManual]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-confirm-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-confirm-management]').click()");
+        QTRY_COMPARE(settings.GetManualHosts().size(), 0);
+        QCOMPARE(settings.GetRegisteredHosts().size(), 1);
+        QVERIFY(!settings.GetManualHostExists(manualId));
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-add-manual')").toBool());
+        settings.SetManualHost(ManualHost(-1, "still-saved.example", true, HostMAC(registered.server_mac)));
+        script(setup.view(), "document.querySelector('[data-manage-consoles]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-delete-registration]')").toBool());
+        script(setup.view(), "document.querySelector('[data-delete-registration]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-cancel-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-cancel-management]').click()");
+        QCOMPARE(settings.GetRegisteredHosts().size(), 1);
+        QVERIFY(click(setup.view(), "[data-manage-consoles]"));
+        QVERIFY(click(setup.view(), "[data-delete-registration]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-confirm-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-confirm-management]').click()");
+        QTRY_COMPARE(settings.GetRegisteredHosts().size(), 0);
+        QCOMPARE(settings.GetManualHosts().size(), 1);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.console-card').textContent.includes('Not registered')").toBool());
+    }
+
+    void consoleTargetGuards()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        DiscoveryHost first = {};
+        first.ps5 = true;
+        first.host_name = "Office <img src=x onerror=alert(1)>";
+        first.host_id = "001122334455";
+        first.host_addr = "192.0.2.10";
+        first.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        DiscoveryHost second = first;
+        second.host_name = "Other console";
+        second.host_id = "001122334466";
+        second.host_addr = "192.0.2.20";
+        discover(backend, {first, second});
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 2);
+        script(setup.view(), "document.querySelector('.console-details').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-console-action=hide]')").toBool());
+        QVERIFY(!script(setup.view(), "!!document.querySelector('dialog h3 img')").toBool());
+        script(setup.view(), "document.querySelector('[data-console-action=hide]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-cancel-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-cancel-management]').click()");
+        QCOMPARE(settings.GetHiddenHosts().size(), 0);
+        QVERIFY(click(setup.view(), ".console-details"));
+        QVERIFY(click(setup.view(), "[data-console-action=hide]"));
+        discover(backend, {second, first});
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-name').textContent").toString(), second.host_name);
+        script(setup.view(), "document.querySelector('[data-confirm-management]').click()");
+        QTRY_COMPARE(settings.GetHiddenHosts().size(), 1);
+        QCOMPARE(settings.GetHiddenHosts().first().GetMAC().ToString(), QStringLiteral("001122334455"));
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+        script(setup.view(), "document.querySelector('[data-manage-consoles]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-unhide-console]')").toBool());
+        script(setup.view(), "document.querySelector('[data-unhide-console]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-cancel-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-cancel-management]').click()");
+        QCOMPARE(settings.GetHiddenHosts().size(), 1);
+        QVERIFY(click(setup.view(), "[data-manage-consoles]"));
+        QVERIFY(click(setup.view(), "[data-unhide-console]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-confirm-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-confirm-management]').click()");
+        QTRY_COMPARE(settings.GetHiddenHosts().size(), 0);
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 2);
+        const auto key = script(setup.view(), "document.querySelector('.console-card').dataset.consoleKey").toString();
+        QVERIFY(click(setup.view(), ".console-details"));
+        QVERIFY(click(setup.view(), "[data-console-action=hide]"));
+        discover(backend, {second, second});
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-confirm-management]').disabled").toBool());
+        QVERIFY(!consoleRequest(setup.view(), "manageConsole", {"hide", key, ""}).value("accepted").toBool());
+        QCOMPARE(settings.GetHiddenHosts().size(), 0);
+        discover(backend, {});
+        QVERIFY(!consoleRequest(setup.view(), "manageConsole", {"hide", key, ""}).value("accepted").toBool());
+        script(setup.view(), "document.querySelector('[data-close-management]').click()");
+        const auto id = settings.SetManualHost(ManualHost(-1, "private.example", false, {}));
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+        const auto manualKey = script(setup.view(), "document.querySelector('.console-card').dataset.consoleKey").toString();
+        QVERIFY(click(setup.view(), ".console-details"));
+        QVERIFY(click(setup.view(), "[data-console-action=deleteManual]"));
+        settings.SetManualHost(ManualHost(id, "changed.example", false, {}));
+        QVERIFY(!consoleRequest(setup.view(), "manageConsole", {"deleteManual", manualKey, ""}).value("accepted").toBool());
+        QCOMPARE(settings.GetManualHosts().size(), 1);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-confirm-management]').disabled").toBool());
+        backend->qmlSettings()->setStreamerMode(true);
+        const auto json = QJsonDocument::fromVariant(consoleRequest(setup.view(), "snapshot", {})).toJson();
+        QVERIFY(!json.contains("private.example"));
+        QVERIFY(!json.contains("changed.example"));
+        QVERIFY(!json.contains("192.0.2.10"));
+        QVERIFY(!json.contains("001122334455"));
+        QVERIFY(click(setup.view(), "[data-close-management]"));
+        QVERIFY(click(setup.view(), ".console-details"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').textContent.includes('hidden')").toBool());
+        QVERIFY(!script(setup.view(), "document.body.textContent.includes('changed.example')").toBool());
+        QVERIFY(click(setup.view(), "[data-close-management]"));
+        QVERIFY(click(setup.view(), "[data-add-manual]"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-manual-address]')?.type === 'password'").toBool());
+        QVERIFY(fill(setup.view(), "[data-manual-address]", "private-input.example"));
+        setup.resize(390, 720);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').scrollWidth <= document.querySelector('dialog').clientWidth").toBool());
+        setup.view()->grab().save(qEnvironmentVariable("CHIAKI_MANUAL_PREVIEW", "embedded-manual.png"));
+        setup.resize(900, 600);
+        setup.view()->setZoomFactor(2);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').scrollWidth <= document.querySelector('dialog').clientWidth").toBool());
+        const auto oldGeneration = setup.bridge()->snapshot().value("profileGeneration").toString();
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        backend->setDiscoveryEnabled(false);
+        QVERIFY(!consoleRequest(setup.view(), "saveManualAddress", {"private-input.example", "later", oldGeneration}).value("accepted").toBool());
+        QVERIFY(!consoleRequest(setup.view(), "manageConsole", {"deleteManual", manualKey, ""}).value("accepted").toBool());
+        QCOMPARE(backend->nativeSettings()->GetManualHosts().size(), 0);
+    }
+
+    void manualAddressValidation()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Office console");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-add-manual]')").toBool());
+        script(setup.view(), "document.querySelector('[data-add-manual]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-manual-address]')").toBool());
+        script(setup.view(), "const input=document.querySelector('[data-manual-address]');input.value='https://example.com';input.dispatchEvent(new Event('input',{bubbles:true}));const choice=document.querySelector('[data-manual-registration]');choice.value='later';choice.dispatchEvent(new Event('change',{bubbles:true}));");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-save-manual]').disabled").toBool());
+        QCOMPARE(settings.GetManualHosts().size(), 0);
+        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+        for (const auto &invalid : {"", "https://example.com", "192.0.2.1:9295", "example.com/path", "bad host", "-console", "999.999.999.999"}) {
+            QVERIFY(fill(setup.view(), "[data-manual-address]", invalid));
+            QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-save-manual]').disabled").toBool());
+            QVERIFY(!consoleRequest(setup.view(), "saveManualAddress", {invalid, "later", generation}).value("accepted").toBool());
+        }
+        QVERIFY(fill(setup.view(), "[data-manual-address]", "  console.example  "));
+        const auto registrationKey = script(setup.view(), "document.querySelector('[data-manual-registration]').options[1].value").toString();
+        QVERIFY(fill(setup.view(), "[data-manual-registration]", registrationKey));
+        ChiakiRegisteredHost other = registered;
+        memcpy(other.server_mac, "\x00\x00\x00\x00\x00\x01", 6);
+        strcpy(other.server_nickname, "Other console");
+        settings.AddRegisteredHost(RegisteredHost(other));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-manual-registration]').options.length").toInt(), 4);
+        script(setup.view(), "document.querySelector('[data-save-manual]').click();document.querySelector('[data-save-manual]').click()");
+        QTRY_COMPARE(settings.GetManualHosts().size(), 1);
+        const auto savedHost = settings.GetManualHosts().first();
+        QCOMPARE(savedHost.GetHost(), QStringLiteral("console.example"));
+        QVERIFY(savedHost.GetRegistered());
+        QCOMPARE(savedHost.GetMAC().ToString(), QStringLiteral("001122334455"));
+        Settings reread(profile);
+        QCOMPARE(reread.GetManualHosts().first().GetHost(), QStringLiteral("console.example"));
+        QVERIFY(click(setup.view(), "[data-close-management]"));
+        QVERIFY(click(setup.view(), "[data-add-manual]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-manual-address]')").toBool());
+        QVERIFY(fill(setup.view(), "[data-manual-address]", "2001:db8::42"));
+        QVERIFY(fill(setup.view(), "[data-manual-registration]", "later"));
+        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-save-manual]').disabled").toBool());
+        script(setup.view(), "document.querySelector('[data-save-manual]').click()");
+        QTRY_COMPARE(settings.GetManualHosts().size(), 2);
+        QVERIFY(click(setup.view(), "[data-close-management]"));
+        QVERIFY(click(setup.view(), "[data-add-manual]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-manual-address]')").toBool());
+        QVERIFY(fill(setup.view(), "[data-manual-address]", "new.example"));
+        QVERIFY(fill(setup.view(), "[data-manual-registration]", registrationKey));
+        settings.RemoveRegisteredHost(HostMAC(registered.server_mac));
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QVERIFY(!consoleRequest(setup.view(), "saveManualAddress", {"new.example", registrationKey, generation}).value("accepted").toBool());
+        QCOMPARE(settings.GetManualHosts().size(), 2);
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-manual-address]').value").toString(), QStringLiteral("new.example"));
+        services.backend()->qmlSettings()->setCurrentProfile(profile + "-next");
+        services.backend()->setDiscoveryEnabled(false);
+        QVERIFY(!consoleRequest(setup.view(), "saveManualAddress", {"new.example", "later", generation}).value("accepted").toBool());
+        QCOMPARE(services.backend()->nativeSettings()->GetManualHosts().size(), 0);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-save-manual]').disabled").toBool());
+    }
+
+    void manualAddress()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-add-manual]')").toBool());
+        script(setup.view(), "document.querySelector('[data-add-manual]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-manual-address]')").toBool());
+        script(setup.view(), "const input=document.querySelector('[data-manual-address]');input.value='192.0.2.42';input.dispatchEvent(new Event('input',{bubbles:true}));");
+        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-save-manual]').disabled").toBool());
+        script(setup.view(), "document.querySelector('[data-save-manual]').click()");
+        QTRY_COMPARE(settings.GetManualHosts().size(), 1);
+        QCOMPARE(settings.GetManualHosts().first().GetHost(), QStringLiteral("192.0.2.42"));
+        QVERIFY(!settings.GetManualHosts().first().GetRegistered());
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-manual-result]')?.textContent").toString(), QStringLiteral("Address saved"));
+        script(setup.view(), "document.querySelector('[data-close-management]').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-name')?.textContent").toString(), QStringLiteral("192.0.2.42"));
+        setup.view()->reload();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-name')?.textContent").toString(), QStringLiteral("192.0.2.42"));
+        QVERIFY(script(setup.view(), "document.querySelector('.connect-console').disabled").toBool());
     }
 
     void consoleLibrary()

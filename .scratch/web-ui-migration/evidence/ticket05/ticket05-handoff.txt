@@ -1,0 +1,148 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (v7.360.1) (API v360)
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Spent 84.784 ms enumerating instance extensions
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Creating vulkan instance with extensions:
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_surface
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_EXT_swapchain_colorspace
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_get_surface_capabilities2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_surface_maintenance1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_EXT_surface_maintenance1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_portability_enumeration
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_win32_surface
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_surface
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Spent 11.531 ms creating vulkan instance
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Probing for vulkan devices:
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     GPU 0: NVIDIA GeForce RTX 5090 v1.4.351 (discrete)
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]            uuid: 28:16:06:B7:CA:A5:B2:F9:6A:B5:98:0E:85:36:FF:E2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Vulkan device properties:
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     Device Name: NVIDIA GeForce RTX 5090
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     Device ID: 10de:2b85
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     Device UUID: 28:16:06:B7:CA:A5:B2:F9:6A:B5:98:0E:85:36:FF:E2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     Driver version: 9a4a8000
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     API version: 1.4.351
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     Driver ID: VK_DRIVER_ID_NVIDIA_PROPRIETARY
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     Driver name: NVIDIA
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     Driver info: 617.42
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     Conformance version: 1.4.3.3
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     Driver UUID: 8B:2E:D3:A7:D6:66:51:B8:AD:47:BB:85:41:6B:87:1B
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Using async transfer (queue 1)
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Using async compute (queue 2)
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Creating vulkan device with extensions:
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_swapchain
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_external_memory_win32
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_EXT_external_memory_host
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_external_semaphore_win32
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_EXT_pci_bus_info
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_EXT_hdr_metadata
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_EXT_full_screen_exclusive
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_swapchain_maintenance1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_EXT_swapchain_maintenance1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_video_queue
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_video_decode_queue
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_video_decode_h264
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     VK_KHR_video_decode_h265
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Spent 340.810 ms creating vulkan device (slow!)
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Memory heaps supported by device:
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     0: flags 0x1 size   31G
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     1: flags 0x0 size   31G
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Memory summary:     0 used     0 res     0 alloc, efficiency 100.00%, utilization 100.00%, max page: 2011M
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] shaderc SPIR-V version 1.6 rev 1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Initialized SPIR-V compiler 'shaderc'
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] GPU information:
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     GLSL version: 450 (vulkan)
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       subgroup_size:             32
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     Limits:
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_buf_size:              34174062592
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_ssbo_size:             4294967295
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_vbo_size:              33750515712
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_mapped_size:           34174062592
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_buffer_texels:         268435456
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       align_host_ptr:            4096
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       blittable_1d_3d:           1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       align_tex_xfer_offset:     4
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_variable_comps:        0
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_constants:             18446744073709551615
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_pushc_size:            256
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]     External API interop:
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       UUID: 28:16:06:B7:CA:A5:B2:F9:6A:B5:98:0E:85:36:FF:E2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       PCI: 0000:01:00:0
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       buf export caps: 0x16
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       buf import caps: 0x16
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       tex export caps: 0x16
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       tex import caps: 0x16
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       sync export caps: 0x6
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo]       sync import caps: 0x0
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: Using nvidia graphics card
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: Native Qt Quick QRhi: Vulkan device: "NVIDIA GeForce RTX 5090" imported libplacebo device matches
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: EmbeddedSetupTest::manualHandoff() chiaki.gui: Current Profile:  ""
+QINFO  : EmbeddedSetupTest::manualHandoff() chiaki.gui: Checking sleep state: 
+PASS   : EmbeddedSetupTest::manualHandoff()
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 2517ms
+********* Finished testing of EmbeddedSetupTest *********
