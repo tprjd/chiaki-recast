@@ -85,6 +85,9 @@
         if (action === 'pin') { saved = true; message = t('Console login PIN saved'); }
         else { close(); return; }
       } else message = reply.message ?? t('The change could not be saved. Try again.');
+      await tick();
+      document.querySelector<HTMLElement>(!reply.accepted && mode === 'pin' && validTarget
+        ? '[data-saved-pin]' : '[data-close-management]')?.focus();
     } finally { busy = false; }
   }
 </script>
