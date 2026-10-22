@@ -14,6 +14,12 @@ class NativeServicesTest : public QObject
 private slots:
     void windowRecreation()
     {
+        QQuickWindow setup;
+        setup.resize(160, 90);
+        QSignalSpy setupFrames(&setup, &QQuickWindow::frameSwapped);
+        setup.show();
+        QTRY_VERIFY(!setupFrames.isEmpty());
+        const auto setupApi = QQuickWindow::graphicsApi();
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
         const auto removeSettings = qScopeGuard([&] {
             QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
@@ -39,6 +45,10 @@ private slots:
         QSignalSpy changed(backend, &QmlBackend::windowChanged);
         for (int connection = 0; connection < 2; ++connection) {
             QmlMainWindow window(backend, services.engine());
+            QCOMPARE(QQuickWindow::graphicsApi(), setupApi);
+            QCOMPARE(window.nativeGraphicsApi(), settings.GetRenderBackend() == RenderBackend::Vulkan
+                && !qEnvironmentVariableIsSet("CHIAKI_FORCE_VULKAN_FALLBACK")
+                ? QSGRendererInterface::Vulkan : QSGRendererInterface::OpenGL);
             QCOMPARE(backend->qmlWindow(), &window);
             QCOMPARE(savedSettings->audioVolume(), 37);
             QCOMPARE(state->property("host").value<QObject *>(), &window);
@@ -51,6 +61,12 @@ private slots:
             QCOMPARE(window.size(), QSize(960, 640));
             window.hide();
         }
+        const auto framesBeforeReturn = setupFrames.count();
+        setup.raise();
+        setup.requestActivate();
+        setup.setColor(Qt::green);
+        setup.update();
+        QTRY_VERIFY(setupFrames.count() > framesBeforeReturn);
         QVERIFY(!backend->qmlWindow());
         QVERIFY(!state->property("host").value<QObject *>());
         QCOMPARE(backend->qmlSettings(), savedSettings);

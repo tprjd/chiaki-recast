@@ -43,6 +43,7 @@ class QmlBackend;
 class QOffscreenSurface;
 class QOpenGLContext;
 class QOpenGLFramebufferObject;
+class QRhi;
 #ifdef Q_OS_WIN
 class WindowsMouseCapture;
 #endif
@@ -94,6 +95,7 @@ public:
 
     bool directStream() const;
     int runtimeRendererBackend() const { return static_cast<int>(render_backend); }
+    QSGRendererInterface::GraphicsApi nativeGraphicsApi() const;
 
     bool keepVideo() const;
     void setKeepVideo(bool keep);
@@ -297,6 +299,7 @@ private:
     QQmlEngine *qml_engine = {};
     QQuickWindow *quick_window = {};
     QQuickRenderControl *quick_render = {};
+    QRhi *native_rhi = {};
     QQuickItem *quick_item = {};
     pl_tex quick_tex = {};
     QOpenGLFramebufferObject *quick_fbo = {};
