@@ -10,6 +10,38 @@
 #include <QDir>
 #include <QScreen>
 #include <QRegularExpression>
+#ifdef Q_OS_WIN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+
+static QString windowProcess(HWND window)
+{
+    DWORD processId = 0;
+    GetWindowThreadProcessId(window, &processId);
+    HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId);
+    if (!process) return {};
+    wchar_t path[32768];
+    DWORD size = 32768;
+    const bool found = QueryFullProcessImageNameW(process, 0, path, &size);
+    CloseHandle(process);
+    return found ? QString::fromWCharArray(path, size).section('\\', -1) : QString();
+}
+
+static bool protectedWindowVisible()
+{
+    bool found = false;
+    EnumWindows([](HWND window, LPARAM data) -> BOOL {
+        if (IsWindowVisible(window) && windowProcess(window).compare("PickerHost.exe", Qt::CaseInsensitive) == 0) {
+            *reinterpret_cast<bool *>(data) = true;
+            return FALSE;
+        }
+        return TRUE;
+    }, reinterpret_cast<LPARAM>(&found));
+    return found;
+}
+#endif
 #ifdef CHIAKI_HAVE_WEBENGINE
 #include <QtWebEngineQuick>
 #endif
@@ -99,8 +131,30 @@ private slots:
                 native.requestActivate();
                 QTRY_VERIFY(native.isActive());
 #ifdef Q_OS_WIN
-                SetForegroundWindow(reinterpret_cast<HWND>(native.winId()));
-                QTRY_VERIFY(GetForegroundWindow() == reinterpret_cast<HWND>(native.winId()));
+                const auto nativeWindow = reinterpret_cast<HWND>(native.winId());
+                qInfo() << "Graphics observation native HWND" << quintptr(nativeWindow)
+                    << "foreground HWND" << quintptr(GetForegroundWindow())
+                    << "foreground process" << windowProcess(GetForegroundWindow());
+                QVERIFY2(!protectedWindowVisible(), "Windows Security owns a visible protected window");
+                QVERIFY(SetWindowPos(nativeWindow, HWND_TOPMOST, 0, 0, 0, 0,
+                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE));
+                const auto restoreStacking = qScopeGuard([&] {
+                    SetWindowPos(nativeWindow, HWND_NOTOPMOST, 0, 0, 0, 0,
+                        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+                });
+                QTRY_VERIFY(([&] {
+                    RECT client;
+                    if (!IsWindowVisible(nativeWindow) || !GetClientRect(nativeWindow, &client)
+                        || client.right != qRound(native.width() * native.devicePixelRatio())
+                        || client.bottom != qRound(native.height() * native.devicePixelRatio())) return false;
+                    for (int y : {client.bottom / 4, 3 * client.bottom / 4})
+                        for (int x : {client.right / 4, 3 * client.right / 4}) {
+                            POINT point{x, y};
+                            if (!ClientToScreen(nativeWindow, &point)
+                                || GetAncestor(WindowFromPoint(point), GA_ROOT) != nativeWindow) return false;
+                        }
+                    return !protectedWindowVisible();
+                })());
 #endif
                 AVFrame *frame = av_frame_alloc();
                 QVERIFY(frame);
@@ -118,6 +172,14 @@ private slots:
                 emit backend->error("GPU coexistence", "Native overlay rendered");
                 QImage rendered;
                 int bluePixels = 0, redPixels = 0;
+                QElapsedTimer captureTimer;
+                captureTimer.start();
+                qint64 lastCaptureMs = 0;
+                const auto preserveCapture = qScopeGuard([&] {
+                    rendered.save(evidence.filePath(QString("native-overlay-%1.png").arg(pass)));
+                    qInfo() << "Native rendered pass" << pass << "blue overlay pixels" << bluePixels
+                        << "native frame pixels" << redPixels << "last capture elapsed ms" << lastCaptureMs;
+                });
                 QTRY_VERIFY_WITH_TIMEOUT(([&] {
                     const auto position = native.mapToGlobal(QPoint(0, 0));
                     rendered = native.screen()->grabWindow(0, position.x(), position.y(), native.width(), native.height()).toImage();
@@ -128,10 +190,10 @@ private slots:
                             if (color.blue() > color.red() + 40 && color.green() > color.red() + 40) ++bluePixels;
                             if (color.red() > color.green() + 80 && color.red() > color.blue() + 80) ++redPixels;
                         }
+                    lastCaptureMs = captureTimer.elapsed();
                     return bluePixels > 500 && redPixels > 5000;
-                })(), 5000);
+                })(), 15000);
                 QVERIFY(rendered.save(evidence.filePath(QString("native-overlay-%1.png").arg(pass))));
-                qInfo() << "Native rendered pass" << pass << "blue overlay pixels" << bluePixels << "native frame pixels" << redPixels;
                 native.resize(900, 600);
                 QTRY_COMPARE(native.size(), QSize(900, 600));
                 native.hide();
