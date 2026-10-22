@@ -15,11 +15,15 @@ export interface State {
     bindings: { action: number; name: string; group: number; primaryName: string; alternativeName: string }[];
     keys: { buttonName: string; buttonValue: number; keyName: string }[];
   };
+  rendererSettings: Record<string, boolean | number>;
+  rendererStatus: { restartRequired: boolean; runtimeBackend?: number };
   capabilities: { discovery: boolean }; strings: Record<string, string>;
   psn: { status: 'signedOut' | 'ready' | 'expired'; id?: string; phase?: string; message?: string; profileValid?: boolean };
 }
 interface Reply { accepted: boolean; message?: string; form?: string }
 interface NativeBridge {
+  setRendererSetting(name: string, value: boolean | number | string, profileGeneration: string, callback: (reply: Reply) => void): void;
+  rendererAction(action: string, profileGeneration: string, callback: (reply: Reply) => void): void;
   snapshot(callback: (state: State) => void): void;
   setDiscoveryEnabled(value: boolean, callback: (reply: Reply) => void): void;
   selectConsole(key: string, callback: (reply: Reply) => void): void;
@@ -65,6 +69,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
   captureKeyboardMouse(action: number, slot: number, legacy: boolean, form: string, profile: string): Promise<Reply>;
   resetKeyboardMouse(form: string, profile: string): Promise<Reply>;
   resetKeyboardKeys(form: string, profile: string): Promise<Reply>;
+  rendererSetting(name: string, value: boolean | number | string, profileGeneration: string): Promise<Reply>;
+  rendererAction(action: string, profileGeneration: string): Promise<Reply>;
   dispose(): void;
 }> {
   return new Promise((resolve, reject) => {
@@ -115,6 +121,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
         captureKeyboardMouse: (action, slot, legacy, form, profile) => new Promise(done => setup.captureKeyboardMouse(action, slot, legacy, form, profile, done)),
         resetKeyboardMouse: (form, profile) => new Promise(done => setup.resetKeyboardMouse(form, profile, done)),
         resetKeyboardKeys: (form, profile) => new Promise(done => setup.resetKeyboardKeys(form, profile, done)),
+        rendererSetting: (name, value, generation) => new Promise(done => setup.setRendererSetting(name, value, generation, done)),
+        rendererAction: (action, generation) => new Promise(done => setup.rendererAction(action, generation, done)),
         dispose() {
           setup.stateChanged.disconnect(update);
           window.removeEventListener('pageshow', refresh);

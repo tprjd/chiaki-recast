@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick, onMount } from 'svelte';
-  import { generalSettings, mediaSettings, keyboardMouseSettings } from './settings';
   import KeyboardMouse from './KeyboardMouse.svelte';
+  import { generalSettings, mediaSettings, rendererSettings, keyboardMouseSettings } from './settings';
   import SettingField from './SettingField.svelte';
   import type { State, connectSetup } from './bridge';
   let { current, connection, close, t }: {
@@ -14,13 +14,13 @@
   let pending = $state(false);
   let keyboardMouseTarget = $state('');
   let search: HTMLInputElement;
-  const values = $derived({ ...current.generalSettings, ...current.mediaSettings, ...current.keyboardMouse.values });
-  const fields = $derived([...generalSettings, ...mediaSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => Object.hasOwn(values, field.key)).map(field => {
+  const values = $derived({ ...current.generalSettings, ...current.mediaSettings, ...current.rendererSettings, ...current.keyboardMouse.values });
+  const fields = $derived([...generalSettings, ...mediaSettings, ...rendererSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
     const choices = current.mediaChoices[field.key];
     if (field.key.startsWith('bitrate')) return { ...field, automatic: [0, 2, 6, 10, 15][Number(values[`resolution${field.key.slice(7)}`])] };
     return choices ? { ...field, options: choices.map(choice => choice.label), optionValues: choices.map(choice => choice.value) } : field;
   }));
-  const categories = ['General', 'Video', 'Stream', 'Audio/Wifi', 'Keyboard and mouse'];
+  const categories = ['General', 'Video', 'Stream', 'Audio/Wifi', 'Display', 'Renderer', 'Color mapping', 'Keyboard and mouse'];
   const visibleFields = $derived(fields.filter(field => (field.category ?? 'General') === category));
   const groups = $derived([...new Set(visibleFields.map(field => field.group))]);
   const searchFields = $derived([...fields,
@@ -40,7 +40,8 @@
     if (category === 'Audio/Wifi') connection.refreshAudioDevices();
     await tick();
     const field = fields.find(field => field.key === key);
-    const target = document.getElementById(requires && !values[requires] ? requires : field?.requiresValue && values[field.requiresValue.key] !== field.requiresValue.value ? field.requiresValue.key : key);
+    const unmet = field?.when?.find(condition => values[condition.key] !== condition.value);
+    const target = document.getElementById(unmet ? unmet.key : requires && !values[requires] ? requires : field?.requiresValue && values[field.requiresValue.key] !== field.requiresValue.value ? field.requiresValue.key : key);
     target?.focus();
     target?.scrollIntoView({ block: 'nearest' });
   }
@@ -48,8 +49,10 @@
     if (pending) return;
     pending = true;
     try {
-      const reply = await (Object.hasOwn(current.generalSettings, key) ? connection.generalSetting(key, value as boolean | number, generation) : connection.mediaSetting(key, value, generation));
-      message = reply.accepted ? t('Saved') : reply.message ?? t('The setting could not be saved.');
+      const action = key === 'restartRenderer' || rendererSettings.find(field => field.key === key)?.action;
+      const reply = await (action ? connection.rendererAction(key, generation) : Object.hasOwn(current.rendererSettings, key) ? connection.rendererSetting(key, value, generation) : Object.hasOwn(current.generalSettings, key) ? connection.generalSetting(key, value as boolean | number, generation) : connection.mediaSetting(key, value, generation));
+      if (generation !== current.profileGeneration) return;
+      message = reply.message ?? (reply.accepted ? t('Saved') : t('The setting could not be saved.'));
     } catch {
       message = t('The setting could not be saved.');
     } finally { pending = false; }
@@ -96,7 +99,14 @@
     {:else}
       <h2>{t(category)}</h2>
       <p class="settings-note">{t('Changes are saved automatically.')}</p>
-      {#if category !== 'General' && category !== 'Keyboard and mouse'}<p class="settings-note">{t('Stream settings apply to the next session. Audio volume also changes the current session.')}</p>{/if}
+      {#if ['Video', 'Stream', 'Audio/Wifi'].includes(category)}<p class="settings-note">{t('Stream settings apply to the next session. Audio volume also changes the current session.')}</p>{/if}
+      {#if category === 'Renderer'}
+        <p data-renderer-runtime>{current.rendererStatus.runtimeBackend === undefined ? t('No native stream window is active.') : `${t('Active native renderer')}: ${current.rendererStatus.runtimeBackend === 0 ? 'Vulkan' : 'OpenGL'}`}</p>
+        {#if current.rendererStatus.restartRequired}
+          <p data-renderer-restart role="status">{t('Restart the application to apply the saved renderer backend or OpenGL vertical sync change.')}</p>
+          <button disabled={pending} onclick={() => change('restartRenderer', true)}>{t('Restart application')}</button>
+        {/if}
+      {/if}
       {#if category === 'Audio/Wifi'}<button disabled={pending} onclick={() => connection.refreshAudioDevices()}>{t('Refresh audio devices')}</button>{/if}
       {#key current.profileGeneration}
       {#if category === 'Keyboard and mouse'}
@@ -107,8 +117,8 @@
           <h3>{t(group)}</h3>
           <div class="setting-rows">
             {#each visibleFields.filter(field => field.group === group) as field (field.key)}
-              {#if (!field.requires || values[field.requires]) && (!field.requiresValue || values[field.requiresValue.key] === field.requiresValue.value)}
-                <SettingField {field} value={values[field.key]} disabled={pending}
+              {#if (!field.requires || values[field.requires]) && (!field.requiresValue || values[field.requiresValue.key] === field.requiresValue.value) && (!field.when || field.when.every(condition => values[condition.key] === condition.value))}
+                <SettingField {field} value={values[field.key] ?? false} disabled={pending}
                   generation={current.profileGeneration} change={(value, generation) => change(field.key, value, generation)} {t} />
               {/if}
             {/each}

@@ -35,6 +35,8 @@ public:
     bool keyboardMouseFormValid(const QString &form, const QString &profile) const;
     void setKeyboardMouseAvailable(bool available);
     void invalidateKeyboardMouse();
+    Q_INVOKABLE QVariantMap setRendererSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
+    Q_INVOKABLE QVariantMap rendererAction(const QString &action, const QString &profileGeneration);
     // Native callers resolve immediately before dispatch; no row index crosses WebChannel.
     bool resolveConsole(const QString &key, int &index, QString &nickname) const;
 
@@ -62,5 +64,7 @@ private:
     bool keyboardMouseAvailable = false;
     quint64 keyboardMouseWindowGeneration = 0;
     QString keyboardMouseForm;
+    int startupRendererBackend = 0;
+    bool startupVSync = true;
     bool currentProfile(const QString &profile) const;
 };

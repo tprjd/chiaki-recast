@@ -120,7 +120,7 @@ public:
         ConnectFailedConsoleUnreachable,
     };
     Q_ENUM(PsnConnectState);
-    explicit QmlBackend(Settings *settings, QObject *parent = nullptr, PsnRequests requests = {});
+    explicit QmlBackend(Settings *settings, QObject *parent = nullptr, PsnRequests requests = {}, QmlSettings::ProcessLauncher launcher = {});
     ~QmlBackend();
 
     QmlMainWindow *qmlWindow() const;
