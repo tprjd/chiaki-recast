@@ -458,19 +458,15 @@ private slots:
         QCOMPARE(settings.GetKeyboardMouseBindings()[2][1], 0);
         dialog = capture(2, 1);
         QVERIFY(dialog);
-        setup.hide();
+        setup.suspend();
         QTRY_VERIFY(dialog.isNull());
-        setup.show();
-        script(setup.view(), "document.querySelector('.category-nav button').click()");
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('#disconnectAction') !== null").toBool());
-        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('#mouseCameraEnabled')?.disabled === false").toBool());
-        script(setup.view(), "Array.from(document.querySelectorAll('[role=tab]')).find(e => e.textContent === 'Bindings').click()");
+        setup.resume();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#keyboardMouseBinding2_1')?.disabled === false").toBool());
         dialog = capture(2, 1);
         QVERIFY(dialog);
         backend->qmlSettings()->setCurrentProfile(profile + "-next");
         QTRY_VERIFY(dialog.isNull());
-        QVERIFY(settings.GetKeyboardMouseBindings() == DefaultKeyboardMouseBindings());
+        QVERIFY(backend->nativeSettings()->GetKeyboardMouseBindings() == DefaultKeyboardMouseBindings());
     }
 
     void suspendClosesSignIn()
