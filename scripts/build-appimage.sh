@@ -1,6 +1,11 @@
 #!/bin/bash
 
-set -xe
+set -xeuo pipefail
+
+if [ "$(uname -m)" != x86_64 ]; then
+    echo "ARM AppImage is unavailable until a complete Qt >= 6.9.3 SDK is validated. Use the ARM Flatpak build path." >&2
+    exit 1
+fi
 
 if [ "$(uname -m)" = "aarch64" ]
 then
@@ -11,6 +16,8 @@ fi
 
 export QT_DIR="$(find ${QT_PATH} -maxdepth 1 -type d -name "${QT_VERSION}")"
 export PATH="${QT_DIR}/${GCC_STRING}/bin:$PATH"
+test "$(node --version)" = v24.16.0
+test "$(npm --version)" = 11.13.0
 if [ -f "${HOME}/chiaki-venv/bin/activate" ]
 then
    source "${HOME}/chiaki-venv/bin/activate"
@@ -47,6 +54,7 @@ ninja -C build_appimage
 build_appimage/test/chiaki-unit
 
 DESTDIR="${appdir}" ninja -C build_appimage install
+install -Dm644 COPYING "${appdir}/usr/share/licenses/chiaki-ng/COPYING"
 
 # linuxdeploy does not reliably pick up libSDL3 when it is only required through
 # the packaged sdl2-compat shim. Stage both SDL runtimes explicitly so the
@@ -75,9 +83,9 @@ export ARCH="$(uname -m)"
 curl -L -O https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${ARCH}.AppImage
 chmod +x linuxdeploy-${ARCH}.AppImage
 
-export LD_LIBRARY_PATH="${QT_DIR}/${GCC_STRING}/lib:$(pwd)/../build_appimage/third-party/cpp-steam-tools:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="${QT_DIR}/${GCC_STRING}/lib:$(pwd)/../build_appimage/third-party/cpp-steam-tools:${LD_LIBRARY_PATH:-}"
 export QML_SOURCES_PATHS="$(pwd)/../gui/src/qml"
-export EXTRA_QT_MODULES="waylandclient;waylandcompositor"
+export EXTRA_QT_MODULES="widgets;webenginewidgets;webchannel;quick;qml;waylandclient;waylandcompositor"
 export EXTRA_PLATFORM_PLUGINS="libqwayland-egl.so;libqwayland-generic.so;libqeglfs.so;libqminimal.so;libqminimalegl.so;libqvkkhrdisplay.so;libqvnc.so;libqoffscreen.so;libqlinuxfb.so"
 curl -L -O https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-${ARCH}.AppImage
 chmod +x linuxdeploy-plugin-qt-${ARCH}.AppImage
@@ -90,3 +98,5 @@ chmod +x linuxdeploy-plugin-qt-${ARCH}.AppImage
     --exclude-library='libvulkan*' \
     --output appimage
 mv chiaki-ng-${ARCH}.AppImage chiaki-ng.AppImage
+./chiaki-ng.AppImage --appimage-extract >/dev/null
+../scripts/check-linux-package.sh "$(pwd)/squashfs-root"

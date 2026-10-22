@@ -459,22 +459,18 @@ jobs:
           submodules: 'recursive'
           path: 'chiaki-ng'
 
-      - name: Add QmlWebEngine Import
-        working-directory: chiaki-ng
-        run: |
-          cp scripts/qtwebengine_import.qml gui/src/qml/
-
       - name: Run build script
         working-directory: chiaki-ng
         run: |
           set -xe
+          podman build -t chiaki-appimage -f scripts/Dockerfile.qt6 scripts
           podman run --rm \
             -v "`pwd`:/build/chiaki" \
             -w "/build/chiaki" \
             --device /dev/fuse \
             --cap-add SYS_ADMIN \
-            -t docker.io/streetpea/chiaki-ng-builder:qt6.9 \
-            /bin/bash -c "sudo -E scripts/build-appimage.sh /build/appdir"
+            -t chiaki-appimage \
+            /bin/bash -c 'sudo -E env PATH="$PATH" scripts/build-appimage.sh /build/appdir'
           cp appimage/chiaki-ng.AppImage appimage/chiaki-ng.AppImage_x86_64
 
       - name: Upload chiaki-ng Artifact
@@ -486,50 +482,6 @@ jobs:
           if-no-files-found: error
           release-upload-url: ${{ needs.create-release.outputs.upload_url }}
 
-  build-appimage_arm64:
-    name: Build chiaki-ng appimage_arm64
-    runs-on: ubuntu-24.04-arm
-    permissions:
-      contents: write
-    needs: create-release
-    steps:
-      - name: Setup Podman
-        run: |
-          sudo apt update
-          sudo apt-get -y install podman
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: 'recursive'
-          path: 'chiaki-ng'
-
-      - name: Add QmlWebEngine Import
-        working-directory: chiaki-ng
-        run: |
-          cp scripts/qtwebengine_import.qml gui/src/qml/
-
-      - name: Run build script
-        working-directory: chiaki-ng
-        run: |
-          set -xe
-          podman run --rm \
-            -v "`pwd`:/build/chiaki" \
-            -w "/build/chiaki" \
-            --device /dev/fuse \
-            --cap-add SYS_ADMIN \
-            -t docker.io/streetpea/chiaki-ng-builder:qt6.7 \
-            /bin/bash -c "sudo -E scripts/build-appimage.sh /build/appdir"
-          cp appimage/chiaki-ng.AppImage appimage/chiaki-ng.AppImage_arm64
-
-      - name: Upload chiaki-ng Artifact
-        uses: nanoufo/action-upload-artifacts-and-release-assets@v2
-        with:
-          path: |
-            chiaki-ng/appimage/chiaki-ng.AppImage_arm64
-          upload-release-files: true
-          if-no-files-found: error
-          release-upload-url: ${{ needs.create-release.outputs.upload_url }}
 
   build-flatpak_x64:
     name: Build chiaki-ng flatpak bundle x64
@@ -555,15 +507,16 @@ jobs:
       - name: Setup Flatpak Builder Environment
         run: |
           flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          flatpak install org.kde.Sdk//6.9 -y
-          flatpak install org.kde.Platform//6.9 -y
-          flatpak install io.qt.qtwebengine.BaseApp//6.9 -y
-          flatpak update --appstream --assumeyes
+          flatpak install --user flathub org.kde.Sdk//6.11 -y
+          flatpak install --user flathub org.kde.Platform//6.11 -y
+          flatpak install --user flathub io.qt.qtwebengine.BaseApp//6.11 -y
+          flatpak update --user --appstream --assumeyes
 
       - name: Build Flatpak package
         working-directory: chiaki-ng
         run: |
-          flatpak-builder --repo=chiaki-ng --force-clean build-dir scripts/flatpak/io.github.streetpea.Chiaki4deck.yaml
+          flatpak-builder --user --repo=chiaki-ng --force-clean build-dir scripts/flatpak/io.github.streetpea.Chiaki4deck.yaml
+          flatpak build --runtime build-dir /app/bin/check-chiaki-package /app
 
       - name: Bundle Flatpak app
         working-directory: chiaki-ng
@@ -613,15 +566,16 @@ jobs:
       - name: Setup Flatpak Builder Environment
         run: |
           flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          flatpak install org.kde.Sdk//6.9 -y
-          flatpak install org.kde.Platform//6.9 -y
-          flatpak install io.qt.qtwebengine.BaseApp//6.9 -y
-          flatpak update --appstream --assumeyes
+          flatpak install --user flathub org.kde.Sdk//6.11 -y
+          flatpak install --user flathub org.kde.Platform//6.11 -y
+          flatpak install --user flathub io.qt.qtwebengine.BaseApp//6.11 -y
+          flatpak update --user --appstream --assumeyes
 
       - name: Build Flatpak package
         working-directory: chiaki-ng
         run: |
-          flatpak-builder --repo=chiaki-ng --force-clean build-dir scripts/flatpak/io.github.streetpea.Chiaki4deck.yaml
+          flatpak-builder --user --repo=chiaki-ng --force-clean build-dir scripts/flatpak/io.github.streetpea.Chiaki4deck.yaml
+          flatpak build --runtime build-dir /app/bin/check-chiaki-package /app
 
       - name: Bundle Flatpak app
         working-directory: chiaki-ng
