@@ -1,4 +1,5 @@
 #include <QtTest>
+#include <SDL.h>
 #include <QApplication>
 #include <QWebEnginePage>
 #include <QWebEngineView>
@@ -978,6 +979,85 @@ private slots:
         QTRY_COMPARE_WITH_TIMEOUT(restarted.state(), QProcess::NotRunning, 20000);
         QCOMPARE(restarted.exitStatus(), QProcess::NormalExit);
         QCOMPARE(restarted.exitCode(), 0);
+    }
+
+    void videoAudioDevices()
+    {
+        // The dummy driver controls the system audio boundary, not WebChannel or QmlSettings.
+        QCOMPARE(SDL_AudioInit("dummy"), 0);
+        const auto audioCleanup = qScopeGuard([] { SDL_AudioQuit(); });
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetAudioOutDevice("Disconnected output");
+        settings.SetAudioInDevice("Disconnected input");
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        services.backend()->setDiscoveryEnabled(false);
+        auto *native = services.backend()->qmlSettings();
+        QSignalSpy refreshed(native, &QmlSettings::audioDevicesChanged);
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#disconnectAction')").toBool());
+        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(b=>b.textContent==='Audio/Wifi').click()");
+        QTRY_VERIFY(refreshed.count() >= 1);
+        QVERIFY(!native->availableAudioOutDevices().isEmpty());
+        QVERIFY(!native->availableAudioInDevices().isEmpty());
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#audioOutDevice')?.value").toString(), QStringLiteral("Disconnected output"));
+        for (const auto &key : {"audioOutDevice", "audioInDevice"}) {
+            QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled === false").arg(key)).toBool());
+            script(setup.view(), QString("{const field=document.getElementById('%1');field.selectedIndex=1;field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(key));
+            if (QString(key) == "audioOutDevice") QTRY_COMPARE(settings.GetAudioOutDevice(), native->availableAudioOutDevices().first());
+            else QTRY_COMPARE(settings.GetAudioInDevice(), native->availableAudioInDevices().first());
+        }
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#audioOutDevice').options.length").toInt(), native->availableAudioOutDevices().size() + 1);
+        Settings reopened(profile);
+        QCOMPARE(reopened.GetAudioOutDevice(), native->availableAudioOutDevices().first());
+        QCOMPARE(reopened.GetAudioInDevice(), native->availableAudioInDevices().first());
+        const int before = refreshed.count();
+        script(setup.view(), "[...document.querySelectorAll('button')].find(b=>b.textContent==='Refresh audio devices').click()");
+        QTRY_VERIFY(refreshed.count() > before);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#audioOutDevice').value").toString(), settings.GetAudioOutDevice());
+    }
+
+    void videoAudioPreview()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetAudioOutDevice("Disconnected output");
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        services.backend()->setDiscoveryEnabled(false);
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#disconnectAction')").toBool());
+        const QDir evidence(qEnvironmentVariable("CHIAKI_MEDIA_EVIDENCE", "."));
+        const auto capture = [&](const QString &category, int width, int height, double zoom, const QString &name) {
+            setup.resize(width, height);
+            setup.view()->setZoomFactor(zoom);
+            script(setup.view(), QString("[...document.querySelectorAll('.category-nav button')].find(b=>b.textContent==='%1').click();window.scrollTo(0,0)").arg(category));
+            QTRY_COMPARE(script(setup.view(), "innerWidth").toInt(), qRound(width / zoom));
+            QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth && scrollY === 0").toBool());
+            QTest::qWait(100);
+            QVERIFY(setup.view()->grab().save(evidence.filePath(name)));
+        };
+        capture("Video", 1280, 900, 1, "video-1280.png");
+        capture("Stream", 1280, 900, 1, "stream-1280.png");
+        capture("Audio/Wifi", 390, 720, 1, "audio-390.png");
+        capture("Audio/Wifi", 800, 600, 2, "audio-200-percent.png");
     }
 
     void generalSettings()
