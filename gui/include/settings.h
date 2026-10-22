@@ -221,8 +221,8 @@ class Settings : public QObject
 	public:
 		explicit Settings(const QString &conf, QObject *parent = nullptr);
 
-		void ExportSettings(QString filepath);
-		void ImportSettings(QString filepath);
+		bool ExportSettings(QString filepath);
+		bool ImportSettings(QString filepath);
 
 		bool ExportPlaceboSettings(QString filepath);
 		bool ImportPlaceboSettings(QString filepath);
@@ -421,7 +421,7 @@ class Settings : public QObject
 		void SetPsnAuthTokenExpiry(QString expiry_date);
 
 		QString GetCurrentProfile() const;
-		void SetCurrentProfile(QString profile);
+		bool SetCurrentProfile(QString profile);
 
 		bool GetKeyboardEnabled() const;
 		void SetKeyboardEnabled(bool enabled);
@@ -469,7 +469,7 @@ class Settings : public QObject
 		uint GetStreamMenuShortcut4() const;
 		void SetStreamMenuShortcut4(uint button);
 
-		void DeleteProfile(QString profile);
+		bool DeleteProfile(QString profile);
 
 		QString GetPsnAccountId() const;
 		void SetPsnAccountId(QString account_id);

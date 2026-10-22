@@ -15,7 +15,6 @@ Item {
     function showRegistDialog(host, ps5) { record("register", [host, ps5]); }
     function showDisplaySettingsDialog() { record("display"); }
     function showPlaceboSettingsDialog() { record("renderer"); }
-    function showProfileDialog() { record("profiles"); }
     function showPSNTokenDialog(remote) { record("login", [remote]); }
     function showConfirmDialog(title, text, actionText, callback, cancel) { record("confirm", [title, text, actionText, callback, cancel]); }
     FakeSettings { id: fakeSettings }

@@ -620,10 +620,10 @@ public:
     Q_INVOKABLE void refreshAudioDevices();
     Q_INVOKABLE QString changeControllerKey(int button, int key);
     Q_INVOKABLE void clearKeyMapping();
-    Q_INVOKABLE void exportSettings();
+    Q_INVOKABLE QVariantMap exportSettings();
     Q_INVOKABLE QString chooseSteamBasePath();
     Q_INVOKABLE QVariantMap exportPlaceboSettings();
-    Q_INVOKABLE void importSettings();
+    Q_INVOKABLE QVariantMap importSettings();
     Q_INVOKABLE QVariantMap importPlaceboSettings();
     Q_INVOKABLE void deleteProfile(QString profile);
     Q_INVOKABLE QString stringForDpadShortcut() const;
