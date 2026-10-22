@@ -2960,6 +2960,214 @@ private slots:
         capture("Audio/Wifi", 800, 600, 2, "audio-200-percent.png");
     }
 
+    void colorMappingSettings()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+            QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
+        });
+        QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        backend->setDiscoveryEnabled(false);
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav')!==null").toBool());
+        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='Renderer').click()");
+        const auto change = [&](const QString &key, double value) {
+            QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled===false").arg(key)).toBool());
+            script(setup.view(), QString("{const field=document.getElementById('%1');field.value='%2';field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(key).arg(value));
+        };
+        change("videoPreset", 5);
+        QTRY_COMPARE(int(settings.GetPlaceboPreset()), 5);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#placeboColorMappingEnabled')!==null").toBool());
+        QCOMPARE(script(setup.view(), "document.querySelector('#placeboColorMappingEnabled').checked").toBool(), true);
+        change("placeboColorMappingPreset", 0);
+        QTRY_COMPARE(int(settings.GetPlaceboColorMappingPreset()), 0);
+        script(setup.view(), "document.querySelector('#openPlaceboColorMapping').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboGamutMappingFunction')?.options.length").toInt(), 10);
+        QSignalSpy changed(backend->qmlSettings(), &QmlSettings::placeboChanged);
+        change("placeboGamutMappingPerceptualDeadzone", 0.42);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboGamutMappingPerceptualDeadzone() - 0.42f) < 0.001f);
+        QVERIFY(changed.count() > 0);
+        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+        change("placeboGamutMappingFunction", 2);
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('#placeboGamutMappingPerceptualDeadzone') && !!document.querySelector('#placeboGamutMappingSoftClipDesat')").toBool());
+        change("placeboGamutMappingSoftClipDesat", 0.55);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboGamutMappingSoftClipDesat() - 0.55f) < 0.001f);
+        change("placeboGamutMappingFunction", 3);
+        change("placeboGamutMappingColorimetricGamma", 2.25);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboGamutMappingColorimetricGamma() - 2.25f) < 0.001f);
+        change("placeboGamutMappingLut3dSizeI", 64);
+        QTRY_COMPARE(settings.GetPlaceboGamutMappingLut3dSizeI(), 64);
+        QCOMPARE(script(setup.view(), "document.querySelector('#placeboToneMappingFunction').options.length").toInt(), 12);
+        change("placeboToneMappingKneeMinimum", 0.23);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboToneMappingKneeMinimum() - 0.23f) < 0.001f);
+        change("placeboToneMappingFunction", 4);
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('#placeboToneMappingKneeMinimum') && !!document.querySelector('#placeboToneMappingKneeDefault') && !!document.querySelector('#placeboToneMappingKneeOffset')").toBool());
+        change("placeboToneMappingKneeOffset", 1.25);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboToneMappingKneeOffset() - 1.25f) < 0.001f);
+        change("placeboToneMappingFunction", 6);
+        change("placeboToneMappingReinhardContrast", 0.65);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboToneMappingReinhardContrast() - 0.65f) < 0.001f);
+        change("placeboToneMappingFunction", 7);
+        change("placeboToneMappingLinearKnee", 0.45);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboToneMappingLinearKnee() - 0.45f) < 0.001f);
+        change("placeboToneMappingFunction", 10);
+        change("placeboToneMappingExposure", 2.5);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboToneMappingExposure() - 2.5f) < 0.001f);
+        change("placeboToneMappingMetadata", 4);
+        QTRY_COMPARE(int(settings.GetPlaceboToneMappingMetadata()), 4);
+        change("placeboToneMappingToneLutSize", 512);
+        QTRY_COMPARE(settings.GetPlaceboToneMappingToneLutSize(), 512);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#placeboGamutMappingGamutExpansionEnabled')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('#placeboGamutMappingGamutExpansionEnabled').click()");
+        QTRY_VERIFY(settings.GetPlaceboGamutMappingGamutExpansionEnabled());
+        const auto previous = settings.GetPlaceboValues();
+        for(const auto &input : QList<QPair<QString, QVariant>>{{"placeboColorMappingEnabled", 1}, {"placeboColorMappingPreset", 3},
+            {"placeboGamutMappingFunction", 10}, {"placeboGamutMappingFunction", QStringLiteral("1")},
+            {"placeboGamutMappingPerceptualDeadzone", 0.5}, {"placeboGamutMappingSoftClipDesat", 0.5},
+            {"placeboGamutMappingColorimetricGamma", 10.01}, {"placeboGamutMappingLut3dSizeI", 1025}, {"placeboGamutMappingLut3dSizeC", 0.5},
+            {"placeboGamutMappingLut3dTricubicEnabled", 1}, {"placeboToneMappingFunction", 12},
+            {"placeboToneMappingKneeMinimum", 0.2}, {"placeboToneMappingReinhardContrast", 0.4},
+            {"placeboToneMappingExposure", -0.1}, {"placeboToneMappingMetadata", 5}, {"placeboToneMappingToneLutSize", 4097},
+            {"placeboToneMappingContrastRecovery", 2.01}, {"placeboToneMappingContrastSmoothness", 0.9}}) {
+            QVERIFY(!settingRequest(setup.view(), input.first, input.second, generation, "setRendererSetting").value("accepted").toBool());
+        }
+        QVERIFY(!settingRequest(setup.view(), "placeboToneMappingExposure", 3, generation + "-old", "setRendererSetting").value("accepted").toBool());
+        QCOMPARE(settings.GetPlaceboValues(), previous);
+        backend->qmlSettings()->setPlaceboToneMappingContrastRecovery(0.57);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboToneMappingContrastRecovery')?.value").toString(), QStringLiteral("0.57"));
+        const auto search = [&](const QString &query) {
+            script(setup.view(), QString("{const field=document.querySelector('.settings-search input');field.value='%1';field.dispatchEvent(new Event('input',{bubbles:true}));}").arg(query));
+            QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 1);
+            script(setup.view(), "document.querySelector('.settings-results button').click()");
+        };
+        search("perceptual deadzone");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("placeboGamutMappingFunction"));
+        change("placeboGamutMappingFunction", 1);
+        QTRY_COMPARE(int(settings.GetPlaceboGamutMappingFunction()), 1);
+        search("perceptual deadzone");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("placeboGamutMappingPerceptualDeadzone"));
+        script(setup.view(), "document.querySelector('#backRenderer').click()");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("openPlaceboColorMapping"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#placeboColorMappingEnabled')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('#placeboColorMappingEnabled').click()");
+        QTRY_VERIFY(!settings.GetPlaceboColorMappingEnabled());
+        QVERIFY(!settingRequest(setup.view(), "placeboColorMappingPreset", 1, generation, "setRendererSetting").value("accepted").toBool());
+        QVERIFY(!settingRequest(setup.view(), "placeboGamutMappingFunction", 2, generation, "setRendererSetting").value("accepted").toBool());
+        search("perceptual deadzone");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("placeboColorMappingEnabled"));
+        script(setup.view(), "document.querySelector('#placeboColorMappingEnabled').click()");
+        QTRY_VERIFY(settings.GetPlaceboColorMappingEnabled());
+        change("placeboColorMappingPreset", 2);
+        QTRY_COMPARE(int(settings.GetPlaceboColorMappingPreset()), 2);
+        search("perceptual deadzone");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("placeboColorMappingPreset"));
+        change("placeboColorMappingPreset", 0);
+        QTRY_COMPARE(int(settings.GetPlaceboColorMappingPreset()), 0);
+        change("videoPreset", 2);
+        QTRY_COMPARE(int(settings.GetPlaceboPreset()), 2);
+        QVERIFY(!settingRequest(setup.view(), "placeboColorMappingEnabled", false, generation, "setRendererSetting").value("accepted").toBool());
+        search("perceptual deadzone");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("videoPreset"));
+        change("videoPreset", 5);
+        QTRY_COMPARE(int(settings.GetPlaceboPreset()), 5);
+        search("perceptual deadzone");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("placeboGamutMappingPerceptualDeadzone"));
+        script(setup.view(), "window.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("openPlaceboColorMapping"));
+        setup.view()->reload();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.settings-search input')").toBool());
+        search("perceptual deadzone");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboGamutMappingPerceptualDeadzone')?.value").toString(), QStringLiteral("0.42"));
+        QSettings(QCoreApplication::organizationName(), "pl_render_params").sync();
+        QProcess restarted;
+        auto environment = QProcessEnvironment::systemEnvironment();
+        environment.insert("CHIAKI_COLOR_RESTART_PROFILE", profile);
+        restarted.setProcessEnvironment(environment);
+        restarted.start(QCoreApplication::applicationFilePath(), {"colorMappingRestartRead", "-o",
+            qEnvironmentVariable("CHIAKI_EMBEDDED_LAYOUT_DIR", QDir::tempPath()) + "/color-restart.txt,txt"});
+        QVERIFY(restarted.waitForStarted());
+        QTRY_COMPARE_WITH_TIMEOUT(restarted.state(), QProcess::NotRunning, 20000);
+        QCOMPARE(restarted.exitStatus(), QProcess::NormalExit);
+        QCOMPARE(restarted.exitCode(), 0);
+    }
+
+    void colorMappingLayout()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+            QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
+        });
+        QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetPlaceboPreset(PlaceboPreset::Custom);
+        settings.SetPlaceboGamutMappingPerceptualDeadzone(0.42);
+        settings.SetPlaceboColorMappingPreset(PlaceboColorMappingPreset::None);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        services.backend()->setDiscoveryEnabled(false);
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.category-nav')").toBool());
+        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='Color mapping').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#placeboGamutMappingFunction')").toBool());
+        const auto capture = [&](int width, int height, double zoom, const QString &name) {
+            setup.resize(width, height);
+            setup.view()->setZoomFactor(zoom);
+            QTRY_COMPARE(script(setup.view(), "innerWidth").toInt(), qRound(setup.view()->width() / zoom));
+            QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth<=innerWidth && [...document.querySelectorAll('.settings-content input,.settings-content select,.settings-content button')].every(e=>{const r=e.getBoundingClientRect();return r.left>=0 && r.right<=innerWidth})").toBool());
+            script(setup.view(), "document.querySelector('.settings-content h2').scrollIntoView()");
+            QTRY_VERIFY(script(setup.view(), "['.settings-content h2','#placeboGamutMappingFunction'].every(s=>{const r=document.querySelector(s).getBoundingClientRect();return r.top>=0 && r.bottom<=innerHeight})").toBool());
+            script(setup.view(), "window.__colorPainted=false;requestAnimationFrame(()=>requestAnimationFrame(()=>window.__colorPainted=true))");
+            QTRY_VERIFY(script(setup.view(), "window.__colorPainted===true").toBool());
+            QTest::qWait(100);
+            QVERIFY(setup.view()->grab().save(qEnvironmentVariable("CHIAKI_EMBEDDED_LAYOUT_DIR", QDir::tempPath()) + "/" + name));
+        };
+        capture(1280, 720, 1, "color-1280.png");
+        capture(900, 600, 1, "color-900.png");
+        capture(800, 900, 2, "color-200-percent.png");
+        capture(390, 720, 1, "color-390.png");
+    }
+
+    void colorMappingRestartRead()
+    {
+        const auto profile = qEnvironmentVariable("CHIAKI_COLOR_RESTART_PROFILE");
+        if(profile.isEmpty()) QSKIP("Launched only by colorMappingSettings with isolated saved settings");
+        Settings settings(profile);
+        QCOMPARE(settings.GetPlaceboGamutMappingLut3dSizeI(), 64);
+        QCOMPARE(settings.GetPlaceboToneMappingToneLutSize(), 512);
+        QVERIFY(qAbs(settings.GetPlaceboToneMappingExposure() - 2.5f) < 0.001f);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        services.backend()->setDiscoveryEnabled(false);
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.settings-search input')").toBool());
+        script(setup.view(), "{const field=document.querySelector('.settings-search input');field.value='perceptual deadzone';field.dispatchEvent(new Event('input',{bubbles:true}));}");
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 1);
+        script(setup.view(), "document.querySelector('.settings-results button').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboGamutMappingPerceptualDeadzone')?.value").toString(), QStringLiteral("0.42"));
+        QCOMPARE(script(setup.view(), "document.querySelector('#placeboToneMappingExposure').value").toString(), QStringLiteral("2.5"));
+    }
+
     void rendererSettings()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);

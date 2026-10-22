@@ -204,7 +204,117 @@ void SetupBridge::refresh()
         }
     }
     QVariantMap strings;
-    const char *texts[] = {QT_TR_NOOP("Consoles"), QT_TR_NOOP("Search consoles"), QT_TR_NOOP("Discovery"), QT_TR_NOOP("Discovery is on"), QT_TR_NOOP("Discovery is off"),
+    const char *colorParentTexts[] = {
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping Enabled:"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Checked"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping Preset:"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Custom"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Default"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "High Quality"),
+        QT_TRANSLATE_NOOP("PlaceboSettingsDialog", "Color Mapping Settings:")};
+    for(const auto *text : colorParentTexts) {
+        auto key = QString::fromUtf8(text);
+        if(key.endsWith(':')) key.chop(1);
+        strings.insert(key, QCoreApplication::translate("PlaceboSettingsDialog", text));
+    }
+    const char *colorDetailTexts[] = {
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Mapping Function:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Mapping 1"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Clip"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Perceptual"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Soft Clip"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Relative"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Saturation"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Absolute"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Desaturate"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Darken"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Highlight"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Linear"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Perceptual Deadzone:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Perceptual Strength:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Colorimetric Gamma:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Soft Clip Knee:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Soft Clip Desaturation:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Size I:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Mapping 2"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Size C:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Size h:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "LUT 3D Tricubic Enabled:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Unchecked"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamut Expansion Enabled:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping Function:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping 1"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Spline"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "St2094-40"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "St-2094-10"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Bt2390"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Bt2446a"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Reinhard"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Mobius"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Hable"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Gamma"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Linear Light"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Adaptation:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Minimum:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Maximum:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Default:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Knee Offset:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Slope Tuning:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping 2"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Slope Offset:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Spline Contrast:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Reinhard Contrast:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Linear Knee:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Exposure:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Inverse Tone-mapping Enabled:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping 3"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone-mapping Metadata:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Any"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "None"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "HDR10"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "HDR10 Plus"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Cie_y"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Tone LUT Size:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Contrast Recovery:"),
+        QT_TRANSLATE_NOOP("PlaceboColorMappingDialog", "Contrast Smoothness:")};
+    for(const auto *text : colorDetailTexts) {
+        auto key = QString::fromUtf8(text);
+        if(key.endsWith(':')) key.chop(1);
+        strings.insert(key, QCoreApplication::translate("PlaceboColorMappingDialog", text));
+    }
+    const char *colorSearchTexts[] = {
+        QT_TRANSLATE_NOOP("SettingsSearch", "Choose how out-of-gamut colors are mapped."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the deadzone. Requires the Perceptual gamut function."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set mapping strength. Requires the Perceptual gamut function."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set gamma. Requires Relative, Absolute or Darken gamut mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the knee. Requires Perceptual or Soft Clip gamut mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set desaturation. Requires Soft Clip gamut mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the intensity dimension of the gamut lookup table."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the chroma dimension of the gamut lookup table."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the hue dimension of the gamut lookup table."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Use tricubic gamut lookup interpolation."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Allow the output color gamut to expand."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Choose the algorithm for mapping display brightness."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set knee adaptation. Requires Spline or ST 2094 tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the minimum knee. Requires Spline or ST 2094 tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the maximum knee. Requires Spline or ST 2094 tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the default knee."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set knee offset. Requires BT.2390 tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Tune the slope. Requires Spline tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set slope offset. Requires Spline tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set spline contrast. Requires Spline tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set contrast. Requires Reinhard tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set the linear knee. Requires Mobius or Gamma tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set exposure. Requires Linear or Linear Light tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Expand SDR brightness to HDR."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Choose the HDR metadata source."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set tone mapping lookup table precision."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Recover contrast after tone mapping."),
+        QT_TRANSLATE_NOOP("SettingsSearch", "Set contrast recovery smoothing.")};
+    for(const auto *text : colorSearchTexts) strings.insert(QString::fromUtf8(text), QCoreApplication::translate("SettingsSearch", text));
+    const char *texts[] = {QT_TR_NOOP("Back to Renderer"), QT_TR_NOOP("Configure color mapping in Renderer"),
+        QT_TR_NOOP("Requires the Custom render preset, Color Mapping Enabled, and the Custom color mapping preset in Renderer."), QT_TR_NOOP("Consoles"), QT_TR_NOOP("Search consoles"), QT_TR_NOOP("Discovery"), QT_TR_NOOP("Discovery is on"), QT_TR_NOOP("Discovery is off"),
         QT_TR_NOOP("No consoles found"), QT_TR_NOOP("No matching consoles"), QT_TR_NOOP("Turn on discovery to find consoles on your local network."),
         QT_TR_NOOP("Online"), QT_TR_NOOP("In standby"), QT_TR_NOOP("Status unknown"), QT_TR_NOOP("Not registered"), QT_TR_NOOP("Local network"), QT_TR_NOOP("Manual address"),
         QT_TR_NOOP("Remote connection via PSN"), QT_TR_NOOP("Console"), QT_TR_NOOP("Console unavailable"), QT_TR_NOOP("Selected"), QT_TR_NOOP("Loading consoles"), QT_TR_NOOP("Setup unavailable"), QT_TR_NOOP("Connect"), QT_TR_NOOP("Dismiss"),
@@ -438,7 +548,37 @@ void SetupBridge::refresh()
         {"placeboPeakDetectionSceneThresholdHigh", settings->placeboPeakDetectionSceneThresholdHigh()},
         {"placeboPeakDetectionPeakPercentile", settings->placeboPeakDetectionPeakPercentile()},
         {"placeboPeakDetectionBlackCutoff", settings->placeboPeakDetectionBlackCutoff()},
-        {"placeboPeakDetectionAllowDelayedPeak", settings->placeboPeakDetectionAllowDelayedPeak()}};
+        {"placeboPeakDetectionAllowDelayedPeak", settings->placeboPeakDetectionAllowDelayedPeak()},
+        {"placeboColorMappingEnabled", settings->placeboColorMappingEnabled()},
+        {"placeboColorMappingPreset", settings->placeboColorMappingPreset()},
+        {"placeboGamutMappingFunction", settings->placeboGamutMappingFunction()},
+        {"placeboGamutMappingPerceptualDeadzone", settings->placeboGamutMappingPerceptualDeadzone()},
+        {"placeboGamutMappingPerceptualStrength", settings->placeboGamutMappingPerceptualStrength()},
+        {"placeboGamutMappingColorimetricGamma", settings->placeboGamutMappingColorimetricGamma()},
+        {"placeboGamutMappingSoftClipKnee", settings->placeboGamutMappingSoftClipKnee()},
+        {"placeboGamutMappingSoftClipDesat", settings->placeboGamutMappingSoftClipDesat()},
+        {"placeboGamutMappingLut3dSizeI", settings->placeboGamutMappingLut3dSizeI()},
+        {"placeboGamutMappingLut3dSizeC", settings->placeboGamutMappingLut3dSizeC()},
+        {"placeboGamutMappingLut3dSizeH", settings->placeboGamutMappingLut3dSizeH()},
+        {"placeboGamutMappingLut3dTricubicEnabled", settings->placeboGamutMappingLut3dTricubicEnabled()},
+        {"placeboGamutMappingGamutExpansionEnabled", settings->placeboGamutMappingGamutExpansionEnabled()},
+        {"placeboToneMappingFunction", settings->placeboToneMappingFunction()},
+        {"placeboToneMappingKneeAdaptation", settings->placeboToneMappingKneeAdaptation()},
+        {"placeboToneMappingKneeMinimum", settings->placeboToneMappingKneeMinimum()},
+        {"placeboToneMappingKneeMaximum", settings->placeboToneMappingKneeMaximum()},
+        {"placeboToneMappingKneeDefault", settings->placeboToneMappingKneeDefault()},
+        {"placeboToneMappingKneeOffset", settings->placeboToneMappingKneeOffset()},
+        {"placeboToneMappingSlopeTuning", settings->placeboToneMappingSlopeTuning()},
+        {"placeboToneMappingSlopeOffset", settings->placeboToneMappingSlopeOffset()},
+        {"placeboToneMappingSplineContrast", settings->placeboToneMappingSplineContrast()},
+        {"placeboToneMappingReinhardContrast", settings->placeboToneMappingReinhardContrast()},
+        {"placeboToneMappingLinearKnee", settings->placeboToneMappingLinearKnee()},
+        {"placeboToneMappingExposure", settings->placeboToneMappingExposure()},
+        {"placeboToneMappingInverseToneMappingEnabled", settings->placeboToneMappingInverseToneMappingEnabled()},
+        {"placeboToneMappingMetadata", settings->placeboToneMappingMetadata()},
+        {"placeboToneMappingToneLutSize", settings->placeboToneMappingToneLutSize()},
+        {"placeboToneMappingContrastRecovery", settings->placeboToneMappingContrastRecovery()},
+        {"placeboToneMappingContrastSmoothness", settings->placeboToneMappingContrastSmoothness()}};
     renderer.insert("targetPeakChoice", settings->displayTargetPeak() == 0 ? 0 : 1);
     renderer.insert("targetContrastChoice", settings->displayTargetContrast() == 0 ? 0 : settings->displayTargetContrast() == -1 ? 1 : 2);
     const auto *window = backend->qmlWindow();
@@ -1146,6 +1286,186 @@ QVariantMap SetupBridge::setRendererSetting(const QString &name, const QVariant 
     const auto type = value.metaType().id();
     const bool numeric = type == QMetaType::Double || type == QMetaType::Int || type == QMetaType::UInt || type == QMetaType::LongLong;
     const auto number = value.toDouble();
+    if(name == "placeboColorMappingEnabled") {
+        if(!(settings->videoPreset() == 5)) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboColorMappingEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboColorMappingPreset") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 2 || std::floor(number) != number) return reject();
+        settings->setPlaceboColorMappingPreset(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingFunction") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 9 || std::floor(number) != number) return reject();
+        settings->setPlaceboGamutMappingFunction(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingPerceptualDeadzone") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 1))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboGamutMappingPerceptualDeadzone(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingPerceptualStrength") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 1))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboGamutMappingPerceptualStrength(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingColorimetricGamma") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 3 || settings->placeboGamutMappingFunction() == 5 || settings->placeboGamutMappingFunction() == 7))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 10.0) return reject();
+        settings->setPlaceboGamutMappingColorimetricGamma(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingSoftClipKnee") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 1 || settings->placeboGamutMappingFunction() == 2))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboGamutMappingSoftClipKnee(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingSoftClipDesat") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboGamutMappingFunction() == 2))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboGamutMappingSoftClipDesat(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingLut3dSizeI") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1024.0 || std::floor(number) != number) return reject();
+        settings->setPlaceboGamutMappingLut3dSizeI(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingLut3dSizeC") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1024.0 || std::floor(number) != number) return reject();
+        settings->setPlaceboGamutMappingLut3dSizeC(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingLut3dSizeH") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1024.0 || std::floor(number) != number) return reject();
+        settings->setPlaceboGamutMappingLut3dSizeH(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingLut3dTricubicEnabled") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboGamutMappingLut3dTricubicEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboGamutMappingGamutExpansionEnabled") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboGamutMappingGamutExpansionEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingFunction") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 11 || std::floor(number) != number) return reject();
+        settings->setPlaceboToneMappingFunction(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingKneeAdaptation") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1 || settings->placeboToneMappingFunction() == 2 || settings->placeboToneMappingFunction() == 3))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingKneeAdaptation(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingKneeMinimum") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1 || settings->placeboToneMappingFunction() == 2 || settings->placeboToneMappingFunction() == 3))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 0.5) return reject();
+        settings->setPlaceboToneMappingKneeMinimum(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingKneeMaximum") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1 || settings->placeboToneMappingFunction() == 2 || settings->placeboToneMappingFunction() == 3))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.5 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingKneeMaximum(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingKneeDefault") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingKneeDefault(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingKneeOffset") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 4))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.5 || number > 2.0) return reject();
+        settings->setPlaceboToneMappingKneeOffset(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingSlopeTuning") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 10.0) return reject();
+        settings->setPlaceboToneMappingSlopeTuning(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingSlopeOffset") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingSlopeOffset(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingSplineContrast") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 1))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.5) return reject();
+        settings->setPlaceboToneMappingSplineContrast(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingReinhardContrast") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 6))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingReinhardContrast(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingLinearKnee") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 7 || settings->placeboToneMappingFunction() == 9))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 1.0) return reject();
+        settings->setPlaceboToneMappingLinearKnee(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingExposure") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0 && (settings->placeboToneMappingFunction() == 10 || settings->placeboToneMappingFunction() == 11))) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 10.0) return reject();
+        settings->setPlaceboToneMappingExposure(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingInverseToneMappingEnabled") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboToneMappingInverseToneMappingEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingMetadata") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 4 || std::floor(number) != number) return reject();
+        settings->setPlaceboToneMappingMetadata(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingToneLutSize") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 4096.0 || std::floor(number) != number) return reject();
+        settings->setPlaceboToneMappingToneLutSize(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingContrastRecovery") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0.0 || number > 2.0) return reject();
+        settings->setPlaceboToneMappingContrastRecovery(number);
+        return {{"accepted", true}};
+    }
+    if(name == "placeboToneMappingContrastSmoothness") {
+        if(!(settings->videoPreset() == 5 && settings->placeboColorMappingEnabled() == true && settings->placeboColorMappingPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 1.0 || number > 32.0) return reject();
+        settings->setPlaceboToneMappingContrastSmoothness(number);
+        return {{"accepted", true}};
+    }
     if(name == "targetPeakChoice") {
         if(!numeric || (number != 0 && number != 1)) return reject();
         settings->setDisplayTargetPeak(number == 0 ? 0 : 1000);
