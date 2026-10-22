@@ -103,6 +103,10 @@
       disabled={!connection || changingDiscovery || !current?.capabilities.discovery} onclick={discovery}>
       {t('Discovery')}<span>{t(current?.discoveryEnabled ? 'Discovery is on' : 'Discovery is off')}</span>
     </button>
+    <button class="refresh-psn" data-psn-refresh disabled={!connection || !current || ['refreshing', 'listing'].includes(current.psn.refresh.phase ?? '')}
+      onclick={() => current && connection?.refreshPsnConsoles(current.profileGeneration)}>{t('Refresh remote consoles')}</button>
+    <span role="status" data-psn-refresh-status>{current?.psn.refresh.phase === 'refreshing' ? t('Refreshing PSN credentials')
+      : current?.psn.refresh.phase === 'listing' ? t('Finding remote consoles') : current?.psn.refresh.message ?? ''}</span>
     <span role="status" class="message">{message || (!current ? t('Loading consoles') : '')}</span>
   </div>
   <ConnectAction {current} {connection} />

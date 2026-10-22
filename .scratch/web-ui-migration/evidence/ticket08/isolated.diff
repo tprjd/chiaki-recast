@@ -1,0 +1,109 @@
+diff --git a/gui/tests/CMakeLists.txt b/gui/tests/CMakeLists.txt
+index 9ee5bdbf..6abb8516 100644
+--- a/gui/tests/CMakeLists.txt
++++ b/gui/tests/CMakeLists.txt
+@@ -46,6 +46,11 @@ if(TARGET chiaki-gui)
+     set_tests_properties(chiaki-embedded-setup PROPERTIES LABELS desktop)
+     add_test(NAME chiaki-embedded-psn COMMAND chiaki-embedded-setup-tests psnAccountStatus psnSignIn psnRefreshCredentials psnEmbeddedIsolation psnAccountPresentation)
+     set_tests_properties(chiaki-embedded-psn PROPERTIES LABELS desktop)
++    add_test(NAME chiaki-embedded-psn-remote COMMAND chiaki-embedded-setup-tests psnRemoteRefresh psnRemoteRefreshOwnership psnRemoteTokenConnection)
++    set_tests_properties(chiaki-embedded-psn-remote PROPERTIES
++        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
++    add_test(NAME chiaki-remote-native-connection COMMAND chiaki-embedded-setup-tests remoteNativeConnection)
++    set_tests_properties(chiaki-remote-native-connection PROPERTIES LABELS desktop)
+     add_test(NAME chiaki-embedded-settings COMMAND chiaki-embedded-setup-tests generalSettings settingsValidation settingsRestart)
+     set_tests_properties(chiaki-embedded-settings PROPERTIES LABELS desktop)
+     add_test(NAME chiaki-embedded-video-audio COMMAND chiaki-embedded-setup-tests videoAudioSettings videoAudioState videoAudioRestart videoAudioDevices)
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 017df341..8a7997c2 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -380,10 +380,10 @@ private slots:
+             return result.load();
+         };
+         QmlNativeServices services(&settings, transport, {}, controlledDiscovery());
+-        const auto unblock = qScopeGuard([&] { release.release(100); });
+         auto *backend = services.backend();
+         backend->stopAutoConnect();
+         ApplicationController controller(&services);
++        const auto unblock = qScopeGuard([&] { release.release(100); });
+         auto *setup = controller.setupWindow();
+         setup->show();
+         QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
+@@ -601,6 +601,10 @@ private slots:
+         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-connection-retry]')?.disabled === false").toBool());
+         QCOMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("failure"));
+         QVERIFY(script(setup.view(), "document.querySelector('[data-psn-connection]').textContent.includes('PSN credentials expired. Sign in again.')").toBool());
++        setup.resize(390, 720);
++        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
++        if (qEnvironmentVariableIsSet("CHIAKI_EMBEDDED_EVIDENCE"))
++            QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("remote-connection-error-390.png")));
+         script(setup.view(), "document.querySelector('[data-connection-retry]').click()");
+         QTRY_COMPARE(requests.size(), 2);
+         QVERIFY(backend->connectionAttempt().value("id").toString() != first);
+@@ -680,6 +684,11 @@ private slots:
+         QVERIFY(!snapshot.contains("access-secret"));
+         QVERIFY(!snapshot.contains("refresh-secret"));
+         QVERIFY(!snapshot.contains("12121212"));
++        setup.resize(800, 600);
++        setup.view()->setZoomFactor(2);
++        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
++        if (qEnvironmentVariableIsSet("CHIAKI_EMBEDDED_EVIDENCE"))
++            QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("remote-refresh-200-percent.png")));
+     }
+ 
+     void keyboardMouseSettings()
+@@ -2834,7 +2843,7 @@ private slots:
+         settings.AddRegisteredHost(RegisteredHost(registered));
+         settings.SetManualHost(ManualHost(-1, "private.example", true, HostMAC(registered.server_mac)));
+         settings.AddHiddenHost(HiddenHost(HostMAC(registered.server_mac), "192.0.2.77"));
+-        QmlNativeServices services(&settings);
++        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
+         services.backend()->stopAutoConnect();
+         SetupWindow setup(services.backend());
+         setup.show();
+@@ -2892,7 +2901,7 @@ private slots:
+         paired.SetConsolePin(paired, "0091");
+         settings.AddRegisteredHost(paired);
+         const auto manualId = settings.SetManualHost(ManualHost(-1, "console.example", true, HostMAC(registered.server_mac)));
+-        QmlNativeServices services(&settings);
++        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
+         auto *backend = services.backend();
+         backend->stopAutoConnect();
+         SetupWindow setup(backend);
+@@ -2961,7 +2970,7 @@ private slots:
+         });
+         Settings settings(profile);
+         settings.SetDiscoveryEnabled(false);
+-        QmlNativeServices services(&settings);
++        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
+         auto *backend = services.backend();
+         backend->stopAutoConnect();
+         SetupWindow setup(backend);
+@@ -3067,7 +3076,7 @@ private slots:
+         memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+         strcpy(registered.server_nickname, "Office console");
+         settings.AddRegisteredHost(RegisteredHost(registered));
+-        QmlNativeServices services(&settings);
++        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
+         services.backend()->stopAutoConnect();
+         SetupWindow setup(services.backend());
+         setup.show();
+@@ -3133,7 +3142,7 @@ private slots:
+         });
+         Settings settings(profile);
+         settings.SetDiscoveryEnabled(false);
+-        QmlNativeServices services(&settings);
++        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
+         services.backend()->stopAutoConnect();
+         SetupWindow setup(services.backend());
+         setup.show();
+@@ -3164,7 +3173,7 @@ private slots:
+         });
+         Settings settings(profile);
+         settings.SetDiscoveryEnabled(false);
+-        QmlNativeServices services(&settings);
++        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
+         auto *backend = services.backend();
+         backend->stopAutoConnect();
+         backend->setDiscoveryEnabled(false);

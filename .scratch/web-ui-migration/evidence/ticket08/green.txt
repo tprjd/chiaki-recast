@@ -1,0 +1,18 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QDEBUG : EmbeddedSetupTest::psnRemoteRefresh() FT_New_Face failed with index 0 : 2
+QWARN  : EmbeddedSetupTest::psnRemoteRefresh() chiaki.gui: Could not refresh token. Automatic PSN Connection Unavailable! "PSN credentials expired. Sign in again."
+QWARN  : EmbeddedSetupTest::psnRemoteRefresh() chiaki.gui: PSN Remote Connection Tokens Refreshed.
+QINFO  : EmbeddedSetupTest::psnRemoteRefresh() chiaki.gui: Updated PSN hosts
+PASS   : EmbeddedSetupTest::psnRemoteRefresh()
+QWARN  : EmbeddedSetupTest::psnRefreshCredentials() chiaki.gui: Could not refresh token. Automatic PSN Connection Unavailable! "PSN returned incomplete credentials. Sign in again."
+QWARN  : EmbeddedSetupTest::psnRefreshCredentials() chiaki.gui: Could not refresh token. Automatic PSN Connection Unavailable! "PSN credentials expired. Sign in again."
+QWARN  : EmbeddedSetupTest::psnRefreshCredentials() chiaki.gui: PSN Remote Connection Tokens Refreshed.
+QINFO  : EmbeddedSetupTest::psnRefreshCredentials() chiaki.gui: Updated PSN hosts
+PASS   : EmbeddedSetupTest::psnRefreshCredentials()
+QINFO  : EmbeddedSetupTest::psnSignIn() chiaki.gui: Updated PSN hosts
+PASS   : EmbeddedSetupTest::psnSignIn()
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 5 passed, 0 failed, 0 skipped, 0 blacklisted, 3674ms
+********* Finished testing of EmbeddedSetupTest *********

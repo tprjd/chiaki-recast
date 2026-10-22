@@ -1,0 +1,21 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QDEBUG : EmbeddedSetupTest::psnRemoteRefreshOwnership() FT_New_Face failed with index 0 : 2
+QINFO  : EmbeddedSetupTest::psnRemoteRefreshOwnership() chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::psnRemoteRefreshOwnership() chiaki.gui: Updated PSN hosts
+QWARN  : EmbeddedSetupTest::psnRemoteRefreshOwnership() chiaki.gui: Failed to get PS5 devices trying again
+QWARN  : EmbeddedSetupTest::psnRemoteRefreshOwnership() chiaki.gui: Failed to get PS5 devices after max tries:  2
+QINFO  : EmbeddedSetupTest::psnRemoteRefreshOwnership() chiaki.gui: Updated PSN hosts
+QINFO  : EmbeddedSetupTest::psnRemoteRefreshOwnership() chiaki.gui: Updated PSN hosts
+PASS   : EmbeddedSetupTest::psnRemoteRefreshOwnership()
+QINFO  : EmbeddedSetupTest::psnRemoteTokenConnection() chiaki.gui: Updated PSN hosts
+PASS   : EmbeddedSetupTest::psnRemoteTokenConnection()
+QWARN  : EmbeddedSetupTest::psnRemoteRefresh() chiaki.gui: Could not refresh token. Automatic PSN Connection Unavailable! "PSN credentials expired. Sign in again."
+QWARN  : EmbeddedSetupTest::psnRemoteRefresh() chiaki.gui: PSN Remote Connection Tokens Refreshed.
+QINFO  : EmbeddedSetupTest::psnRemoteRefresh() chiaki.gui: Updated PSN hosts
+FAIL!  : EmbeddedSetupTest::psnRemoteRefresh() '!snapshot.contains("12121212")' returned FALSE. ()
+C:\Users\david\.codex\worktrees\web-ui-ticket-08\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(686) : failure location
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 4 passed, 1 failed, 0 skipped, 0 blacklisted, 3629ms
+********* Finished testing of EmbeddedSetupTest *********
