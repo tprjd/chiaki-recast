@@ -93,7 +93,7 @@
 </script>
 
 <div class="management-tools" data-setup-panel>
-  <button data-add-manual disabled={current.connectionBusy} onclick={event => { event.currentTarget.focus(); open('manual'); }}>{t('Add console')}</button>
+  <button data-add-manual disabled={current.connectionBusy} onclick={event => { event.currentTarget.focus(); open('manual'); }}>{t('Add manual address')}</button>
   <button data-manage-consoles onclick={event => { event.currentTarget.focus(); open('manage'); }}>{t('Manage consoles')}</button>
 </div>
 {#if mode}

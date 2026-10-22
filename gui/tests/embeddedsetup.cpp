@@ -984,9 +984,9 @@ private slots:
             backend->refreshPsnToken();
         } else discover(backend, {host});
         QVERIFY(click(setup->view(), ".console-card"));
-        QVERIFY(fill(setup->view(), ".library-heading input", "Office"));
+        QVERIFY(fill(setup->view(), ".library-toolbar input", "Office"));
         const auto selected = setup->bridge()->snapshot().value("selectedKey").toString();
-        QVERIFY(click(setup->view(), ".connect-console"));
+        QVERIFY(click(setup->view(), ".console-entry.selected .connect-console"));
         QFile fixture(QFINDTESTDATA("fixtures/red.h264"));
         QVERIFY(fixture.open(QIODevice::ReadOnly));
         auto packet = fixture.readAll();
@@ -1051,7 +1051,7 @@ private slots:
             native->dismissStreamView();
             QTRY_VERIFY(!native);
             QTRY_VERIFY(setup->isVisible());
-            QTRY_COMPARE(script(setup->view(), "document.querySelector('.library-heading input')?.value").toString(), QStringLiteral("Office"));
+            QTRY_COMPARE(script(setup->view(), "document.querySelector('.library-toolbar input')?.value").toString(), QStringLiteral("Office"));
             if (remote) QCOMPARE(setup->bridge()->snapshot().value("selectedKey").toString(), selected);
             else {
                 discover(backend, {host});
@@ -1259,7 +1259,7 @@ private slots:
         QTRY_COMPARE(requests.size(), 1);
         const auto request = requests.first();
         const auto refresh = setup.bridge()->snapshot().value("psn").toMap().value("refresh").toMap();
-        QVERIFY(fill(setup.view(), ".library-heading input", "Office"));
+        QVERIFY(fill(setup.view(), ".library-toolbar input", "Office"));
         QVERIFY(click(setup.view(), ".open-settings"));
         QVERIFY(fill(setup.view(), ".settings-search input", "suspend"));
         QTRY_COMPARE(setup.bridge()->snapshot().value("viewState").toMap().value("settingsSearch").toString(), QStringLiteral("suspend"));
@@ -1288,14 +1288,14 @@ private slots:
         QCOMPARE(setup.bridge()->snapshot().value("psn").toMap().value("refresh").toMap(), refresh);
         request->finish({}, QNetworkReply::AuthenticationRequiredError, 401);
         QVERIFY(click(setup.view(), ".back-consoles"));
-        QTRY_COMPARE(script(setup.view(), "document.querySelector('.library-heading input')?.value").toString(), QStringLiteral("Office"));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.library-toolbar input')?.value").toString(), QStringLiteral("Office"));
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-refresh-status]')?.textContent.includes('Sign in')").toBool());
         QVERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains("reload-refresh-secret"));
         QCOMPARE(requests.size(), 1);
         QCOMPARE(setup.bridge()->snapshot().value("selectedKey").toString(), selected);
         QTRY_COMPARE(setup.bridge()->snapshot().value("viewState").toMap().value("route").toString(), QStringLiteral("consoles"));
         setup.view()->reload();
-        QTRY_COMPARE(script(setup.view(), "document.querySelector('.library-heading input')?.value").toString(), QStringLiteral("Office"));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.library-toolbar input')?.value").toString(), QStringLiteral("Office"));
         QTRY_COMPARE(script(setup.view(), "document.activeElement?.dataset.consoleKey").toString(), selected);
         QCOMPARE(requests.size(), 1);
     }
@@ -1434,7 +1434,7 @@ private slots:
         QPointer<QmlMainWindow> native = backend->qmlWindow();
         QPointer<StreamSession> session = backend->qmlSession();
         QCOMPARE(backend->connectionAttempt().value("id").toString(), attempt);
-        QVERIFY(!script(setup.view(), "!!document.querySelector('.connect-console')").toBool());
+        QVERIFY(!script(setup.view(), "!!document.querySelector('.console-entry.selected .connect-console')").toBool());
         if (mode == "local-wake") {
             QCOMPARE(starts, 0);
             QCOMPARE(wakes, 1);
@@ -1470,7 +1470,7 @@ private slots:
         if (!success) QCOMPARE(starts, 0);
         setup.view()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
         setup.view()->reload();
-        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.connect-console')").toBool());
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.console-entry.selected .connect-console')").toBool());
         QCOMPARE(starts, success ? 1 : 0);
         QVERIFY(requests.isEmpty());
     }
@@ -2402,9 +2402,9 @@ private slots:
         const auto unblock = qScopeGuard([&] { release.release(100); });
         auto *setup = controller.setupWindow();
         setup->show();
-        QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('.console-entry.selected .connect-console')?.disabled === false").toBool());
         const auto key = setup->bridge()->snapshot().value("selectedKey").toString();
-        script(setup->view(), "document.querySelector('.connect-console').click();document.querySelector('.connect-console').click()");
+        script(setup->view(), "document.querySelector('.console-entry.selected .connect-console').click();document.querySelector('.console-entry.selected .connect-console').click()");
         QTRY_COMPARE(calls.load(), 1);
         QCOMPARE(connectedDuid, QStringLiteral("1212121212121212121212121212121212121212121212121212121212121212"));
         QVERIFY(connectedPs5);
@@ -2444,9 +2444,9 @@ private slots:
         QVERIFY(QMetaObject::invokeMethod(back, "clicked"));
         QTRY_VERIFY(!native);
         QTRY_VERIFY(setup->isVisible());
-        QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('.console-entry.selected .connect-console')?.disabled === false").toBool());
         QCOMPARE(calls.load(), 2);
-        script(setup->view(), "document.querySelector('.connect-console').click()");
+        script(setup->view(), "document.querySelector('.console-entry.selected .connect-console').click()");
         QTRY_COMPARE(calls.load(), 3);
         QPointer<StreamSession> staleSession = backend->qmlSession();
         native = backend->qmlWindow();
@@ -2585,6 +2585,7 @@ private slots:
             manualContext = setupRequest(setup->view(), "openRegistration", {initialKey, initialProfile}).value("context").toString();
         if (outcome == "context") {
             script(setup->view(), "document.querySelector('[data-register-selected]').click()");
+            QVERIFY(click(setup->view(), "[data-registration-manual]"));
             QTRY_COMPARE(script(setup->view(), "document.querySelector('[data-registration-address]')?.value").toString(), QStringLiteral("192.0.2.10"));
             QVERIFY(fill(setup->view(), "[data-registration-account]", "AQAAAAAAAAA="));
             QVERIFY(fill(setup->view(), "[data-registration-pin]", "00123456"));
@@ -2603,6 +2604,7 @@ private slots:
             discover(backend, {host});
             QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-register-selected]') !== null").toBool());
             script(setup->view(), "document.querySelector('[data-register-selected]').click()");
+            QVERIFY(click(setup->view(), "[data-registration-manual]"));
             QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-registration-form]') !== null").toBool());
             QVERIFY(fill(setup->view(), "[data-registration-account]", "AQAAAAAAAAA="));
             QVERIFY(fill(setup->view(), "[data-registration-pin]", "00123456"));
@@ -2720,8 +2722,8 @@ private slots:
         QCOMPARE(starts.load(), 1);
         QCOMPARE(manual.requests.size(), 0);
         if (outcome == "success") {
-            QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
-            script(setup->view(), "document.querySelector('.connect-console').click()");
+            QTRY_VERIFY(script(setup->view(), "document.querySelector('.console-entry.selected .connect-console')?.disabled === false").toBool());
+            script(setup->view(), "document.querySelector('.console-entry.selected .connect-console').click()");
             QTRY_VERIFY(backend->qmlWindow());
             QPointer<QmlMainWindow> playback = backend->qmlWindow();
             QTRY_VERIFY(playback->isVisible());
@@ -2871,10 +2873,10 @@ private slots:
         backend->stopAutoConnect();
         SetupWindow setup(backend);
         setup.show();
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.console-entry.selected .connect-console')?.disabled === false").toBool());
         const auto key = setup.bridge()->snapshot().value("selectedKey").toString();
         backend->qmlSettings()->setPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(-60).toString(settings.GetTimeFormat()));
-        script(setup.view(), "document.querySelector('.connect-console').click();document.querySelector('.connect-console').click()");
+        script(setup.view(), "document.querySelector('.console-entry.selected .connect-console').click();document.querySelector('.console-entry.selected .connect-console').click()");
         QTRY_COMPARE(requests.size(), 1);
         const auto first = backend->connectionAttempt().value("id").toString();
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-connection-cancel]')?.disabled === false").toBool());
@@ -2899,8 +2901,8 @@ private slots:
         QVERIFY(!backend->qmlSession());
         script(setup.view(), "document.querySelector('[data-connection-back]').click()");
         QTRY_VERIFY(script(setup.view(), "!document.querySelector('[data-psn-connection]')").toBool());
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('.connect-console').disabled === false").toBool());
-        script(setup.view(), "document.querySelector('.connect-console').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.console-entry.selected .connect-console').disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.console-entry.selected .connect-console').click()");
         QTRY_COMPARE(requests.size(), 3);
         backend->qmlSettings()->setCurrentProfile(profile + "-next");
         backend->setDiscoveryEnabled(false);
@@ -2961,7 +2963,7 @@ private slots:
         requests[1]->finish(R"({"access_token":"renewed-access-secret","refresh_token":"renewed-refresh-secret","expires_in":3600})");
         QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-card .console-name')?.textContent").toString(), QStringLiteral("Remote office"));
         QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]').textContent").toString(), QStringLiteral("Remote consoles updated"));
-        QTRY_VERIFY(!script(setup.view(), "document.querySelector('.connect-console').disabled").toBool());
+        QTRY_VERIFY(!script(setup.view(), "document.querySelector('.console-entry.selected .connect-console').disabled").toBool());
         backend->qmlSettings()->setStreamerMode(true);
         const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
         QVERIFY(!snapshot.contains("access-secret"));
@@ -3505,8 +3507,8 @@ private slots:
         discover(backend, {host});
         for (int pass = 0; pass < 2; ++pass) {
             backend->nativeSettings()->SetRenderBackend(pass ? RenderBackend::Vulkan : RenderBackend::OpenGL);
-            QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
-            script(setup->view(), "document.querySelector('.connect-console').focus();document.querySelector('.connect-console').click();document.querySelector('.connect-console').click()");
+            QTRY_VERIFY(script(setup->view(), "document.querySelector('.console-entry.selected .connect-console')?.disabled === false").toBool());
+            script(setup->view(), "document.querySelector('.console-entry.selected .connect-console').focus();document.querySelector('.console-entry.selected .connect-console').click();document.querySelector('.console-entry.selected .connect-console').click()");
             QTRY_VERIFY(backend->qmlSession());
             QPointer<StreamSession> session = backend->qmlSession();
             QPointer<QmlMainWindow> native = backend->qmlWindow();
@@ -3586,7 +3588,7 @@ private slots:
                 script(setup->view(), "document.querySelector('.discovery').click()");
                 QTRY_VERIFY(!backend->discoveryEnabled());
                 discover(backend, {host});
-                QTRY_VERIFY(!script(setup->view(), "document.querySelector('.connect-console').disabled").toBool());
+                QTRY_VERIFY(!script(setup->view(), "document.querySelector('.console-entry.selected .connect-console').disabled").toBool());
                 QTRY_COMPARE(script(setup->view(), "document.querySelector('.console-card.selected .console-name')?.textContent").toString(), QStringLiteral("Office console"));
             }
             QVERIFY(!native);
@@ -3628,8 +3630,8 @@ private slots:
         host.host_addr = "127.0.0.1";
         host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
         discover(services.backend(), {host});
-        QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
-        script(setup->view(), "document.querySelector('.connect-console').click()");
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('.console-entry.selected .connect-console')?.disabled === false").toBool());
+        script(setup->view(), "document.querySelector('.console-entry.selected .connect-console').click()");
         QTRY_VERIFY(script(setup->view(), "document.querySelector('.stream-error')?.textContent.includes('Failed initializing OpenGL backend')").toBool());
         QVERIFY(setup->isVisible());
         QVERIFY(!services.backend()->qmlSession());
@@ -3677,8 +3679,8 @@ private slots:
         host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
         discover(backend, {host});
         QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
-        QTRY_COMPARE(script(setup.view(), "document.querySelector('.connect-console')?.textContent.trim()").toString(), QStringLiteral("Connect"));
-        script(setup.view(), "document.querySelector('.connect-console').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-entry.selected .connect-console')?.textContent.trim()").toString(), QStringLiteral("Connect"));
+        script(setup.view(), "document.querySelector('.console-entry.selected .connect-console').click()");
         QTRY_VERIFY(backend->qmlWindow());
         QTRY_VERIFY(backend->qmlWindow()->isExposed());
         QTRY_VERIFY(!setup.isVisible());
@@ -3738,8 +3740,8 @@ private slots:
         QVERIFY(settings.GetManualHosts().first().GetRegistered());
         script(setup.view(), "document.querySelector('[data-close-management]').click()");
         QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
-        QTRY_COMPARE(script(setup.view(), "document.querySelector('.connect-console')?.textContent.trim()").toString(), QStringLiteral("Connect"));
-        script(setup.view(), "document.querySelector('.connect-console').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-entry.selected .connect-console')?.textContent.trim()").toString(), QStringLiteral("Connect"));
+        script(setup.view(), "document.querySelector('.console-entry.selected .connect-console').click()");
         QTRY_VERIFY(backend->qmlWindow());
         QTRY_VERIFY(backend->qmlWindow()->isExposed());
         QTRY_VERIFY(!setup.isVisible());
@@ -3794,6 +3796,7 @@ private slots:
         setup.show();
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-selected]')").toBool());
         script(setup.view(), "document.querySelector('[data-register-selected]').click()");
+        QVERIFY(click(setup.view(), "[data-registration-manual]"));
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
         QVERIFY(fill(setup.view(), "[data-registration-address]", "127.0.0.1"));
         QVERIFY(fill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
@@ -3852,6 +3855,7 @@ private slots:
         QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
         QVERIFY2(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool(), "The library must offer guided registration.");
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QVERIFY(click(setup.view(), "[data-registration-manual]"));
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-target]').options.length").toInt(), 4);
         const auto capture = [&](const QString &name) {
@@ -3920,6 +3924,7 @@ private slots:
         setup.show();
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QVERIFY(click(setup.view(), "[data-registration-manual]"));
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
         script(setup.view(), R"(
             for (const [selector,value] of [['[data-registration-account]','AQAAAAAAAAA='],['[data-registration-pin]','00123456'],['[data-registration-console-pin]','0007']]) {
@@ -4004,6 +4009,7 @@ private slots:
         setup.show();
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QVERIFY(click(setup.view(), "[data-registration-manual]"));
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
         QVERIFY2(script(setup.view(), "document.querySelector('[data-registration-lookup]') !== null").toBool(), "Registration must offer native public Account ID lookup.");
         QVERIFY(fill(setup.view(), "[data-registration-address]", "pair.example"));
@@ -4097,6 +4103,7 @@ private slots:
         setup.show();
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QVERIFY(click(setup.view(), "[data-registration-manual]"));
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
         script(setup.view(), "document.querySelector('[data-registration-lookup]').click()");
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-lookup-username]')").toBool());
@@ -4142,6 +4149,7 @@ private slots:
         setup.show();
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QVERIFY(click(setup.view(), "[data-registration-manual]"));
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
         QVERIFY(fill(setup.view(), "[data-registration-address]", "original-console.example"));
         QVERIFY(fill(setup.view(), "[data-registration-pin]", "00123456"));
@@ -4188,6 +4196,7 @@ private slots:
         QVERIFY(!snapshot.contains("0007"));
         script(setup.view(), "document.querySelector('[data-registration-close]').click()");
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QVERIFY(click(setup.view(), "[data-registration-manual]"));
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-pin]').value").toString(), QString());
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-console-pin]').value").toString(), QString());
@@ -4213,6 +4222,7 @@ private slots:
         setup.show();
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-selected]')").toBool());
         script(setup.view(), "document.querySelector('[data-register-selected]').click()");
+        QVERIFY(click(setup.view(), "[data-registration-manual]"));
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
         QVERIFY(fill(setup.view(), "[data-registration-address]", "corrected.example"));
         QVERIFY(fill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
@@ -4321,6 +4331,7 @@ private slots:
         setup.show();
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-selected]')").toBool());
         script(setup.view(), "document.querySelector('[data-register-selected]').click()");
+        QVERIFY(click(setup.view(), "[data-registration-manual]"));
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-address]').value").toString(), QStringLiteral("192.0.2.10"));
         QVERIFY(fill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
@@ -6238,7 +6249,7 @@ private slots:
         QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-name')?.textContent").toString(), QStringLiteral("192.0.2.42"));
         setup.view()->reload();
         QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-name')?.textContent").toString(), QStringLiteral("192.0.2.42"));
-        QVERIFY(script(setup.view(), "document.querySelector('.connect-console').disabled").toBool());
+        QVERIFY(script(setup.view(), "!document.querySelector('.console-entry.selected .connect-console') && !!document.querySelector('.console-entry.selected .register-console')").toBool());
     }
 
     void consoleLibrary()
