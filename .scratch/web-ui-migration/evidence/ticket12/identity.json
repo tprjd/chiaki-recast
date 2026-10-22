@@ -1,0 +1,32 @@
+{
+  "source_commit": "3f19a3c6b9366b2ee2eb170a8f7b06011646eff7",
+  "merged_integration": "ae754f2b6262b77de6898f7913837a0d69ddedc0",
+  "build_directory": "C:/Users/david/.cache/chiaki-msvc-native/ticket12-build",
+  "qt": "6.9.3 MSVC2022 x86_64",
+  "compiler": "clang-cl 19.1.7 with MSVC14.44 STL",
+  "runtime": {
+    "QT_QPA_PLATFORM": "offscreen",
+    "QTWEBENGINE_CHROMIUM_FLAGS": "--disable-gpu"
+  },
+  "artifact_sha256": {
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket12-build\\gui\\tests\\chiaki-embedded-setup-tests.exe": "9ea4eb0d8c1882edd8b8075b95b4819a5699bfce67e62f53a8a7e64ba8c5a415",
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket12-build\\gui\\web\\app.js": "308ca581b5a5bf9cda4ab3a7734386d19b0ecfeeb423bf9a5fc48733fb8afead",
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket12-build\\gui\\web\\app.css": "ffa4ee7c31b7dcc3e4c32a5fab20b65a7a80684aaa63e3d5815a99a2039a1a33",
+    "C:\\Users\\david\\.codex\\worktrees\\web-ui-ticket-12\\chiaki-ng-ui\\gui\\web\\package-lock.json": "59e9bbe871ea16981ea1fd5beb0913760e66d684de0e3de8c15f2fed0a6b31e6",
+    "C:\\Users\\david\\.codex\\worktrees\\web-ui-ticket-12\\chiaki-ng-ui\\scripts\\windows-vc\\gf-complete.patch": "9ed4f490f718ecdb5f49177738036503b894b015d33cc2f993925894dc53554e"
+  },
+  "source_sha256": {
+    "gui\\src\\setupbridge.cpp": "8e27f8d7a5ab85b43d17971730a08a3bc521608018e631e172525635ddb65e62",
+    "gui\\include\\setupbridge.h": "3ed0a2bd367f65a0fc2183134fa21d17a737024e72b89d2b3813368f2b67b7f5",
+    "gui\\tests\\embeddedsetup.cpp": "e39de8877fa629b73ebf345c4275c06b55deec4436881da66de2df1f1c184181",
+    "gui\\web\\src\\App.svelte": "e962686ac7cb21a4a3bb84b1597edbdcd7e71c3107adae166133f35a2b95ce78",
+    "gui\\web\\src\\bridge.ts": "e30d7884e34dda876f614117c810b279fc6f97cb62cab4955c4d8c537eafcb5a",
+    "gui\\web\\src\\main.ts": "1d38aa6a11da61af52c34a00539a06551e8d7796023157a5c9d286c346350f6a",
+    "gui\\web\\src\\PsnAccount.svelte": "d53aa79ade35285bc4dfd724268673a98fd24376ff2ea438a6c1097ec4e55de6",
+    "gui\\web\\src\\SettingField.svelte": "0343fc6b885d5a917ff39e31be52dcada179fde2678825fc758a1914805665c3",
+    "gui\\web\\src\\Settings.svelte": "3ee0a6d0d33e41ca4ea1ba12b58365a393a986a2f74b912fef3307917ae87947",
+    "gui\\web\\src\\settings.ts": "966a027be422dc45a500e409c891172d4f3f9e7b28753fa69be846c84be62496",
+    "gui\\web\\src\\style.css": "fddb3dcdcbfd04a92ad2c458ba256512235fb6f69976403ace5c08592c9d96f5"
+  },
+  "native_gf_complete": "fa54a4670a5705c84abf6c24b92b0cd479625478 plus local existing workflow patch, not committed"
+}
