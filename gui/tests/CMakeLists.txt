@@ -56,6 +56,12 @@ if(TARGET chiaki-gui)
     set_tests_properties(chiaki-embedded-renderer PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-graphics COMMAND chiaki-embedded-setup-tests graphicsCoexistence)
     set_tests_properties(chiaki-embedded-graphics PROPERTIES LABELS "desktop;gpu")
+    add_test(NAME chiaki-embedded-console-management COMMAND chiaki-embedded-setup-tests
+        manualAddress manualAddressValidation consoleManagement consoleTargetGuards consoleManagementPrivacy)
+    set_tests_properties(chiaki-embedded-console-management PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-manual-handoff COMMAND chiaki-embedded-setup-tests manualHandoff)
+    set_tests_properties(chiaki-manual-handoff PROPERTIES LABELS desktop)
     add_test(NAME chiaki-local-handoff COMMAND chiaki-embedded-setup-tests localHandoff)
     add_test(NAME chiaki-decoded-session-cleanup COMMAND chiaki-embedded-setup-tests decodedSessionCleanup)
     set_tests_properties(chiaki-local-handoff chiaki-decoded-session-cleanup PROPERTIES LABELS "desktop;gpu")

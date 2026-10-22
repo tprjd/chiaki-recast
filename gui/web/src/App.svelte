@@ -4,6 +4,7 @@
   import ConnectAction from './ConnectAction.svelte';
   import PsnAccount from './PsnAccount.svelte';
   import Settings from './Settings.svelte';
+  import ConsoleManagement from './ConsoleManagement.svelte';
 
   let current = $state<State>();
   let connection = $state<Awaited<ReturnType<typeof connectSetup>>>();
@@ -11,6 +12,7 @@
   let message = $state('');
   let changingDiscovery = $state(false);
   let settingsOpen = $state(false);
+  let detailsKey = $state('');
   const t = (text: string) => current?.strings[text] ?? text;
   const type = (console: Console) => console.ps5 === undefined ? t('Console') : console.ps5 ? 'PlayStation 5' : 'PlayStation 4';
   const status = (console: Console) => !console.available ? t('Console unavailable') : !console.registered ? t('Not registered')
@@ -108,6 +110,7 @@
     <span role="status" class="message">{message || (!current ? t('Loading consoles') : '')}</span>
   </div>
   <ConnectAction {current} {connection} />
+  {#if current && connection}<ConsoleManagement {current} {connection} bind:detailsKey />{/if}
   {#if current && !consoles.length}
     <section class="empty" aria-live="polite">
       <h2>{t(query ? 'No matching consoles' : 'No consoles found')}</h2>
@@ -117,6 +120,7 @@
   {#if current && connection}<PsnAccount {current} {connection} />{/if}
   <div class="console-grid">
     {#each consoles as console, index (console.key || `unavailable-${index}`)}
+      <div class="console-entry">
       <button class="console-card" class:selected={current?.selectedKey === console.key && !!console.key}
         disabled={!console.available} aria-pressed={current?.selectedKey === console.key && !!console.key}
         aria-label={`${console.name}, ${type(console)}, ${status(console)}`} data-console-key={console.key}
@@ -134,6 +138,9 @@
           {#if current?.selectedKey === console.key && console.key}<span class="selection">{t('Selected')}</span>{/if}
         </span>
       </button>
+      <button class="console-details" disabled={!console.available} aria-label={`${t('Console details')}: ${console.name}`}
+        data-console-details-key={console.key} onclick={event => { event.currentTarget.focus(); detailsKey = console.key; }}>{t('Console details')}</button>
+      </div>
     {/each}
   </div>
   {/if}

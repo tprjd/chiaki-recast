@@ -1,0 +1,41 @@
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 236e3563..017b2b65 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -1583,6 +1583,36 @@ private slots:
+         QCOMPARE(restarted.exitCode(), 0);
+     }
+ 
++    void manualAddress()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto removeSettings = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        QmlNativeServices services(&settings);
++        services.backend()->stopAutoConnect();
++        SetupWindow setup(services.backend());
++        setup.show();
++        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-add-manual]')").toBool());
++        script(setup.view(), "document.querySelector('[data-add-manual]').click()");
++        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-manual-address]')").toBool());
++        script(setup.view(), "const input=document.querySelector('[data-manual-address]');input.value='192.0.2.42';input.dispatchEvent(new Event('input',{bubbles:true}));");
++        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-save-manual]').disabled").toBool());
++        script(setup.view(), "document.querySelector('[data-save-manual]').click()");
++        QTRY_COMPARE(settings.GetManualHosts().size(), 1);
++        QCOMPARE(settings.GetManualHosts().first().GetHost(), QStringLiteral("192.0.2.42"));
++        QVERIFY(!settings.GetManualHosts().first().GetRegistered());
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-manual-result]')?.textContent").toString(), QStringLiteral("Address saved"));
++        script(setup.view(), "document.querySelector('[data-close-management]').click()");
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-name')?.textContent").toString(), QStringLiteral("192.0.2.42"));
++        setup.view()->reload();
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-name')?.textContent").toString(), QStringLiteral("192.0.2.42"));
++        QVERIFY(script(setup.view(), "document.querySelector('.connect-console').disabled").toBool());
++    }
++
+     void consoleLibrary()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);

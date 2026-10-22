@@ -1,9 +1,12 @@
 export interface Console {
   key: string; name: string; available: boolean; registered: boolean;
+  address: string; identifier: string; app: string; titleId: string; actions: string[];
   state: string; route: 'local' | 'manual' | 'psn'; ps5?: boolean;
 }
 export interface State {
   revision: string; profileGeneration: string; consoles: Console[];
+  registrations: { key: string; name: string; ps5: boolean; identifier: string }[];
+  hiddenConsoles: { key: string; name: string; identifier: string }[];
   selectedKey: string; discoveryEnabled: boolean; streamerMode: boolean;
   connectionBusy: boolean;
   connection: { id?: string; phase?: string; cancelable?: boolean; cleanupPending?: boolean; targetValid?: boolean; errorTitle?: string; errorText?: string };
@@ -34,6 +37,8 @@ interface NativeBridge {
   cancelConnection(attempt: string, callback: (reply: Reply) => void): void;
   retryConnection(attempt: string, callback: (reply: Reply) => void): void;
   dismissConnection(attempt: string, callback: (reply: Reply) => void): void;
+  saveManualAddress(address: string, registrationKey: string, profile: string, callback: (reply: Reply) => void): void;
+  manageConsole(action: string, key: string, pin: string, callback: (reply: Reply) => void): void;
   dismissStreamError(id: string, callback: (reply: Reply) => void): void;
   openPsnSignIn(profile: string, callback: (reply: Reply) => void): void;
   openPsnExternal(profile: string, callback: (reply: Reply) => void): void;
@@ -65,6 +70,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
   cancelConnection(attempt: string): Promise<Reply>;
   retryConnection(attempt: string): Promise<Reply>;
   dismissConnection(attempt: string): Promise<Reply>;
+  saveManual(address: string, registrationKey: string, profile: string): Promise<Reply>;
+  manage(action: string, key: string, pin?: string): Promise<Reply>;
   dismissStreamError(id: string): Promise<Reply>;
   psnEmbedded(profile: string): Promise<Reply>;
   psnExternal(profile: string): Promise<Reply>;
@@ -121,6 +128,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
         cancelConnection: attempt => new Promise(done => setup.cancelConnection(attempt, done)),
         retryConnection: attempt => new Promise(done => setup.retryConnection(attempt, done)),
         dismissConnection: attempt => new Promise(done => setup.dismissConnection(attempt, done)),
+        saveManual: (address, registrationKey, profile) => new Promise(done => setup.saveManualAddress(address, registrationKey, profile, done)),
+        manage: (action, key, pin = '') => new Promise(done => setup.manageConsole(action, key, pin, done)),
         dismissStreamError: id => new Promise(done => setup.dismissStreamError(id, done)),
         psnEmbedded: profile => new Promise(done => setup.openPsnSignIn(profile, done)),
         psnExternal: profile => new Promise(done => setup.openPsnExternal(profile, done)),

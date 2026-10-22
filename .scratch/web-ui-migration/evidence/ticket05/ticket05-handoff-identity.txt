@@ -1,0 +1,19 @@
+
+Algorithm : SHA256
+Hash      : FEDDAE9D5C72F09C733B25DE6323536362164DC8ED2CE6360C8557981D26F30C
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket05-build\gui\tests\chiaki-embedded-setup-tests.exe
+
+
+Algorithm : SHA256
+Hash      : 8D62C3DC66C9291A0014CAFBA48D95507CF6EAE6855C7FB699CD46FD4078E0FD
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-05\chiaki-ng-ui\gui\web\src\ConsoleManagement.svelte
+
+Algorithm : SHA256
+Hash      : 349E73F81A7F0D7F0914D46D039898824F2EBA8D1826978F2665994E6F445E4D
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-05\chiaki-ng-ui\gui\web\src\Dialog.svelte
+
+Algorithm : SHA256
+Hash      : AFA49A823C617B35FACA02A23E0D339948A76B88B6ADD51C89050CB4346D6D37
+Path      : C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\ticket05-handoff-source.patch
+
+c5c35627f596d751aaba39ef5a1a7b6d81b1f1b7

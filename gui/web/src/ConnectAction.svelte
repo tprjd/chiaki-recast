@@ -43,7 +43,7 @@
 {/if}
 <div class="connect-action">
   <button class="connect-console" disabled={!connection || pending || current?.connectionBusy || !selected?.available
-    || !selected.registered || (selected.route !== 'psn' && (selected.route !== 'local' || selected.state !== 'ready'))} onclick={connect}>{t('Connect')}</button>
+    || !selected.registered || (selected.route === 'local' && selected.state !== 'ready')} onclick={connect}>{t('Connect')}</button>
   <span role="status">{message}</span>
 </div>
 

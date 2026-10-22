@@ -1,0 +1,9 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[41864:42508:1022/164750.662:ERROR:gpu_channel_manager.cc(956)] Failed to create GLES3 context, fallback to GLES2.
+[41864:42508:1022/164750.662:ERROR:gpu_channel_manager.cc(967)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+[I] Discovery failed to bind port 9304, trying one higher
+[38;5;31m[E] [0mgetaddrinfo failed
+[38;5;31m[E] [0mgetaddrinfo failed

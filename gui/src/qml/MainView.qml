@@ -31,9 +31,7 @@ Pane {
         }
     }
     function manageConsole(action, accept, cancel, consoleName) {
-        if (action === "pin") {
-            navigation.showConsolePinDialog(accept, cancel, consoleName);
-        } else if (action === "delete") {
+        if (action === "delete") {
             navigation.showConfirmDialog(qsTr("Delete Console"), qsTr("Are you sure you want to delete this console?"), qsTr("Delete console"), accept, cancel);
         } else if (action === "hide") {
             navigation.showConfirmDialog(qsTr("Hide Console"), qsTr("Are you sure you want to hide this console?") + "\n\n" + qsTr("Note: You can unhide from the Consoles section of the Settings under Hidden Consoles"), qsTr("Hide console"), accept, cancel);
@@ -54,7 +52,6 @@ Pane {
         playStationController: backend.controllers.some(controller => controller.playStation)
         onConnectRequested: (sourceIndex, nickname) => backend.connectToHost(sourceIndex, nickname)
         onSettingsRequested: navigation.showSettingsDialog()
-        onAddConsoleRequested: navigation.showManualHostDialog()
         onRefreshPsnRequested: backend.refreshPsnToken()
         onSteamShortcutRequested: navigation.showSteamShortcutDialog(false)
         onDiscoveryToggled: enabled => backend.discoveryEnabled = enabled
@@ -63,6 +60,5 @@ Pane {
         onWakeRequested: sourceIndex => backend.wakeUpHost(sourceIndex)
         onDeleteRequested: sourceIndex => backend.deleteHost(sourceIndex)
         onHideRequested: (mac, nickname) => backend.hideHost(mac, nickname)
-        savePin: (sourceIndex, pin) => backend.setConsolePin(sourceIndex, pin)
     }
 }

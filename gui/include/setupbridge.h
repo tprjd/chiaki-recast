@@ -20,6 +20,8 @@ public:
     Q_INVOKABLE QVariantMap cancelConnection(const QString &attempt);
     Q_INVOKABLE QVariantMap retryConnection(const QString &attempt);
     Q_INVOKABLE QVariantMap dismissConnection(const QString &attempt);
+    Q_INVOKABLE QVariantMap saveManualAddress(const QString &address, const QString &registrationKey, const QString &profile);
+    Q_INVOKABLE QVariantMap manageConsole(const QString &action, const QString &key, const QString &pin);
     void setSuspended(bool suspended);
     void reportStreamError(const QString &title, const QString &text);
     Q_INVOKABLE QVariantMap dismissStreamError(const QString &id);
