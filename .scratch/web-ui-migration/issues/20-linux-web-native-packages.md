@@ -20,3 +20,4 @@
 ## Comments
 
 - Claimed after ticket 04. Prepare current compatible AppImage and Flatpak build inputs and verify package completeness in the available WSL environment. WSL has software graphics; Linux hardware, focus, and GPU acceptance remains unverified because only a Windows PC is available.
+- Deployment and dependency preparation is saved in [the waiting checkpoint](../evidence/ticket20/checkpoint.md). The matching AppImage SDK builder and Flatpak dependency build passed. Final application builds wait for the approved ticket 22 recovery and ticket 19 common package preflight and notice merges. The ticket remains claimed.
