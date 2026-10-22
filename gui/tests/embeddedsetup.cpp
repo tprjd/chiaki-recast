@@ -250,6 +250,23 @@ class EmbeddedSetupTest : public QObject
         return {};
     }
 
+    QObject *nativeObject(const QString &name)
+    {
+        const auto find = [&](auto &&self, QQuickItem *item) -> QObject * {
+            if (item->objectName() == name) return item;
+            if (auto *object = item->findChild<QObject *>(name)) return object;
+            for (auto *child : item->childItems())
+                if (auto *object = self(self, child)) return object;
+            return nullptr;
+        };
+        for (auto *window : QGuiApplication::allWindows()) {
+            if (window->objectName() == name) return window;
+            if (auto *quick = qobject_cast<QQuickWindow *>(window))
+                if (auto *object = find(find, quick->contentItem())) return object;
+        }
+        return nullptr;
+    }
+
 private slots:
     void keyboardMouseSettings()
     {
