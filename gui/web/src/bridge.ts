@@ -8,11 +8,15 @@ export interface State {
   mediaSettings: Record<string, boolean | number | string>;
   mediaChoices: Record<string, { label: string; value: string }[]>;
   generalSettings: Record<string, boolean | number>;
+  rendererSettings: Record<string, boolean | number>;
+  rendererStatus: { restartRequired: boolean; runtimeBackend?: number };
   capabilities: { discovery: boolean }; strings: Record<string, string>;
   psn: { status: 'signedOut' | 'ready' | 'expired'; id?: string; phase?: string; message?: string; profileValid?: boolean };
 }
 interface Reply { accepted: boolean; message?: string }
 interface NativeBridge {
+  setRendererSetting(name: string, value: boolean | number | string, profileGeneration: string, callback: (reply: Reply) => void): void;
+  rendererAction(action: string, profileGeneration: string, callback: (reply: Reply) => void): void;
   snapshot(callback: (state: State) => void): void;
   setDiscoveryEnabled(value: boolean, callback: (reply: Reply) => void): void;
   selectConsole(key: string, callback: (reply: Reply) => void): void;
@@ -42,6 +46,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
   generalSetting(name: string, value: boolean | number, profileGeneration: string): Promise<Reply>;
   mediaSetting(name: string, value: boolean | number | string, profileGeneration: string): Promise<Reply>;
   refreshAudioDevices(): Promise<Reply>;
+  rendererSetting(name: string, value: boolean | number | string, profileGeneration: string): Promise<Reply>;
+  rendererAction(action: string, profileGeneration: string): Promise<Reply>;
   dispose(): void;
 }> {
   return new Promise((resolve, reject) => {
@@ -72,6 +78,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
         generalSetting: (name, value, generation) => new Promise(done => setup.setGeneralSetting(name, value, generation, done)),
         mediaSetting: (name, value, generation) => new Promise(done => setup.setMediaSetting(name, value, generation, done)),
         refreshAudioDevices: () => new Promise(done => setup.refreshAudioDevices(done)),
+        rendererSetting: (name, value, generation) => new Promise(done => setup.setRendererSetting(name, value, generation, done)),
+        rendererAction: (action, generation) => new Promise(done => setup.rendererAction(action, generation, done)),
         dispose() {
           setup.stateChanged.disconnect(update);
           window.removeEventListener('pageshow', refresh);

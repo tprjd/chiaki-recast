@@ -9,6 +9,9 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QFile>
+#include <QFileDialog>
+#include <QTemporaryDir>
+#include <QClipboard>
 #include <QDir>
 #include <QScreen>
 #include <QRegularExpression>
@@ -1068,17 +1071,185 @@ private slots:
             QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
             QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
         });
+        QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
         QmlNativeServices services(&settings);
-        services.backend()->stopAutoConnect();
-        services.backend()->setDiscoveryEnabled(false);
-        SetupWindow setup(services.backend());
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        backend->setDiscoveryEnabled(false);
+        SetupWindow setup(backend);
         setup.show();
         QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
         script(setup.view(), "document.querySelector('.open-settings').click()");
         QTRY_VERIFY(script(setup.view(), "[...document.querySelectorAll('.category-nav button')].some(e=>e.textContent==='Renderer')").toBool());
+        const auto category = [&](const QString &name) {
+            script(setup.view(), QString("[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='%1').click()").arg(name));
+        };
+        const auto change = [&](const QString &key, double value) {
+            QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled===false").arg(key)).toBool());
+            script(setup.view(), QString("{const field=document.getElementById('%1');field.value='%2';field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(key).arg(value));
+        };
+        category("Display");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#displayTargetPrim')?.options.length").toInt(), 18);
+        QCOMPARE(script(setup.view(), "document.querySelector('#displayTargetTrc').options.length").toInt(), 17);
+        change("displayTargetPrim", 12);
+        QTRY_COMPARE(settings.GetDisplayTargetPrim(), 12);
+        change("displayTargetTrc", 12);
+        QTRY_COMPARE(settings.GetDisplayTargetTrc(), 12);
+        change("targetPeakChoice", 1);
+        QTRY_COMPARE(settings.GetDisplayTargetPeak(), 1000);
+        change("displayTargetPeak", 2000);
+        QTRY_COMPARE(settings.GetDisplayTargetPeak(), 2000);
+        change("targetContrastChoice", 1);
+        QTRY_COMPARE(settings.GetDisplayTargetContrast(), -1);
+        QVERIFY(script(setup.view(), "!document.querySelector('#displayTargetContrast')").toBool());
+        change("targetContrastChoice", 2);
+        QTRY_COMPARE(settings.GetDisplayTargetContrast(), 1000);
+        change("displayTargetContrast", 5000);
+        QTRY_COMPARE(settings.GetDisplayTargetContrast(), 5000);
+        category("Renderer");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#videoPreset')?.value").toString(), QStringLiteral("2"));
+        QVERIFY(script(setup.view(), "!document.querySelector('#placeboUpscaler') && document.querySelector('[data-renderer-runtime]').textContent.includes('No native stream')").toBool());
+        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+        QVERIFY(!settingRequest(setup.view(), "placeboUpscaler", 11, generation, "setRendererSetting").value("accepted").toBool());
+        change("videoPreset", 5);
+        QTRY_COMPARE(int(settings.GetPlaceboPreset()), 5);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboUpscaler')?.options.length").toInt(), 14);
+        change("queueDepthLimit", 5);
+        QTRY_COMPARE(settings.GetQueueDepthLimit(), 5);
+        change("rendererBackend", 1);
+        QTRY_COMPARE(int(settings.GetRenderBackend()), 1);
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-renderer-restart]')").toBool());
+        QVERIFY(!setup.bridge()->snapshot().value("rendererStatus").toMap().contains("runtimeBackend"));
+        change("placeboUpscaler", 13);
+        QTRY_COMPARE(int(settings.GetPlaceboUpscaler()), 13);
+        change("placeboAntiringingStrength", 0.42);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboAntiringingStrength() - 0.42f) < 0.001f);
+        change("placeboDebandPreset", 1);
+        QTRY_COMPARE(int(settings.GetPlaceboDebandPreset()), 1);
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('#placeboDebandIterations')").toBool());
+        change("placeboDebandPreset", 0);
+        QTRY_COMPARE(int(settings.GetPlaceboDebandPreset()), 0);
+        change("placeboDebandIterations", 4);
+        QTRY_COMPARE(settings.GetPlaceboDebandIterations(), 4);
+        change("placeboSigmoidSlope", 7.5);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboSigmoidSlope() - 7.5f) < 0.001f);
+        change("placeboColorAdjustmentTemperature", 1.234);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboColorAdjustmentTemperature() - 1.234f) < 0.001f);
+        change("placeboPeakDetectionPreset", 0);
+        QTRY_COMPARE(int(settings.GetPlaceboPeakDetectionPreset()), 0);
+        change("placeboPeakDetectionPeakPercentile", 98.765);
+        QTRY_VERIFY(qAbs(settings.GetPlaceboPeakDetectionPeakPercentile() - 98.765f) < 0.001f);
+        for(const auto &input : QList<QPair<QString, QVariant>>{{"queueDepthLimit", 6}, {"rendererBackend", -1}, {"videoPreset", 6},
+            {"displayTargetPrim", 18}, {"displayTargetTrc", 17}, {"displayTargetPeak", 9}, {"placeboAntiringingStrength", 1.01},
+            {"placeboDebandIterations", 0.5}, {"placeboSigmoidSlope", 20.1}, {"placeboColorAdjustmentTemperature", 5.287},
+            {"placeboPeakDetectionPeakPercentile", -1}, {"vSyncEnabled", 1}, {"rendererBackend", QStringLiteral("0")}, {"psnAuthToken", QStringLiteral("forbidden")}}) {
+            const auto reply = settingRequest(setup.view(), input.first, input.second, generation, "setRendererSetting");
+            QVERIFY(reply.contains("accepted"));
+            QVERIFY(!reply.value("accepted").toBool());
+        }
+        QSignalSpy changed(backend->qmlSettings(), &QmlSettings::placeboChanged);
+        backend->qmlSettings()->setPlaceboDebandThreshold(4.5);
+        QVERIFY(changed.count() > 0);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboDebandThreshold')?.value").toString(), QStringLiteral("4.5"));
+        setup.view()->reload();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        category("Renderer");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboUpscaler')?.value").toString(), QStringLiteral("13"));
+        Settings restarted(profile);
+        QCOMPARE(restarted.GetQueueDepthLimit(), 5);
+        QCOMPARE(restarted.GetDisplayTargetPeak(), 2000);
+        QCOMPARE(int(restarted.GetRenderBackend()), 1);
+        QCOMPARE(int(restarted.GetPlaceboUpscaler()), 13);
+        PsnBrowserOpener opener;
+        QDesktopServices::setUrlHandler("https", &opener, "open");
+        const auto resetOpener = qScopeGuard([] { QDesktopServices::unsetUrlHandler("https"); });
+        script(setup.view(), "document.querySelector('#openRendererDocumentation').click()");
+        QTRY_COMPARE(opener.url, QUrl("https://libplacebo.org/options/"));
+        script(setup.view(), "document.querySelector('#copyRendererDocumentationUrl').click()");
+        QTRY_COMPARE(QGuiApplication::clipboard()->text(), QStringLiteral("https://libplacebo.org/options/"));
     }
+
+    void rendererFiles()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            for(const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+            QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
+        });
+        QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
+        QTemporaryDir files;
+        QVERIFY(files.isValid());
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetPlaceboPreset(PlaceboPreset::Custom);
+        settings.SetPlaceboDebandIterations(7);
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        backend->setDiscoveryEnabled(false);
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#disconnectAction')").toBool());
+        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='Renderer').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#exportPlaceboSettings')").toBool());
+        const auto pick = [&](const QString &action, const QString &path, bool cancel = false, const std::function<void()> &before = {}) {
+            QTimer completion;
+            completion.setInterval(10);
+            connect(&completion, &QTimer::timeout, &completion, [&] {
+                for(auto *widget : QApplication::topLevelWidgets()) if(auto *picker = qobject_cast<QFileDialog *>(widget)) {
+                    if(!picker->isVisible()) continue;
+                    completion.stop();
+                    if(before) before();
+                    if(!cancel) picker->selectFile(path);
+                    // Deliver the native picker result, including OS/file races, without replacing the bridge or file service.
+                    QMetaObject::invokeMethod(picker, "done", Qt::DirectConnection, Q_ARG(int, cancel ? QDialog::Rejected : QDialog::Accepted));
+                    return;
+                }
+            });
+            completion.start();
+            QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled===false").arg(action)).toBool());
+            script(setup.view(), QString("document.getElementById('%1').click()").arg(action));
+            QTRY_VERIFY(!completion.isActive());
+        };
+        const auto output = files.filePath("renderer.ini");
+        pick("exportPlaceboSettings", output);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.settings-message')?.textContent").toString(), QStringLiteral("Renderer settings exported."));
+        QSettings exported(output, QSettings::IniFormat);
+        QCOMPARE(exported.value("placebo_settings/deband_iterations").toInt(), 7);
+        QVERIFY(!exported.contains("settings/psn_auth_token"));
+        const auto previous = settings.GetPlaceboValues();
+        const auto invalid = files.filePath("invalid.ini");
+        { QFile file(invalid); QVERIFY(file.open(QIODevice::WriteOnly)); file.write("[placebo_settings]\nversion=0\nupscaler=not-a-filter\n"); }
+        pick("importPlaceboSettings", invalid);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-message')?.textContent.includes('could not be imported')").toBool());
+        QCOMPARE(settings.GetPlaceboValues(), previous);
+        pick("importPlaceboSettings", {}, true);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.settings-message')?.textContent").toString(), QStringLiteral("Import cancelled."));
+        QCOMPARE(settings.GetPlaceboValues(), previous);
+        const auto badExport = files.filePath("missing/renderer.ini");
+        pick("exportPlaceboSettings", badExport);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-message')?.textContent.includes('could not be exported')").toBool());
+        QCOMPARE(settings.GetPlaceboValues(), previous);
+        { QFile file(invalid); QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate)); file.write("[placebo_settings]\nversion=0\nupscaler=fsrcnnx_x2_8_0_4_1\ndeband=yes\ndeband_iterations=3\n"); }
+        pick("importPlaceboSettings", invalid);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.settings-message')?.textContent").toString(), QStringLiteral("Renderer settings imported."));
+        QCOMPARE(settings.GetPlaceboDebandIterations(), 3);
+        QCOMPARE(int(settings.GetPlaceboUpscaler()), 12);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboDebandIterations')?.value").toString(), QStringLiteral("3"));
+        const auto after = settings.GetPlaceboValues();
+        pick("importPlaceboSettings", output, false, [&] { backend->qmlSettings()->setCurrentProfile(profile + "-next"); backend->setDiscoveryEnabled(false); });
+        QCOMPARE(backend->nativeSettings()->GetPlaceboValues(), after);
+        QVERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains(files.path().toUtf8()));
+        QVERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains("fsrcnnx_x2_8_0_4_1"));
+    }
+
     void generalSettings()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
