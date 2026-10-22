@@ -40,7 +40,7 @@
     if (pending) return;
     pending = true;
     try {
-      const action = rendererSettings.find(field => field.key === key)?.action;
+      const action = key === 'restartRenderer' || rendererSettings.find(field => field.key === key)?.action;
       const reply = await (action ? connection.rendererAction(key, generation) : Object.hasOwn(current.rendererSettings, key) ? connection.rendererSetting(key, value, generation) : Object.hasOwn(current.generalSettings, key) ? connection.generalSetting(key, value as boolean | number, generation) : connection.mediaSetting(key, value, generation));
       if (generation !== current.profileGeneration) return;
       message = reply.message ?? (reply.accepted ? t('Saved') : t('The setting could not be saved.'));
@@ -94,7 +94,7 @@
         <p data-renderer-runtime>{current.rendererStatus.runtimeBackend === undefined ? t('No native stream window is active.') : `${t('Active native renderer')}: ${current.rendererStatus.runtimeBackend === 0 ? 'Vulkan' : 'OpenGL'}`}</p>
         {#if current.rendererStatus.restartRequired}
           <p data-renderer-restart role="status">{t('Restart the application to apply the saved renderer backend or OpenGL vertical sync change.')}</p>
-          <button disabled={pending} onclick={() => connection.rendererAction('restartRenderer', current.profileGeneration)}>{t('Restart application')}</button>
+          <button disabled={pending} onclick={() => change('restartRenderer', true)}>{t('Restart application')}</button>
         {/if}
       {/if}
       {#if category === 'Audio/Wifi'}<button disabled={pending} onclick={() => connection.refreshAudioDevices()}>{t('Refresh audio devices')}</button>{/if}

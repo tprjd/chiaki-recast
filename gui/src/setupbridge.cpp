@@ -632,7 +632,11 @@ QVariantMap SetupBridge::setRendererSetting(const QString &name, const QVariant 
     }
     if(name == "vSyncEnabled") {
         if(type != QMetaType::Bool) return reject();
+        const bool changed = settings->vSyncEnabled() != value.toBool();
+        const auto *window = backend->qmlWindow();
+        const int runtimeBackend = window ? window->runtimeRendererBackend() : startupRendererBackend;
         settings->setVSyncEnabled(value.toBool());
+        if(changed && runtimeBackend == static_cast<int>(RenderBackend::OpenGL)) return settings->restartApplication();
         return {{"accepted", true}};
     }
     if(name == "videoPreset") {
@@ -648,7 +652,9 @@ QVariantMap SetupBridge::setRendererSetting(const QString &name, const QVariant 
     }
     if(name == "rendererBackend") {
         if(!numeric || !std::isfinite(number) || number < 0 || number > 1 || std::floor(number) != number) return reject();
+        const bool changed = settings->rendererBackend() != int(number);
         settings->setRendererBackend(int(number));
+        if(changed) return settings->restartApplication();
         return {{"accepted", true}};
     }
     if(name == "displayTargetPrim") {
@@ -904,9 +910,6 @@ QVariantMap SetupBridge::rendererAction(const QString &action, const QString &pr
         QGuiApplication::clipboard()->setText(QStringLiteral("https://libplacebo.org/options/"));
         return {{"accepted", true}, {"message", tr("Renderer documentation link copied.")}};
     }
-    if(action == "restartRenderer") {
-        settings->restartApplication();
-        return {{"accepted", true}};
-    }
+    if(action == "restartRenderer") return settings->restartApplication();
     return {{"accepted", false}};
 }

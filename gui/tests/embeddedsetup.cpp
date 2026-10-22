@@ -1414,7 +1414,7 @@ private slots:
         QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, [](const QString &, const QStringList &) { return false; });
         auto *backend = services.backend();
         backend->stopAutoConnect();
         backend->setDiscoveryEnabled(false);

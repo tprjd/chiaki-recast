@@ -690,16 +690,17 @@ void QmlSettings::setRendererBackend(int backend)
     emit rendererBackendChanged();
 }
 
-void QmlSettings::restartApplication()
+QVariantMap QmlSettings::restartApplication()
 {
     const QString application = QCoreApplication::applicationFilePath();
     const QStringList arguments = QCoreApplication::arguments().mid(1);
     if (!processLauncher(application, arguments))
     {
-        qWarning() << "Failed to relaunch application for renderer backend switch";
-        return;
+        qWarning() << "Failed to relaunch application for renderer settings";
+        return {{"accepted", false}, {"message", tr("The renderer setting was saved, but the application could not restart. Close and open the application to apply it.")}};
     }
     QCoreApplication::quit();
+    return {{"accepted", true}};
 }
 
 QString QmlSettings::autoConnectMac() const

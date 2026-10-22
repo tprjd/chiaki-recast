@@ -328,7 +328,7 @@ public:
 
     int rendererBackend() const;
     void setRendererBackend(int backend);
-    Q_INVOKABLE void restartApplication();
+    Q_INVOKABLE QVariantMap restartApplication();
 
     QString autoConnectMac() const;
     void setAutoConnectMac(const QString &mac);
