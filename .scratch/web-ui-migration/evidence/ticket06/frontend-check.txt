@@ -1,0 +1,3 @@
+npm run check
+Source: d1f643d7e4810c296e59141a9f0074d05b1ad233
+Result: svelte-check found 0 errors and 0 warnings
