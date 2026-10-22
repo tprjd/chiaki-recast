@@ -380,10 +380,10 @@ private slots:
             return result.load();
         };
         QmlNativeServices services(&settings, transport, {}, controlledDiscovery());
-        const auto unblock = qScopeGuard([&] { release.release(100); });
         auto *backend = services.backend();
         backend->stopAutoConnect();
         ApplicationController controller(&services);
+        const auto unblock = qScopeGuard([&] { release.release(100); });
         auto *setup = controller.setupWindow();
         setup->show();
         QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
@@ -601,6 +601,10 @@ private slots:
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-connection-retry]')?.disabled === false").toBool());
         QCOMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("failure"));
         QVERIFY(script(setup.view(), "document.querySelector('[data-psn-connection]').textContent.includes('PSN credentials expired. Sign in again.')").toBool());
+        setup.resize(390, 720);
+        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+        if (qEnvironmentVariableIsSet("CHIAKI_EMBEDDED_EVIDENCE"))
+            QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("remote-connection-error-390.png")));
         script(setup.view(), "document.querySelector('[data-connection-retry]').click()");
         QTRY_COMPARE(requests.size(), 2);
         QVERIFY(backend->connectionAttempt().value("id").toString() != first);
@@ -676,10 +680,16 @@ private slots:
         QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-card .console-name')?.textContent").toString(), QStringLiteral("Remote office"));
         QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]').textContent").toString(), QStringLiteral("Remote consoles updated"));
         QTRY_VERIFY(!script(setup.view(), "document.querySelector('.connect-console').disabled").toBool());
+        backend->qmlSettings()->setStreamerMode(true);
         const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
         QVERIFY(!snapshot.contains("access-secret"));
         QVERIFY(!snapshot.contains("refresh-secret"));
         QVERIFY(!snapshot.contains("12121212"));
+        setup.resize(800, 600);
+        setup.view()->setZoomFactor(2);
+        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+        if (qEnvironmentVariableIsSet("CHIAKI_EMBEDDED_EVIDENCE"))
+            QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("remote-refresh-200-percent.png")));
     }
 
     void keyboardMouseSettings()
@@ -2834,7 +2844,7 @@ private slots:
         settings.AddRegisteredHost(RegisteredHost(registered));
         settings.SetManualHost(ManualHost(-1, "private.example", true, HostMAC(registered.server_mac)));
         settings.AddHiddenHost(HiddenHost(HostMAC(registered.server_mac), "192.0.2.77"));
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
         setup.show();
@@ -2892,7 +2902,7 @@ private slots:
         paired.SetConsolePin(paired, "0091");
         settings.AddRegisteredHost(paired);
         const auto manualId = settings.SetManualHost(ManualHost(-1, "console.example", true, HostMAC(registered.server_mac)));
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
         SetupWindow setup(backend);
@@ -2961,7 +2971,7 @@ private slots:
         });
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
         SetupWindow setup(backend);
@@ -3067,7 +3077,7 @@ private slots:
         memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
         strcpy(registered.server_nickname, "Office console");
         settings.AddRegisteredHost(RegisteredHost(registered));
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
         setup.show();
@@ -3133,7 +3143,7 @@ private slots:
         });
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
         setup.show();
@@ -3164,7 +3174,7 @@ private slots:
         });
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
         backend->setDiscoveryEnabled(false);
