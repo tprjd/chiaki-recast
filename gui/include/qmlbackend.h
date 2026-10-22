@@ -133,6 +133,8 @@ public:
     quint64 profileGeneration() const { return profile_generation; }
     void attachWindow(QmlMainWindow *window);
     void detachWindow(QmlMainWindow *window);
+    void setSetupNavigationTarget(QObject *target);
+    void setControllerNavigationEnabled(bool enabled);
     QmlSettings *qmlSettings() const;
     StreamSession *qmlSession() const;
     QList<QmlController*> qmlControllers() const;
@@ -328,6 +330,8 @@ private:
     Settings *settings = {};
     QmlSettings *settings_qml = {};
     QPointer<QmlMainWindow> window;
+    QPointer<QObject> setup_navigation_target;
+    bool controller_navigation_enabled = true;
     QList<QMetaObject::Connection> window_connections;
     StreamSession *session = {};
     QThread *frame_thread = {};

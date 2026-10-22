@@ -221,6 +221,9 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
     profile->setUrlRequestInterceptor(new SetupRequests(profile));
     auto *page = new SetupPage(profile, webView);
     webView->setPage(page);
+    backend->setSetupNavigationTarget(webView);
+    connect(page, &QWebEnginePage::loadStarted, this, [this] { setupBridge->invalidateControllerMapping(); });
+    connect(page, &QWebEnginePage::renderProcessTerminated, this, [this] { setupBridge->invalidateControllerMapping(); });
     connect(page, &QWebEnginePage::loadStarted, setupBridge, &SetupBridge::invalidateKeyboardMouse);
     connect(page, &QWebEnginePage::renderProcessTerminated, setupBridge, &SetupBridge::invalidateKeyboardMouse);
     connect(page, &QWebEnginePage::recommendedStateChanged, this, [this, page](QWebEnginePage::LifecycleState state) {
@@ -262,6 +265,7 @@ void SetupWindow::resume()
 
 void SetupWindow::closeEvent(QCloseEvent *event)
 {
+    setupBridge->invalidateControllerMapping();
     setupBridge->invalidateKeyboardMouse();
     if (signInWindow) signInWindow->close();
     backend->nativeSettings()->SetGeometry(geometry());

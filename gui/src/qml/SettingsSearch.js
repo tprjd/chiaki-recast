@@ -100,8 +100,6 @@ function entries(settings) {
         {category: 5, group: qsTranslate("SettingsSearch", "Keyboard and mouse"), target: "keyboardEnabled", fallback: "mouseCameraEnabled", keywords: qsTranslate("SettingsSearch", "Enable keyboard controller"), title: qsTranslate("SettingsSearch", "Keyboard controller"), description: qsTranslate("SettingsSearch", "Enable keyboard controller input.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Keyboard and mouse"), target: "mouseTouchEnabled", fallback: "mouseCameraEnabled", keywords: qsTranslate("SettingsSearch", "Enable mouse touchpad"), title: qsTranslate("SettingsSearch", "Mouse touchpad"), description: qsTranslate("SettingsSearch", "Use the mouse to control the touchpad.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Key assignments"), target: "resetAllKeys", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Reset all keys"), description: qsTranslate("SettingsSearch", "Restore all keyboard assignments to their native defaults.")},
-        {category: 6, group: qsTranslate("SettingsSearch", "Controller input"), target: "controllerMappingChange", keywords: qsTranslate("SettingsSearch", "Change controller mappings"), title: qsTranslate("SettingsSearch", "Change controller mapping"), description: qsTranslate("SettingsSearch", "Select a controller before editing its mappings.")},
-        {category: 6, group: qsTranslate("SettingsSearch", "Controller input"), target: "controllerMappingReset", keywords: qsTranslate("SettingsSearch", "Reset controller mappings"), title: qsTranslate("SettingsSearch", "Reset controller mapping"), description: qsTranslate("SettingsSearch", "Select the controller whose mappings you want to reset.")},
         {category: 6, group: qsTranslate("SettingsSearch", "Controller input"), target: "allowJoystickBackgroundEvents", keywords: qsTranslate("SettingsSearch", "Process controller input in the background"), title: qsTranslate("SettingsSearch", "Background controller input"), description: qsTranslate("SettingsSearch", "Accept controller input while another window has focus.")},
         {category: 6, group: qsTranslate("SettingsSearch", "Controller input"), target: "buttonsByPosition", keywords: qsTranslate("SettingsSearch", "Interpret buttons by position"), title: qsTranslate("SettingsSearch", "Buttons by position"), description: qsTranslate("SettingsSearch", "Interpret controller buttons by their physical position.")},
         {category: 6, group: qsTranslate("SettingsSearch", "Touchpad"), target: "dpadTouchEnabled", title: qsTranslate("SettingsSearch", "D-pad touchpad emulation"), description: qsTranslate("SettingsSearch", "Use the directional pad to move the touchpad position.")},
@@ -218,9 +216,6 @@ function entries(settings) {
         {page: "color", category: 1, group: qsTranslate("SettingsSearch", "Tone-mapping 3"), section: 4, target: "placeboToneMappingToneLutSize", title: qsTranslate("SettingsSearch", "Tone LUT size"), description: qsTranslate("SettingsSearch", "Set tone mapping lookup table precision.")},
         {page: "color", category: 1, group: qsTranslate("SettingsSearch", "Tone-mapping 3"), section: 4, target: "placeboToneMappingContrastRecovery", title: qsTranslate("SettingsSearch", "Contrast recovery"), description: qsTranslate("SettingsSearch", "Recover contrast after tone mapping.")},
         {page: "color", category: 1, group: qsTranslate("SettingsSearch", "Tone-mapping 3"), section: 4, target: "placeboToneMappingContrastSmoothness", title: qsTranslate("SettingsSearch", "Contrast smoothness"), description: qsTranslate("SettingsSearch", "Set contrast recovery smoothing.")},
-        {page: "mapping", category: 6, group: qsTranslate("SettingsSearch", "Controller Mapping"), section: 0, target: "enableAnalogStickMapping", title: qsTranslate("SettingsSearch", "Analog stick and L2/R2 mapping"), description: qsTranslate("SettingsSearch", "Enable analog stick and trigger mapping after selecting a controller.")},
-        {page: "mapping", category: 6, group: qsTranslate("SettingsSearch", "Controller Mapping"), section: 0, target: "controllerMappingApply", title: qsTranslate("SettingsSearch", "Apply controller mapping"), description: qsTranslate("SettingsSearch", "Apply changed mappings after selecting a controller.")},
-        {page: "mapping", category: 6, group: qsTranslate("SettingsSearch", "Controller Mapping"), section: 0, target: "controllerMappingCancel", title: qsTranslate("SettingsSearch", "Cancel controller mapping"), description: qsTranslate("SettingsSearch", "Leave controller mapping without applying changes.")}
     ];
     const platform = {steamDeckHaptics: "steamDeckHaptics", verticalDeck: "verticalDeck",
         speechProcessing: "speechProcessing", noiseSuppressLevel: "speechProcessing", echoSuppressLevel: "speechProcessing"};
@@ -232,19 +227,6 @@ function entries(settings) {
             title: qsTranslate("SettingsSearch", "Keyboard key for %1").arg(mapping.buttonName),
             description: qsTranslate("SettingsSearch", "Focus this key assignment. Activate it to capture a new key."),
             target: "keyMapping" + mapping.buttonValue, fallback: "resetAllKeys"});
-    }
-    const names = [qsTranslate("SettingsSearch", "Cross"), qsTranslate("SettingsSearch", "Moon"), qsTranslate("SettingsSearch", "Box"), qsTranslate("SettingsSearch", "Pyramid"),
-        qsTranslate("SettingsSearch", "D-Pad Left"), qsTranslate("SettingsSearch", "D-Pad Right"), qsTranslate("SettingsSearch", "D-Pad Up"), qsTranslate("SettingsSearch", "D-Pad Down"),
-        "L1", "R1", "L3", "R3", qsTranslate("SettingsSearch", "Options"), qsTranslate("SettingsSearch", "Share"), qsTranslate("SettingsSearch", "Touchpad"), "PS", "L2", "R2",
-        qsTranslate("SettingsSearch", "Left Stick X"), qsTranslate("SettingsSearch", "Left Stick Y"), qsTranslate("SettingsSearch", "Right Stick X"), qsTranslate("SettingsSearch", "Right Stick Y"), "MIC"];
-    for (let i = 0; i < names.length; ++i) {
-        const value = Math.pow(2, i < 18 ? i : i + 8);
-        for (let slot = 0; slot < 2; ++slot) {
-            supported.push({category: 6, page: "mapping", group: qsTranslate("SettingsSearch", "Controller Mapping"),
-                title: (slot === 0 ? qsTranslate("SettingsSearch", "%1 primary input") : qsTranslate("SettingsSearch", "%1 alternate input")).arg(names[i]),
-                description: qsTranslate("SettingsSearch", "Select a controller first. Focusing the target does not capture input."),
-                target: "controllerMap" + value + "Slot" + slot, buttonValue: value, slot: slot});
-        }
     }
     if (settings.mouseCameraSupported) for (const action of settings.keyboardMouseBindings || []) {
         for (let slot = 0; slot < 2; ++slot) supported.push({category: 5,

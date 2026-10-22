@@ -14,6 +14,12 @@ export interface State {
   mediaSettings: Record<string, boolean | number | string>;
   mediaChoices: Record<string, { label: string; value: string }[]>;
   generalSettings: Record<string, boolean | number>;
+  controllerSetup: {
+    values: Record<string, boolean | number>; devices: { name: string; type: string; playStation: boolean; steamVirtual: boolean }[];
+    operation: string; phase: string; message: string; type: string; altered: boolean; analog: boolean; button: number; slot: number;
+    mappings: { buttonName: string; buttonValue: number; physicalButton: string[] }[];
+    targets: { buttonName: string; buttonValue: number }[];
+  };
   keyboardMouse: {
     supported: boolean; windowGeneration: string; values: Record<string, boolean | number>; limits: Record<string, number>;
     bindings: { action: number; name: string; group: number; primaryName: string; alternativeName: string }[];
@@ -27,6 +33,10 @@ export interface State {
 }
 interface Reply { accepted: boolean; message?: string; form?: string }
 interface NativeBridge {
+  setControllerSetting(name: string, value: boolean | number | string, profile: string, callback: (reply: Reply) => void): void;
+  beginControllerMapping(reset: boolean, profile: string, callback: (reply: Reply) => void): void;
+  controllerMappingAction(action: string, operation: string, profile: string, callback: (reply: Reply) => void): void;
+  captureControllerMapping(button: number, slot: number, operation: string, profile: string, callback: (reply: Reply) => void): void;
   setRendererSetting(name: string, value: boolean | number | string, profileGeneration: string, callback: (reply: Reply) => void): void;
   rendererAction(action: string, profileGeneration: string, callback: (reply: Reply) => void): void;
   snapshot(callback: (state: State) => void): void;
@@ -63,6 +73,10 @@ declare global {
 }
 
 export function connectSetup(receive: (state: State) => void): Promise<{
+  controllerSetting(name: string, value: boolean | number | string, profile: string): Promise<Reply>;
+  beginControllerMapping(reset: boolean, profile: string): Promise<Reply>;
+  controllerMappingAction(action: string, operation: string, profile: string): Promise<Reply>;
+  captureControllerMapping(button: number, slot: number, operation: string, profile: string): Promise<Reply>;
   discovery(enabled: boolean): Promise<Reply>;
   select(key: string): Promise<Reply>;
   connect(key: string): Promise<Reply>;
@@ -135,6 +149,10 @@ export function connectSetup(receive: (state: State) => void): Promise<{
         psnExternal: profile => new Promise(done => setup.openPsnExternal(profile, done)),
         psnCopyLink: profile => new Promise(done => setup.copyPsnSignInLink(profile, done)),
         psnSubmit: (profile, url) => new Promise(done => setup.submitPsnRedirect(profile, url, done)),
+        controllerSetting: (name, value, profile) => new Promise(done => setup.setControllerSetting(name, value, profile, done)),
+        beginControllerMapping: (reset, profile) => new Promise(done => setup.beginControllerMapping(reset, profile, done)),
+        controllerMappingAction: (action, operation, profile) => new Promise(done => setup.controllerMappingAction(action, operation, profile, done)),
+        captureControllerMapping: (button, slot, operation, profile) => new Promise(done => setup.captureControllerMapping(button, slot, operation, profile, done)),
         generalSetting: (name, value, generation) => new Promise(done => setup.setGeneralSetting(name, value, generation, done)),
         mediaSetting: (name, value, generation) => new Promise(done => setup.setMediaSetting(name, value, generation, done)),
         refreshAudioDevices: () => new Promise(done => setup.refreshAudioDevices(done)),

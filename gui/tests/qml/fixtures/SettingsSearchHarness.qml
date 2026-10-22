@@ -17,7 +17,6 @@ Item {
     function showPlaceboSettingsDialog(route) { pages.push(rendererComponent, {searchRoute: route || null}); }
     function showPlaceboColorMappingDialog(route) { pages.push(colorComponent, {searchRoute: route || null}); }
     function showProfileDialog(route) { pages.push(profileComponent, {searchRoute: route || null}); }
-    function showControllerMappingDialog(route) { pages.push(mappingComponent, {searchRoute: route || null}); }
     function showConfirmDialog(title, text, actionText, accept, cancel) { collaborators.showConfirmDialog(title, text, actionText, accept, cancel); }
     function showRegistDialog(host, ps5) { collaborators.showRegistDialog(host, ps5); }
     SettingsHarness { id: collaborators; visible: false; screenActive: false }
@@ -32,5 +31,4 @@ Item {
     Component { id: rendererComponent; PlaceboSettingsDialog { backend: collaborators.backend; navigation: harness } }
     Component { id: colorComponent; PlaceboColorMappingDialog { backend: collaborators.backend; navigation: harness } }
     Component { id: profileComponent; ProfileDialog { backend: collaborators.backend; navigation: harness } }
-    Component { id: mappingComponent; ControllerMappingDialog { backend: collaborators.backend; navigation: harness } }
 }

@@ -1,6 +1,7 @@
 #include "setupbridge.h"
 #include "qmlbackend.h"
 #include "keyboardmousebindings.h"
+#include "qmlcontroller.h"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QUuid>
@@ -34,6 +35,52 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     accountExpiry.setSingleShot(true);
     connect(&accountExpiry, &QTimer::timeout, this, &SetupBridge::refresh);
     auto *settings = backend->qmlSettings();
+    connect(settings, &QmlSettings::currentProfileChanged, this, [this] {
+        invalidateControllerMapping(tr("The profile changed. Select the controller again."));
+    });
+    connect(backend, &QmlBackend::controllersChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::currentControllerMappingChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::currentControllerTypeChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::controllerMappingAlteredChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::enableAnalogStickMappingChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::controllerMappingInProgressChanged, this, [this] {
+        if (controllerOperation.isEmpty()) return;
+        if (!this->backend->controllerMappingInProgress()) {
+            invalidateControllerMapping(tr("The controller was disconnected. Connect it and try again."));
+        } else if (controllerReset) {
+            controllerOperation.clear();
+            this->backend->controllerMappingReset();
+            controllerPhase.clear();
+            controllerMessage = tr("Controller mapping reset.");
+            controllerNavigation(true);
+            refresh();
+        } else {
+            controllerPhase = "edit";
+            controllerNavigation(true);
+            refresh();
+        }
+    });
+    connect(backend, &QmlBackend::controllerMappingSteamControllerSelected, this, [this] {
+        invalidateControllerMapping(tr("This controller is managed by Steam. Use Steam to map it, or disable Steam Input before mapping here."));
+    });
+    connect(backend, &QmlBackend::controllerMappingButtonSelected, this, [this](const QString &input) {
+        if (controllerOperation.isEmpty() || controllerPhase != "capture" || !this->backend->controllerMappingInProgress()) return;
+        this->backend->controllerMappingButtonQuit();
+        controllerPhase = "edit";
+        this->backend->updateButton(controllerButton, input, controllerSlot);
+        controllerNavigation(true);
+        refresh();
+    });
+    connect(settings, &QmlSettings::allowJoystickBackgroundEventsChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::buttonsByPositionChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::dpadTouchEnabledChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::dpadTouchIncrementChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::dpadTouchShortcut1Changed, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::dpadTouchShortcut2Changed, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::dpadTouchShortcut3Changed, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::dpadTouchShortcut4Changed, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::rumbleHapticsIntensityChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::hapticOverrideChanged, this, &SetupBridge::refresh);
     connect(settings, &QmlSettings::currentProfileChanged, this, &SetupBridge::invalidateKeyboardMouse);
     connect(settings, &QmlSettings::mouseCameraEnabledChanged, this, [this] { emit keyboardMouseClosed(); refresh(); });
     connect(settings, &QmlSettings::mouseResponseChanged, this, &SetupBridge::refresh);
@@ -103,6 +150,14 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     connect(settings, &QmlSettings::placeboChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::windowChanged, this, &SetupBridge::refresh);
     refresh();
+}
+
+SetupBridge::~SetupBridge()
+{
+    const bool mapping = !controllerOperation.isEmpty();
+    controllerOperation.clear();
+    if (mapping) backend->controllerMappingQuit();
+    backend->setControllerNavigationEnabled(true);
 }
 
 QString SetupBridge::identity(const QVariantMap &host) const
@@ -339,6 +394,25 @@ void SetupBridge::refresh()
     addChoices("decoder", decoders, settings->decoder(), false);
     addChoices("audioInDevice", settings->availableAudioInDevices(), settings->audioInDevice(), true);
     addChoices("audioOutDevice", settings->availableAudioOutDevices(), settings->audioOutDevice(), true);
+    QVariantList devices;
+    for (const auto *controller : backend->qmlControllers())
+        devices.append(QVariantMap{{"name", controller->name()}, {"type", controller->type().isEmpty() ? tr("Controller") : controller->type()},
+            {"playStation", controller->isPS()}, {"steamVirtual", controller->isSteamVirtual()}});
+    QVariantList controllerTargets;
+    for (int index = 0; index < 23; ++index) {
+        const int value = 1 << (index < 18 ? index : index + 8);
+        controllerTargets.append(QVariantMap{{"buttonValue", value}, {"buttonName", Settings::GetChiakiControllerButtonName(value)}});
+    }
+    QVariantMap controllerValues{{"allowJoystickBackgroundEvents", settings->allowJoystickBackgroundEvents()}, {"buttonsByPosition", settings->buttonsByPosition()},
+        {"dpadTouchEnabled", settings->dpadTouchEnabled()}, {"dpadTouchIncrement", settings->dpadTouchIncrement()},
+        {"dpadTouchShortcut1", settings->dpadTouchShortcut1()}, {"dpadTouchShortcut2", settings->dpadTouchShortcut2()},
+        {"dpadTouchShortcut3", settings->dpadTouchShortcut3()}, {"dpadTouchShortcut4", settings->dpadTouchShortcut4()},
+        {"rumbleHapticsIntensity", settings->rumbleHapticsIntensity()}, {"hapticOverride", settings->hapticOverride()}};
+    QVariantMap controllerSetup{{"values", controllerValues}, {"devices", devices}, {"targets", controllerTargets},
+        {"operation", controllerOperation}, {"phase", controllerPhase}, {"message", controllerMessage},
+        {"type", backend->currentControllerType()}, {"mappings", backend->currentControllerMapping()},
+        {"altered", backend->controllerMappingAltered()}, {"analog", backend->enableAnalogStickMapping()},
+        {"button", controllerButton}, {"slot", controllerSlot}};
     QVariantMap keyboardMouse{{"supported", settings->mouseCameraSupported()}, {"windowGeneration", QString::number(keyboardMouseWindowGeneration)},
         {"values", QVariantMap{{"mouseCameraEnabled", settings->mouseCameraEnabled()},
             {"mouseHorizontalSensitivity", settings->mouseHorizontalSensitivity()},
@@ -409,7 +483,7 @@ void SetupBridge::refresh()
     const bool pending = nativeAttempt.value("presented").toBool() && !phase.isEmpty()
         && phase != "failure" && phase != "cancelled" && phase != "registered";
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
-        {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
+        {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
         {"streamerMode", privateMode}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
             || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
     if (!suspended) emit stateChanged(state);
@@ -530,6 +604,7 @@ QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &
 void SetupBridge::setSuspended(bool value)
 {
     suspended = value;
+    if (suspended) invalidateControllerMapping();
     if (suspended) invalidateKeyboardMouse();
     if (!suspended) refresh();
 }
@@ -550,6 +625,7 @@ QVariantMap SetupBridge::dismissStreamError(const QString &id)
 
 QVariantMap SetupBridge::connectConsole(const QString &key)
 {
+    if (!controllerOperation.isEmpty()) return {{"accepted", false}};
     int index;
     QString nickname;
     if (state.value("connectionBusy").toBool())
@@ -594,6 +670,121 @@ QVariantMap SetupBridge::refreshAudioDevices()
     return {{"accepted", true}};
 }
 
+void SetupBridge::controllerNavigation(bool enabled)
+{
+    const auto generation = ++controllerNavigationGeneration;
+    if (!enabled) backend->setControllerNavigationEnabled(false);
+    else QTimer::singleShot(0, this, [this, generation] {
+        // Drain the selecting/captured SDL event before navigation can resume.
+        if (generation == controllerNavigationGeneration) backend->setControllerNavigationEnabled(true);
+    });
+}
+
+void SetupBridge::invalidateControllerMapping(const QString &message)
+{
+    if (controllerOperation.isEmpty()) return;
+    controllerOperation.clear();
+    controllerPhase.clear();
+    controllerMessage = message;
+    backend->controllerMappingQuit();
+    controllerNavigation(true);
+    refresh();
+}
+
+bool SetupBridge::controllerOperationValid(const QString &operation, const QString &profile) const
+{
+    return !suspended && keyboardMouseAvailable && !operation.isEmpty() && operation == controllerOperation
+        && currentProfile(profile) && !backend->qmlWindow() && !backend->qmlSession();
+}
+
+QVariantMap SetupBridge::beginControllerMapping(bool reset, const QString &profile)
+{
+    if (suspended || !keyboardMouseAvailable || !currentProfile(profile) || backend->qmlWindow() || backend->qmlSession()
+            || state.value("connectionBusy").toBool() || !controllerOperation.isEmpty() || backend->qmlControllers().isEmpty()) return {{"accepted", false}};
+    controllerOperation = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    controllerPhase = "select";
+    controllerReset = reset;
+    controllerMessage.clear();
+    controllerNavigation(false);
+    backend->beginControllerMapping(reset);
+    refresh();
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::controllerMappingAction(const QString &action, const QString &operation, const QString &profile)
+{
+    if (!controllerOperationValid(operation, profile)) return {{"accepted", false}};
+    if (action == "cancel") invalidateControllerMapping();
+    else if (action == "cancelCapture" && controllerPhase == "capture") {
+        backend->controllerMappingButtonQuit();
+        controllerPhase = "edit";
+        controllerNavigation(true);
+        refresh();
+    } else if (controllerPhase != "edit" || !backend->controllerMappingInProgress()) return {{"accepted", false}};
+    else if (action == "apply" && backend->controllerMappingAltered()) {
+        backend->controllerMappingApply();
+        invalidateControllerMapping(tr("Controller mapping saved."));
+    } else if (action == "analogOn" || action == "analogOff") backend->setEnableAnalogStickMapping(action == "analogOn");
+    else return {{"accepted", false}};
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::captureControllerMapping(const QVariant &button, const QVariant &slot, const QString &operation, const QString &profile)
+{
+    const auto integer = [](const QVariant &value) {
+        const auto type = value.metaType().id();
+        return (type == QMetaType::Int || type == QMetaType::UInt || type == QMetaType::Double || type == QMetaType::LongLong)
+            && std::isfinite(value.toDouble()) && value.toDouble() == std::floor(value.toDouble());
+    };
+    if (!controllerOperationValid(operation, profile) || controllerPhase != "edit" || !integer(button) || !integer(slot)
+        || (slot.toDouble() != 0 && slot.toDouble() != 1)) return {{"accepted", false}};
+    bool found = false;
+    for (const auto &row : backend->currentControllerMapping())
+        if (row.toMap().value("buttonValue").toDouble() == button.toDouble()) found = true;
+    if (!found) return {{"accepted", false}};
+    controllerButton = button.toInt();
+    controllerSlot = slot.toInt();
+    controllerPhase = "capture";
+    controllerNavigation(false);
+    backend->controllerMappingSelectButton();
+    refresh();
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::setControllerSetting(const QString &name, const QVariant &value, const QString &profile)
+{
+    const auto invalid = [this] { return QVariantMap{{"accepted", false}, {"message", tr("Choose a valid setting value.")}}; };
+    if (suspended || !keyboardMouseAvailable || !currentProfile(profile)) return invalid();
+    auto *settings = backend->qmlSettings();
+    if (name == "allowJoystickBackgroundEvents" || name == "buttonsByPosition" || name == "dpadTouchEnabled") {
+        if (value.metaType().id() != QMetaType::Bool) return invalid();
+        if (name == "allowJoystickBackgroundEvents") settings->setAllowJoystickBackgroundEvents(value.toBool());
+        else if (name == "buttonsByPosition") settings->setButtonsByPosition(value.toBool());
+        else settings->setDpadTouchEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    const auto type = value.metaType().id();
+    if (type != QMetaType::Int && type != QMetaType::UInt && type != QMetaType::Double && type != QMetaType::LongLong) return invalid();
+    const double number = value.toDouble();
+    if (!std::isfinite(number)) return invalid();
+    if (name == "hapticOverride") {
+        if (number < 0 || number > 2) return invalid();
+        settings->setHapticOverride(number);
+    } else {
+        if (number != std::floor(number)) return invalid();
+        if (name == "rumbleHapticsIntensity" && number >= 0 && number <= 5) settings->setRumbleHapticsIntensity(number);
+        else if (name == "dpadTouchIncrement" && settings->dpadTouchEnabled() && number >= 1 && number <= 1079) settings->setDpadTouchIncrement(number);
+        else if (number >= 0 && number <= 16 && settings->dpadTouchEnabled()) {
+            if (name == "dpadTouchShortcut1") settings->setDpadTouchShortcut1(number);
+            else if (name == "dpadTouchShortcut2") settings->setDpadTouchShortcut2(number);
+            else if (name == "dpadTouchShortcut3") settings->setDpadTouchShortcut3(number);
+            else if (name == "dpadTouchShortcut4") settings->setDpadTouchShortcut4(number);
+            else return invalid();
+        } else return invalid();
+    }
+    return {{"accepted", true}};
+}
+
 bool SetupBridge::keyboardMouseFormValid(const QString &form, const QString &profile) const
 {
     return !suspended && keyboardMouseAvailable && !form.isEmpty() && form == keyboardMouseForm && currentProfile(profile);
@@ -610,7 +801,7 @@ void SetupBridge::setKeyboardMouseAvailable(bool available)
     if (keyboardMouseAvailable == available) return;
     keyboardMouseAvailable = available;
     ++keyboardMouseWindowGeneration;
-    if (!available) invalidateKeyboardMouse();
+    if (!available) { invalidateKeyboardMouse(); invalidateControllerMapping(); }
     refresh();
 }
 

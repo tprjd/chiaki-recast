@@ -16,7 +16,6 @@ FocusScope {
         PS5
     }
     property int selectedConsole: SettingsDialog.Console.PS5
-    property bool quitControllerMapping: true
     id: dialog
     objectName: "settingsDialog"
     property var backend: Chiaki
@@ -29,7 +28,6 @@ FocusScope {
     property var openExternal: function(url) { Qt.openUrlExternally(url); }
     property alias currentCategory: bar.currentIndex
     property Item restoreFocusItem
-    property var pendingMappingSearch: null
     readonly property string searchQuery: searchField.text.trim().toLocaleLowerCase()
     readonly property var searchResults: {
         const query = searchQuery;
@@ -81,22 +79,18 @@ FocusScope {
     function openSearchResult(index) {
         const entry = searchResults[index];
         if (!entry) return;
-        pendingMappingSearch = null;
         if (!entry.page) {
             revealSetting(entry.category, entry.target, entry.consoleType, entry.fallback);
             return;
         }
         const opener = entry.page === "display" ? "displaySettings"
             : entry.page === "profiles" ? "manageProfiles"
-            : entry.page === "mapping" ? "controllerMappingChange" : "customRendererSettings";
+            : "customRendererSettings";
         revealSetting(entry.category, opener, undefined, "videoPreset", function(item) {
             if (!item || item.objectName !== opener || !item.visible || !item.enabled) return;
             if (entry.page === "display") navigation.showDisplaySettingsDialog(entry);
             else if (entry.page === "profiles") navigation.showProfileDialog(entry);
-            else if (entry.page === "mapping") {
-                pendingMappingSearch = entry;
-                controllerMappingDialog.show({reset: false});
-            } else navigation.showPlaceboSettingsDialog(entry);
+            else navigation.showPlaceboSettingsDialog(entry);
         });
     }
     readonly property bool compact: width < 760
@@ -1727,24 +1721,6 @@ FocusScope {
                             ColumnLayout {
                                 anchors.fill: parent
                                 spacing: 12
-                            RowLayout {
-                                Layout.fillWidth: true
-                                C.Button {
-                                    id: controllerMappingChange
-                                    objectName: "controllerMappingChange"
-                                    firstInFocusChain: true
-                                    text: qsTr("Change controller mapping")
-                                    font.pixelSize: 14
-                                    onClicked: controllerMappingDialog.show({ reset: false })
-                                }
-                                C.Button {
-                                    id: controllerMappingReset
-                                    objectName: "controllerMappingReset"
-                                    text: qsTr("Reset controller mapping")
-                                    font.pixelSize: 14
-                                    onClicked: controllerMappingDialog.show({ reset: true })
-                                }
-                            }
                             C.CheckBox {
                                 objectName: "allowJoystickBackgroundEvents"
                                 text: qsTr("Process controller input in the background. Default: On")
@@ -2195,37 +2171,6 @@ FocusScope {
             function onHeightChanged() { Qt.callLater(dialog.ensureActiveFocusVisible); }
         }
 
-        Item {
-            Timer {
-                id: openTimer
-                interval: 100
-                running: false
-                onTriggered: {
-                    if (!controllerMappingDialog.visible || !dialog.backend.controllerMappingInProgress) return;
-                    if(controllerMappingDialog.resetMapping)
-                    {
-                        if(!dialog.backend.controllerMappingDefaultMapping)
-                        {
-                            quitControllerMapping = false;
-                            dialog.backend.controllerMappingReset();
-                        }
-                        controllerMappingDialog.close();
-                    }
-                    else
-                    {
-                        controllerMappingChange.forceActiveFocus(Qt.TabFocusReason);
-                        const route = dialog.pendingMappingSearch;
-                        dialog.pendingMappingSearch = null;
-                        if (route) dialog.navigation.showControllerMappingDialog(route);
-                        else dialog.navigation.showControllerMappingDialog();
-                        quitControllerMapping = false;
-                        controllerMappingDialog.resetFocus = false;
-                        controllerMappingDialog.close();
-                    }
-                }
-            }
-        }
-
         ConfirmDialog {
             id: aboutDialog
             objectName: "aboutDialog"
@@ -2316,129 +2261,5 @@ FocusScope {
             }
         }
 
-        Dialog {
-            id: controllerMappingDialog
-            objectName: "controllerCapture"
-            width: 600
-            onAboutToHide: openTimer.stop()
-            property bool resetFocus: true
-            property bool resetMapping: false
-            parent: Overlay.overlay
-            x: Math.round((dialog.navigation.width - width) / 2)
-            y: Math.round((dialog.navigation.height - height) / 2)
-            title: qsTr("Controller Capture")
-            modal: true
-            standardButtons: Dialog.Close
-            closePolicy: Popup.CloseOnPressOutside
-            onOpened: {
-                controllerLabel.forceActiveFocus(Qt.TabFocusReason);
-                dialog.backend.beginControllerMapping(resetMapping);
-            }
-            onClosed: {
-                dialog.pendingMappingSearch = null;
-                if(resetFocus)
-                {
-                    if(resetMapping)
-                        controllerMappingReset.forceActiveFocus(Qt.TabFocusReason);
-                    else
-                        controllerMappingChange.forceActiveFocus(Qt.TabFocusReason);
-                    focus = false;
-                }
-                else
-                {
-                    resetFocus = true;
-                    focus = false;
-                }
-                if(quitControllerMapping)
-                    dialog.backend.controllerMappingQuit();
-                else
-                    quitControllerMapping = true;
-            }
-            Material.roundedScale: Material.MediumScale
-
-            function show(opts) {
-                resetMapping = opts.reset;
-                open();
-            }
-            contentItem: Label {
-                id: controllerLabel
-                wrapMode: Text.Wrap
-                text: qsTr("Choose the controller by pressing any button on the controller")
-                Keys.onPressed: event => {
-                    if (event.key === Qt.Key_Escape) controllerMappingDialog.close();
-                    event.accepted = true;
-                }
-                Keys.onReleased: event => event.accepted = true
-            }
-        }
-
-        Dialog {
-            id: steamControllerMappingDialog
-            objectName: "steamControllerNotice"
-            width: 600
-            property bool resetMapping: false
-            parent: Overlay.overlay
-            x: Math.round((dialog.navigation.width - width) / 2)
-            y: Math.round((dialog.navigation.height - height) / 2)
-            title: qsTr("Controller Managed by Steam")
-            modal: true
-            standardButtons: Dialog.Close
-            closePolicy: Popup.NoAutoClose
-            onOpened: {
-                steamLabel.forceActiveFocus(Qt.TabFocusReason);
-            }
-            onClosed: {
-                focus = false;
-                const opener = resetMapping ? controllerMappingReset : controllerMappingChange;
-                if (dialog.visible && opener.visible && opener.enabled) {
-                    opener.focus = false;
-                    opener.forceActiveFocus(Qt.TabFocusReason);
-                }
-            }
-            Material.roundedScale: Material.MediumScale
-
-            contentItem: Label {
-                id: steamLabel
-                wrapMode: TextEdit.Wrap
-                text: qsTr("This controller is managed by Steam.\nPlease use Steam to map controller or disable Steam Input for the controller before mapping here.")
-                Keys.onReturnPressed: steamControllerMappingDialog.close();
-                Keys.onEscapePressed: steamControllerMappingDialog.close();
-            }
-        }
-
-        Connections {
-            target: dialog.backend.settings
-            function onCurrentProfileChanged() {
-                dialog.pendingMappingSearch = null;
-                if (controllerMappingDialog.visible) controllerMappingDialog.close();
-                if (steamControllerMappingDialog.visible) steamControllerMappingDialog.close();
-            }
-        }
-
-        Connections {
-            target: dialog.backend
-
-            function onControllerMappingInProgressChanged()
-            {
-                if (dialog.backend.controllerMappingInProgress && controllerMappingDialog.visible)
-                    openTimer.start();
-                else
-                {
-                    openTimer.stop();
-                    dialog.pendingMappingSearch = null;
-                }
-            }
-
-            function onControllerMappingSteamControllerSelected()
-            {
-                if (!controllerMappingDialog.visible) return;
-                dialog.pendingMappingSearch = null;
-                controllerMappingDialog.resetFocus = false;
-                quitControllerMapping = false;
-                steamControllerMappingDialog.resetMapping = controllerMappingDialog.resetMapping;
-                controllerMappingDialog.close();
-                steamControllerMappingDialog.open();
-            }
-        }
     }
 }
