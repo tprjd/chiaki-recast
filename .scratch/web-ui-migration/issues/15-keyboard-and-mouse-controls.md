@@ -4,7 +4,7 @@
 
 **Blocked by:** 11: Open settings and change general session options.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 50, 51, 52, 57, 58, 78, 79.
 
