@@ -165,7 +165,7 @@ class EmbeddedSetupTest : public QObject
         return *result;
     }
 
-    QVariantMap cookieMetadata(QWebEngineProfile *profile, const QByteArray &name)
+    QVariantMap cookieMetadata(const QString &path, const QByteArray &name)
     {
         QProcess probe;
         probe.start(QStringLiteral(CHIAKI_TEST_PYTHON), {"-c",
@@ -173,7 +173,7 @@ class EmbeddedSetupTest : public QObject
             "db=sqlite3.connect(Path(sys.argv[1]).as_uri()+'?mode=ro',uri=True); "
             "r=db.execute('SELECT COUNT(*),SUM(is_persistent),MAX(expires_utc) FROM cookies WHERE name=?',(sys.argv[2],)).fetchone(); "
             "print(json.dumps(dict(count=r[0],persistent=r[1] or 0,future=bool(r[2] and r[2]/1000000-11644473600>time.time()))))",
-            QDir(profile->persistentStoragePath()).filePath("Cookies"), QString::fromUtf8(name)});
+            QDir(path).filePath("Cookies"), QString::fromUtf8(name)});
         if (!probe.waitForFinished(5000) || probe.exitCode() != 0) return {};
         return QJsonDocument::fromJson(probe.readAllStandardOutput()).toVariant().toMap();
     }
@@ -281,6 +281,8 @@ private slots:
         };
         QmlNativeServices services(&settings, transport);
         services.backend()->stopAutoConnect();
+        QString retainedPath;
+        QByteArray retainedName;
         for (bool complete : {false, true}) {
             PsnSignInWindow signIn(services.backend());
             auto *page = signIn.view()->page();
@@ -305,9 +307,10 @@ private slots:
             profile->cookieStore()->setCookie(cookie, QUrl("https://fixture.invalid"));
             QTRY_VERIFY(hasCookie());
             if (complete) {
-                QTRY_COMPARE(cookieMetadata(profile, cookieName).value("count").toInt(), 1);
+                retainedPath = profile->persistentStoragePath();
+                retainedName = cookieName;
                 qInfo() << "Owned PSN cookie profile" << profile->persistentStoragePath()
-                    << "fixture name" << cookieName << "before success" << cookieMetadata(profile, cookieName);
+                    << "fixture name" << cookieName << "before success" << cookieMetadata(retainedPath, cookieName);
                 auto *http = new PsnPageRequests(profile);
                 profile->setUrlRequestInterceptor(http);
                 QSignalSpy loadFinished(page, &QWebEnginePage::loadFinished);
@@ -322,19 +325,18 @@ private slots:
                 QTRY_COMPARE(settings.GetPsnAccountId(), QStringLiteral("AQAAAAAAAAA="));
                 QTRY_VERIFY(cacheCleared.count() > 0);
                 QCOMPARE(removed.count(), 0);
-                // Cache reset does not replay cookie notifications in Qt 6.9.3; read persisted metadata.
-                const auto retained = cookieMetadata(profile, cookieName);
-                QCOMPARE(retained.value("count").toInt(), 1);
-                QCOMPARE(retained.value("persistent").toInt(), 1);
-                QVERIFY(retained.value("future").toBool());
-                qInfo() << "Owned PSN cookie after success" << retained;
-                profile->cookieStore()->deleteAllCookies();
             } else {
                 signIn.close();
                 QTRY_VERIFY(cacheCleared.count() > 0);
                 QTRY_VERIFY(removed.count() > 0);
             }
         }
+        // The profile flushes persistent cookies on destruction; post-cache replay emits no cookies here.
+        QTRY_COMPARE(cookieMetadata(retainedPath, retainedName).value("count").toInt(), 1);
+        const auto retained = cookieMetadata(retainedPath, retainedName);
+        QCOMPARE(retained.value("persistent").toInt(), 1);
+        QVERIFY(retained.value("future").toBool());
+        qInfo() << "Owned PSN cookie after success and profile destruction" << retained;
     }
 
     void psnRefreshCredentials()
