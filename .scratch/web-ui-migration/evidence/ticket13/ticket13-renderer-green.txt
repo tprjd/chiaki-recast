@@ -1,0 +1,14 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QWARN  : EmbeddedSetupTest::rendererSettings() QFontDatabase: Cannot find font directory C:/Users/david/.cache/chiaki-native-qt/6.9.3/msvc2022_64/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+PASS   : EmbeddedSetupTest::rendererSettings()
+QWARN  : EmbeddedSetupTest::rendererFiles() This plugin does not support propagateSizeHints()
+FAIL!  : EmbeddedSetupTest::rendererFiles() Compared values are not the same
+   Actual   (script(setup.view(), "document.querySelector('.settings-message')?.textContent").toString()): "Renderer settings could not be exported. Check the file permissions and free space."
+   Expected ((QString(QtPrivate::qMakeStringPrivate(u"" "Renderer settings exported."))))                : "Renderer settings exported."
+C:\Users\david\.codex\worktrees\web-ui-ticket-13\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(1223) : failure location
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 3 passed, 1 failed, 0 skipped, 0 blacklisted, 27177ms
+********* Finished testing of EmbeddedSetupTest *********

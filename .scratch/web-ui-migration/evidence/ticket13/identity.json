@@ -1,0 +1,86 @@
+{
+  "sourceCommit": "b7e14bcc56c4fdc9b91aad59caeaf0e2ad68050a",
+  "compiledCommit": "dab7697b8d7e1827ac388424512f419cf3308d79",
+  "sourceHashes": {
+    "gui/src/settings.cpp": "541f4c9d12772633902c7fa5988644ea4b11267f68e4893c91baa9daf2a751d1",
+    "gui/include/settings.h": "d7a6df377353c324b061f06c75d4f82ec010c8c8c7b0b274c6c9145566088188",
+    "gui/src/qmlsettings.cpp": "5a8f33af6c78ef4aa3f154b78f70392c135d7ee280b29c354b982fc16383c09c",
+    "gui/include/qmlsettings.h": "a69e2b8df532dc95bb8a721946def34ce567f3c89c17d09824e8eabffb4d2a19",
+    "gui/src/qmlbackend.cpp": "4475ea01c4a3d64cf5bea79869e4b3d54d5fbe5a89a95697fd87c29847e2fdae",
+    "gui/src/setupbridge.cpp": "c126667f555b6e686576bc858ad9e521d31ab737070692dac2fe40cb09295439",
+    "gui/include/setupbridge.h": "3d27a13f63fa8aac472a64d694c03cebeda8ad33a996ac7b65c116f380cb5fbf",
+    "gui/web/src/settings.ts": "48e514de9462d5a5a4f97108997b9da2704a557abea7446ab0c55220041318f4",
+    "gui/web/src/SettingField.svelte": "73e72de099d3bc843a6534f420ad810057b2d935635e6c5ac6bf8e84ccfee191",
+    "gui/web/src/Settings.svelte": "4c44cb79ce6df41d3a32ec460db77190ae99f0fa55100bf9001d275f371fa58a",
+    "gui/web/src/bridge.ts": "f2b861adc44f48f2e12b2d99c7e84664ac5bbeaea09d14f6d1bbc5203544b78e",
+    "gui/tests/embeddedsetup.cpp": "d9eff8ab386c2bb1d91ac223c45d08a2a86a27a095da51265a2e2033bc1aed09",
+    "gui/tests/CMakeLists.txt": "c397de0610370bd70b2143e908a6e94a3b13404afe5623b127f8ef8521e2aed2",
+    "gui/src/qml/PlaceboSettingsDialog.qml": "534abcd50ba739393e70ea72d21ba21d8148f0a13d79bd6dc191cb0e77bdc7a9"
+  },
+  "artifacts": {
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket13-build\\gui\\tests\\chiaki-embedded-setup-tests.exe": "c72fbfbccc340cf1090c19c2d760d9e6dcf6202c4e5bc23ca9cce6c3b9949a10",
+    "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket13-build\\gui\\tests\\chiaki-console-screen-tests.exe": "a827c94797fabf2ac5b2ddd6146831a103e5a497e6fbbf993ccfb3b21de9706c"
+  },
+  "settingsRunArtifactSha256": "f81ed040c082ebdaaca39e8fd6a46e0e97acbc661b66c0974062ac9e4573f66f",
+  "fileRunArtifactSha256": null,
+  "fileRunArtifactLimit": "The 5b5f341b executable was not hashed before a later test-only rebuild.",
+  "bodyComparisons": [
+    {
+      "testedCommit": "5b5f341b",
+      "file": "gui/src/settings.cpp",
+      "signature": "bool Settings::ExportPlaceboSettings(",
+      "unchanged": true,
+      "bodySha256": "6a8f0a0d266574f111e611dc64ecc1b813768d2a12fe8facfdca6b2f18917b06"
+    },
+    {
+      "testedCommit": "5b5f341b",
+      "file": "gui/src/settings.cpp",
+      "signature": "bool Settings::ImportPlaceboSettings(",
+      "unchanged": true,
+      "bodySha256": "c1475a4653b04619dab2f7f55690f77cc550fc0f12aee7e82fdf7a305d2ab7ca"
+    },
+    {
+      "testedCommit": "5b5f341b",
+      "file": "gui/src/qmlsettings.cpp",
+      "signature": "QVariantMap QmlSettings::exportPlaceboSettings()",
+      "unchanged": true,
+      "bodySha256": "e160832ff5d3d09685b5b45ab92f87ad4af8ff37f20ac6f8bf68d7ed29b8519a"
+    },
+    {
+      "testedCommit": "5b5f341b",
+      "file": "gui/src/qmlsettings.cpp",
+      "signature": "QVariantMap QmlSettings::importPlaceboSettings()",
+      "unchanged": true,
+      "bodySha256": "01fe6cb180790710ea26e7e2bb7000899e0fc307ab7c862fe73046700c2f69b7"
+    },
+    {
+      "testedCommit": "5b5f341b",
+      "file": "gui/tests/embeddedsetup.cpp",
+      "signature": "    void rendererFiles()",
+      "unchanged": true,
+      "bodySha256": "406ac895f6490852ad6edfadfe1481d0bf44f29c1ee99bec9f887ae114bf5776"
+    },
+    {
+      "testedCommit": "62f7f839",
+      "file": "gui/tests/embeddedsetup.cpp",
+      "signature": "    void rendererSettings()",
+      "unchanged": true,
+      "bodySha256": "0b616041be1d394bad8e92395bbe1f8a2069be3cbcdd7cedfb48188034dbe417"
+    },
+    {
+      "testedCommit": "62f7f839",
+      "file": "gui/src/setupbridge.cpp",
+      "signature": "QVariantMap SetupBridge::setRendererSetting(",
+      "unchanged": true,
+      "bodySha256": "9b62ab2aa7323556ac833022d2dca5bb7e22424dd691e841fcb7e2e701851bf8"
+    },
+    {
+      "testedCommit": "62f7f839",
+      "file": "gui/src/setupbridge.cpp",
+      "signature": "QVariantMap SetupBridge::rendererAction(",
+      "unchanged": true,
+      "bodySha256": "9b2214ade3d5f1b0375aa4933cdeff39782e9c4de2da9b238612cf28453f98db"
+    }
+  ],
+  "vendorDiffSha256": "44b9b3710790c388323f84f2b3aada58eae5719d749930e0d277accad082f7da"
+}
