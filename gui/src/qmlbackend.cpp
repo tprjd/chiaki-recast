@@ -1350,7 +1350,7 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
     }
 
     try {
-        session = new StreamSession(session_info, this);
+        session = new StreamSession(session_info, this, psn_requests.startSession);
     } catch (const Exception &e) {
         failConnection(tr("Stream failed"), tr("Failed to initialize Stream Session: %1").arg(e.what()));
         emit error(tr("Stream failed"), tr("Failed to initialize Stream Session: %1").arg(e.what()));

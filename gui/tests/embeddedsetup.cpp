@@ -359,6 +359,7 @@ private slots:
         QSemaphore release;
         std::atomic<int> calls = 0;
         std::atomic<ChiakiErrorCode> result = CHIAKI_ERR_HOST_UNREACH;
+        std::atomic<int> starts = 0;
         QString connectedDuid;
         bool connectedPs5 = false;
         QList<QPointer<PsnReply>> requests;
@@ -379,6 +380,7 @@ private slots:
             release.acquire();
             return result.load();
         };
+        transport.startSession = [&](ChiakiSession *) { ++starts; return CHIAKI_ERR_CANCELED; };
         QmlNativeServices services(&settings, transport, {}, controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
@@ -422,6 +424,7 @@ private slots:
         release.release();
         QTRY_VERIFY(!secondSession);
         QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("cancelled"));
+        QCOMPARE(starts.load(), 0);
         auto *back = nativeObject("connectionBack");
         QVERIFY(back && back->property("enabled").toBool());
         QVERIFY(QMetaObject::invokeMethod(back, "clicked"));
@@ -452,6 +455,7 @@ private slots:
         QCOMPARE(requests.size(), 0);
         QVERIFY(!backend->qmlSession());
         QVERIFY(!backend->qmlWindow());
+        QCOMPARE(starts.load(), 0);
     }
 
     void psnRemoteRefreshOwnership()

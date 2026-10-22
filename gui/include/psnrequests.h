@@ -2,6 +2,7 @@
 
 #include "jsonrequester.h"
 #include <chiaki/remote/holepunch.h>
+#include <chiaki/session.h>
 #include <functional>
 
 class StreamSession;
@@ -13,4 +14,5 @@ struct PsnRequests
     std::function<ChiakiErrorCode(const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **, size_t *, ChiakiLog *)> listDevices = chiaki_holepunch_list_devices;
     using Connect = std::function<ChiakiErrorCode(StreamSession *, const QString &, bool)>;
     Connect connect;
+    std::function<ChiakiErrorCode(ChiakiSession *)> startSession = chiaki_session_start;
 };
