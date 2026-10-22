@@ -6,6 +6,8 @@ The user skipped the remaining build tests and performance tests to prioritize p
 
 The branch is `codex/web-ui-ticket-20`. Integration `1d769ee9ec3bfd267137d8ca738255feed9c7f90` was merged without conflicts in `4c1e7a08`. This includes the ticket 19 shared `--check-package` preflight, mandatory frontend notice output and install, and ticket 22 recovery changes. The Linux workflow changes preserve the other platform job blocks.
 
+The latest priority integration `06b38253e60cb6c4db1a3a2fa73a3b2d8bbba421` was merged without conflicts in `704e15bb`. Both the Linux source milestone and the appended prototype-fidelity priority remain in the map. No further build or test ran.
+
 Implementation commits are `c1fc84f9`, `69b9a39b`, `bd17c1bf`, and `7831e7b7`. Checkpoint commit `c5cf60b5` retains the completed preparation and exact external cache paths.
 
 The AppImage Dockerfile pins its builder base, complete Qt 6.9.3 SDK, matching WebEngine extension, and Node 24.16.0 with npm 11.13.0. The Flatpak main, legacy, and development manifests use runtime and WebEngine BaseApp 6.11, the selected checkout, and one shared application source module. Locked npm sources include the build dependencies. The mandatory CMake frontend target builds and embeds the page. Node is build-only.
