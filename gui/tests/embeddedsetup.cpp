@@ -411,11 +411,29 @@ class EmbeddedSetupTest : public QObject
     QVariantMap setupRequest(QWebEngineView *view, const QString &method, const QJsonArray &args)
     {
         const QString arguments = QString::fromUtf8(QJsonDocument(args).toJson(QJsonDocument::Compact));
-        // A second real WebChannel client checks rejected public commands, then restores the UI client's receiver.
+        // Keep replies to the UI client separate from this real WebChannel client's requests.
         script(view, QString(R"(
             window.settingsReply = null;
             { const transport = window.qt.webChannelTransport, receive = transport.onmessage;
-              new QWebChannel(transport, channel => channel.objects.setup.%2(...%1, reply => {
+              const replies = new Map();
+              const helper = { send(payload) {
+                const message = JSON.parse(payload);
+                if (message.id !== undefined) {
+                  if (!Number.isSafeInteger(message.id) || message.id < 0 || message.id >= 1000000)
+                    throw new Error('Temporary WebChannel client request ID is outside its own range');
+                  const id = window.setupTestMessageId = (window.setupTestMessageId ?? 1000000) + 1;
+                  replies.set(id, message.id); message.id = id;
+                }
+                transport.send(JSON.stringify(message));
+              }};
+              transport.onmessage = event => {
+                const message = JSON.parse(event.data), id = replies.get(message.id);
+                if (id === undefined) { receive(event); return; }
+                if (message.type !== 10) throw new Error('An owned WebChannel request must receive a response');
+                replies.delete(message.id); message.id = id;
+                helper.onmessage({data: JSON.stringify(message)});
+              };
+              new QWebChannel(helper, channel => channel.objects.setup.%2(...%1, reply => {
                 window.settingsReply = reply; transport.onmessage = receive;
               })); }
         )").arg(arguments, method));
@@ -460,22 +478,7 @@ class EmbeddedSetupTest : public QObject
 
     QVariantMap consoleRequest(QWebEngineView *view, const QString &method, const QJsonArray &arguments)
     {
-        const auto args = QString::fromUtf8(QJsonDocument(arguments).toJson(QJsonDocument::Compact));
-        script(view, QString(R"(
-            window.consoleReply = null;
-            { const transport = window.qt.webChannelTransport, receive = transport.onmessage;
-              new QWebChannel(transport, channel => channel.objects.setup.%1(...%2, reply => {
-                window.consoleReply = reply; transport.onmessage = receive;
-              })); }
-        )").arg(method, args));
-        QElapsedTimer timeout;
-        timeout.start();
-        while (timeout.elapsed() < 5000) {
-            const auto reply = script(view, "window.consoleReply").toMap();
-            if (!reply.isEmpty()) return reply;
-            QTest::qWait(10);
-        }
-        return {};
+        return setupRequest(view, method, arguments);
     }
 
     QObject *nativeObject(const QString &name)
@@ -4921,7 +4924,7 @@ private slots:
                  {"audioVolume", 129}, {"audioBufferSize", 9601}, {"customResolutionWidth", -1}, {"customResolutionHeight", 10000},
                  {"useZeroCopy", 1}, {"audioVolume", QStringLiteral("64")}, {"audioVolume", 1.5},
                  {"audioOutDevice", QStringLiteral("Unknown")}, {"decoder", QStringLiteral("unsupported")}, {"psnAuthToken", QStringLiteral("forbidden")}}) {
-            const auto reply = settingRequest(setup.view(), input.first, input.second, generation, "setMediaSetting");
+            const auto reply = consoleRequest(setup.view(), "setMediaSetting", {input.first, QJsonValue::fromVariant(input.second), generation});
             QVERIFY2(reply.contains("accepted"), "The real WebChannel media command did not return");
             QVERIFY2(!reply.value("accepted").toBool(), qPrintable(input.first));
         }
