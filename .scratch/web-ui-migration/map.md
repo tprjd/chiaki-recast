@@ -1,9 +1,13 @@
 # Web UI migration implementation
 
-Status: active
+Status: source and UI milestone complete; remaining validation deferred
 Integration branch: codex/web-ui-migration-integration
 Implementation baseline: d0e2f052cb076b7fda85c51f60dab1cc428951fb
 Started: 2026-10-22
+
+Deferred validation and known issues: [follow-up record](deferred-work.md).
+This includes the unresolved native HighQuality failure and the later Windows
+build and launch result. Skipped acceptance checks remain unverified.
 
 The user invoked implement-spec for the full approved specification. This
 supersedes the earlier planning-only task restriction. Use the approved

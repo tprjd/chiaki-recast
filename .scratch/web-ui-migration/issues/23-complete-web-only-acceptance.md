@@ -27,6 +27,14 @@
 
 ## Comments
 
+### Deferred follow-up record, 2026-10-22
+
+The user requested a saved record for a later return. See
+[deferred validation and known issues](../deferred-work.md) for the skipped
+checks, HighQuality reproduction, evidence links, and conservative resume policy.
+The current Windows source was later built and the actual UI opened at the
+user's request. This adds local compilation and startup evidence only.
+
 ### Ticket 02 acceptance limits
 
 [02](02-native-stream-only-interface.md) preserves the native media and device
