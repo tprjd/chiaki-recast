@@ -1302,8 +1302,11 @@ private slots:
         const auto capture = [&](const QString &category, int width, int height, qreal zoom, const QString &file) {
             setup.resize(width, height);
             setup.view()->setZoomFactor(zoom);
-            script(setup.view(), QString("[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='%1').click();document.querySelector('h2').scrollIntoView()").arg(category));
+            script(setup.view(), QString("[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='%1').click()").arg(category));
+            QTRY_COMPARE(script(setup.view(), "document.querySelector('h2')?.textContent").toString(), category);
             QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth<=innerWidth && [...document.querySelectorAll('.settings-content input,.settings-content select,.settings-content button')].every(e=>{const r=e.getBoundingClientRect();return r.left>=0 && r.right<=innerWidth})").toBool());
+            script(setup.view(), "document.querySelector('h2').scrollIntoView()");
+            QTest::qWait(100);
             QVERIFY(setup.view()->grab().save(evidence.filePath(file)));
         };
         capture("Renderer", 390, 720, 1, "renderer-390.png");
