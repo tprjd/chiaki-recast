@@ -328,7 +328,6 @@ class StreamSession : public QObject
 		void InitAudio(unsigned int channels, unsigned int rate);
 		void InitMic(unsigned int channels, unsigned int rate);
 		void InitHaptics();
-		void Event(ChiakiEvent *event);
 		void DisconnectHaptics();
 		void ConnectHaptics();
 #if CHIAKI_GUI_ENABLE_STEAMDECK_NATIVE
@@ -347,6 +346,8 @@ class StreamSession : public QObject
 
 		void Start();
 		void Stop();
+		void WaitForStop();
+		void Event(ChiakiEvent *event);
 		void GoToBed();
 	Q_INVOKABLE bool RequestIDR();
 		void ToggleMute();

@@ -15,6 +15,10 @@ public:
     Q_INVOKABLE QVariantMap snapshot() const { return state; }
     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
+    Q_INVOKABLE QVariantMap connectConsole(const QString &key);
+    void setSuspended(bool suspended);
+    void reportStreamError(const QString &title, const QString &text);
+    Q_INVOKABLE QVariantMap dismissStreamError(const QString &id);
     Q_INVOKABLE QVariantMap openPsnSignIn(const QString &profile);
     Q_INVOKABLE QVariantMap openPsnExternal(const QString &profile);
     Q_INVOKABLE QVariantMap copyPsnSignInLink(const QString &profile);
@@ -49,6 +53,9 @@ private:
     quint64 revision = 0;
     QString selectedKey;
     QVariantMap state;
+    bool suspended = false;
+    QVariantMap streamError;
+    quint64 streamErrorGeneration = 0;
     QStringList decoders;
     QTimer accountExpiry;
     bool credentialsRejected = false;
