@@ -76,9 +76,9 @@
   $effect(() => {
     if (invalidProfile || phase === 'success' || phase === 'failure') { pin = ''; consolePin = ''; }
   });
-  async function start(key = '') {
+  async function start(key = '', trigger?: HTMLButtonElement) {
     if (submitting) return;
-    opener = document.activeElement as HTMLElement;
+    opener = trigger ?? document.activeElement as HTMLElement;
     const ownedProfile = current.profileGeneration;
     const reply = await connection.registrationOpen(key, ownedProfile);
     if (current.profileGeneration !== ownedProfile) return;
@@ -116,9 +116,9 @@
   if (open && event.key === 'Escape' && (event.target as Element).closest('.pairing')) { event.preventDefault(); close(); }
 }} />
 <section data-setup-panel class="pairing">
-  <button data-register-new onclick={() => start()}>{t(current.registration.busy ? 'View registration progress' : 'Register console')}</button>
+  <button data-register-new onclick={event => start('', event.currentTarget)}>{t(current.registration.busy ? 'View registration progress' : 'Register console')}</button>
   {#if selected && selected.available && selected.route !== 'psn' && !selected.registered}
-    <button data-register-selected onclick={() => start(selected!.key)}>{t('Register selected console')}</button>
+    <button data-register-selected onclick={event => start(selected!.key, event.currentTarget)}>{t('Register selected console')}</button>
   {/if}
   {#if !open && message}<p role="alert">{message}</p>{/if}
   {#if open}

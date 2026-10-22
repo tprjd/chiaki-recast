@@ -670,6 +670,7 @@ QVariantMap SetupBridge::submitRegistration(const QString &context, const QVaria
         refresh();
         return {{"accepted", false}, {"message", tr("Check the console address, Account ID, and pairing codes. The console or profile can have changed.")}};
     }
+    registrationContext = nativeContext;
     registrationAddress = address;
     refresh();
     return {{"accepted", accepted}, {"id", backend->registrationAttempt().value("id")}};
