@@ -9,7 +9,7 @@
             "npm_config_cache": "/run/build/chiaki-ng/flatpak-node/npm-cache"
         }
     },
-    "config-opts": ["-DCHIAKI_ENABLE_TESTS=OFF", "-DCHIAKI_ENABLE_SPEEX=ON", "-DCHIAKI_ENABLE_RUDP=ON"],
+    "config-opts": ["-DCMAKE_POLICY_VERSION_MINIMUM=3.5", "-DCHIAKI_ENABLE_TESTS=OFF", "-DCHIAKI_ENABLE_SPEEX=ON", "-DCHIAKI_ENABLE_RUDP=ON"],
     "sources": [
         {
             "type": "dir",
