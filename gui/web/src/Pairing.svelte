@@ -300,7 +300,6 @@
   .account-lookup { display: grid; gap: 16px; max-width: 720px; }
   form, label, aside { display: grid; gap: 10px; min-width: 0; }
   aside { align-content: start; gap: 18px; }
-  button { min-height: 40px; padding: 9px 14px; background: var(--raised); border: 1px solid var(--line); border-radius: 7px; }
   input, select { width: 100%; min-height: 42px; }
   pre { max-height: 240px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
   p { color: var(--muted); overflow-wrap: anywhere; }

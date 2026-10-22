@@ -1521,6 +1521,7 @@ private slots:
         host.host_addr = "192.0.2.10";
         host.state = CHIAKI_DISCOVERY_HOST_STATE_STANDBY;
         discover(backend, {host});
+        QVERIFY(click(setup.view(), ".console-details"));
         QVERIFY(click(setup.view(), "[data-wake-console]"));
         QTRY_COMPARE(wakes, 1);
         if (mode == "timeout") {
@@ -2200,6 +2201,7 @@ private slots:
         host.host_addr = "192.0.2.10";
         host.state = CHIAKI_DISCOVERY_HOST_STATE_STANDBY;
         discover(backend, {host});
+        QVERIFY(click(setup.view(), ".console-details"));
         QVERIFY(click(setup.view(), "[data-wake-console]"));
         QTRY_COMPARE(wakes, 1);
         const auto manual = backend->connectionAttempt().value("id").toString();
@@ -2267,6 +2269,7 @@ private slots:
         host.host_addr = "192.0.2.10";
         host.state = CHIAKI_DISCOVERY_HOST_STATE_STANDBY;
         discover(backend, {host});
+        QVERIFY(click(setup.view(), ".console-details"));
         QVERIFY(click(setup.view(), "[data-wake-console]"));
         QTRY_COMPARE(wakes, 1);
         QVERIFY(wakeMatches);
@@ -2327,16 +2330,17 @@ private slots:
         SetupWindow setup(services.backend());
         setup.resize(1280, 720);
         setup.show();
-        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-auto-connect-target]') !== null").toBool());
+        QVERIFY(click(setup.view(), ".open-settings"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#autoConnectTarget') !== null").toBool());
         const auto key = setup.bridge()->snapshot().value("registrations").toList().first().toMap().value("key").toString();
-        QVERIFY(fill(setup.view(), "[data-auto-connect-target]", key));
+        QVERIFY(fill(setup.view(), "#autoConnectTarget", key));
         QTRY_COMPARE(settings.GetAutoConnectHost().GetServerMAC().ToString(), QStringLiteral("001122334455"));
         QVERIFY(services.backend()->connectionAttempt().isEmpty());
         Settings restarted(profile);
         QCOMPARE(restarted.GetAutoConnectHost().GetServerMAC().ToString(), QStringLiteral("001122334455"));
         setup.view()->reload();
-        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-auto-connect-target]')?.value").toString(), key);
-        QVERIFY(fill(setup.view(), "[data-auto-connect-target]", ""));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#autoConnectTarget')?.value").toString(), key);
+        QVERIFY(fill(setup.view(), "#autoConnectTarget", ""));
         QTRY_VERIFY(!settings.GetAutoConnectHost().GetServerMAC().GetValue());
         QVERIFY(requests.isEmpty());
     }
@@ -2577,7 +2581,6 @@ private slots:
         host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
         discover(backend, {host});
         QTRY_COMPARE(script(setup->view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
-        QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-automatic-register]')?.disabled === false").toBool());
         const auto initialKey = setup->bridge()->snapshot().value("selectedKey").toString();
         const auto initialProfile = setup->bridge()->snapshot().value("profileGeneration").toString();
         QString manualContext;
@@ -2631,6 +2634,8 @@ private slots:
             return;
         }
         QSignalSpy saved(&settings, &Settings::RegisteredHostsUpdated);
+        QVERIFY(click(setup->view(), "[data-register-selected]"));
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('[data-automatic-register]')?.disabled === false").toBool());
         script(setup->view(), "document.querySelector('[data-automatic-register]').click();document.querySelector('[data-automatic-register]').click()");
         QTRY_COMPARE(connects.load(), 1);
         QPointer<QmlMainWindow> native = backend->qmlWindow();
@@ -3027,7 +3032,7 @@ private slots:
         QCOMPARE(script(setup.view(), "document.querySelector('#mouseDeadZoneCompensation').max").toString(), QStringLiteral("50"));
         QCOMPARE(script(setup.view(), "document.querySelector('#mouseResponseExponent').min").toString(), QStringLiteral("0.1"));
         numeric("mouseHorizontalSensitivity", "9");
-        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-keyboard-mouse] [role=status]').textContent").toString(), QStringLiteral("Choose a valid setting value."));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.settings-tools .settings-message').textContent").toString(), QStringLiteral("Choose a valid setting value."));
         QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 2.37);
         services.backend()->qmlSettings()->setMouseHorizontalSensitivity(3.25);
         QTRY_COMPARE(script(setup.view(), "document.querySelector('#mouseHorizontalSensitivity').value").toString(), QStringLiteral("3.25"));
@@ -4841,15 +4846,24 @@ private slots:
             script(setup.view(), QString("[...document.querySelectorAll('.category-nav button')].find(b=>b.textContent==='%1').click()").arg(name));
         };
         const auto change = [&](const QString &key, const QString &value) {
+            if (key.endsWith("PS4") || key.endsWith("PS5")) {
+                const auto selector = QString("#stream-console-%1").arg(key.right(3));
+                QTRY_VERIFY(script(setup.view(), QString("!!document.querySelector('%1')").arg(selector)).toBool());
+                script(setup.view(), QString("document.querySelector('%1').click()").arg(selector));
+            }
             QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled === false").arg(key)).toBool());
             script(setup.view(), QString("{const field=document.getElementById('%1');field.value='%2';field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(key, value));
             QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled === false").arg(key)).toBool());
         };
         category("Stream");
         QTRY_COMPARE(script(setup.view(), "document.querySelector('#resolutionLocalPS5')?.options.length").toInt(), 4);
+        QVERIFY(script(setup.view(), "!document.querySelector('#resolutionLocalPS4')").toBool());
         QVERIFY(script(setup.view(), "!document.querySelector('#codecLocalPS4') && !document.querySelector('#codecRemotePS4')").toBool());
         change("bitrateLocalPS4", "20");
         QTRY_COMPARE(settings.GetBitrateLocalPS4(), 20000u);
+        QVERIFY(script(setup.view(), "!document.querySelector('#resolutionLocalPS5')").toBool());
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.settings-message.saved svg')").toBool());
+        QTRY_COMPARE_WITH_TIMEOUT(script(setup.view(), "document.querySelector('.settings-message').textContent").toString(), QStringLiteral("Changes are saved automatically."), 4500);
         change("resolutionLocalPS4", "1");
         QTRY_COMPARE(settings.GetResolutionLocalPS4(), CHIAKI_VIDEO_RESOLUTION_PRESET_360p);
         QCOMPARE(settings.GetBitrateLocalPS4(), 0u);
@@ -5096,6 +5110,11 @@ private slots:
             QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#disconnectAction')").toBool());
             script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(b=>b.textContent==='Stream').click()");
             const auto change = [&](const QString &key, const QString &value) {
+                if (key.endsWith("PS4") || key.endsWith("PS5")) {
+                    const auto selector = QString("#stream-console-%1").arg(key.right(3));
+                    QTRY_VERIFY(script(setup.view(), QString("!!document.querySelector('%1')").arg(selector)).toBool());
+                    script(setup.view(), QString("document.querySelector('%1').click()").arg(selector));
+                }
                 QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled === false").arg(key)).toBool());
                 script(setup.view(), QString("{const field=document.getElementById('%1');field.value='%2';field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(key, value));
                 QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled === false").arg(key)).toBool());

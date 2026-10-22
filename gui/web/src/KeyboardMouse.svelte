@@ -2,15 +2,16 @@
   import { tick } from 'svelte';
   import { moveFocus } from './navigation';
   import SettingField from './SettingField.svelte';
+  import Icon from './Icon.svelte';
   import type { State, connectSetup } from './bridge';
   import { keyboardMouseSettings } from './settings';
-  let { current, connection, target = '', t }: {
+  let { current, connection, target = '', t, notify }: {
     current: State; connection: Awaited<ReturnType<typeof connectSetup>>;
     target?: string; t: (text: string) => string;
+    notify: (message: string, saved: boolean) => void;
   } = $props();
   let form = $state('');
   let pending = $state(false);
-  let message = $state('');
   let tab = $state('Mouse response');
   let confirmation: HTMLDialogElement;
   let resetIdentity: { form: string; generation: string } | undefined;
@@ -50,13 +51,13 @@
     pending = true;
     try {
       const reply = await connection.keyboardMouseSetting(key, value as boolean | number, form, editGeneration);
-      message = reply.accepted ? t('Saved · Applies the next time you press F8.') : reply.message ?? t('The setting could not be saved.');
-    } catch { message = t('The setting could not be saved.'); }
+      notify(reply.accepted ? t('Saved') : reply.message ?? t('The setting could not be saved.'), reply.accepted);
+    } catch { notify(t('The setting could not be saved.'), false); }
     finally { pending = false; }
   }
   async function capture(action: number, slot: number, legacy = false) {
     const reply = await connection.captureKeyboardMouse(action, slot, legacy, form, generation);
-    if (!reply.accepted) message = t('The binding could not be opened.');
+    if (!reply.accepted) notify(t('The binding could not be opened.'), false);
   }
   function openReset() {
     resetIdentity = { form, generation };
@@ -73,11 +74,11 @@
     cancelReset();
     if (!identity) return;
     const reply = await connection.resetKeyboardMouse(identity.form, identity.generation);
-    message = reply.accepted ? t('Saved · Applies the next time you press F8.') : t('The setting could not be saved.');
+    notify(reply.accepted ? t('Saved') : t('The setting could not be saved.'), reply.accepted);
   }
   async function resetKeys() {
     const reply = await connection.resetKeyboardKeys(form, generation);
-    message = reply.accepted ? t('Saved') : t('The setting could not be saved.');
+    notify(reply.accepted ? t('Saved') : t('The setting could not be saved.'), reply.accepted);
   }
   function tabKey(event: KeyboardEvent) {
     if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
@@ -94,13 +95,18 @@
       <SettingField field={fields[0]} value={values.mouseCameraEnabled} disabled={!form || pending} {generation} change={value => change('mouseCameraEnabled', value)} {t} />
       <div class="setting-row reset-row"><button id="keyboardMouseReset" disabled={!form || pending} onclick={openReset}>{t('Reset defaults')}</button></div>
       </div>
-      <div class="keyboard-mouse-tabs" role="tablist" tabindex="-1" aria-label={t('Keyboard and mouse')} onkeydown={tabKey}>
+      <div class="keyboard-mouse-tabs settings-tabs" role="tablist" tabindex="-1" aria-label={t('Keyboard and mouse')} onkeydown={tabKey}>
         {#each ['Mouse response', 'Bindings'] as item}
           <button role="tab" id={item === 'Bindings' ? 'keyboard-mouse-bindings' : 'keyboard-mouse-response'} tabindex={tab === item ? 0 : -1} aria-selected={tab === item} aria-controls="keyboard-mouse-tab" onclick={() => tab = item}>{t(item)}</button>
         {/each}
       </div>
       <div id="keyboard-mouse-tab" role="tabpanel" tabindex="0" aria-labelledby={tab === 'Bindings' ? 'keyboard-mouse-bindings' : 'keyboard-mouse-response'}>
         {#if tab === 'Mouse response'}
+          <aside class="settings-info"><Icon name="info" size={18} /><div>
+            <p>{t("Increase compensation only if small mouse movements do not move the camera. Start response correction at 1.00. Lower values increase small movements to compensate for a game's slow stick response.")}</p>
+            <p>{t('Sensitivity is a multiplier. The game still controls its response curve and maximum turn speed.')}</p>
+            <p>{t('Changes apply the next time you press F8.')}</p>
+          </div></aside>
           {#each fields.slice(1, 6) as field (field.key)}
             <div class="setting-rows mouse-response-row">
             <SettingField {field} value={values[field.key]} disabled={!form || pending || !enabled} {generation} change={(value, editGeneration) => change(field.key, value, editGeneration)} {t} />
@@ -110,10 +116,8 @@
             {/if}
             </div>
           {/each}
-          <p class="keyboard-note">{t("Increase compensation only if small mouse movements do not move the camera. Start response correction at 1.00. Lower values increase small movements to compensate for a game's slow stick response.")}</p>
-          <p class="keyboard-note">{t('Sensitivity is a multiplier. The game still controls its response curve and maximum turn speed.')}</p>
         {:else}
-          <p class="keyboard-note">{t('Choose a slot to assign or clear one key or mouse button. Mouse movement controls the right stick.')}</p>
+          <aside class="settings-info"><Icon name="info" size={18} /><p>{t('Choose a slot to assign or clear one key or mouse button. Mouse movement controls the right stick.')}</p></aside>
           {#each ['Movement', 'Buttons', 'Shoulders and sticks', 'D-pad', 'System'] as group, index}
             <section class="settings-group" aria-label={t(group)}>
               <h3>{t(group)}</h3>
@@ -144,7 +148,6 @@
     {/each}
     </div>
   </section>
-  <p class="keyboard-note" role="status">{message}</p>
 </div>
 <dialog bind:this={confirmation} aria-labelledby="reset-keyboard-title" onkeydown={event => moveFocus(event, confirmation)} oncancel={event => { event.preventDefault(); cancelReset(); }}>
   <h2 id="reset-keyboard-title">{t('Reset keyboard and mouse defaults?')}</h2>
@@ -155,12 +158,7 @@
 
 <style>
   .reset-row { justify-content:flex-end; }
-  .keyboard-note { color:var(--muted); font-size:12px; margin-block:12px; }
-  .keyboard-note:empty { display:none; }
   .binding-row { display:grid; grid-template-columns:minmax(7rem,1fr) repeat(2,minmax(0,1fr)); margin:0; gap:12px; }
   .binding-row button { font-size:12px; }
-  .keyboard-mouse-tabs { gap:4px; padding:3px; border:1px solid var(--line); border-radius:8px; background:#11151c; width:fit-content; }
-  .keyboard-mouse-tabs button { border:0; background:transparent; color:var(--muted); font-size:12px; }
-  .keyboard-mouse-tabs button[aria-selected=true] { background:var(--raised); color:var(--text); }
   .mouse-response-row input[type=range] { display:block; width:calc(100% - 40px); margin:0 20px 17px; }
 </style>

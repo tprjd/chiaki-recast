@@ -110,7 +110,7 @@
   </Dialog>
 {/if}
 <style>
-  button { min-height: 44px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+  button { min-height: 44px; }
   section, form, label { display: grid; gap: 12px; }
   section { gap: 20px; }
   input { width: 100%; }

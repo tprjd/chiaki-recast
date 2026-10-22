@@ -19,6 +19,8 @@ const buttons = ['Not Used', 'Cross', 'Moon', 'Box', 'Pyramid', 'Dpad Left', 'Dp
 
 // Search uses this public metadata only. Never add saved values or private identifiers.
 export const generalSettings: Setting[] = [
+  { key: 'autoConnectTarget', label: 'Auto-connect at startup', group: 'Startup', description: 'Choose a registered console to connect to when Recast starts.',
+    defaultLabel: 'Off', options: ['Off'] },
   { key: 'disconnectAction', label: 'Action on disconnect', group: 'Session behavior', description: 'Choose what the console does when the session ends.',
     defaultLabel: 'Ask', options: ['Do Nothing', 'Enter Sleep Mode', 'Ask'] },
   { key: 'suspendAction', label: 'Action on suspend', group: 'Session behavior', description: 'Choose what the console does when the computer sleeps.',

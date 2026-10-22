@@ -167,7 +167,7 @@
   {:else}
     <div class:hidden={pairingOpen || accountRoute}>
       <div class="library-heading">
-        <div><div class="library-title"><h1>{t('Consoles')}</h1><span class="heading-count">{current?.consoles.length ?? 0}</span></div></div>
+        <h1>{t('Consoles')}</h1>
         <button class="add-console" data-register-new={current && connection ? '' : undefined} disabled={!current || !connection || current.connectionBusy && !current.registration.busy} onclick={event => pairing?.choose('', event.currentTarget)}><Icon name="plus" />{t(current?.registration.busy ? 'View registration progress' : 'Add console')}</button>
       </div>
       <div class="library-toolbar">
@@ -221,7 +221,6 @@
         <span class="library-count">{consoles.length} {t('of')} {current?.consoles.length ?? 0} {t('consoles')} , {consoles.filter(console => console.available && console.state === 'ready').length} {t('online')}</span>
         <span role="status" data-psn-refresh-status>{current?.psn.refresh.phase === 'refreshing' ? t('Refreshing PSN credentials') : current?.psn.refresh.phase === 'listing' ? t('Finding remote consoles') : current?.psn.refresh.message ?? ''}</span>
       </div>
-      <ConnectAction {current} {connection} optionsOnly />
       <div class="library-secondary">
         {#if current && connection}<ConsoleManagement {current} {connection} bind:detailsKey />{/if}
         {#if current && connection && current.steam.supported}<SteamShortcut {current} {connection} />{/if}

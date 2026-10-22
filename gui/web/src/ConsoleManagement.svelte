@@ -90,6 +90,17 @@
         ? '[data-saved-pin]' : '[data-close-management]')?.focus();
     } finally { busy = false; }
   }
+  async function wake() {
+    if (busy || !validTarget || current.connectionBusy || !console?.registered || console.route === 'psn' || !console.available) return;
+    busy = true; message = '';
+    try {
+      const reply = await connection.wake(target);
+      if (reply.accepted) close();
+      else message = reply.message ?? t('The console could not be woken. Try again.');
+    } catch {
+      message = t('The console could not be woken. Try again.');
+    } finally { busy = false; }
+  }
 </script>
 
 <div class="management-tools" data-setup-panel>
@@ -103,21 +114,21 @@
     {#if mode === 'manual'}
       {#if !saved}
         <div class="manual-workspace"><form onsubmit={saveManual}>
-          <p class="kicker">{t('Manual address')}</p><h3>{t('Find your console')}</h3>
-          <label>{t('Console address')}<input data-manual-address data-initial-focus type={current.streamerMode ? 'password' : 'text'} autocomplete="off" spellcheck="false" bind:value={address} disabled={busy} /></label>
-          <p>{t('Enter an IP address or hostname without a port or URL.')}</p>
+          <div><p class="kicker">{t('Manual address')}</p><h3>{t('Find your console')}</h3></div>
+          <div><label>{t('Console address')}<input data-manual-address data-initial-focus type={current.streamerMode ? 'password' : 'text'} autocomplete="off" spellcheck="false" bind:value={address} disabled={busy} aria-describedby="manual-address-help" /></label>
+          <p id="manual-address-help" class="field-help">{t('Enter an IP address or hostname without a port or URL.')}</p></div>
           <label>{t('Registered console')}<select data-manual-registration bind:value={registration} disabled={busy}>
             <option value="">{t('Select a console')}</option>
             {#each current.registrations as host (host.key)}<option value={host.key}>{host.name} · {host.ps5 ? 'PS5' : 'PS4'} · {host.identifier}</option>{/each}
             <option value="later">{t('Register on first connection')}</option>
           </select></label>
-          <button data-save-manual disabled={busy || !addressValid || !registration || profile !== current.profileGeneration || current.connectionBusy}>{t('Save address')}</button>
+          <div class="actions manual-actions"><button class="primary" data-save-manual disabled={busy || !addressValid || !registration || profile !== current.profileGeneration || current.connectionBusy}>{t('Save address')}</button></div>
         </form><aside><h3>{t('Use a manual address')}</h3><p>{t('Save an address when discovery does not show your console.')}</p><h3>{t('Choose its registration')}</h3><p>{t('Use an existing registration, or register when you first connect. Saving an address does not pair the console or start a connection.')}</p></aside></div>
       {/if}
       <p data-manual-result role={saved ? 'status' : 'alert'}>{message}</p>
     {:else if mode === 'manage'}
       <h3>{t('Registered consoles')}</h3>
-      {#each current.registrations as host (host.key)}<div class="management-row"><span>{host.name} · {host.ps5 ? 'PS5' : 'PS4'}<small>{host.identifier}</small></span><button data-delete-registration={host.key} disabled={current.connectionBusy} onclick={() => request('deleteRegistration', host.key)}>{t('Delete registration')}</button></div>{:else}<p>{t('No registered consoles')}</p>{/each}
+      {#each current.registrations as host (host.key)}<div class="management-row"><span>{host.name} · {host.ps5 ? 'PS5' : 'PS4'}<small>{host.identifier}</small></span><button class="danger" data-delete-registration={host.key} disabled={current.connectionBusy} onclick={() => request('deleteRegistration', host.key)}>{t('Delete registration')}</button></div>{:else}<p>{t('No registered consoles')}</p>{/each}
       <h3>{t('Hidden consoles')}</h3>
       {#each current.hiddenConsoles as host (host.key)}<div class="management-row"><span>{host.name}<small>{host.identifier}</small></span><button data-unhide-console={host.key} disabled={current.connectionBusy} onclick={() => request('unhide', host.key)}>{t('Unhide console')}</button></div>{:else}<p>{t('No hidden consoles')}</p>{/each}
     {:else if mode === 'details'}
@@ -128,7 +139,11 @@
           <dt>{t('Registration')}</dt><dd>{t(console.registered ? 'Registered' : 'Not registered')}</dd>
           <dt>{t('Address')}</dt><dd>{console.address || '—'}</dd><dt>{t('ID')}</dt><dd>{console.identifier || '—'}</dd>
           {#if console.app}<dt>{t('App')}</dt><dd>{console.app}</dd>{/if}{#if console.titleId}<dt>{t('Title ID')}</dt><dd>{console.titleId}</dd>{/if}
-        </dl><div class="actions">{#each console.actions.filter(item => Object.hasOwn(actions, item)) as item}<button data-console-action={item} disabled={current.connectionBusy} onclick={() => request(item, target)}>{t(actions[item])}</button>{/each}</div>
+        </dl><div class="actions">
+          {#if console.registered && console.route !== 'psn'}<button data-wake-console disabled={busy || current.connectionBusy || !console.available} onclick={wake}>{t('Wake console')}</button>{/if}
+          {#each console.actions.filter(item => Object.hasOwn(actions, item)) as item}<button class:danger={item === 'deleteManual' || item === 'deleteRegistration'} data-console-action={item} disabled={busy || current.connectionBusy} onclick={() => request(item, target)}>{t(actions[item])}</button>{/each}
+        </div>
+        {#if message}<p role="alert">{message}</p>{/if}
       {:else}<p role="alert">{t('Console unavailable. Close this screen and select the console again.')}</p>{/if}
     {:else if mode === 'pin'}
       <h3>{targetName}</h3><p>{t('This is the four-digit PIN for your console user. It is different from the eight-digit Remote Play pairing code.')}</p>
@@ -138,7 +153,7 @@
       <p role="status">{message}</p>
     {:else if mode === 'confirm'}
       <h3>{targetName}</h3><p>{t(explanations[action])}</p>
-      <div class="actions"><button data-cancel-management data-initial-focus onclick={close}>{t('Cancel')}</button><button data-confirm-management disabled={busy || !validTarget || current.connectionBusy} onclick={() => apply()}>{t(actions[action])}</button></div>
+      <div class="actions"><button data-cancel-management data-initial-focus onclick={close}>{t('Cancel')}</button><button class:danger={action === 'deleteManual' || action === 'deleteRegistration'} data-confirm-management disabled={busy || !validTarget || current.connectionBusy} onclick={() => apply()}>{t(actions[action])}</button></div>
       <p role="alert">{message}</p>
     {/if}
     {#if mode !== 'manage' && profile !== current.profileGeneration}<p role="alert">{t('The profile changed. Open this form again.')}</p>{:else if (mode === 'pin' || mode === 'confirm') && !validTarget}<p role="alert">{t('Console unavailable. Close this screen and select the console again.')}</p>{/if}
@@ -146,13 +161,18 @@
 {/if}
 
 <style>
-  button, select { min-height: 44px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
-  .management-tools, .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  button, select { min-height: 44px; }
+  .management-tools, .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .actions { justify-content: flex-end; margin-top: 24px; }
+  .manual-actions { margin-top: 0; }
   .dialog-heading, .management-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
   .dialog-heading { margin-bottom: 24px; } h2 { font-size: 23px; } h3 { margin: 16px 0 8px; }
-  form, label { display: grid; gap: 10px; } form { gap: 16px; } input, select { width: 100%; }
+  form, label { display: grid; gap: 8px; } form { gap: 20px; align-content: start; } input, select { width: 100%; }
   p, dt, small, aside { color: var(--muted); } p { margin-block: 12px; } small { display: block; }
-  .manual-workspace { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; }
+  .manual-workspace { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; gap: 24px; }
+  .manual-workspace h3 { margin-top: 0; }
+  .manual-workspace .kicker { margin: 0 0 8px; }
+  .field-help { font-size: 12px; margin: 8px 0 0; }
   aside { border-left: 1px solid var(--line); padding-left: 24px; } .kicker { text-transform: uppercase; font-size: 11px; }
   .management-row { padding: 16px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; } .management-row span { min-width: 0; }
   dl { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; } dd { margin: 0; }

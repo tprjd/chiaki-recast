@@ -1,12 +1,11 @@
 <script lang="ts">
   import { tick, untrack } from 'svelte';
   import type { State, connectSetup } from './bridge';
-  let { current, connection, t }: { current: State; connection: Awaited<ReturnType<typeof connectSetup>>; t: (text: string) => string } = $props();
+  let { current, connection, t, notify }: { current: State; connection: Awaited<ReturnType<typeof connectSetup>>; t: (text: string) => string; notify: (message: string, saved: boolean) => void } = $props();
   let selected = $state('');
   let name = $state('');
   let deleting = $state(false);
   let pending = $state(false);
-  let message = $state('');
   let generation = '';
   const item = $derived(current.profiles.items.find(item => item.key === selected));
   const creating = $derived(selected === 'create');
@@ -15,7 +14,7 @@
   $effect(() => {
     generation = profileGeneration;
     void catalog;
-    untrack(() => { selected = current.profiles.items.find(item => item.active)?.key ?? ''; name = ''; deleting = false; message = ''; });
+    untrack(() => { selected = current.profiles.items.find(item => item.active)?.key ?? ''; name = ''; deleting = false; });
   });
   async function apply() {
     if (pending) return;
@@ -24,7 +23,7 @@
     try {
       const result = await connection.profileAction(creating ? 'create' : deleting ? 'delete' : 'switch', selected, name, deleting, owner);
       if (owner !== current.profileGeneration && result.profileGeneration !== current.profileGeneration) return;
-      message = result.message ?? '';
+      notify(result.message || t(result.accepted ? 'Saved' : 'The setting could not be saved.'), result.accepted);
       if (result.accepted) {
         pending = false;
         await tick();
@@ -59,12 +58,11 @@
   {/if}
   <div class="setting-row profile-action">
   <p>{t('The default and current profiles cannot be deleted.')}</p>
-  <button id="profileAction" disabled={pending || current.connectionBusy || (creating ? !name.trim() : !item || item.active)} onclick={apply}>
+  <button id="profileAction" class:danger={deleting && !creating} disabled={pending || current.connectionBusy || (creating ? !name.trim() : !item || item.active)} onclick={apply}>
     {t(deleting ? 'Delete Profile' : creating ? 'Create Profile' : 'Switch Profile')}
   </button>
   </div>
   </div>
-  <p class="profile-message" data-profile-message role="status">{message}</p>
 </section>
 
 <style>
@@ -72,7 +70,6 @@
   .setting-control input:not([type=checkbox]) { width:100%; min-height:38px; padding:8px 11px; }
   .setting-control input[type=checkbox] { appearance:auto; width:16px; height:16px; accent-color:var(--accent); }
   .setting-control input[type=checkbox]::after { display:none; }
-  .profile-action p,.profile-message { color:var(--muted); font-size:12px; }
+  .profile-action p { color:var(--muted); font-size:12px; }
   .profile-action button { min-height:36px; font-size:12px; color:var(--accent); flex-shrink:0; }
-  .profile-message:not(:empty) { margin-top:12px; }
 </style>

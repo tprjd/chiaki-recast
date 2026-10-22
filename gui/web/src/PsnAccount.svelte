@@ -78,7 +78,7 @@
 
 <style>
   .psn-account { margin-block: 24px; }
-  button { min-height: 44px; padding: 9px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  button { min-height: 44px; }
   .account-panel { display: grid; gap: 16px; padding: 24px; margin-top: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
   .actions { display: flex; flex-wrap: wrap; gap: 10px; }
   form, label { display: grid; gap: 10px; }
