@@ -3,6 +3,7 @@
   import { connectSetup, type State, type Console } from './bridge';
   import ConnectAction from './ConnectAction.svelte';
   import PsnAccount from './PsnAccount.svelte';
+  import Pairing from './Pairing.svelte';
   import Settings from './Settings.svelte';
 
   let current = $state<State>();
@@ -104,6 +105,7 @@
     <span role="status" class="message">{message || (!current ? t('Loading consoles') : '')}</span>
   </div>
   <ConnectAction {current} {connection} />
+  {#if current && connection}<Pairing {current} {connection} />{/if}
   {#if current && !consoles.length}
     <section class="empty" aria-live="polite">
       <h2>{t(query ? 'No matching consoles' : 'No consoles found')}</h2>

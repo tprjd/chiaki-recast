@@ -19,6 +19,8 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, &SetupBridge::refresh);
     connect(backend->qmlSettings(), &QmlSettings::currentProfileChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::psnAuthAttemptChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::registrationAttemptChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::accountLookupChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::psnTokenChanged, this, [this] { credentialsRejected = false; refresh(); });
     connect(backend, &QmlBackend::psnCredsExpired, this, [this] { credentialsRejected = true; refresh(); });
     connect(backend->qmlSettings(), &QmlSettings::psnAuthTokenChanged, this, &SetupBridge::refresh);
@@ -280,9 +282,35 @@ void SetupBridge::refresh()
     QVariantMap rendererStatus{{"restartRequired", settings->rendererBackend() != startupRendererBackend
         || (startupRendererBackend == 1 && settings->vSyncEnabled() != startupVSync)}};
     if(window) rendererStatus.insert("runtimeBackend", window->runtimeRendererBackend());
+    QVariantMap registration{{"busy", backend->registrationBusy()}, {"savedAccount", !native->GetPsnAccountId().isEmpty()}};
+    if (registrationContextId == registrationAttemptContext && !registrationContextId.isEmpty()) {
+        const auto attempt = backend->registrationAttempt();
+        registration["context"] = registrationContextId;
+        for (const auto &field : {"id", "phase", "message", "profileValid"})
+            if (attempt.contains(field)) registration[field] = attempt.value(field);
+        registration["diagnostics"] = privateMode ? QString() : attempt.value("diagnostics").toString();
+        if (attempt.value("phase") == "success" && attempt.value("profileValid").toBool()) {
+            for (const auto &value : hosts) {
+                const auto host = value.toMap();
+                if (host.value("mac") == attempt.value("resultMac") && host.value("address") == attempt.value("resultAddress")
+                    && host.value("registered").toBool()) {
+                    registration["connectKey"] = keys.value(identity(host));
+                    break;
+                }
+            }
+        }
+    }
+    QVariantMap lookup;
+    if (!accountRouteId.isEmpty() && accountSource == "lookup" && registrationAccountCurrent(registrationContextId, accountRouteId)) {
+        const auto attempt = backend->accountLookupAttempt();
+        lookup = {{"route", accountRouteId}};
+        if (attempt.value("id") == accountRequest)
+            for (const auto &field : {"id", "phase", "message"})
+                if (attempt.contains(field)) lookup[field] = attempt.value(field);
+    }
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
         {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
-        {"streamerMode", privateMode}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
+        {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
             || backend->connectionAttempt().value("cleanupPending").toBool()}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
     if (!suspended) emit stateChanged(state);
 }
@@ -433,6 +461,125 @@ QVariantMap SetupBridge::connectConsole(const QString &key)
     selectedKey = key;
     backend->connectToHost(index, nickname);
     return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::openRegistration(const QString &key, const QString &profile)
+{
+    if (!currentProfile(profile)) return {{"accepted", false}, {"message", tr("The profile changed. Open registration again.")}};
+    if (backend->registrationBusy()) {
+        if (registrationContextId.isEmpty() || registrationContext.value("profileGeneration").toULongLong() != backend->profileGeneration())
+            return {{"accepted", false}, {"message", tr("Wait for the current registration to finish before starting another request.")}};
+    } else {
+        int index = -1;
+        QString nickname;
+        if (!key.isEmpty() && !resolveConsole(key, index, nickname))
+            return {{"accepted", false}, {"message", tr("Console unavailable")}};
+        backend->cancelAccountLookup(accountRequest);
+        accountRouteId.clear();
+        accountRequest.clear();
+        registrationContext = backend->createRegistrationContext(index);
+        if (registrationContext.isEmpty()) return {{"accepted", false}, {"message", tr("Select a local console or enter its address.")}};
+        registrationContextId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        registrationAddress = registrationContext.value("address", "255.255.255.255").toString();
+        refresh();
+    }
+    return {{"accepted", true}, {"context", registrationContextId}, {"address", registrationAddress},
+        {"ps5", registrationContext.value("ps5", true)}};
+}
+
+QVariantMap SetupBridge::submitRegistration(const QString &context, const QVariantMap &fields)
+{
+    if (context.isEmpty() || context != registrationContextId || backend->registrationBusy()
+        || registrationContext.value("profileGeneration").toULongLong() != backend->profileGeneration())
+        return {{"accepted", false}, {"message", tr("The registration context changed. Close this screen and open registration again.")}};
+    for (const auto &field : {"address", "account", "pin", "consolePin"})
+        if (fields.value(field).metaType().id() != QMetaType::QString) return {{"accepted", false}, {"message", tr("Enter text for the address, account, and pairing codes.")}};
+    const auto target = fields.value("target");
+    const double targetNumber = target.toDouble();
+    if (target.metaType().id() == QMetaType::QString || !std::isfinite(targetNumber) || std::floor(targetNumber) != targetNumber)
+        return {{"accepted", false}, {"message", tr("Select a supported console and firmware.")}};
+    const auto address = fields.value("address").toString().trimmed();
+    const auto nativeContext = address == registrationAddress ? registrationContext : backend->createRegistrationContext();
+    const auto previous = backend->registrationAttempt().value("id");
+    registrationAttemptContext = context;
+    const bool accepted = backend->registerHost(address, fields.value("account").toString().trimmed(),
+        fields.value("pin").toString(), fields.value("consolePin").toString(), address == "255.255.255.255",
+        fields.value("target").toInt(), nativeContext);
+    if (backend->registrationAttempt().value("id") == previous) {
+        registrationAttemptContext.clear();
+        refresh();
+        return {{"accepted", false}, {"message", tr("Check the console address, Account ID, and pairing codes. The console or profile can have changed.")}};
+    }
+    registrationAddress = address;
+    refresh();
+    return {{"accepted", accepted}, {"id", backend->registrationAttempt().value("id")}};
+}
+
+bool SetupBridge::registrationAccountCurrent(const QString &context, const QString &route) const
+{
+    return !context.isEmpty() && context == registrationContextId && !route.isEmpty() && route == accountRouteId
+        && registrationContext.value("profileGeneration").toULongLong() == backend->profileGeneration()
+        && backend->registrationContextCurrent(registrationContext, registrationAddress);
+}
+
+QVariantMap SetupBridge::beginRegistrationAccount(const QString &context, const QString &source)
+{
+    if (context.isEmpty() || context != registrationContextId || backend->registrationBusy()
+        || registrationContext.value("profileGeneration").toULongLong() != backend->profileGeneration()
+        || (source != "lookup" && source != "signIn" && source != "saved")) return {{"accepted", false}};
+    backend->cancelAccountLookup(accountRequest);
+    accountRequest.clear();
+    accountSource = source;
+    accountRouteId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    accountAuthBaseline = backend->psnAuthAttempt().value("id").toString();
+    refresh();
+    return {{"accepted", true}, {"route", accountRouteId}};
+}
+
+QVariantMap SetupBridge::lookupRegistrationAccount(const QString &context, const QString &route, const QString &username)
+{
+    if (!registrationAccountCurrent(context, route) || accountSource != "lookup"
+        || (!accountRequest.isEmpty() && backend->accountLookupAttempt().value("phase") == "pending")) return {{"accepted", false}};
+    accountRequest = backend->startAccountLookup(username);
+    refresh();
+    return {{"accepted", true}, {"id", accountRequest}};
+}
+
+QVariantMap SetupBridge::readRegistrationAccount(const QString &context, const QString &route, const QString &request)
+{
+    if (!registrationAccountCurrent(context, route)) return {{"accepted", false}};
+    QString account;
+    if (accountSource == "saved") account = backend->nativeSettings()->GetPsnAccountId();
+    else {
+        const auto attempt = accountSource == "lookup" ? backend->accountLookupAttempt() : backend->psnAuthAttempt();
+        if (request.isEmpty() || attempt.value("id") != request || attempt.value("phase") != "success"
+            || (accountSource == "lookup" ? request != accountRequest : request == accountAuthBaseline || !attempt.value("profileValid").toBool()))
+            return {{"accepted", false}};
+        account = attempt.value("accountId").toString();
+    }
+    const auto bytes = account.toLatin1();
+    const auto decoded = QByteArray::fromBase64Encoding(bytes, QByteArray::AbortOnBase64DecodingErrors);
+    if (!decoded || decoded.decoded.size() != CHIAKI_PSN_ACCOUNT_ID_SIZE || decoded.decoded.toBase64() != bytes)
+        return {{"accepted", false}, {"message", tr("No valid saved Account ID is available. Use public lookup or PSN sign-in.")}};
+    return {{"accepted", true}, {"accountId", account}};
+}
+
+QVariantMap SetupBridge::endRegistrationAccount(const QString &context, const QString &route)
+{
+    if (!registrationAccountCurrent(context, route)) return {{"accepted", false}};
+    accountRouteId.clear();
+    backend->cancelAccountLookup(accountRequest);
+    accountRequest.clear();
+    refresh();
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::connectRegistration(const QString &attempt)
+{
+    const auto registration = state.value("registration").toMap();
+    if (attempt.isEmpty() || registration.value("id") != attempt || registration.value("phase") != "success")
+        return {{"accepted", false}};
+    return connectConsole(registration.value("connectKey").toString());
 }
 
 QVariantMap SetupBridge::refreshAudioDevices()

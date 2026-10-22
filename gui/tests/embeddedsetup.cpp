@@ -8,6 +8,7 @@
 #include <QElapsedTimer>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QJsonObject>
 #include <QFile>
 #include <QFileDialog>
 #include <QTemporaryDir>
@@ -131,16 +132,18 @@ public:
         setUrl(request.url());
         open(QIODevice::ReadOnly | QIODevice::Unbuffered);
     }
-    void finish(QByteArray json, NetworkError error = NoError)
+    void finish(QByteArray json, NetworkError error = NoError, int status = 200)
     {
         if (isFinished()) return;
         payload = std::move(json);
+        setAttribute(QNetworkRequest::HttpStatusCodeAttribute, status);
         if (error != NoError) setError(error, "credential-bearing-network-error");
         setFinished(true);
         emit readyRead();
         emit finished();
     }
-    void abort() override { finish({}, OperationCanceledError); }
+    bool deferAbort = false;
+    void abort() override { if (!deferAbort) finish({}, OperationCanceledError); }
     qint64 bytesAvailable() const override { return payload.size() - offset + QNetworkReply::bytesAvailable(); }
 protected:
     qint64 readData(char *data, qint64 size) override
@@ -185,6 +188,51 @@ public:
     {
         count.fetchAndAddRelaxed(1);
         request.block(true);
+    }
+};
+
+struct RegistrationTransport
+{
+    struct Request {
+        QPointer<QObject> owner;
+        ChiakiRegistCb callback;
+        void *user;
+        ChiakiLog *log;
+        QString address;
+        QString onlineId;
+        ChiakiTarget target;
+        bool broadcast;
+        uint32_t pin;
+        uint32_t consolePin;
+    };
+    QList<Request> requests;
+    ChiakiErrorCode startResult = CHIAKI_ERR_SUCCESS;
+    RegistrationRequests boundary()
+    {
+        RegistrationRequests transport;
+        transport.start = [this](ChiakiRegist *, ChiakiLog *log, const ChiakiRegistInfo *info, ChiakiRegistCb callback, void *user) {
+            requests.append({static_cast<QmlRegist *>(user), callback, user, log, QString::fromUtf8(info->host),
+                QString::fromUtf8(info->psn_online_id), info->target, info->broadcast, info->pin, info->console_pin});
+            return startResult;
+        };
+        transport.stop = [](ChiakiRegist *) {};
+        transport.fini = [](ChiakiRegist *) {};
+        return transport;
+    }
+    void complete(int index, bool success, uint8_t lastMacByte = 0x55)
+    {
+        const auto request = requests.at(index);
+        if (!request.owner) return;
+        ChiakiRegisteredHost host = {};
+        host.target = request.target;
+        memcpy(host.server_mac, "\x00\x11\x22\x33\x44", 5);
+        host.server_mac[5] = lastMacByte;
+        memcpy(host.server_nickname, "Paired console", 15);
+        memcpy(host.rp_regist_key, "registration-key", 16);
+        memset(host.rp_key, 0x42, sizeof(host.rp_key));
+        host.console_pin = request.consolePin;
+        ChiakiRegistEvent event{success ? CHIAKI_REGIST_EVENT_TYPE_FINISHED_SUCCESS : CHIAKI_REGIST_EVENT_TYPE_FINISHED_FAILED, &host};
+        request.callback(&event, request.user);
     }
 };
 
@@ -237,6 +285,32 @@ class EmbeddedSetupTest : public QObject
         timeout.start();
         while (timeout.elapsed() < 5000) {
             const auto reply = script(view, "window.settingsReply").toMap();
+            if (!reply.isEmpty()) return reply;
+            QTest::qWait(10);
+        }
+        return {};
+    }
+
+    bool registrationFill(QWebEngineView *view, const QString &selector, const QString &value)
+    {
+        const auto arguments = QString::fromUtf8(QJsonDocument(QJsonArray{selector, value}).toJson(QJsonDocument::Compact));
+        return script(view, "((selector,value)=>{const element=document.querySelector(selector);if(!element)return false;element.value=value;element.dispatchEvent(new Event(element.tagName==='SELECT'?'change':'input',{bubbles:true}));return true;})(..." + arguments + ")").toBool();
+    }
+
+    QVariantMap registrationCommand(QWebEngineView *view, const QString &method, const QJsonArray &arguments)
+    {
+        const auto args = QString::fromUtf8(QJsonDocument(arguments).toJson(QJsonDocument::Compact));
+        script(view, QString(R"(
+            window.registrationReply = null;
+            { const transport=window.qt.webChannelTransport, receive=transport.onmessage;
+              new QWebChannel(transport, channel => channel.objects.setup.%1(...%2, reply => {
+                window.registrationReply=reply; transport.onmessage=receive;
+              })); }
+        )").arg(method, args));
+        QElapsedTimer timeout;
+        timeout.start();
+        while (timeout.elapsed() < 5000) {
+            const auto reply = script(view, "window.registrationReply").toMap();
             if (!reply.isEmpty()) return reply;
             QTest::qWait(10);
         }
@@ -559,6 +633,451 @@ private slots:
             QVERIFY(!protectedWindowVisible());
         }
 #endif
+    }
+
+    void registrationForm()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, {}, {}, registration.boundary());
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
+        QVERIFY2(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool(), "The library must offer guided registration.");
+        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-target]').options.length").toInt(), 4);
+        QVERIFY(script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
+        QVERIFY(registrationFill(setup.view(), "[data-registration-account]", "not-base64"));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
+        QVERIFY(script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
+        QVERIFY(registrationFill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
+        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
+        for (const auto &value : {"1234", "1234567", "123456789", "abcdefgh"}) {
+            QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", value));
+            QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
+        }
+        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-console-pin]", "007"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
+        QVERIFY(registrationFill(setup.view(), "[data-registration-console-pin]", "0007"));
+        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-pin]').value").toString(), QStringLiteral("00123456"));
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-console-pin]').value").toString(), QStringLiteral("0007"));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-target]", "800"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-online-id]')").toBool());
+        QVERIFY(registrationFill(setup.view(), "[data-registration-online-id]", "LegacyUser"));
+        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
+        services.backend()->qmlSettings()->setStreamerMode(true);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-registration-address]').type").toString(), QStringLiteral("password"));
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-online-id]').type").toString(), QStringLiteral("password"));
+        QCOMPARE(registration.requests.size(), 0);
+        setup.resize(900, 600);
+        setup.view()->setZoomFactor(2);
+        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+        setup.view()->setZoomFactor(1);
+        setup.resize(390, 720);
+        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+        script(setup.view(), "document.querySelector('[data-registration-close]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-register-new')").toBool());
+    }
+
+    void registrationProgress()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, {}, {}, registration.boundary());
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
+        script(setup.view(), R"(
+            for (const [selector,value] of [['[data-registration-account]','AQAAAAAAAAA='],['[data-registration-pin]','00123456'],['[data-registration-console-pin]','0007']]) {
+              const input=document.querySelector(selector);input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));
+            }
+        )");
+        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-registration-submit]').disabled").toBool());
+        script(setup.view(), "document.querySelector('[data-registration-submit]').click()");
+        QTRY_VERIFY2(script(setup.view(), "document.body.textContent.includes('Registering console')").toBool(), "Accepted native registration must display progress.");
+        QCOMPARE(registration.requests.size(), 1);
+        QCOMPARE(registration.requests[0].pin, uint32_t(123456));
+        QVERIFY(registration.requests[0].broadcast);
+        const auto context = setup.bridge()->snapshot().value("registration").toMap().value("context").toString();
+        const auto duplicate = registrationCommand(setup.view(), "submitRegistration", {context, QJsonObject{{"address", "255.255.255.255"}, {"target", 1000100}, {"account", "AQAAAAAAAAA="}, {"pin", "00123456"}}});
+        QVERIFY(!duplicate.value("accepted").toBool());
+        QCOMPARE(registration.requests.size(), 1);
+        chiaki_log(registration.requests[0].log, CHIAKI_LOG_INFO, "Regist waiting for response");
+        chiaki_log(registration.requests[0].log, CHIAKI_LOG_VERBOSE, "registration-key-secret");
+        script(setup.view(), "document.querySelector('[data-registration-close]').click()");
+        registration.complete(0, false);
+        QTRY_COMPARE(services.backend()->registrationAttempt().value("phase").toString(), QStringLiteral("failure"));
+        QVERIFY(settings.GetRegisteredHosts().isEmpty());
+        // A closed progress screen does not cancel native work. A fresh attempt can correct its fields.
+        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
+        QVERIFY(registrationFill(setup.view(), "[data-registration-address]", "127.0.0.1"));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-console-pin]", "0007"));
+        script(setup.view(), "document.querySelector('[data-registration-submit]').click()");
+        QTRY_COMPARE(registration.requests.size(), 2);
+        QVERIFY(!registration.requests[1].broadcast);
+        QCOMPARE(registration.requests[1].consolePin, uint32_t(7));
+        chiaki_log(registration.requests[1].log, CHIAKI_LOG_INFO, "Regist waiting for response");
+        registration.complete(1, true);
+        registration.complete(1, true, 0x66);
+        QTRY_VERIFY(script(setup.view(), "document.body.textContent.includes('Console registered')").toBool());
+        QCOMPARE(settings.GetRegisteredHosts().size(), 1);
+        QCOMPARE(settings.GetManualHosts().size(), 1);
+        QVERIFY(settings.GetManualHosts().first().GetRegistered());
+        QCOMPARE(settings.GetRegisteredHosts().first().GetConsolePin(), QStringLiteral("0007"));
+        Settings persisted(profile);
+        QCOMPARE(persisted.GetRegisteredHosts().first().GetConsolePin(), QStringLiteral("0007"));
+        QVERIFY(script(setup.view(), "document.querySelector('[data-registration-connect]') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-registration-diagnostics]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-log]')?.textContent.includes('waiting for response')").toBool());
+        auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
+        QVERIFY(!snapshot.contains("registration-key"));
+        QVERIFY(!snapshot.contains("0007"));
+        services.backend()->qmlSettings()->setStreamerMode(true);
+        QTRY_VERIFY(script(setup.view(), "document.body.textContent.includes('Diagnostics are hidden in streamer mode.')").toBool());
+        QVERIFY(!script(setup.view(), "document.querySelector('[data-registration-log]') !== null").toBool());
+        snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
+        QVERIFY(!snapshot.contains("127.0.0.1"));
+        QVERIFY(!snapshot.contains("Regist waiting"));
+    }
+
+    void registrationLookup()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        RegistrationTransport registration;
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) { *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS; };
+        QmlNativeServices services(&settings, transport, {}, registration.boundary());
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
+        QVERIFY2(script(setup.view(), "document.querySelector('[data-registration-lookup]') !== null").toBool(), "Registration must offer native public Account ID lookup.");
+        QVERIFY(registrationFill(setup.view(), "[data-registration-address]", "pair.example"));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-console-pin]", "0007"));
+        script(setup.view(), "document.querySelector('[data-registration-lookup]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-lookup-explanation]')?.textContent.includes('psn.flipscreen.games')").toBool());
+        QVERIFY(script(setup.view(), "document.querySelector('[data-lookup-explanation]').textContent.includes('anyone') && document.querySelector('[data-lookup-explanation]').textContent.includes('credentials')").toBool());
+        QCOMPARE(requests.size(), 0);
+        QVERIFY(registrationFill(setup.view(), "[data-lookup-username]", "  Public User+  "));
+        script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
+        QTRY_COMPARE(requests.size(), 1);
+        QCOMPARE(QUrlQuery(requests[0]->url()).queryItemValue("username", QUrl::FullyDecoded), QStringLiteral("Public User+"));
+        QVERIFY(requests[0]->request().rawHeader("Authorization").isEmpty());
+        QCOMPARE(requests[0]->url().host(), QStringLiteral("psn.flipscreen.games"));
+        const auto route = services.backend()->accountLookupAttempt().value("id").toString();
+        requests[0]->finish({}, QNetworkReply::NoError, 503);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-lookup-error]')?.textContent.includes('could not be reached')").toBool());
+        const QList<QByteArray> invalid = {"unreadable", "{}", R"({"encoded_id":42})", R"({"encoded_id":"invalid"})", R"({"encoded_id":"AQAAAAAAAAB="})"};
+        for (const auto &reply : invalid) {
+            const int count = requests.size();
+            script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
+            QTRY_COMPARE(requests.size(), count + 1);
+            QVERIFY(script(setup.view(), "document.querySelector('[data-lookup-submit]').disabled").toBool());
+            script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
+            QCOMPARE(requests.size(), count + 1);
+            requests.last()->finish(reply);
+            QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-lookup-error]')").toBool());
+        }
+        script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
+        QTRY_COMPARE(requests.size(), 7);
+        requests.last()->finish(R"({"encoded_id":"EjRWeJCrze8="})");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-registration-account]')?.value").toString(), QStringLiteral("EjRWeJCrze8="));
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-address]').value").toString(), QStringLiteral("pair.example"));
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-pin]').value").toString(), QStringLiteral("00123456"));
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-console-pin]').value").toString(), QStringLiteral("0007"));
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-registration-account')").toBool());
+        QVERIFY(settings.GetPsnAccountId().isEmpty());
+        QVERIFY(settings.GetPsnAuthToken().isEmpty());
+        QVERIFY(settings.GetPsnRefreshToken().isEmpty());
+        QCOMPARE(registration.requests.size(), 0);
+        QVERIFY(script(setup.view(), "localStorage.length === 0 && sessionStorage.length === 0").toBool());
+        // An external reply can arrive after an abort. It cannot complete a replacement route.
+        script(setup.view(), "document.querySelector('[data-registration-lookup]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-lookup-username]')").toBool());
+        QVERIFY(registrationFill(setup.view(), "[data-lookup-username]", "old-user"));
+        script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
+        QTRY_COMPARE(requests.size(), 8);
+        auto obsolete = requests.last();
+        obsolete->deferAbort = true;
+        script(setup.view(), "document.querySelector('[data-lookup-cancel]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-account]')").toBool());
+        script(setup.view(), "document.querySelector('[data-registration-lookup]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-lookup-username]')").toBool());
+        QVERIFY(registrationFill(setup.view(), "[data-lookup-username]", "new-user"));
+        script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
+        QTRY_COMPARE(requests.size(), 9);
+        obsolete->finish(R"({"encoded_id":"AAAAAAAAAAA="})");
+        QTest::qWait(30);
+        QVERIFY(script(setup.view(), "!!document.querySelector('[data-lookup-username]')").toBool());
+        requests.last()->finish(R"({"encoded_id":"AgAAAAAAAAA="})");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-registration-account]')?.value").toString(), QStringLiteral("AgAAAAAAAAA="));
+        services.backend()->qmlSettings()->setStreamerMode(true);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-registration-account]').type").toString(), QStringLiteral("password"));
+        const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
+        QVERIFY(!snapshot.contains("AgAAAAAAAAA="));
+        QVERIFY(!snapshot.contains("new-user"));
+        QVERIFY(!snapshot.contains("0007"));
+    }
+
+    void registrationLookupTimeout()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        RegistrationTransport registration;
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) { *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS; };
+        QmlNativeServices services(&settings, transport, {}, registration.boundary());
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-registration-lookup]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-lookup-username]')").toBool());
+        QVERIFY(registrationFill(setup.view(), "[data-lookup-username]", "timeout-user"));
+        script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
+        QTRY_COMPARE(requests.size(), 1);
+        QTRY_VERIFY_WITH_TIMEOUT(script(setup.view(), "document.querySelector('[data-lookup-error]')?.textContent.includes('timed out')").toBool(), 35000);
+        script(setup.view(), "document.querySelector('[data-lookup-submit]').click()");
+        QTRY_COMPARE(requests.size(), 2);
+        requests.last()->deferAbort = true;
+        const auto late = requests.last();
+        services.backend()->qmlSettings()->setCurrentProfile(profile + "-next");
+        services.backend()->setDiscoveryEnabled(false);
+        late->finish(R"({"encoded_id":"EjRWeJCrze8="})");
+        QTest::qWait(30);
+        QVERIFY(services.backend()->nativeSettings()->GetPsnAccountId().isEmpty());
+        QVERIFY(!script(setup.view(), "!!document.querySelector('[data-registration-account]')").toBool());
+        QVERIFY(script(setup.view(), "document.querySelector('[data-lookup-submit]').disabled").toBool());
+        QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+    }
+
+    void registrationAccountSources()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetPsnAccountId("AQAAAAAAAAA=");
+        RegistrationTransport registration;
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) { *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS; };
+        QmlNativeServices services(&settings, transport, {}, registration.boundary());
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-registration-form]') !== null").toBool());
+        QVERIFY(registrationFill(setup.view(), "[data-registration-address]", "original-console.example"));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-console-pin]", "0007"));
+        script(setup.view(), "document.querySelector('[data-registration-saved]').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-registration-account]')?.value").toString(), QStringLiteral("AQAAAAAAAAA="));
+        QCOMPARE(requests.size(), 0);
+        script(setup.view(), "document.querySelector('[data-registration-sign-in]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.pairing [data-psn-redirect]')").toBool());
+        QVERIFY(script(setup.view(), "document.querySelector('.pairing .psn-account').textContent.includes('Sign-in saves PSN credentials')").toBool());
+        QVERIFY(registrationFill(setup.view(), ".pairing [data-psn-redirect]", "https://remoteplay.dl.playstation.net/remoteplay/redirect?code=pairing-sign-in"));
+        script(setup.view(), "document.querySelector('.pairing [data-psn-submit]').click()");
+        QTRY_COMPARE(requests.size(), 1);
+        requests[0]->finish(R"({"access_token":"pairing-access-secret","refresh_token":"pairing-refresh-secret","expires_in":3600})");
+        QTRY_COMPARE(requests.size(), 2);
+        requests[1]->finish(R"({"user_id":"2"})");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-registration-account]')?.value").toString(), QStringLiteral("AgAAAAAAAAA="));
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-address]').value").toString(), QStringLiteral("original-console.example"));
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-pin]').value").toString(), QStringLiteral("00123456"));
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-console-pin]').value").toString(), QStringLiteral("0007"));
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-registration-account')").toBool());
+        script(setup.view(), "document.querySelector('[data-registration-sign-in]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.pairing [data-psn-redirect]')").toBool());
+        QVERIFY(registrationFill(setup.view(), ".pairing [data-psn-redirect]", "https://remoteplay.dl.playstation.net/remoteplay/redirect?code=obsolete-sign-in"));
+        script(setup.view(), "document.querySelector('.pairing [data-psn-submit]').click()");
+        QTRY_COMPARE(requests.size(), 3);
+        script(setup.view(), "document.querySelector('.pairing [data-psn-close]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-account]')").toBool());
+        script(setup.view(), "document.querySelector('[data-registration-sign-in]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.pairing [data-psn-redirect]')").toBool());
+        requests[2]->finish(R"({"access_token":"late-access-secret","refresh_token":"late-refresh-secret","expires_in":3600})");
+        QTRY_COMPARE(requests.size(), 4);
+        requests[3]->finish(R"({"user_id":"3"})");
+        QTRY_COMPARE(services.backend()->psnAuthAttempt().value("phase").toString(), QStringLiteral("success"));
+        QTest::qWait(30);
+        QVERIFY(script(setup.view(), "!!document.querySelector('.pairing [data-psn-redirect]')").toBool());
+        script(setup.view(), "document.querySelector('.pairing [data-psn-close]').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-registration-account]')?.value").toString(), QStringLiteral("AgAAAAAAAAA="));
+        const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
+        QVERIFY(!snapshot.contains("pairing-access-secret"));
+        QVERIFY(!snapshot.contains("late-access-secret"));
+        QVERIFY(!snapshot.contains("AgAAAAAAAAA="));
+        QVERIFY(!snapshot.contains("00123456"));
+        QVERIFY(!snapshot.contains("0007"));
+        script(setup.view(), "document.querySelector('[data-registration-close]').click()");
+        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-pin]').value").toString(), QString());
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-console-pin]').value").toString(), QString());
+    }
+
+    void registrationNativeValidation()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, {}, {}, registration.boundary());
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-new]')").toBool());
+        const auto generation = QString::number(services.backend()->profileGeneration());
+        const auto context = registrationCommand(setup.view(), "openRegistration", {"", generation}).value("context").toString();
+        QVERIFY(!context.isEmpty());
+        const QJsonObject valid{{"address", "console.example"}, {"target", 1000100}, {"account", "AQAAAAAAAAA="}, {"pin", "00123456"}, {"consolePin", "0007"}};
+        for (const auto &input : QList<QPair<QString, QJsonValue>>{{"address", "https://private.example/"}, {"address", "192.0.2.999"},
+                {"address", "console:9295"}, {"address", ""}, {"target", 123}, {"target", 1000100.5}, {"account", ""}, {"account", "AQAAAAAAAAB="},
+                {"pin", "1234"}, {"pin", "123456789"}, {"pin", 12345678}, {"consolePin", "123"}}) {
+            auto fields = valid;
+            fields[input.first] = input.second;
+            const auto reply = registrationCommand(setup.view(), "submitRegistration", {context, fields});
+            QVERIFY2(!reply.value("accepted").toBool(), qPrintable(input.first));
+        }
+        QCOMPARE(registration.requests.size(), 0);
+        for (const int target : {800, 900, 1000, 1000100}) {
+            const auto next = registrationCommand(setup.view(), "openRegistration", {"", generation}).value("context").toString();
+            auto fields = valid;
+            fields["target"] = target;
+            if (target == 800) fields["account"] = "LegacyUser";
+            const auto reply = registrationCommand(setup.view(), "submitRegistration", {next, fields});
+            QVERIFY(reply.value("accepted").toBool());
+            QCOMPARE(int(registration.requests.last().target), target);
+            QCOMPARE(registration.requests.last().onlineId, target == 800 ? QStringLiteral("LegacyUser") : QString());
+            registration.complete(registration.requests.size() - 1, false);
+            QTRY_VERIFY(!services.backend()->registrationBusy());
+        }
+        registration.startResult = CHIAKI_ERR_NETWORK;
+        const auto failedContext = registrationCommand(setup.view(), "openRegistration", {"", generation}).value("context").toString();
+        QVERIFY(!registrationCommand(setup.view(), "submitRegistration", {failedContext, valid}).value("accepted").toBool());
+        QCOMPARE(services.backend()->registrationAttempt().value("phase").toString(), QStringLiteral("failure"));
+        QVERIFY(!services.backend()->registrationBusy());
+        QVERIFY(settings.GetRegisteredHosts().isEmpty());
+    }
+
+    void registrationStaleTargets_data()
+    {
+        QTest::addColumn<QString>("change");
+        for (const auto &change : {"manualAddress", "manualRemoved", "discoveryAddress", "discoveryDuplicate", "profile"})
+            QTest::newRow(change) << QString::fromLatin1(change);
+    }
+    void registrationStaleTargets()
+    {
+        QFETCH(QString, change);
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        const bool discovery = change.startsWith("discovery");
+        const int manualId = discovery ? -1 : settings.SetManualHost(ManualHost(-1, "192.0.2.10", false, {}));
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, {}, {}, registration.boundary());
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        DiscoveryHost discovered = {};
+        discovered.ps5 = true;
+        discovered.host_id = "001122334455";
+        discovered.host_addr = "192.0.2.10";
+        discovered.host_name = "Unregistered console";
+        discovered.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        if (discovery) discover(backend, {discovered});
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-selected]')").toBool());
+        script(setup.view(), "document.querySelector('[data-register-selected]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-address]').value").toString(), QStringLiteral("192.0.2.10"));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
+        QVERIFY(registrationFill(setup.view(), "[data-registration-pin]", "00123456"));
+        script(setup.view(), "document.querySelector('[data-registration-submit]').click()");
+        QTRY_COMPARE(registration.requests.size(), 1);
+        if (change == "manualAddress") settings.SetManualHost(ManualHost(manualId, "192.0.2.20", false, {}));
+        else if (change == "manualRemoved") settings.RemoveManualHost(manualId);
+        else if (change == "discoveryAddress") { discovered.host_addr = "192.0.2.20"; discover(backend, {discovered}); QTRY_COMPARE(backend->hosts().first().toMap().value("address").toString(), QStringLiteral("192.0.2.20")); }
+        else if (change == "discoveryDuplicate") { discover(backend, {discovered, discovered}); QTRY_COMPARE(backend->hosts().size(), 2); }
+        else { backend->qmlSettings()->setCurrentProfile(profile + "-next"); backend->setDiscoveryEnabled(false); }
+        registration.complete(0, true);
+        QTRY_VERIFY(!backend->registrationBusy());
+        QCOMPARE(backend->registrationAttempt().value("phase").toString(), QStringLiteral("failure"));
+        QVERIFY(backend->nativeSettings()->GetRegisteredHosts().isEmpty());
+        QVERIFY(settings.GetRegisteredHosts().isEmpty());
+        QVERIFY(!script(setup.view(), "!!document.querySelector('[data-registration-connect]')").toBool());
     }
 
     void psnAccountPresentation()

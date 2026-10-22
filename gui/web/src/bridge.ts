@@ -6,6 +6,8 @@ export interface State {
   revision: string; profileGeneration: string; consoles: Console[];
   selectedKey: string; discoveryEnabled: boolean; streamerMode: boolean;
   connectionBusy: boolean;
+  registration: Registration;
+  accountLookup: { route?: string; id?: string; phase?: string; message?: string };
   streamError?: { id: string; title: string; text: string };
   mediaSettings: Record<string, boolean | number | string>;
   mediaChoices: Record<string, { label: string; value: string }[]>;
@@ -15,8 +17,16 @@ export interface State {
   capabilities: { discovery: boolean }; strings: Record<string, string>;
   psn: { status: 'signedOut' | 'ready' | 'expired'; id?: string; phase?: string; message?: string; profileValid?: boolean };
 }
-interface Reply { accepted: boolean; message?: string }
+export interface Registration { busy: boolean; savedAccount: boolean; context?: string; id?: string; phase?: string; message?: string; diagnostics?: string; profileValid?: boolean; connectKey?: string }
+interface Reply { accepted: boolean; message?: string; context?: string; address?: string; ps5?: boolean; id?: string; route?: string; accountId?: string }
 interface NativeBridge {
+  beginRegistrationAccount(context: string, source: string, callback: (reply: Reply) => void): void;
+  lookupRegistrationAccount(context: string, route: string, username: string, callback: (reply: Reply) => void): void;
+  readRegistrationAccount(context: string, route: string, request: string, callback: (reply: Reply) => void): void;
+  endRegistrationAccount(context: string, route: string, callback: (reply: Reply) => void): void;
+  openRegistration(key: string, profile: string, callback: (reply: Reply) => void): void;
+  submitRegistration(context: string, fields: Record<string, string | number>, callback: (reply: Reply) => void): void;
+  connectRegistration(attempt: string, callback: (reply: Reply) => void): void;
   setRendererSetting(name: string, value: boolean | number | string, profileGeneration: string, callback: (reply: Reply) => void): void;
   rendererAction(action: string, profileGeneration: string, callback: (reply: Reply) => void): void;
   snapshot(callback: (state: State) => void): void;
@@ -41,6 +51,13 @@ declare global {
 }
 
 export function connectSetup(receive: (state: State) => void): Promise<{
+  accountBegin(context: string, source: string): Promise<Reply>;
+  accountLookup(context: string, route: string, username: string): Promise<Reply>;
+  accountRead(context: string, route: string, request: string): Promise<Reply>;
+  accountEnd(context: string, route: string): Promise<Reply>;
+  registrationOpen(key: string, profile: string): Promise<Reply>;
+  registrationSubmit(context: string, fields: Record<string, string | number>): Promise<Reply>;
+  registrationConnect(attempt: string): Promise<Reply>;
   discovery(enabled: boolean): Promise<Reply>;
   select(key: string): Promise<Reply>;
   connect(key: string): Promise<Reply>;
@@ -87,6 +104,13 @@ export function connectSetup(receive: (state: State) => void): Promise<{
       window.addEventListener('pageshow', refresh);
       document.addEventListener('visibilitychange', resume);
       resolve({
+        accountBegin: (context, source) => new Promise(done => setup.beginRegistrationAccount(context, source, done)),
+        accountLookup: (context, route, username) => new Promise(done => setup.lookupRegistrationAccount(context, route, username, done)),
+        accountRead: (context, route, request) => new Promise(done => setup.readRegistrationAccount(context, route, request, done)),
+        accountEnd: (context, route) => new Promise(done => setup.endRegistrationAccount(context, route, done)),
+        registrationOpen: (key, profile) => new Promise(done => setup.openRegistration(key, profile, done)),
+        registrationSubmit: (context, fields) => new Promise(done => setup.submitRegistration(context, fields, done)),
+        registrationConnect: attempt => new Promise(done => setup.connectRegistration(attempt, done)),
         discovery: value => new Promise(done => setup.setDiscoveryEnabled(value, done)),
         select: key => new Promise(done => setup.selectConsole(key, done)),
         connect: key => new Promise(done => setup.connectConsole(key, done)),
