@@ -12,6 +12,7 @@
 
 - [ ] Normal startup loads packaged Svelte 5 and TypeScript output in QWebEngineView. The GUI build includes WebEngineWidgets, WebChannel, and the frontend build dependency.
 - [ ] The unconditional startup override that disables WebEngine GPU acceleration is removed from the web setup path. Actual Chromium acceleration is verified in the embedded application.
+- [ ] Complete the required graphics check carried from [01](01-application-owned-native-services.md). Use a compatible toolchain to prove accelerated embedded Chromium beside the native renderer. Record actual GPU state and environment limits. Module availability or software rendering cannot establish a pass. Ticket [04](04-local-native-stream-handoff.md) extends this check through native handoff.
 - [ ] One restricted production SetupBridge supplies current console state, capabilities, and discovery control through real WebChannel transport. Backend QObjects and secrets are not published.
 - [ ] Console keys are native-issued and profile-scoped. Live updates preserve selection, and missing or ambiguous targets are rejected.
 - [ ] The selected card library design uses shared CSS values and real artwork. Search, empty states, long names, and discovery changes display correctly.
