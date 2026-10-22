@@ -8,7 +8,7 @@ export interface Setting {
   requires?: string;
   category?: string;
   optionValues?: (string | number)[];
-  min?: number; max?: number; step?: number; factor?: number; unit?: string;
+  min?: number; max?: number; step?: number; factor?: number; unit?: string; automatic?: number;
   requiresValue?: { key: string; value: number };
 }
 
@@ -48,7 +48,7 @@ export const mediaSettings: Setting[] = [
     return [
       { key: `resolution${suffix}`, label: `${group} Resolution`, category: 'Stream', group, description: 'Changing resolution restores automatic bitrate. 1080p on PS4 requires PS4 Pro.', defaultLabel: suffix === 'LocalPS5' ? '1080p' : '720p', options: ['360p', '540p', '720p', '1080p'], optionValues: [1, 2, 3, 4] },
       { key: `fps${suffix}`, label: `${group} Frame rate`, category: 'Stream', group, description: 'Choose video frames per second.', defaultLabel: '60 fps', options: ['30 fps', '60 fps'], optionValues: [30, 60] },
-      { key: `bitrate${suffix}`, label: `${group} Bitrate`, category: 'Stream', group, description: 'Set video data rate. 0 uses automatic bitrate: 2, 6, 10 or 15 Mbps for 360p, 540p, 720p or 1080p.', defaultLabel: 'Automatic', min: 0, max: 100, factor: 1000, unit: 'Mbps' },
+      { key: `bitrate${suffix}`, label: `${group} Bitrate`, category: 'Stream', group, description: 'Set video data rate. Automatic bitrate uses: 2, 6, 10 or 15 Mbps for 360p, 540p, 720p or 1080p.', defaultLabel: 'Automatic', min: 2, max: 100, factor: 1000, unit: 'Mbps' },
       ...(suffix.endsWith('PS5') ? [{ key: `codec${suffix}`, label: `${group} Codec`, category: 'Stream', group, description: 'Choose the supported PS5 video codec. HDR needs a compatible native display and decoder.', defaultLabel: 'H265', options: ['H264', 'H265', 'H265 HDR'] }] : [])
     ];
   }),

@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { Setting } from './settings';
-  let { field, value, disabled, change, t }: {
-    field: Setting; value: boolean | number | string; disabled: boolean;
-    change: (value: boolean | number | string) => void; t: (text: string) => string;
+  let { field, value, disabled, generation, change, t }: {
+    field: Setting; value: boolean | number | string; disabled: boolean; generation: string;
+    change: (value: boolean | number | string, generation?: string) => void; t: (text: string) => string;
   } = $props();
+  let editGeneration: string | undefined;
 </script>
 
 <div class="setting-row">
@@ -18,10 +19,13 @@
         {#each field.options as option, index}<option value={field.optionValues?.[index] ?? index}>{t(option)}</option>{/each}
       </select>
     {:else if field.min !== undefined}
-      <input id={field.key} type="number" value={Number(value) / (field.factor ?? 1)} min={field.min} max={field.max} step={field.step ?? 1} {disabled}
+      <input id={field.key} type="number" value={Number(value) / (field.factor ?? 1) || field.automatic || 0} min={field.min} max={field.max} step={field.step ?? 1} {disabled}
         aria-describedby={`${field.key}-description ${field.key}-default`}
-        onchange={event => { const next = event.currentTarget.valueAsNumber * (field.factor ?? 1); event.currentTarget.value = String(Number(value) / (field.factor ?? 1)); change(next); }} />
+        oninput={() => { editGeneration ??= generation; }}
+        onchange={event => { const next = event.currentTarget.valueAsNumber * (field.factor ?? 1); event.currentTarget.value = String(Number(value) / (field.factor ?? 1) || field.automatic || 0); change(next, editGeneration ?? generation); editGeneration = undefined; }} />
       {#if field.unit}<span>{t(field.unit)}</span>{/if}
+      {#if field.automatic !== undefined}<button type="button" disabled={disabled || value === 0} onclick={() => change(0)}>{t('Use automatic bitrate')}</button><small>{value === 0 ? `${t('Automatic')}: ${field.automatic} Mbps` : ''}</small>{/if}
+      {#if field.key === 'audioVolume'}<output for={field.key}>{Math.round(Number(value) / 128 * 100)}{t('% volume')}</output>{/if}
     {:else}
       <input id={field.key} type="checkbox" checked={value === true} {disabled}
         aria-describedby={`${field.key}-description ${field.key}-default`}

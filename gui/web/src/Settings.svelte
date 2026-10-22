@@ -15,6 +15,7 @@
   const values = $derived({ ...current.generalSettings, ...current.mediaSettings });
   const fields = $derived([...generalSettings, ...mediaSettings].filter(field => Object.hasOwn(values, field.key)).map(field => {
     const choices = current.mediaChoices[field.key];
+    if (field.key.startsWith('bitrate')) return { ...field, automatic: [0, 2, 6, 10, 15][Number(values[`resolution${field.key.slice(7)}`])] };
     return choices ? { ...field, options: choices.map(choice => choice.label), optionValues: choices.map(choice => choice.value) } : field;
   }));
   const categories = ['General', 'Video', 'Stream', 'Audio/Wifi'];
@@ -34,9 +35,8 @@
     target?.focus();
     target?.scrollIntoView({ block: 'nearest' });
   }
-  async function change(key: string, value: boolean | number | string) {
+  async function change(key: string, value: boolean | number | string, generation = current.profileGeneration) {
     if (pending) return;
-    const generation = current.profileGeneration;
     pending = true;
     try {
       const reply = await (Object.hasOwn(current.generalSettings, key) ? connection.generalSetting(key, value as boolean | number, generation) : connection.mediaSetting(key, value, generation));
@@ -88,6 +88,7 @@
       <p class="settings-note">{t('Changes are saved automatically.')}</p>
       {#if category !== 'General'}<p class="settings-note">{t('Stream settings apply to the next session. Audio volume also changes the current session.')}</p>{/if}
       {#if category === 'Audio/Wifi'}<button disabled={pending} onclick={() => connection.refreshAudioDevices()}>{t('Refresh audio devices')}</button>{/if}
+      {#key current.profileGeneration}
       {#each groups as group}
         <section class="settings-group" aria-label={t(group)}>
           <h3>{t(group)}</h3>
@@ -95,12 +96,13 @@
             {#each visibleFields.filter(field => field.group === group) as field (field.key)}
               {#if (!field.requires || values[field.requires]) && (!field.requiresValue || values[field.requiresValue.key] === field.requiresValue.value)}
                 <SettingField {field} value={values[field.key]} disabled={pending}
-                  change={value => change(field.key, value)} {t} />
+                  generation={current.profileGeneration} change={(value, generation) => change(field.key, value, generation)} {t} />
               {/if}
             {/each}
           </div>
         </section>
       {/each}
+      {/key}
     {/if}
     <p class="settings-message" role="status">{message}</p>
   </div>

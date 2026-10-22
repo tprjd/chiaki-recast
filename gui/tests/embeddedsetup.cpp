@@ -415,6 +415,160 @@ private slots:
         QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 128);
     }
 
+    void videoAudioState()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        backend->setDiscoveryEnabled(false);
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#disconnectAction')").toBool());
+        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(b=>b.textContent==='Audio/Wifi').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#audioVolume')?.value").toString(), QStringLiteral("128"));
+        script(setup.view(), "{const field=document.querySelector('#audioVolume');field.value='42';field.dispatchEvent(new Event('input',{bubbles:true}));}");
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        backend->setDiscoveryEnabled(false);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#audioVolume')?.value").toString(), QStringLiteral("128"));
+        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 128);
+        script(setup.view(), "document.querySelector('#audioVolume').dispatchEvent(new Event('change',{bubbles:true}))");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#audioVolume')?.disabled").toBool(), false);
+        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 128);
+        backend->qmlSettings()->setAudioVolume(64);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#audioVolume')?.value").toString(), QStringLiteral("64"));
+        QCOMPARE(script(setup.view(), "document.querySelector('output[for=audioVolume]').textContent").toString(), QStringLiteral("50% volume"));
+        script(setup.view(), "{const field=document.querySelector('#audioVolume');field.value='129';field.dispatchEvent(new Event('input',{bubbles:true}));field.dispatchEvent(new Event('change',{bubbles:true}));}");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.settings-message').textContent").toString(), QStringLiteral("Choose a valid setting value."));
+        QCOMPARE(script(setup.view(), "document.querySelector('#audioVolume').value").toString(), QStringLiteral("64"));
+        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 64);
+        qInfo() << "Native audio inventory" << backend->qmlSettings()->availableAudioOutDevices().size()
+                << backend->qmlSettings()->availableAudioInDevices().size();
+        if (!backend->qmlSettings()->availableAudioOutDevices().isEmpty()) {
+            const QString name = backend->qmlSettings()->availableAudioOutDevices().first();
+            const auto encoded = QString::fromUtf8(QJsonDocument(QJsonArray{name}).toJson(QJsonDocument::Compact));
+            script(setup.view(), QString("{const field=document.querySelector('#audioOutDevice');field.value=%1[0];field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(encoded));
+            QTRY_COMPARE(backend->nativeSettings()->GetAudioOutDevice(), name);
+        }
+        if (!backend->qmlSettings()->availableAudioInDevices().isEmpty()) {
+            const QString name = backend->qmlSettings()->availableAudioInDevices().first();
+            const auto encoded = QString::fromUtf8(QJsonDocument(QJsonArray{name}).toJson(QJsonDocument::Compact));
+            QTRY_VERIFY(script(setup.view(), "document.querySelector('#audioInDevice').disabled === false").toBool());
+            script(setup.view(), QString("{const field=document.querySelector('#audioInDevice');field.value=%1[0];field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(encoded));
+            QTRY_COMPARE(backend->nativeSettings()->GetAudioInDevice(), name);
+        }
+        const auto search = [&](const QString &term) {
+            script(setup.view(), QString("{const field=document.querySelector('.settings-search input');field.value='%1';field.dispatchEvent(new Event('input',{bubbles:true}));}").arg(term));
+            QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 1);
+            script(setup.view(), "document.querySelector('.settings-results button').click()");
+        };
+        search("PS5 Remote Codec");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("codecRemotePS5"));
+        search("Custom resolution width");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("windowType"));
+#if CHIAKI_GUI_ENABLE_SPEEX
+        backend->qmlSettings()->setSpeechProcessing(false);
+        search("Noise to suppress");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("speechProcessing"));
+#endif
+        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(b=>b.textContent==='Stream').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#bitrateLocalPS5')").toBool());
+        QCOMPARE(script(setup.view(), "document.querySelector('#bitrateLocalPS5').min").toString(), QStringLiteral("2"));
+        QCOMPARE(script(setup.view(), "document.querySelector('#bitrateLocalPS5').value").toString(), QStringLiteral("15"));
+        script(setup.view(), "{const field=document.querySelector('#bitrateLocalPS5');field.value='25';field.dispatchEvent(new Event('change',{bubbles:true}));}");
+        QTRY_COMPARE(backend->nativeSettings()->GetBitrateLocalPS5(), 25000u);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#bitrateLocalPS5').disabled === false").toBool());
+        script(setup.view(), "document.querySelector('#bitrateLocalPS5').parentElement.querySelector('button').click()");
+        QTRY_COMPARE(backend->nativeSettings()->GetBitrateLocalPS5(), 0u);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#bitrateLocalPS5').value").toString(), QStringLiteral("15"));
+        setup.resize(800, 600);
+        setup.view()->setZoomFactor(2);
+        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+        setup.resize(390, 720);
+        setup.view()->setZoomFactor(1);
+        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+        setup.resize(1280, 900);
+        setup.view()->grab().save(qEnvironmentVariable("CHIAKI_MEDIA_PREVIEW", "media-settings.png"));
+    }
+
+    void videoAudioRestartRead()
+    {
+        const auto profile = qEnvironmentVariable("CHIAKI_MEDIA_RESTART_PROFILE");
+        if (profile.isEmpty()) QSKIP("Launched only by videoAudioRestart with an isolated saved profile");
+        Settings settings(profile);
+        QCOMPARE(settings.GetBitrateLocalPS4(), 2000u);
+        QCOMPARE(settings.GetBitrateRemotePS4(), 6000u);
+        QCOMPARE(settings.GetBitrateLocalPS5(), 10000u);
+        QCOMPARE(settings.GetBitrateRemotePS5(), 15000u);
+        QCOMPARE(settings.GetAudioBufferSize(), 13440u);
+        QCOMPARE(settings.GetAudioVolume(), 64);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        services.backend()->setDiscoveryEnabled(false);
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#disconnectAction')").toBool());
+        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(b=>b.textContent==='Audio/Wifi').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#audioVolume')?.value").toString(), QStringLiteral("64"));
+        QCOMPARE(script(setup.view(), "document.querySelector('#audioBufferSize').value").toString(), QStringLiteral("70"));
+    }
+
+    void videoAudioRestart()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        {
+            Settings settings(profile);
+            settings.SetDiscoveryEnabled(false);
+            QmlNativeServices services(&settings);
+            services.backend()->stopAutoConnect();
+            services.backend()->setDiscoveryEnabled(false);
+            SetupWindow setup(services.backend());
+            setup.show();
+            QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+            script(setup.view(), "document.querySelector('.open-settings').click()");
+            QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#disconnectAction')").toBool());
+            script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(b=>b.textContent==='Stream').click()");
+            const auto change = [&](const QString &key, const QString &value) {
+                QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled === false").arg(key)).toBool());
+                script(setup.view(), QString("{const field=document.getElementById('%1');field.value='%2';field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(key, value));
+                QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled === false").arg(key)).toBool());
+            };
+            change("bitrateLocalPS4", "2");
+            change("bitrateRemotePS4", "6");
+            change("bitrateLocalPS5", "10");
+            change("bitrateRemotePS5", "15");
+            script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(b=>b.textContent==='Audio/Wifi').click()");
+            change("audioBufferSize", "70");
+            change("audioVolume", "64");
+            QTRY_COMPARE(settings.GetAudioVolume(), 64);
+        }
+        QProcess restarted;
+        auto environment = QProcessEnvironment::systemEnvironment();
+        environment.insert("CHIAKI_MEDIA_RESTART_PROFILE", profile);
+        restarted.setProcessEnvironment(environment);
+        const auto childLog = qEnvironmentVariable("CHIAKI_MEDIA_RESTART_LOG", "media-restart-child.txt");
+        restarted.start(QCoreApplication::applicationFilePath(), {"videoAudioRestartRead", "-o", childLog + ",txt"});
+        QVERIFY(restarted.waitForStarted());
+        QTRY_COMPARE_WITH_TIMEOUT(restarted.state(), QProcess::NotRunning, 20000);
+        QCOMPARE(restarted.exitStatus(), QProcess::NormalExit);
+        QCOMPARE(restarted.exitCode(), 0);
+    }
+
     void generalSettings()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
