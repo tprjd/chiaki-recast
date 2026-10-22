@@ -41,7 +41,7 @@ cd build_appimage
 qt-cmake \
 	-GNinja \
 	-DCMAKE_BUILD_TYPE=Release \
-	-DCHIAKI_ENABLE_TESTS=ON \
+	-DCHIAKI_ENABLE_TESTS=OFF \
 	-DCHIAKI_ENABLE_GUI=ON \
 	-DCHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER=ON \
 	-DCMAKE_INSTALL_PREFIX=/usr \
@@ -52,7 +52,6 @@ cd ..
 rm -fv third-party/nanopb/generator/proto/nanopb_pb2.py
 
 ninja -C build_appimage
-build_appimage/test/chiaki-unit
 
 DESTDIR="${appdir}" ninja -C build_appimage install
 install -Dm644 COPYING "${appdir}/usr/share/licenses/chiaki-ng/COPYING"

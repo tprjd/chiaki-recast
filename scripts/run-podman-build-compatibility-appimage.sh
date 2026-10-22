@@ -1,15 +1,6 @@
 #!/bin/bash
 
-set -xe
-cd "`dirname $(readlink -f ${0})`"
-
-podman build -t chiaki-focal . -f Dockerfile.focal
-cd ..
-podman run --rm \
-	-v "`pwd`:/build/chiaki" \
-	-w "/build/chiaki" \
-	--device /dev/fuse \
-	--cap-add SYS_ADMIN \
-	-t chiaki-focal \
-	/bin/bash -c "scripts/build-compatibility-appimage.sh /build/appdir"
+set -eu
+echo "Qt 5 compatibility AppImage is unsupported. Use scripts/run-podman-build-appimage.sh." >&2
+exit 1
 

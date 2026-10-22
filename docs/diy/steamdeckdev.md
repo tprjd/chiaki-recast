@@ -14,24 +14,7 @@ This is for contributors that want to make/test updates to the codebase without 
     flatpak install --user --include-debug -y https://raw.githubusercontent.com/streetpea/chiaki-ng/main/scripts/flatpak/io.github.streetpea.Chiaki4deck-devel.flatpakref
     ```
 
-    !!! Info "Creating local flatpak builds"
-
-        If you want to create flatpak builds from local files, you can do this by changing the manifest sources from:
-
-        ``` bash
-        sources:
-        - type: git
-          url: https://github.com/streetpea/chiaki-ng.git
-          branch: main
-        ```
-
-        to:
-
-        ``` bash
-        sources:
-        - type: dir
-          path: path-to-chiaki-ng-git
-        ```
+    The current manifests build the local checkout through `scripts/flatpak/chiaki-ng.json`. Use the development manifest in that checkout to include your changes. Do not replace its shared source module with an upstream branch.
 
 2. Copy config file from chiaki-ng
 
@@ -42,13 +25,13 @@ This is for contributors that want to make/test updates to the codebase without 
 3. Install the SDK
 
     ``` bash
-    flatpak install --user org.kde.Sdk//6.9
+    flatpak install --user org.kde.Sdk//6.11
     ```
 
 4. Install the `Debug` extensions for the SDK
 
     ``` bash
-    flatpak install --user org.kde.Sdk.Debug//6.9
+    flatpak install --user org.kde.Sdk.Debug//6.11
     ```
 
 5. Clone the project onto your Steam Deck with:
@@ -83,7 +66,9 @@ This is for contributors that want to make/test updates to the codebase without 
     flatpak run --command=bash --devel io.github.streetpea.Chiaki4deck-devel
     ```
 
-2. Create a build using cmake as per usual
+2. Prepare the frontend build tools in a writable build directory. Use the archive URL and SHA256 for your architecture from `scripts/flatpak/frontend-node.json`. Add that archive's `bin` directory to `PATH`. Confirm `node --version` is `v24.16.0` and `npm --version` is `11.13.0`. These tools are absent from the installed runtime package.
+
+3. Create a build using CMake.
 
     === "Debug build"
 
@@ -103,7 +88,7 @@ This is for contributors that want to make/test updates to the codebase without 
         4. Create build files with cmake
 
             ``` bash
-            cmake -DCMAKE_BUILD_TYPE=Debug ..
+            cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Debug ..
             ```
         
         5. Build `chiaki-ng`
@@ -129,7 +114,7 @@ This is for contributors that want to make/test updates to the codebase without 
         4. Create build files with cmake
 
             ``` bash
-            cmake -DCMAKE_BUILD_TYPE=Release ..
+            cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release ..
             ```
         
         5. Build `chiaki-ng`
