@@ -48,3 +48,16 @@ Live PSN page compatibility, actual sign-in and visible desktop focus were not
 checked. Software Chromium rendering applies only to these offscreen tests.
 The unchanged ticket 03 GPU evidence is reused. Physical hardware acceptance remains
 with tickets 04 and 23.
+
+Integration merge `abd776d6` contains worker commit `a75ebe09` without conflicts.
+The merged tree matches the worker tree. Its source matches tested source
+`d1f643d7`.
+All 32 recorded source, lock, executable, asset, and capture hashes match.
+The merger read the saved case results and inspected all four captures.
+Ticket 11's settings components, snapshots, commands, CTest entry, and shared
+keyboard guards remain. Passing evidence was reused without builds or test
+reruns. Source-only whitespace checks pass. Ticket 03 graphics evidence is
+unchanged.
+
+Ticket 04 must close the optional `signInWindow` in `SetupWindow::suspend`
+before setup hides or its page freezes. This remains a handoff merge requirement.

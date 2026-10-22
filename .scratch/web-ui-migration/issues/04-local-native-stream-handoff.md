@@ -59,3 +59,10 @@ failure. A controller cannot catch `qFatal` to restore setup. Assess graceful
 initialization failure at the real native boundary while implementing handoff.
 Actual foreground ownership and focus return still need handoff acceptance;
 the GPU observer can render a visible native window without foreground focus.
+
+### Ticket 06 sign-in window merge requirement
+
+[06](06-psn-sign-in.md) adds an optional native `signInWindow` to `SetupWindow`.
+When this ticket adds `SetupWindow::suspend`, close that window before setup
+hides or its page freezes. Retain the sign-in profile cleanup rules. This is
+required when the handoff source merges with the integrated sign-in source.
