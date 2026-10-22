@@ -243,7 +243,8 @@ public:
     Q_INVOKABLE void controllerMappingQuit();
     Q_INVOKABLE void controllerMappingButtonQuit();
     Q_INVOKABLE void controllerMappingApply();
-    Q_INVOKABLE void autoRegister(const QVariantMap &context);
+    bool autoRegisterHost(int index);
+    void autoRegister(const QVariantMap &context);
 #if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
     Q_INVOKABLE void createSteamShortcut(QString shortcutName, QString launchOptions, const QJSValue &callback, QString steamDir);
 #endif
@@ -289,7 +290,6 @@ signals:
     void sessionError(const QString &title, const QString &text);
     void sessionPinDialogRequested(bool incorrect);
     void sessionStopDialogRequested();
-    void registDialogRequested(const QString &host, bool ps5, const QString &duid, const QVariantMap &context);
 
 private:
     struct DisplayServer {
