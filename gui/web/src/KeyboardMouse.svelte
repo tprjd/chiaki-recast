@@ -91,7 +91,6 @@
     <div class="settings-group">
       <SettingField field={fields[0]} value={values.mouseCameraEnabled} disabled={!form || pending} {generation} change={value => change('mouseCameraEnabled', value)} {t} />
       <button id="keyboardMouseReset" disabled={!form || pending} onclick={openReset}>{t('Reset defaults')}</button>
-      <p>{t('During a stream, press F8 to capture or release your controls.')}</p>
       <div class="keyboard-mouse-tabs" role="tablist" tabindex="-1" aria-label={t('Keyboard and mouse')} onkeydown={tabKey}>
         {#each ['Mouse response', 'Bindings'] as item}
           <button role="tab" id={item === 'Bindings' ? 'keyboard-mouse-bindings' : 'keyboard-mouse-response'} tabindex={tab === item ? 0 : -1} aria-selected={tab === item} aria-controls="keyboard-mouse-tab" onclick={() => tab = item}>{t(item)}</button>
@@ -100,11 +99,13 @@
       <div id="keyboard-mouse-tab" role="tabpanel" tabindex="0" aria-labelledby={tab === 'Bindings' ? 'keyboard-mouse-bindings' : 'keyboard-mouse-response'}>
         {#if tab === 'Mouse response'}
           {#each fields.slice(1, 6) as field (field.key)}
+            <div class="setting-rows mouse-response-row">
             <SettingField {field} value={values[field.key]} disabled={!form || pending || !enabled} {generation} change={(value, editGeneration) => change(field.key, value, editGeneration)} {t} />
             {#if field.min !== undefined}
               <input type="range" aria-label={`${t(field.label)} ${t('slider')}`} min={field.min} max={field.max} step={field.step} value={Number(values[field.key]) / (field.factor ?? 1)} disabled={!form || pending || !enabled}
                 onchange={event => change(field.key, event.currentTarget.valueAsNumber * (field.factor ?? 1))} />
             {/if}
+            </div>
           {/each}
           <p>{t("Increase compensation only if small mouse movements do not move the camera. Start response correction at 1.00. Lower values increase small movements to compensate for a game's slow stick response.")}</p>
           <p>{t('Sensitivity is a multiplier. The game still controls its response curve and maximum turn speed.')}</p>
