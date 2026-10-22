@@ -4,7 +4,7 @@
 
 **Blocked by:** 04: Connect locally from web setup to native playback; 06: Sign in to PSN independently from web setup.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 12, 32, 33, 34, 43, 46, 47, 81.
 
@@ -18,3 +18,7 @@
 - [ ] Embedded tests cover delayed refresh, expired credentials, unreachable consoles, late cancellation, stale profiles, and native cleanup.
 - [ ] A real PSN connection confirms native playback and return to the accelerated web setup UI.
 - [ ] Remove setup-only routes, resources, callback adapters, and tests replaced by this slice once no caller needs them. Preserve shared native stream components and their tests.
+
+## Comments
+
+- Claimed for implementation after local handoff and PSN sign-in. Use the existing native connection attempt, worker, token refresh, and cleanup services. A registered console is available on this Windows PC. Linux and macOS GPU hardware checks are unavailable on this host.
