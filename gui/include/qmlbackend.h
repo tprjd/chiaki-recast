@@ -284,8 +284,6 @@ signals:
     void accountLookupChanged();
     void psnCredsExpired();
     void autoConnectChanged();
-    void wakeupStartInitiated();
-    void wakeupStartFailed();
     void windowTypeUpdated(WindowType type);
 
     void error(const QString &title, const QString &text);

@@ -409,7 +409,7 @@ private slots:
     void startupNativeConnection_data()
     {
         QTest::addColumn<QString>("mode");
-        for (const auto &mode : {"local-ready", "local-wake", "psn-ready", "psn-ps4", "psn-cancel", "psn-profile", "psn-removed", "psn-replaced"})
+        for (const auto &mode : {"local-ready", "local-wake", "psn-ready", "psn-late-list", "psn-ps4", "psn-ps4-ambiguous", "psn-cancel", "psn-profile", "psn-removed", "psn-replaced"})
             QTest::newRow(mode) << QString::fromLatin1(mode);
     }
 
@@ -417,8 +417,8 @@ private slots:
     {
         QFETCH(QString, mode);
         const bool local = mode.startsWith("local");
-        const bool ps5 = mode != "psn-ps4";
-        const bool success = mode == "local-ready" || mode == "local-wake" || mode == "psn-ready" || mode == "psn-ps4";
+        const bool ps5 = !mode.startsWith("psn-ps4");
+        const bool success = mode == "local-ready" || mode == "local-wake" || mode == "psn-ready" || mode == "psn-late-list" || mode == "psn-ps4";
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
         const auto removeSettings = qScopeGuard([&] {
             for (const auto &name : {profile, profile + "-next"})
@@ -448,14 +448,22 @@ private slots:
         RegisteredHost paired(registered);
         paired.SetConsolePin(paired, {});
         settings.AddRegisteredHost(paired);
+        if (mode == "psn-ps4-ambiguous") {
+            auto second = registered;
+            second.server_mac[5] = 0x66;
+            strcpy(second.server_nickname, "Other PS4");
+            settings.AddRegisteredHost(RegisteredHost(second));
+        }
         settings.SetAutoConnectHost(QByteArray::fromHex("001122334455"));
         QList<QPointer<PsnReply>> requests;
-        QSemaphore release;
+        QSemaphore release, listRelease;
+        std::atomic<int> lists = 0;
         std::atomic<int> workers = 0;
         int starts = 0, wakes = 0;
         bool selectedRoute = false;
         auto transport = controlledPsn(requests);
-        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+        transport.listDevices = [&](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            if (mode == "psn-late-list") { ++lists; listRelease.acquire(); }
             *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
             *count = 1;
             strcpy((*devices)[0].device_name, "Startup console");
@@ -473,7 +481,8 @@ private slots:
         transport.startSession = [&](ChiakiSession *session) {
             ++starts;
             if (!success) return CHIAKI_ERR_CANCELED;
-            if (local) selectedRoute = QString::fromUtf8(session->connect_info.hostname) == "127.0.0.1" && session->connect_info.ps5;
+            if (local) selectedRoute = session->connect_info.host_addrinfos
+                && QHostAddress(session->connect_info.host_addrinfos->ai_addr) == QHostAddress::LocalHost && session->connect_info.ps5;
             return chiaki_thread_create(&session->session_thread, [](void *user) -> void * {
                 auto *session = static_cast<ChiakiSession *>(user);
                 ChiakiEvent connected = {};
@@ -491,10 +500,11 @@ private slots:
         };
         auto discovery = controlledDiscovery();
         discovery.wakeup = [&](ChiakiLog *, ChiakiDiscovery *, const char *, uint64_t, bool) { ++wakes; return CHIAKI_ERR_SUCCESS; };
-        QmlNativeServices services(&settings, transport, {}, {}, discovery);
-        const auto releaseOnExit = qScopeGuard([&] { release.release(); });
+        Settings startupSettings(profile);
+        QmlNativeServices services(&startupSettings, transport, {}, {}, discovery);
         auto *backend = services.backend();
         ApplicationController controller(&services);
+        const auto releaseOnExit = qScopeGuard([&] { release.release(); listRelease.release(); });
         auto &setup = *controller.setupWindow();
         setup.view()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, false);
         setup.resize(1280, 720);
@@ -508,11 +518,28 @@ private slots:
         host.state = mode == "local-wake" ? CHIAKI_DISCOVERY_HOST_STATE_STANDBY : CHIAKI_DISCOVERY_HOST_STATE_READY;
         if (local) discover(backend, {host});
         else {
-            QTRY_VERIFY(!backend->hosts().isEmpty());
+            if (mode == "psn-late-list") QTRY_COMPARE(lists.load(), 1);
+            else QTRY_VERIFY(!backend->hosts().isEmpty());
             bool accelerated = false;
             for (auto *timer : backend->findChildren<QTimer *>())
                 if (timer->isActive() && timer->interval() == 5000) { timer->start(1); accelerated = true; }
             QVERIFY(accelerated);
+            if (mode == "psn-late-list") {
+                QTest::qWait(40);
+                listRelease.release();
+            }
+        }
+        if (mode == "psn-ps4-ambiguous") {
+            QTest::qWait(40);
+            QCOMPARE(workers.load(), 0);
+            QCOMPARE(starts, 0);
+            QVERIFY(!backend->qmlSession());
+            QVERIFY(!backend->qmlWindow());
+            setup.view()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+            setup.view()->reload();
+            QVERIFY(click(setup.view(), "[data-stop-auto-connect]"));
+            QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("cancelled"));
+            return;
         }
         QTRY_VERIFY(backend->qmlSession());
         QTRY_VERIFY(backend->qmlWindow());
@@ -532,10 +559,10 @@ private slots:
             if (mode == "psn-cancel") QVERIFY(backend->stopAutoConnect(attempt));
             else if (mode == "psn-profile") backend->qmlSettings()->setCurrentProfile(profile + "-next");
             else if (mode == "psn-removed" || mode == "psn-replaced") {
-                settings.RemoveRegisteredHost(paired.GetServerMAC());
+                backend->nativeSettings()->RemoveRegisteredHost(paired.GetServerMAC());
                 if (mode == "psn-replaced") {
                     registered.server_mac[5] = 0x66;
-                    settings.AddRegisteredHost(RegisteredHost(registered));
+                    backend->nativeSettings()->AddRegisteredHost(RegisteredHost(registered));
                 }
             }
             release.release();
@@ -545,6 +572,7 @@ private slots:
             QVERIFY(selectedRoute);
             QCOMPARE(workers.load(), local ? 0 : 1);
             QTRY_VERIFY(!setup.isVisible());
+            QTRY_VERIFY(backend->connectionAttempt().value("cancelable").toBool());
             QVERIFY(backend->stopAutoConnect(attempt));
         }
         QTRY_VERIFY(!session);

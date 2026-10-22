@@ -188,6 +188,11 @@ QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests
             finishPsnCleanup();
             return;
         }
+        if (connection_attempt.value("phase") == "failure" || !connectionTargetValid()) {
+            failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
+            finishPsnCleanup();
+            return;
+        }
         checkPsnConnection(err);
     });
     connect(&psn_hosts_watcher, &QFutureWatcher<void>::finished, [this] {
@@ -251,7 +256,6 @@ QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests
             return;
         clearWakeWait();
         failConnection(tr("Console did not respond"), tr("Timed out waiting for the console to wake. Check its power and network settings."));
-        emit wakeupStartFailed();
     });
     sleep_inhibit = new SystemdInhibit(QGuiApplication::applicationName(), tr("Remote Play session"), "sleep", "delay", this);
     connect(sleep_inhibit, &SystemdInhibit::sleep, this, &QmlBackend::goToSleep);
@@ -934,6 +938,15 @@ bool QmlBackend::connectionTargetValid() const
 {
     if (connection_profile_generation != profile_generation)
         return false;
+    if (connection_attempt.value("context") == "startup") {
+        const auto mac = connection_attempt.value("automaticMac").toString();
+        bool registered = false;
+        for (const auto &host : settings->GetRegisteredHosts())
+            if (host.GetServerMAC().ToString() == mac && !settings->GetHiddenHostHidden(host.GetServerMAC())
+                    && host.GetServerNickname() == connection_attempt.value("automaticNickname").toString())
+                registered = true;
+        if (!registered) return false;
+    }
     const auto mac = QByteArray::fromHex(connection_target.value("mac").toString().toLatin1());
     if (mac.size() == 6 && settings->GetHiddenHostHidden(HostMAC(reinterpret_cast<const uint8_t *>(mac.constData()))))
         return false;
@@ -996,6 +1009,10 @@ void QmlBackend::beginConnection(const StreamSessionConnectInfo &info, const QVa
         {"ps5", chiaki_target_is_ps5(info.target)}, {"cleanupPending", context != "startup"}, {"cancelable", true},
         {"waitingForWake", waiting}, {"context", context.isEmpty() && waiting ? QStringLiteral("wake") : context},
         {"registrationOnly", info.auto_regist}, {"errorTitle", ""}, {"errorText", ""}};
+    if (context == "startup") {
+        connection_attempt["automaticMac"] = target.value("mac");
+        connection_attempt["automaticNickname"] = info.nickname;
+    }
     const int index = resolveConnectionTarget();
     if (index >= 0)
         connection_attempt["name"] = hosts().at(index).toMap().value("name");
@@ -1581,7 +1598,6 @@ void QmlBackend::createSession(const StreamSessionConnectInfo &connect_info, con
             if (!sendWakeup(connect_info.host, connect_info.regist_key, chiaki_target_is_ps5(connect_info.target)))
                 return;
             wakeup_start_timer->start(WAKEUP_WAIT_SECONDS * 1000);
-            emit wakeupStartInitiated();
             updateDiscoveryHosts();
         }
         else
@@ -2057,6 +2073,8 @@ void QmlBackend::connectToHost(int index, QString nickname)
     const bool continue_attempt = connection_attempt.value("phase") == "waiting"
         && connection_attempt.value("waitingForWake").toBool() && !connection_cancelled && !connection_dismissed
         && connection_profile_generation == profile_generation && connectionTargetValid();
+    if (continue_attempt && connection_attempt.value("context") == "startup" && !server.duid.isEmpty())
+        server.registered_host = settings->GetRegisteredHost(auto_connect_mac);
     if (continue_attempt) {
         const auto attempt_id = connection_generation;
         setConnectionPhase(QStringLiteral("found"));
@@ -2285,11 +2303,18 @@ void QmlBackend::autoConnectPsn()
     if (settings->GetPsnAuthTokenExpiry().isEmpty() || settings->GetPsnRefreshToken().isEmpty())
         return;
     const auto listed = hosts();
+    const auto selected = settings->GetRegisteredHost(auto_connect_mac);
+    const bool ps5 = chiaki_target_is_ps5(selected.GetTarget());
+    int ps4_registrations = 0;
+    for (const auto &host : settings->GetRegisteredHosts())
+        if (!chiaki_target_is_ps5(host.GetTarget()) && !settings->GetHiddenHostHidden(host.GetServerMAC()))
+            ++ps4_registrations;
     int found = -1;
     for (int i = 0; i < listed.size(); ++i) {
         const auto host = listed.at(i).toMap();
         if (!host.value("discovered").toBool() && !host.value("duid").toString().isEmpty()
-                && host.value("name").toString() == auto_connect_nickname && host.value("display").toBool()) {
+                && host.value("ps5").toBool() == ps5 && host.value("display").toBool()
+                && (ps5 ? host.value("name").toString() == auto_connect_nickname : ps4_registrations == 1)) {
             if (found != -1) return;
             found = i;
         }
@@ -3350,6 +3375,7 @@ void QmlBackend::updatePsnHostsThread(QString psn_token, uint32_t log_mask, QStr
         psn_nickname_hosts = found_nicknames;
         psn_refresh = {{"phase", "success"}, {"message", tr("Remote consoles updated")}};
         emit hostsChanged();
+        if (generation == profile_generation && !psn_auto_connect_timer->isActive()) autoConnectPsn();
         if (generation == profile_generation) emit psnRefreshChanged();
     }, Qt::QueuedConnection);
     qCInfo(chiakiGui) << "Updated PSN hosts";
