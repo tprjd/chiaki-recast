@@ -33,6 +33,9 @@ windows, and checks setup restoration. It requires an unobstructed hardware
 desktop. Set `CHIAKI_EMBEDDED_EVIDENCE` to an existing directory to save its
 GPU report and images. A protected OS dialog invalidates screen and focus
 observations. Controlled frames do not prove live console decode or latency.
+The fixture selects the existing native Fast preset through Settings.
+Production defaults stay unchanged. The Windows HighQuality processing issue
+recorded in ticket 03 evidence remains acceptance work for tickets 04 and 23.
 
 The standalone QML checks below retain coverage for setup flows that have not
 yet moved to the web page and for shared native components.

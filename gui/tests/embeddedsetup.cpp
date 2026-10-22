@@ -86,6 +86,7 @@ private slots:
         settings.SetDiscoveryEnabled(false);
         settings.SetRemotePlayAsk(false);
         settings.SetAddSteamShortcutAsk(false);
+        settings.SetPlaceboPreset(PlaceboPreset::Fast);
         settings.SetManualHost(ManualHost(-1, "private.example", false, {}));
         QmlNativeServices services(&settings);
         services.backend()->stopAutoConnect();
