@@ -19,6 +19,15 @@ TestCase {
         search.forceActiveFocus(Qt.TabFocusReason);
         keyClick(Qt.Key_Return);
     }
+    function test_migratedProfileMetadataRemoved() {
+        const h = createTemporaryObject(harnessComponent, testCase);
+        const search = findChild(h, "settingsSearch");
+        search.text = "Config";
+        const targets = h.screen.searchResults.map(row => row.target);
+        for (const removed of ["manageProfiles", "profileSelection", "profileAction", "newProfileName", "deleteProfile", "importSettings", "exportSettings"])
+            verify(targets.indexOf(removed) < 0);
+        for (const retained of ["logSanitize", "logVerbose", "aboutSettings"]) verify(targets.indexOf(retained) >= 0);
+    }
     function test_captureModeSearch() {
         const h = createTemporaryObject(harnessComponent, testCase);
         searchFor(h, "F8 gameplay capture");
@@ -133,7 +142,7 @@ TestCase {
             "audioOutDevice", "audioInDevice", "audioBufferSize", "audioVolume", "startMicUnmuted", "speechProcessing", "noiseSuppressLevel", "echoSuppressLevel", "wifiDroppedNotif", "packetLossReportedMax", "iDROnFECFailureEnabled", "showStreamStats",
             "registerConsole", "registeredConsoleInfo0", "autoConnectConsole0", "deleteRegisteredConsole0", "hiddenConsoleInfo0", "unhideConsole0", "mouseCameraEnabled", "keyboardEnabled", "mouseTouchEnabled", "resetAllKeys",
             "allowJoystickBackgroundEvents", "buttonsByPosition", "dpadTouchEnabled", "dpadTouchIncrement", "dpadTouchShortcut1", "dpadTouchShortcut2", "dpadTouchShortcut3", "dpadTouchShortcut4", "rumbleHapticsIntensity", "hapticOverride",
-            "openPsnLogin", "portGuessingEnabled", "portGuessCount", "portGuessSocketCount", "manageProfiles", "exportSettings", "importSettings", "logSanitize", "logVerbose", "aboutSettings"
+            "openPsnLogin", "portGuessingEnabled", "portGuessCount", "portGuessSocketCount", "logSanitize", "logVerbose", "aboutSettings"
         ];
         for (const console of ["PS4", "PS5"]) for (const route of ["Local", "Remote"])
             for (const name of console === "PS5" ? ["resolution", "fps", "bitrate", "codec"] : ["resolution", "fps", "bitrate"])
@@ -261,14 +270,7 @@ TestCase {
             compare(h.settings.changeCount, 0, target + " search does not write");
             while (h.pages.depth > 1) { keyClick(Qt.Key_Escape); tryVerify(() => !h.pages.busy); }
         }
-        for (const target of ["profileSelection", "newProfileName", "deleteProfile", "profileAction"]) {
-            selectTarget(h, "Config", target);
-            tryCompare(h.pages, "depth", 2);
-            tryCompare(findChild(h.pages.currentItem, "profileSelection"), "activeFocus", true);
-            keyClick(Qt.Key_Escape);
-            tryCompare(h.pages, "depth", 1);
-            tryCompare(findChild(h.pages.currentItem, "manageProfiles"), "activeFocus", true);
-        }
+
         compare(h.actions.length, 0);
     }
     function test_linkedPrerequisitesAndProfileChanges() {
@@ -313,15 +315,7 @@ TestCase {
         keyClick(Qt.Key_Return);
         tryCompare(findChild(h.pages.currentItem, "keyMapping2"), "activeFocus", true);
     }
-    function test_profileRoutes() {
-        const h = createTemporaryObject(linkedHarnessComponent, testCase, {width: 900, height: 600});
-        for (const target of ["profileSelection", "newProfileName", "deleteProfile", "profileAction"]) {
-            selectTarget(h, "Config", target);
-            tryCompare(h.pages, "depth", 2);
-            keyClick(Qt.Key_Escape);
-            tryCompare(h.pages, "depth", 1);
-        }
-    }
+
     function test_searchExplainsOuterPrerequisitesAndNativeNames() {
         const h = createTemporaryObject(harnessComponent, testCase);
         const search = findChild(h, "settingsSearch");
@@ -332,7 +326,7 @@ TestCase {
         h.backend.window.videoPreset = 5;
         h.settings.placeboColorMappingEnabled = false;
         verify(h.screen.searchResults[0].description.indexOf("Color mapping enabled") >= 0);
-        for (const query of ["Audio/Video", "Use zero copy", "Start mic unmuted", "Request IDR frame on FEC failure", "Login to PSN", "Force STUN port guessing", "Export settings to file"]) {
+        for (const query of ["Audio/Video", "Use zero copy", "Start mic unmuted", "Request IDR frame on FEC failure", "Login to PSN", "Force STUN port guessing"]) {
             search.text = query;
             verify(h.screen.searchResults.length > 0, query + " uses the native setting name");
         }
@@ -360,10 +354,6 @@ TestCase {
         compare(h.settings.bitrateLocalPS5, 0);
         compare(h.settings.bitrateRemotePS4, 0);
         h.settings.actions = [];
-        searchFor(h, "Export settings to file");
-        compare(h.settings.actions.length, 0);
-        keyClick(Qt.Key_Return);
-        compare(h.settings.actions[0].name, "exportSettings");
         searchFor(h, "Registered console information");
         tryCompare(findChild(h, "registeredConsolesEmpty"), "activeFocus", true);
         searchFor(h, "Unhide console");

@@ -597,6 +597,7 @@ void QmlBackend::profileChanged()
     emit sessionPinRequestChanged();
     QString profile = settings->GetCurrentProfile();
     Settings *settings_copy = new Settings(profile, this);
+    disconnect(settings, nullptr, this, nullptr);
     if(settings_allocd)
         settings->deleteLater();
     settings_allocd = true;

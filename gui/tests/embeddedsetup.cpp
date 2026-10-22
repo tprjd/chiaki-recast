@@ -285,6 +285,16 @@ class EmbeddedSetupTest : public QObject
             Qt::QueuedConnection, Q_ARG(QList<DiscoveryHost>, hosts)));
     }
 
+    PsnRequests controlledProfileRequests(QList<QPointer<PsnReply>> &network)
+    {
+        PsnRequests requests;
+        requests.networkManager = [&network](QObject *owner) { return new PsnNetwork(network, owner); };
+        requests.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **, size_t *, ChiakiLog *) { return CHIAKI_ERR_CANCELED; };
+        requests.connect = [](StreamSession *, const QString &, bool) { return CHIAKI_ERR_CANCELED; };
+        requests.startSession = [](ChiakiSession *) { return CHIAKI_ERR_CANCELED; };
+        return requests;
+    }
+
     DiscoveryRequests controlledDiscovery()
     {
         return {[](ChiakiDiscoveryService *, ChiakiDiscoveryServiceOptions *, ChiakiLog *) { return CHIAKI_ERR_SUCCESS; },
@@ -406,6 +416,387 @@ class EmbeddedSetupTest : public QObject
     }
 
 private slots:
+    void profileImportValidation()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetAudioVolume(37);
+        const uint8_t mac[6] = {0, 1, 2, 3, 4, 5};
+        settings.AddHiddenHost(HiddenHost(HostMAC(mac), "Keep hidden"));
+        QTemporaryDir files;
+        const auto invalid = files.filePath("invalid.ini");
+        {
+            QSettings file(invalid, QSettings::IniFormat);
+            file.setValue("version", 2);
+            file.setValue("settings/this_profile", profile);
+            file.setValue("settings/audio_volume", 1);
+            file.beginWriteArray("registered_hosts", 1);
+            file.setArrayIndex(0);
+            file.setValue("server_mac", QByteArray("short"));
+            file.endArray();
+        }
+        QVERIFY(!settings.ImportSettings(invalid));
+        const auto preserved = [&] {
+            QCOMPARE(settings.GetHiddenHosts().size(), 1);
+            Settings reopened(profile);
+            QCOMPARE(reopened.GetAudioVolume(), 37);
+            QCOMPARE(reopened.GetHiddenHosts().size(), 1);
+        };
+        preserved();
+        for(const auto &contents : QList<QByteArray>{"[General]\nversion=99\n", "[broken\nvalue=1\n", "[General]\nversion=2\n[registered_hosts]\nsize=-1\n",
+            "[General]\nversion=2\n[registered_hosts]\nsize=1\n1\\server_mac=@ByteArray(123456)\n1\\target=1000100\n",
+            "[General]\nversion=2\n[hidden_hosts]\nsize=1\n1\\server_mac=@ByteArray(short)\n",
+            "[General]\nversion=2\n[manual_hosts]\nsize=1\n1\\id=-1\n1\\host=console.test\n",
+            "[General]\nversion=2\n[controller_mappings]\nsize=1\n1\\vidpid=0x1:0x2\n"}) {
+            { QFile file(invalid); QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate)); QCOMPARE(file.write(contents), contents.size()); }
+            QVERIFY(!settings.ImportSettings(invalid));
+            preserved();
+        }
+        // Version 1 exports use ps4_mac/ps4_nickname and hw_decode_engine.
+        {
+            QSettings legacy(invalid, QSettings::IniFormat);
+            legacy.clear();
+            legacy.setValue("version", 1);
+            legacy.setValue("settings/this_profile", profile);
+            legacy.setValue("settings/audio_volume", 19);
+            legacy.setValue("settings/hw_decode_engine", "none");
+            legacy.beginWriteArray("registered_hosts", 1);
+            legacy.setArrayIndex(0);
+            legacy.setValue("ps4_mac", QByteArray("123456"));
+            legacy.setValue("ps4_nickname", "Legacy console");
+            legacy.setValue("rp_regist_key", QByteArray(CHIAKI_SESSION_AUTH_SIZE, 'a'));
+            legacy.setValue("rp_key", QByteArray(16, 'b'));
+            legacy.endArray();
+            // Older writers can retain inactive entries after a removal.
+            legacy.setValue("registered_hosts/2/server_mac", QByteArray("old"));
+        }
+        QVERIFY(settings.ImportSettings(invalid));
+        Settings legacy(profile);
+        QCOMPARE(legacy.GetAudioVolume(), 19);
+        QCOMPARE(legacy.GetRegisteredHosts().size(), 1);
+        QCOMPARE(legacy.GetRegisteredHosts().first().GetServerNickname(), QStringLiteral("Legacy console"));
+        QCOMPARE(legacy.GetRegisteredHosts().first().GetTarget(), CHIAKI_TARGET_PS4_10);
+        QVERIFY(!legacy.DeleteProfile(profile));
+        QVERIFY(!legacy.DeleteProfile({}));
+    }
+
+    void profileSettingsPage()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const QString guest = profile + "-Guest";
+        const auto cleanup = qScopeGuard([&] {
+            for(const auto &name : {profile, guest}) QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        QVERIFY(settings.SetCurrentProfile(profile));
+        settings.SetDiscoveryEnabled(false);
+        settings.SetAudioVolume(37);
+        QList<QPointer<PsnReply>> network;
+        const auto requests = controlledProfileRequests(network);
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, requests, [](const QString &, const QStringList &) { return false; }, registration.boundary(), controlledDiscovery());
+        auto *backend = services.backend();
+        auto *shared = backend->qmlSettings();
+        SetupWindow setup(backend);
+        setup.resize(1280, 900);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "[...document.querySelectorAll('.category-nav button')].some(e=>e.textContent==='Profiles')").toBool());
+        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='Profiles').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#profileSelection')").toBool());
+        const auto initialGeneration = setup.bridge()->snapshot().value("profileGeneration").toString();
+        script(setup.view(), "{const select=document.querySelector('#profileSelection');select.value='create';select.dispatchEvent(new Event('change',{bubbles:true}));}");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#profileAction').disabled").toBool());
+        QVERIFY(fill(setup.view(), "#newProfileName", "  " + guest + "  "));
+        QVERIFY(click(setup.view(), "#profileAction"));
+        QTRY_COMPARE(shared->currentProfile(), guest);
+        QCOMPARE(backend->qmlSettings(), shared);
+        QVERIFY(backend->nativeSettings() != &settings);
+        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), SDL_MIX_MAXVOLUME);
+        backend->nativeSettings()->SetAudioVolume(63);
+        const auto choose = [&](const QString &label) {
+            script(setup.view(), QString("{const select=document.querySelector('#profileSelection');select.value=[...select.options].find(e=>e.textContent===%1).value;select.dispatchEvent(new Event('change',{bubbles:true}));}").arg(QString::fromUtf8(QJsonDocument(QJsonArray{label}).toJson(QJsonDocument::Compact)).mid(1).chopped(1)));
+        };
+        choose(profile);
+        QVERIFY(!script(setup.view(), "document.querySelector('#deleteProfile')?.checked").toBool());
+        QVERIFY(click(setup.view(), "#profileAction"));
+        QTRY_COMPARE(shared->currentProfile(), profile);
+        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 37);
+        Settings reopened(guest);
+        QCOMPARE(reopened.GetAudioVolume(), 63);
+        const auto currentGeneration = setup.bridge()->snapshot().value("profileGeneration").toString();
+        QVERIFY(!setup.bridge()->profileAction("create", {}, "Obsolete", false, initialGeneration).value("accepted").toBool());
+        QSignalSpy settingsSignals(shared, &QmlSettings::registeredHostsChanged);
+        QSignalSpy backendSignals(backend, &QmlBackend::hostsChanged);
+        QVERIFY(QMetaObject::invokeMethod(&settings, "RegisteredHostsUpdated", Qt::DirectConnection));
+        QVERIFY(QMetaObject::invokeMethod(&settings, "CurrentProfileChanged", Qt::DirectConnection));
+        QCOMPARE(settingsSignals.count(), 0);
+        QCOMPARE(backendSignals.count(), 0);
+        QCOMPARE(setup.bridge()->snapshot().value("profileGeneration").toString(), currentGeneration);
+        choose("default");
+        QVERIFY(!script(setup.view(), "!!document.querySelector('#deleteProfile')").toBool());
+        choose(guest);
+        QVERIFY(click(setup.view(), "#deleteProfile"));
+        QVERIFY(click(setup.view(), "#profileAction"));
+        QTRY_VERIFY(!backend->nativeSettings()->GetProfiles().contains(guest));
+        QCOMPARE(shared->currentProfile(), profile);
+        QSettings deleted(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + guest);
+        QVERIFY(deleted.allKeys().isEmpty());
+        shared->setStreamerMode(true);
+        QTRY_VERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains(profile.toUtf8()));
+        QTRY_VERIFY(script(setup.view(), "!document.body.textContent.includes('" + profile + "')").toBool());
+        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='General').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-log-directory]')?.textContent==='Log directory hidden'").toBool());
+        QVERIFY(click(setup.view(), "#logSanitize"));
+        QTRY_VERIFY(!shared->logSanitize());
+        QVERIFY(click(setup.view(), "#logVerbose"));
+        QTRY_VERIFY(shared->logVerbose());
+        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+        QVERIFY(!settingRequest(setup.view(), "logVerbose", QStringLiteral("true"), generation).value("accepted").toBool());
+        PsnBrowserOpener opener;
+        QDesktopServices::setUrlHandler("file", &opener, "open");
+        const auto resetOpener = qScopeGuard([] { QDesktopServices::unsetUrlHandler("file"); });
+        QVERIFY(click(setup.view(), "#openLogDirectory"));
+        QTRY_COMPARE(opener.url, QUrl::fromLocalFile(shared->logDirectory()));
+        for(const auto zoom : {1.0, 2.0}) {
+            setup.resize(int(1280 * zoom), int(900 * zoom));
+            setup.view()->setZoomFactor(zoom);
+            QTRY_VERIFY(script(setup.view(), "innerWidth>=1024 && document.documentElement.scrollWidth<=innerWidth").toBool());
+        }
+        Settings persisted(profile);
+        QCOMPARE(persisted.GetAudioVolume(), 37);
+        QVERIFY(!persisted.GetLogSanitize());
+        QVERIFY(persisted.GetLogVerbose());
+        QProcess restarted;
+        auto environment = QProcessEnvironment::systemEnvironment();
+        environment.insert("CHIAKI_PROFILE_RESTART", profile);
+        restarted.setProcessEnvironment(environment);
+        QTemporaryDir result;
+        const auto log = result.filePath("restart.txt");
+        restarted.start(QCoreApplication::applicationFilePath(), {"profileRestartRead", "-o", log + ",txt"});
+        QVERIFY(restarted.waitForStarted());
+        QTRY_COMPARE_WITH_TIMEOUT(restarted.state(), QProcess::NotRunning, 20000);
+        QCOMPARE(restarted.exitStatus(), QProcess::NormalExit);
+        { QFile file(log); QVERIFY(file.open(QIODevice::ReadOnly)); qInfo().noquote() << file.readAll(); }
+        QCOMPARE(restarted.exitCode(), 0);
+    }
+
+    void profileFiles()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const QString next = profile + "-next";
+        const auto cleanup = qScopeGuard([&] {
+            for(const auto &name : {profile, next}) QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        QVERIFY(settings.SetCurrentProfile(profile));
+        settings.SetDiscoveryEnabled(false);
+        settings.SetAudioVolume(37);
+        settings.SetPsnAuthToken("private-import-auth");
+        settings.SetPsnRefreshToken("private-import-refresh");
+        settings.SetPsnAccountId("private-import-account");
+        QList<QPointer<PsnReply>> network;
+        const auto requests = controlledProfileRequests(network);
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, requests, [](const QString &, const QStringList &) { return false; }, registration.boundary(), controlledDiscovery());
+        auto *backend = services.backend();
+        auto *shared = backend->qmlSettings();
+        SetupWindow setup(backend);
+        setup.resize(1280, 900);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        const auto profiles = [&] {
+            script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='Profiles').click()");
+            QTRY_VERIFY(script(setup.view(), "document.querySelector('#importSettings')?.disabled===false").toBool());
+        };
+        profiles();
+        const auto pick = [&](const QString &action, const QString &path, bool cancel = false, const std::function<void()> &before = {}) {
+            QTimer completion;
+            completion.setInterval(10);
+            connect(&completion, &QTimer::timeout, &completion, [&] {
+                for(auto *widget : QApplication::topLevelWidgets()) if(auto *picker = qobject_cast<QFileDialog *>(widget)) {
+                    if(!picker->isVisible()) continue;
+                    completion.stop();
+                    if(before) before();
+                    if(!cancel) picker->selectFile(path);
+                    QMetaObject::invokeMethod(picker, "done", Qt::DirectConnection, Q_ARG(int, cancel ? QDialog::Rejected : QDialog::Accepted));
+                    return;
+                }
+            });
+            completion.start();
+            QVERIFY(click(setup.view(), "#" + action));
+            QTRY_VERIFY(!completion.isActive());
+        };
+        const auto message = [&] { return script(setup.view(), "document.querySelector('.settings-message')?.textContent").toString(); };
+        QTemporaryDir files;
+        const auto output = files.filePath("profile.ini");
+        pick("exportSettings", output);
+        QTRY_COMPARE(message(), QStringLiteral("Settings exported."));
+        {
+            QSettings file(output, QSettings::IniFormat);
+            QCOMPARE(file.value("settings/audio_volume").toInt(), 37);
+            QCOMPARE(file.value("settings/hw_decoder").toString(), QStringLiteral("auto"));
+            QCOMPARE(file.value("settings/this_profile").toString(), profile);
+            QCOMPARE(file.value("settings/psn_auth_token").toString(), QStringLiteral("private-import-auth"));
+        }
+        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+        pick("importSettings", {}, true);
+        QTRY_COMPARE(message(), QStringLiteral("Import cancelled."));
+        QCOMPARE(setup.bridge()->snapshot().value("profileGeneration").toString(), generation);
+        pick("exportSettings", {}, true);
+        QTRY_COMPARE(message(), QStringLiteral("Export cancelled."));
+        const auto invalid = files.filePath("invalid.ini");
+        { QFile file(invalid); QVERIFY(file.open(QIODevice::WriteOnly)); file.write("[General]\nversion=99\n[settings]\naudio_volume=1\n"); }
+        pick("importSettings", invalid);
+        QTRY_VERIFY(message().contains("could not be imported"));
+        QCOMPARE(shared->currentProfile(), profile);
+        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 37);
+        QCOMPARE(setup.bridge()->snapshot().value("profileGeneration").toString(), generation);
+        QFile original(output);
+        QVERIFY(original.open(QIODevice::ReadOnly));
+        const auto originalBytes = original.readAll();
+        original.close();
+        QVERIFY(QFile::setPermissions(output, QFile::ReadOwner | QFile::ReadGroup | QFile::ReadOther));
+        const auto resetPermissions = qScopeGuard([&] { QFile::setPermissions(output, QFile::ReadOwner | QFile::WriteOwner); });
+        pick("exportSettings", output);
+        QTRY_VERIFY(message().contains("could not be exported"));
+        QVERIFY(original.open(QIODevice::ReadOnly));
+        QCOMPARE(original.readAll(), originalBytes);
+        original.close();
+        QVERIFY(QFile::setPermissions(output, QFile::ReadOwner | QFile::WriteOwner));
+        pick("exportSettings", files.filePath("missing/profile.ini"));
+        QTRY_VERIFY(message().contains("could not be exported"));
+        {
+            QSettings file(output, QSettings::IniFormat);
+            file.setValue("settings/audio_volume", 63);
+            file.setValue("settings/disconnect_action", 1);
+        }
+        pick("importSettings", output);
+        QTRY_COMPARE(message(), QStringLiteral("Settings imported."));
+        QCOMPARE(backend->qmlSettings(), shared);
+        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 63);
+        Settings imported(profile);
+        QCOMPARE(imported.GetAudioVolume(), 63);
+        QVERIFY(setup.bridge()->snapshot().value("profileGeneration").toString() != generation);
+        // A default-profile file must replace the default store, even when a named profile is active.
+        { QSettings file(output, QSettings::IniFormat); file.setValue("settings/this_profile", ""); file.setValue("settings/audio_volume", 21); }
+        pick("importSettings", output);
+        QTRY_COMPARE(message(), QStringLiteral("Settings imported."));
+        QCOMPARE(shared->currentProfile(), QString());
+        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), 21);
+        Settings defaultProfile(QString{});
+        QCOMPARE(defaultProfile.GetAudioVolume(), 21);
+        QCOMPARE(imported.GetAudioVolume(), 63);
+        // Profile replacement makes both native and WebChannel pending results obsolete.
+        QVariantMap nested;
+        pick("importSettings", output, false, [&] {
+            nested = shared->exportPlaceboSettings();
+            shared->setCurrentProfile(next);
+        });
+        QVERIFY(!nested.value("accepted").toBool());
+        QCOMPARE(shared->currentProfile(), next);
+        QCOMPARE(backend->nativeSettings()->GetAudioVolume(), SDL_MIX_MAXVOLUME);
+        QVERIFY(!setup.bridge()->settingsFileAction("importSettings", generation).value("accepted").toBool());
+        QVERIFY(!setup.bridge()->settingsFileAction("readFile", setup.bridge()->snapshot().value("profileGeneration").toString()).value("accepted").toBool());
+        shared->setStreamerMode(true);
+        const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
+        for(const auto &privateValue : {profile, next, files.path(), QStringLiteral("private-import-auth"), QStringLiteral("private-import-refresh"), QStringLiteral("private-import-account")}) {
+            QVERIFY(!snapshot.contains(privateValue.toUtf8()));
+            QVERIFY(!script(setup.view(), "document.body.textContent").toString().contains(privateValue));
+        }
+        setup.view()->reload();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        profiles();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-active-profile]')?.textContent.includes('Hidden')").toBool());
+    }
+
+    void profileSearch()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            for(const auto &name : {profile, profile + "-new"}) QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        QVERIFY(settings.SetCurrentProfile(profile));
+        settings.SetDiscoveryEnabled(false);
+        QList<QPointer<PsnReply>> network;
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, controlledProfileRequests(network), {}, registration.boundary(), controlledDiscovery());
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 900);
+        setup.show();
+        QVERIFY(click(setup.view(), ".open-settings"));
+        QVERIFY(fill(setup.view(), ".settings-search input", "New profile name"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-results button')?.textContent.includes('New profile name')").toBool());
+        QVERIFY(click(setup.view(), ".settings-results button"));
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.id==='profileSelection'").toBool());
+        script(setup.view(), "{const select=document.querySelector('#profileSelection');select.value='create';select.dispatchEvent(new Event('change',{bubbles:true}));}");
+        QVERIFY(fill(setup.view(), "#newProfileName", profile + "-new"));
+        services.backend()->qmlSettings()->setLogVerbose(true);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#newProfileName')?.value").toString(), profile + "-new");
+        QVERIFY(click(setup.view(), "#profileAction"));
+        QTRY_COMPARE(services.backend()->qmlSettings()->currentProfile(), profile + "-new");
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.id==='profileSelection'").toBool());
+        QVERIFY(fill(setup.view(), ".settings-search input", "Delete selected profile"));
+        QVERIFY(click(setup.view(), ".settings-results button"));
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.id==='profileSelection'").toBool());
+        setup.resize(2560, 1800);
+        setup.view()->setZoomFactor(2);
+        QTRY_VERIFY(script(setup.view(), "innerWidth>=1024 && document.documentElement.scrollWidth<=innerWidth && !!document.querySelector('#profileSelection')").toBool());
+    }
+
+    void profileDefaultImport()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        QVERIFY(settings.SetCurrentProfile(profile));
+        settings.SetAudioVolume(37);
+        QTemporaryDir files;
+        const auto input = files.filePath("default.ini");
+        {
+            QSettings file(input, QSettings::IniFormat);
+            file.setValue("version", 2);
+            file.setValue("settings/audio_volume", 21);
+            file.beginWriteArray("profiles", 1);
+            file.setArrayIndex(0);
+            file.setValue("settings/profile_name", "Imported profile");
+            file.endArray();
+        }
+        QVERIFY(settings.ImportSettings(input));
+        Settings restored(QString{});
+        QCOMPARE(restored.GetAudioVolume(), 21);
+        QCOMPARE(restored.GetCurrentProfile(), QString{});
+        QCOMPARE(restored.GetProfiles(), QList<QString>{"Imported profile"});
+        Settings named(profile);
+        QCOMPARE(named.GetAudioVolume(), 37);
+    }
+
+    void profileRestartRead()
+    {
+        const auto profile = qEnvironmentVariable("CHIAKI_PROFILE_RESTART");
+        if(profile.isEmpty()) QSKIP("Only launched by profileSettingsPage");
+        Settings restarted(profile);
+        QCOMPARE(restarted.GetCurrentProfile(), profile);
+        QCOMPARE(restarted.GetAudioVolume(), 37);
+        QVERIFY(!restarted.GetLogSanitize());
+        QVERIFY(restarted.GetLogVerbose());
+    }
+
     void startupNativeConnection_data()
     {
         QTest::addColumn<QString>("mode");
@@ -4239,7 +4630,9 @@ private slots:
         settings.SetDiscoveryEnabled(false);
         settings.SetPlaceboPreset(PlaceboPreset::Custom);
         settings.SetPlaceboDebandIterations(7);
-        QmlNativeServices services(&settings);
+        QList<QPointer<PsnReply>> network;
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, controlledProfileRequests(network), {}, registration.boundary(), controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
         backend->setDiscoveryEnabled(false);

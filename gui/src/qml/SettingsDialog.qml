@@ -84,12 +84,10 @@ FocusScope {
             return;
         }
         const opener = entry.page === "display" ? "displaySettings"
-            : entry.page === "profiles" ? "manageProfiles"
             : "customRendererSettings";
         revealSetting(entry.category, opener, undefined, "videoPreset", function(item) {
             if (!item || item.objectName !== opener || !item.visible || !item.enabled) return;
             if (entry.page === "display") navigation.showDisplaySettingsDialog(entry);
-            else if (entry.page === "profiles") navigation.showProfileDialog(entry);
             else navigation.showPlaceboSettingsDialog(entry);
         });
     }
@@ -242,7 +240,7 @@ FocusScope {
         case 5: item = dialog.backend.settings.mouseCameraSupported ? keyboardMousePage.firstFocusItem : resetAllKeys; break;
         case 6: item = allowJoystickBackgroundEvents; break;
         case 7: item = firstRemoteFocusableItem(); break;
-        case 8: item = profile; break;
+        case 8: item = logSanitizeBox; break;
         }
         if (item)
             item.forceActiveFocus(Qt.TabFocusReason);
@@ -1976,7 +1974,7 @@ FocusScope {
             }
 
             Item {
-                // Config (Options such as Import/Export and Logging)
+                // Config diagnostics retained for the remaining native setup callers.
                 Flickable {
                     id: configFlick
                     objectName: "configFlick"
@@ -1992,61 +1990,6 @@ FocusScope {
                         width: Math.max(0, configFlick.width - 48)
                         spacing: 14
                         Label { text: qsTr("Config"); font.pixelSize: 24; font.bold: true }
-                        Label { text: qsTr("Profiles"); font.pixelSize: 14; font.bold: true }
-                        Frame {
-                            Layout.fillWidth: true
-                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
-                            RowLayout {
-                                anchors.fill: parent
-                                spacing: 24
-                                Label {
-                                    objectName: "configProfile"
-                                    Layout.fillWidth: true
-                                    wrapMode: Text.Wrap
-                                    font.pixelSize: 14
-                                    text: qsTr("Current profile: %1").arg(dialog.backend.settings.streamerMode ? qsTr("Hidden") : (dialog.backend.settings.currentProfile || qsTr("default")))
-                                }
-                                C.Button {
-                                    id: profile
-                                    objectName: "manageProfiles"
-                                    text: qsTr("Manage profiles")
-                                    Accessible.name: text
-                                    firstInFocusChain: true
-                                    font.pixelSize: 14
-                                    onClicked: dialog.navigation.showProfileDialog()
-                                    Material.roundedScale: Material.SmallScale
-                                }
-                            }
-                        }
-                        Label { text: qsTr("Settings files"); font.pixelSize: 14; font.bold: true }
-                        Frame {
-                            Layout.fillWidth: true
-                            background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
-                            RowLayout {
-                                anchors.fill: parent
-                                spacing: 12
-                                C.Button {
-                                    id: exportButton
-                                    objectName: "exportSettings"
-                                    Layout.fillWidth: true
-                                    text: qsTr("Export settings to file")
-                                    Accessible.name: text
-                                    font.pixelSize: 14
-                                    onClicked: dialog.backend.settings.exportSettings()
-                                    Material.roundedScale: Material.SmallScale
-                                }
-                                C.Button {
-                                    id: importButton
-                                    objectName: "importSettings"
-                                    Layout.fillWidth: true
-                                    text: qsTr("Import settings from file")
-                                    Accessible.name: text
-                                    font.pixelSize: 14
-                                    onClicked: dialog.backend.settings.importSettings()
-                                    Material.roundedScale: Material.SmallScale
-                                }
-                            }
-                        }
                         Label { text: qsTr("Diagnostics"); font.pixelSize: 14; font.bold: true }
                         Frame {
                             Layout.fillWidth: true
@@ -2054,6 +1997,8 @@ FocusScope {
                             ColumnLayout {
                                 anchors.fill: parent
                                 C.CheckBox {
+                                    id: logSanitizeBox
+                                    firstInFocusChain: true
                                     objectName: "logSanitize"
                                     text: qsTr("Sanitize logs · Default: On")
                                     Accessible.name: qsTr("Sanitize logs")
