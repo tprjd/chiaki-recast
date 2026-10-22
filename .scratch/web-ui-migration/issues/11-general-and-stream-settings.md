@@ -39,3 +39,16 @@ for source hashes, commands, results, reused evidence, and hardware limits.
 No QML resource was removed because SettingsDialog still has real callers.
 Native live settings remain native. Other settings categories remain assigned
 to tickets 12 through 17. The current integration tip was already merged.
+
+Integration merge `322c486b` contains worker commit `ceae3eb7` without conflicts.
+The merged tree matches the worker tree. All 14 recorded source, lock,
+executable, JavaScript, and CSS hashes match. The shared panel marker and the
+settings route guard remain in place. Passing results were reused without
+builds or test reruns. Source-only whitespace checks pass.
+
+This resolves the settings shell and general session control milestone.
+The offscreen checks used a test-only GPU-disable flag. They establish behavior
+and persistence, but do not establish physical focus, visual layout, Deck
+hardware, live session effects, other platform packages, or GPU acceptance.
+Ticket 03 graphics evidence remains unchanged. These limits remain in the
+relevant hardware and final acceptance tickets.

@@ -27,6 +27,7 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [04: Local native stream handoff](issues/04-local-native-stream-handoff.md): claimed. Tickets 02 and 03 are integrated.
 - [06: PSN sign-in](issues/06-psn-sign-in.md): claimed after ticket 03.
 - [11: General and stream settings](issues/11-general-and-stream-settings.md): resolved for the settings shell and general session controls. Real-bridge writes, rejection, search/focus, privacy, reload, and separate-process persistence pass. Physical and platform acceptance remains in the later acceptance tickets.
+- Tickets [12](issues/12-video-and-audio-settings.md), [13](issues/13-display-and-renderer-settings.md), [15](issues/15-keyboard-and-mouse-controls.md), [16](issues/16-controller-setup-and-mapping.md), and [17](issues/17-profiles-files-and-logs.md): ready after ticket 11.
 - Other tickets 05 through 23: waiting for their declared blockers.
 
 ## Integration history
@@ -37,6 +38,7 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - 9fbc05a2: recorded the compatible Windows native and WebEngine build baseline. Build availability does not establish accelerated coexistence.
 - d893e46f: merged ticket 02 branch d5826be0 and source/evidence commit 15bc0f9c without conflicts. The merged native source matches the tested ticket tree. Reused the recorded passing checks without a build or test rerun.
 - fd207526: merged ticket 03 commit ec92fb73 without conflicts. The merged tree matches the worker tree. Source, package executable, frontend lock, and image digests match the recorded evidence. Production source matches the passing library build 0e2702b7; final graphics source matches passing build 713b5861. Reused the passing checks without builds or test reruns. HighQuality/default processing, actual handoff focus, initialization failure, live media, and platform hardware acceptance remain in tickets 04 and 23.
+- 322c486b: merged ticket 11 commit ceae3eb7 without conflicts. The merged tree and all 14 recorded source, lock, executable, JavaScript, and CSS hashes match the tested artifacts. Reused save/reload 3/0 and validation/restart 4/0 without builds or test reruns. The checks used offscreen rendering and a test-only GPU-disable flag. Physical focus, visual layout, Deck hardware, live session effects, platform packages, and GPU acceptance remain open. Ticket 03 graphics evidence is unchanged.
 
 ## Decisions
 
