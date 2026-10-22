@@ -191,7 +191,9 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
                         && this->backend->qmlSettings()->mouseCameraEnabled() != legacy;
                 }, this);
             connect(setupBridge, &SetupBridge::keyboardMouseClosed, capture, &QDialog::reject);
-            connect(capture, &QDialog::finished, this, [this] { if (isVisible()) webView->setFocus(Qt::TabFocusReason); });
+            connect(capture, &QDialog::finished, this, [this, form, profile] {
+                if (isVisible() && setupBridge->keyboardMouseFormValid(form, profile)) webView->setFocus(Qt::TabFocusReason);
+            });
             capture->open();
         });
     connect(setupBridge, &SetupBridge::psnSignInRequested, this, [this] {
