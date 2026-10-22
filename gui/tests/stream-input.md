@@ -122,14 +122,28 @@ Qt key values. Both use the same held-input set so either trigger alternative
 can keep the action pressed.
 
 `StreamSession::HandleRelativeMouseMove(dx, dy)` supplies the capture-relative
-clock. A precise 4 ms timer advances the mapper and sends changed output through
+clock. A precise 8 ms timer advances the mapper and sends changed output through
 the existing controller feedback path. Capture release stops this timer.
 
-The provisional response uses a trailing 16 ms count window and 1,000 stick
-units per count in that window. This is a gain of 16 stick units per count per
-second. Output has a radial limit of 32,767. Idle output becomes exactly zero
-when the last count leaves the window, normally within 20 ms with the 4 ms
-timer. Scheduler delays can increase that time. Ticket 03 owns calibration.
+The mapper divides new raw counts by the measured time since the preceding
+update. The default gain stays at 16 stick units per count per second. It uses
+double precision until the final 16-bit output. An empty update produces exact
+zero. There is no smoothing tail or queued turn distance after saturation.
+Counts more than 16 ms old are discarded after an event-loop stall. A direction
+change takes effect on the next update. Qt can deliver a timeout late, so 8 ms
+is a requested update interval, not a measured latency guarantee.
+
+The optional game response correction raises normalized speed to a saved
+exponent before dead-zone compensation. The default exponent is 1. This leaves
+the linear response unchanged. Values below 1 increase small movements and can
+invert a measured nonlinear game response. They are not a calibrated game
+profile. Direction is preserved and output has a radial limit of 32,767.
+Capture release clears output immediately. The feedback sender's defined 8 ms
+minimum is not enforced. Network delivery and console response remain separate
+from mapper timing. Physical mouse and game calibration remain unverified.
+
+See [the research notes](../../docs/mouse-mapping-research.md) for primary
+sources and [the tuning guide](../../docs/mouse-aim.md) for game calibration.
 
 ## Check mouse output and native capture
 

@@ -870,6 +870,13 @@ void QmlSettings::setMouseInvertVertical(bool value)
     if (settings->SetMouseResponse(response)) emit mouseResponseChanged();
 }
 
+void QmlSettings::setMouseResponseExponent(double value)
+{
+    auto response = settings->GetMouseResponse();
+    response.responseExponent = value;
+    if (settings->SetMouseResponse(response)) emit mouseResponseChanged();
+}
+
 void QmlSettings::setKeyboardEnabled(bool enabled)
 {
     settings->SetKeyboardEnabled(enabled);

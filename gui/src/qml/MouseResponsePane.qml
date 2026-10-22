@@ -14,7 +14,8 @@ ColumnLayout {
         model: [
             {name: "mouseHorizontalSensitivity", label: qsTr("Horizontal sensitivity"), unit: "×", factor: 1, minimum: pane.settings.mouseSensitivityMinimum, maximum: pane.settings.mouseSensitivityMaximum, step: 0.05, decimals: 2},
             {name: "mouseVerticalSensitivity", label: qsTr("Vertical sensitivity"), unit: "×", factor: 1, minimum: pane.settings.mouseSensitivityMinimum, maximum: pane.settings.mouseSensitivityMaximum, step: 0.05, decimals: 2},
-            {name: "mouseDeadZoneCompensation", label: qsTr("Game dead-zone compensation"), unit: "%", factor: 100, minimum: 0, maximum: pane.settings.mouseCompensationMaximum * 100, step: 1, decimals: 0}
+            {name: "mouseDeadZoneCompensation", label: qsTr("Game dead-zone compensation"), unit: "%", factor: 100, minimum: 0, maximum: pane.settings.mouseCompensationMaximum * 100, step: 1, decimals: 0},
+            {name: "mouseResponseExponent", label: qsTr("Game response correction"), unit: "", factor: 1, minimum: pane.settings.mouseExponentMinimum, maximum: pane.settings.mouseExponentMaximum, step: 0.05, decimals: 2}
         ]
         delegate: Frame {
             id: row
@@ -79,7 +80,7 @@ ColumnLayout {
         }
     }
     Label {
-        text: qsTr("Increase compensation only if small mouse movements do not move the camera.")
+        text: qsTr("Increase compensation only if small mouse movements do not move the camera. Start response correction at 1.00. Lower values increase small movements to compensate for a game's slow stick response.")
         wrapMode: Text.Wrap
         Layout.fillWidth: true
         font.pixelSize: 13

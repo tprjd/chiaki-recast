@@ -530,7 +530,8 @@ private slots:
         key(Qt::Key_J, true);
         key(Qt::Key_W, true);
         session.HandleRelativeMouseMove(1, 0);
-        QMetaObject::invokeMethod(session.gameplay_mouse_timer, "timeout", Qt::DirectConnection);
+        session.keyboard_mouse.advanceMouse(session.gameplay_mouse_clock.nsecsElapsed() / 1000 + 8000);
+        session.SendFeedbackState();
         QCOMPARE(outgoing.buttons, uint32_t(CHIAKI_CONTROLLER_BUTTON_CROSS));
         QVERIFY(outgoing.left_y != 0);
         QVERIFY(outgoing.right_x != 0);
@@ -587,8 +588,9 @@ private slots:
         key(Qt::Key_X, true);
         QCOMPARE(outgoing.r2_state, uint8_t(255));
         session.HandleRelativeMouseMove(1, 0);
-        QMetaObject::invokeMethod(session.gameplay_mouse_timer, "timeout", Qt::DirectConnection);
-        QCOMPARE(outgoing.right_x, int16_t(1000));
+        session.keyboard_mouse.advanceMouse(session.gameplay_mouse_clock.nsecsElapsed() / 1000 + 8000);
+        session.SendFeedbackState();
+        QVERIFY(outgoing.right_x > 0 && outgoing.right_x <= 2000);
         session.SetGameplayCapture(false);
     }
     void keyboardMouseSettingsRoute()
@@ -669,23 +671,33 @@ private slots:
         StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
             QByteArray(CHIAKI_SESSION_AUTH_SIZE, '\0'), QByteArray(16, '\0'), {}, {}, false, false, false, false);
         StreamSession session(info);
+        session.SetGameplayCapture(true);
+        QCOMPARE(session.gameplay_mouse_timer->interval(), 8);
+        mouseMotionObserved = false;
+        session.HandleRelativeMouseMove(1, 0);
+        QTRY_VERIFY_WITH_TIMEOUT(mouseMotionObserved, 200);
+        QTRY_COMPARE_WITH_TIMEOUT(outgoing.right_x, int16_t(0), 200);
+        session.SetGameplayCapture(false);
         session.SetMouseResponse(settings.GetMouseResponse());
         session.SetGameplayCapture(true);
         session.HandleRelativeMouseMove(1, 0);
-        QMetaObject::invokeMethod(session.gameplay_mouse_timer, "timeout", Qt::DirectConnection);
-        QCOMPARE(outgoing.right_x, 1000);
+        session.keyboard_mouse.advanceMouse(session.gameplay_mouse_clock.nsecsElapsed() / 1000 + 8000);
+        session.SendFeedbackState();
+        QVERIFY(outgoing.right_x > 0 && outgoing.right_x <= 2000);
+        const auto before = outgoing.right_x;
         auto response = settings.GetMouseResponse();
         response.horizontalSensitivity = 2;
         QVERIFY(settings.SetMouseResponse(response));
-        QCOMPARE(outgoing.right_x, 1000);
+        QCOMPARE(outgoing.right_x, before);
         session.SetGameplayCapture(false);
         QCOMPARE(outgoing.right_x, 0);
         session.SetMouseResponse(settings.GetMouseResponse());
         session.SetGameplayCapture(true);
         QCOMPARE(outgoing.right_x, 0);
         session.HandleRelativeMouseMove(1, 0);
-        QMetaObject::invokeMethod(session.gameplay_mouse_timer, "timeout", Qt::DirectConnection);
-        QCOMPARE(outgoing.right_x, 2000);
+        session.keyboard_mouse.advanceMouse(session.gameplay_mouse_clock.nsecsElapsed() / 1000 + 8000);
+        session.SendFeedbackState();
+        QVERIFY(outgoing.right_x > 0 && outgoing.right_x <= 4000);
         session.SetGameplayCapture(false);
     }
     void mouseDesktop() { runMouse(false); }
@@ -942,19 +954,20 @@ private slots:
         KeyboardMouseMapper mapper;
         mapper.mouseMove(8, -4, 0);
         mapper.advanceMouse(0);
-        QCOMPARE(mapper.state().right_x, int16_t(8000));
-        QCOMPARE(mapper.state().right_y, int16_t(-4000));
-        mapper.advanceMouse(12000);
-        QCOMPARE(mapper.state().right_x, int16_t(8000));
+        QCOMPARE(mapper.state().right_x, int16_t(0));
+        QCOMPARE(mapper.state().right_y, int16_t(0));
+        mapper.advanceMouse(8000);
+        QCOMPARE(mapper.state().right_x, int16_t(16000));
+        QCOMPARE(mapper.state().right_y, int16_t(-8000));
         mapper.advanceMouse(16000);
         QCOMPARE(mapper.state().right_x, int16_t(0));
         QCOMPARE(mapper.state().right_y, int16_t(0));
         mapper.mouseMove(1000, 1000, 20000);
-        mapper.advanceMouse(20000);
+        mapper.advanceMouse(24000);
         QCOMPARE(mapper.state().right_x, int16_t(23170));
         QCOMPARE(mapper.state().right_y, int16_t(23170));
         mapper.reset();
-        mapper.advanceMouse(24000);
+        mapper.advanceMouse(32000);
         QCOMPARE(mapper.state().right_x, int16_t(0));
         QCOMPARE(mapper.state().right_y, int16_t(0));
         const auto trace = [](int intervalUs) {
@@ -963,7 +976,7 @@ private slots:
             for (int now = 0; now < 64000; now += 1000) {
                 if (now < 32000 && now % intervalUs == 0)
                     timed.mouseMove(intervalUs / 1000, 0, now);
-                if (now % 4000 == 0) {
+                if (now % 8000 == 0) {
                     timed.advanceMouse(now);
                     response += timed.state().right_x;
                 }
@@ -971,8 +984,8 @@ private slots:
             return response;
         };
         // Equal 32-count traces at 1000 Hz and 125 Hz have equal unsaturated response.
-        QCOMPARE(trace(1000), qint64(128000));
-        QCOMPARE(trace(8000), qint64(128000));
+        QCOMPARE(trace(1000), qint64(64000));
+        QCOMPARE(trace(8000), qint64(64000));
     }
     void mouseTriggers()
     {

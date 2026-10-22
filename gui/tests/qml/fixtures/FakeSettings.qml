@@ -9,6 +9,9 @@ QtObject {
     property real mouseHorizontalSensitivity: 1
     property real mouseVerticalSensitivity: 1
     property real mouseDeadZoneCompensation: 0
+    property real mouseResponseExponent: 1
+    readonly property real mouseExponentMinimum: 0.1
+    readonly property real mouseExponentMaximum: 3
     property bool mouseInvertVertical: false
     property var keyboardMouseBindings: []
     readonly property real mouseSensitivityMinimum: 0.05
@@ -22,6 +25,7 @@ QtObject {
         mouseHorizontalSensitivity = 1;
         mouseVerticalSensitivity = 1;
         mouseDeadZoneCompensation = 0;
+        mouseResponseExponent = 1;
         mouseInvertVertical = false;
         keyboardMouseBindings = [];
     }

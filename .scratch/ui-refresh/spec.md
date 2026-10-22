@@ -1,6 +1,6 @@
 # Main console screen: card library
 
-Status: ready-for-agent
+Status: resolved
 Date: 2026-10-20
 
 ## Problem statement
@@ -287,7 +287,7 @@ Required checks:
 These are repository-relative artifact references, not implementation file
 assignments. The implementation should use the current code organization.
 
-### Verification status
+### Initial verification status
 
 The prototype passed 86 browser checks before this specification. That result
 does not verify any native behavior. No Qt build, native UI test, or hardware
@@ -298,3 +298,12 @@ PATH. No root build directory was found. These checks do not prove that the
 tools are absent from the computer. The first stage must locate or configure
 the toolchain. The current Windows build workflow uses Qt 6 and is a more
 relevant starting point than the older platform-build prose.
+
+## Answer
+
+Status corrected on 2026-10-21. All eight implementation tickets are resolved.
+The [final ticket](issues/08-native-acceptance-and-polish.md) records integration
+at `43a839d8c528c574f6e2e2e7ede961c253cf3c3b`.
+The [acceptance record](acceptance.md) contains the native screen checks and
+hardware limits. The [final review](code-review.md) reports no findings.
+The initial verification notes above describe the specification stage.
