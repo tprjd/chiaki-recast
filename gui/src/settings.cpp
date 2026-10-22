@@ -4,7 +4,7 @@
 #include <SDL.h>
 #include <QFile>
 #include <QFileInfo>
-#include <QTemporaryFile>
+#include <QTemporaryDir>
 #include <QSaveFile>
 #include <QScopeGuard>
 extern "C" {
@@ -227,10 +227,9 @@ void Settings::ExportSettings(QString filepath)
 bool Settings::ExportPlaceboSettings(QString filepath)
 {
 	if(QFileInfo(filepath).suffix().isEmpty()) filepath += ".ini";
-	QTemporaryFile temporary(QFileInfo(filepath).absolutePath() + "/.chiaki-renderer-XXXXXX");
-	if(!temporary.open()) return false;
-	const auto temporaryPath = temporary.fileName();
-	temporary.close();
+	QTemporaryDir temporary(QFileInfo(filepath).absolutePath() + "/.chiaki-renderer-XXXXXX");
+	if(!temporary.isValid()) return false;
+	const auto temporaryPath = temporary.filePath("renderer.ini");
 	{
 		QSettings backup(temporaryPath, QSettings::IniFormat);
 		for(const auto &key : placebo_settings.allKeys())

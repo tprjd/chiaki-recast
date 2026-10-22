@@ -1225,6 +1225,21 @@ private slots:
         QCOMPARE(exported.value("placebo_settings/deband_iterations").toInt(), 7);
         QVERIFY(!exported.contains("settings/psn_auth_token"));
         const auto previous = settings.GetPlaceboValues();
+        QFile exportedFile(output);
+        QVERIFY(exportedFile.open(QIODevice::ReadOnly));
+        const auto exportedBytes = exportedFile.readAll();
+        exportedFile.close();
+        pick("exportPlaceboSettings", output, true);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.settings-message')?.textContent").toString(), QStringLiteral("Export cancelled."));
+        QVERIFY(QFile::setPermissions(output, QFile::ReadOwner | QFile::ReadGroup | QFile::ReadOther));
+        const auto resetPermissions = qScopeGuard([&] { QFile::setPermissions(output, QFile::ReadOwner | QFile::WriteOwner); });
+        pick("exportPlaceboSettings", output);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-message')?.textContent.includes('could not be exported')").toBool());
+        QVERIFY(exportedFile.open(QIODevice::ReadOnly));
+        QCOMPARE(exportedFile.readAll(), exportedBytes);
+        exportedFile.close();
+        QVERIFY(QFile::setPermissions(output, QFile::ReadOwner | QFile::WriteOwner));
+        QCOMPARE(settings.GetPlaceboValues(), previous);
         const auto invalid = files.filePath("invalid.ini");
         { QFile file(invalid); QVERIFY(file.open(QIODevice::WriteOnly)); file.write("[placebo_settings]\nversion=0\nupscaler=not-a-filter\n"); }
         pick("importPlaceboSettings", invalid);
