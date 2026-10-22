@@ -236,7 +236,8 @@ Two stale native captures are `ticket03-native-overlay-stale-1.png` (SHA256
 and `ticket03-native-overlay-stale-2.png` (SHA256
 `560B0159C565CF309D6BE9D60D420799F07F22199F43A3D4BA57EA7D5EF20939`).
 These files are in the external temporary directory listed above. They are
-not passing evidence. Repository PNGs contain synthetic setup fixtures only.
+not passing evidence. Repository PNGs contain synthetic setup and native
+graphics fixtures only.
 
 After Windows Security closed, one independent run stopped on an over-strict
 foreground ownership check. Qt reported the native window exposed and active,
@@ -255,8 +256,8 @@ before the image could be saved. See
 That predicate result does not prove native render readiness: changing desktop
 content behind a transparent native area can contain similar colors.
 
-The final `graphicsCoexistence` run used the same exact pixel predicate with
-a 15-second deadline and failure-safe final capture/counts. It passed all
+The earlier HighQuality `graphicsCoexistence` run used the same exact pixel
+predicate with a 15-second deadline and failure-safe final capture/counts. It passed all
 unobscured-window checks and recorded a matching actual OpenGL/NVIDIA QRhi
 import, but failed native output on the first OpenGL pass. Its final image had
 76 blue samples and 149 red samples, below the required 500 and 5000.

@@ -51,3 +51,11 @@ entrypoint and isolated harness setup were checked; normal application startup
 against the user's real default profile was not exercised. Remaining QML setup
 components still have later-flow/test callers; the production native root is
 stream-only, with no QML setup fallback.
+
+Integration merge `fd207526` contains worker commit `ec92fb73` without source
+changes or conflicts. The merged tree matches the worker tree. Recorded
+source, package executable, frontend lock, and image digests match. The
+production source matches library build `0e2702b7`; the final graphics source
+matches `713b5861`. The recorded passing checks were reused without builds or
+test reruns. Raw logs retain their original whitespace; the source-only
+whitespace check passes.
