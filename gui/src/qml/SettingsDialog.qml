@@ -21,6 +21,11 @@ FocusScope {
     objectName: "settingsDialog"
     property var backend: Chiaki
     property var navigation: root
+    property string rendererRestartMessage: ""
+    function restartRenderer() {
+        const result = backend.settings.restartApplication();
+        rendererRestartMessage = result && !result.accepted ? result.message : "";
+    }
     property var openExternal: function(url) { Qt.openUrlExternally(url); }
     property alias currentCategory: bar.currentIndex
     property Item restoreFocusItem
@@ -818,6 +823,7 @@ FocusScope {
                             }
                         }
                         Label { text: qsTr("Rendering"); font.pixelSize: 14; font.bold: true }
+                        Label { text: dialog.rendererRestartMessage; visible: text.length > 0; wrapMode: Text.Wrap; Layout.fillWidth: true; Accessible.role: Accessible.AlertMessage }
                         Frame {
                             Layout.fillWidth: true
                             background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
@@ -836,7 +842,7 @@ FocusScope {
                                 checked: dialog.backend.settings.vSyncEnabled
                                 onToggled: {
                                     dialog.backend.settings.vSyncEnabled = checked;
-                                    if (dialog.backend.window.runtimeRendererBackend === 1) dialog.backend.settings.restartApplication();
+                                    if (dialog.backend.window.runtimeRendererBackend === 1) dialog.restartRenderer();
                                 }
                             }
                             Label { text: qsTr("Render preset\nDefault: High Quality"); font.pixelSize: 14; wrapMode: Text.Wrap; Layout.fillWidth: true }
@@ -883,7 +889,7 @@ FocusScope {
                                 popup.width: width
                                 model: [qsTr("Vulkan"), qsTr("OpenGL")]
                                 currentIndex: dialog.backend.settings.rendererBackend
-                                onActivated: index => { if (index !== dialog.backend.settings.rendererBackend) { dialog.backend.settings.rendererBackend = index; dialog.backend.settings.restartApplication(); } }
+                                onActivated: index => { if (index !== dialog.backend.settings.rendererBackend) { dialog.backend.settings.rendererBackend = index; dialog.restartRenderer(); } }
 
                             }
                             C.Button {

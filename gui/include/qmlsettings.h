@@ -1,6 +1,7 @@
 #pragma once
 
 #include "settings.h"
+#include <functional>
 
 class QmlSettings : public QObject
 {
@@ -171,7 +172,8 @@ class QmlSettings : public QObject
     Q_PROPERTY(float placeboToneMappingContrastSmoothness READ placeboToneMappingContrastSmoothness WRITE setPlaceboToneMappingContrastSmoothness NOTIFY placeboToneMappingContrastSmoothnessChanged)
 
 public:
-    QmlSettings(Settings *settings, QObject *parent = nullptr);
+    using ProcessLauncher = std::function<bool(const QString &, const QStringList &)>;
+    QmlSettings(Settings *settings, QObject *parent = nullptr, ProcessLauncher launcher = {});
 
     int resolutionLocalPS4() const;
     void setResolutionLocalPS4(int resolution);
@@ -326,7 +328,7 @@ public:
 
     int rendererBackend() const;
     void setRendererBackend(int backend);
-    Q_INVOKABLE void restartApplication();
+    Q_INVOKABLE QVariantMap restartApplication();
 
     QString autoConnectMac() const;
     void setAutoConnectMac(const QString &mac);
@@ -620,9 +622,9 @@ public:
     Q_INVOKABLE void clearKeyMapping();
     Q_INVOKABLE void exportSettings();
     Q_INVOKABLE QString chooseSteamBasePath();
-    Q_INVOKABLE void exportPlaceboSettings();
+    Q_INVOKABLE QVariantMap exportPlaceboSettings();
     Q_INVOKABLE void importSettings();
-    Q_INVOKABLE void importPlaceboSettings();
+    Q_INVOKABLE QVariantMap importPlaceboSettings();
     Q_INVOKABLE void deleteProfile(QString profile);
     Q_INVOKABLE QString stringForDpadShortcut() const;
     Q_INVOKABLE QString stringForStreamMenuShortcut() const;
@@ -782,7 +784,10 @@ signals:
     void placeboChanged();
 
 private:
+    ProcessLauncher processLauncher;
     Settings *settings = {};
+    quint64 settingsGeneration = 0;
+    bool rendererFilePending = false;
     QStringList audio_in_devices;
     QStringList audio_out_devices;
 };

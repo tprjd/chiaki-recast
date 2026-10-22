@@ -13,7 +13,9 @@
     <p id={`${field.key}-description`}>{t(field.description)}</p>
   </div>
   <div class="setting-control">
-    {#if field.options}
+    {#if field.action}
+      <button id={field.key} {disabled} onclick={() => change(true)}>{t(field.label)}</button>
+    {:else if field.options}
       <select id={field.key} {value} {disabled} aria-describedby={`${field.key}-description ${field.key}-default`}
         onchange={event => { const next = field.optionValues ? field.optionValues[event.currentTarget.selectedIndex] : Number(event.currentTarget.value); event.currentTarget.value = String(value); change(next); }}>
         {#each field.options as option, index}<option value={field.optionValues?.[index] ?? index}>{t(option)}</option>{/each}
@@ -31,6 +33,6 @@
         aria-describedby={`${field.key}-description ${field.key}-default`}
         onchange={event => { const next = event.currentTarget.checked; event.currentTarget.checked = value === true; change(next); }} />
     {/if}
-    <small id={`${field.key}-default`}>{t('Default')}: {t(field.defaultLabel)}</small>
+    {#if field.defaultLabel}<small id={`${field.key}-default`}>{t('Default')}: {t(field.defaultLabel)}</small>{/if}
   </div>
 </div>
