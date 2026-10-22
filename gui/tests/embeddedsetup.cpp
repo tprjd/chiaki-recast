@@ -2114,6 +2114,7 @@ private slots:
         settings.SetDiscoveryEnabled(false);
         settings.SetPlaceboPreset(PlaceboPreset::Custom);
         settings.SetPlaceboGamutMappingPerceptualDeadzone(0.42);
+        settings.SetPlaceboColorMappingPreset(PlaceboColorMappingPreset::None);
         QmlNativeServices services(&settings);
         services.backend()->stopAutoConnect();
         services.backend()->setDiscoveryEnabled(false);
