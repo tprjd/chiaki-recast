@@ -20,3 +20,17 @@
 ## Comments
 
 - Claimed after ticket 04. Prepare deployment, matching helper entitlements, signing, and package checks for both maintained macOS jobs. Source inspection found ad-hoc signing and no existing notarization workflow; establish the release path instead of claiming that one exists. No Mac SDK or hardware is available on this Windows host, so native build, signing, notarization, and runtime results remain unverified.
+
+## Implementation milestone
+
+All maintained Intel and Apple silicon package jobs now use one locked frontend
+and matching official Qt 6.9.3 SDK route. Shared deployment checks the helper,
+resources, SDK locales, architecture snapshots, relative library paths, native
+architecture, and embedded frontend preflight. Release and weekly jobs have a
+conditional Developer ID and notarization path. Ad-hoc output is identified in
+per-DMG metadata. Matching SDK, source and shipped Homebrew notices fail closed.
+
+[Verification](../evidence/ticket21/verification.md) records the focused local
+checks and source metadata. No Mac build, package, signature, notarization, GPU,
+or runtime result exists on this Windows host. The acceptance checkboxes above
+remain open and transfer to ticket 23's Mac hardware acceptance.

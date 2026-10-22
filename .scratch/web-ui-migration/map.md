@@ -103,3 +103,12 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [Ticket 15](issues/15-keyboard-and-mouse-controls.md) adds native physical capture, all keyboard and mouse slots, response controls, legacy keys, and complete reset to the web settings page. Form/profile/window guards cancel stale capture and reset work across handoff. [Verification](evidence/ticket15/verification.md) records focused application passes, current-source GNU numeric response 10/0, source preservation, and hardware limits. Physical calibration remains provisional.
 
 - [Ticket 16](issues/16-controller-setup-and-mapping.md) adds Controllers to shared web settings. Existing native services retain capture, conflict movement, mapping persistence, reset, and cancellation. Opaque operation and profile guards reject stale commands. Native controller navigation reaches WebEngine and resumes after capture. [Verification](evidence/ticket16/verification.md) records controlled SDL virtual-device checks, source preservation, setup-only QML removal, and the invalid 200 percent widget grab. Physical controllers, real-console input, haptics, graphics, and final zoom visual acceptance remain in ticket 23.
+
+- [Ticket 21](issues/21-macos-web-native-package.md) implements one macOS package
+  action for all maintained Intel and Apple silicon routes. It uses the locked
+  frontend and official Qt 6.9.3 universal SDK, package checks, matching notices,
+  and explicit conditional Developer ID signing and notarization.
+  [Verification](evidence/ticket21/verification.md) records local fixture, shell,
+  YAML, partial-signing rejection, and source checks. No Mac build or runtime
+  result is claimed. The ticket remains claimed for the unavailable Mac package
+  and hardware acceptance carried in ticket 23.
