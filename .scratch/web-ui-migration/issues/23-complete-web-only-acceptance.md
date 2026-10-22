@@ -79,3 +79,13 @@ supported platform packages, or matched performance. The minimal pure native
 HighQuality control reproduces wrong pixels without Qt Quick or WebEngine;
 it does not supply a complete old-application baseline. Preserve production
 defaults and the user's preset while completing that acceptance.
+
+### User priority update, 2026-10-22
+
+Skip the remaining build verification and performance tests at the user's
+request. These checks remain unverified, rather than passed. Complete the
+web frontend's visual fidelity to the chosen B library, A settings sidebar,
+and A guided setup prototypes. Keep all actions connected to existing native
+services, preserve controller/keyboard semantics, and review the visual result
+at 1024 CSS pixels or wider. Necessary frontend preview builds are separate from
+the skipped release build and performance qualification.

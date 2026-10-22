@@ -104,3 +104,15 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [Ticket 15](issues/15-keyboard-and-mouse-controls.md) adds native physical capture, all keyboard and mouse slots, response controls, legacy keys, and complete reset to the web settings page. Form/profile/window guards cancel stale capture and reset work across handoff. [Verification](evidence/ticket15/verification.md) records focused application passes, current-source GNU numeric response 10/0, source preservation, and hardware limits. Physical calibration remains provisional.
 
 - [Ticket 16](issues/16-controller-setup-and-mapping.md) adds Controllers to shared web settings. Existing native services retain capture, conflict movement, mapping persistence, reset, and cancellation. Opaque operation and profile guards reject stale commands. Native controller navigation reaches WebEngine and resumes after capture. [Verification](evidence/ticket16/verification.md) records controlled SDL virtual-device checks, source preservation, setup-only QML removal, and the invalid 200 percent widget grab. Physical controllers, real-console input, haptics, graphics, and final zoom visual acceptance remain in ticket 23.
+
+## User priority update, 2026-10-22
+
+The user directed the agent to skip the remaining build verification and
+performance tests, and bring the web UI up to the selected prototype standard.
+Preserve completed evidence without repeating checks. Do not claim skipped
+platform, package, live, hardware, default-preset, or performance checks passed.
+
+The current work is visual fidelity to the selected B card library, A settings
+sidebar, and A guided setup. Retain native behavior and bridge contracts.
+Keep the minimum design width at 1024 CSS pixels. Build only what is needed to
+preview UI changes, and use short visual reviews instead of validation matrices.
