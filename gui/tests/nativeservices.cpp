@@ -20,6 +20,7 @@ private slots:
         setup.show();
         QTRY_VERIFY(!setupFrames.isEmpty());
         const auto setupApi = QQuickWindow::graphicsApi();
+        setup.hide();
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
         const auto removeSettings = qScopeGuard([&] {
             QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
@@ -62,10 +63,7 @@ private slots:
             window.hide();
         }
         const auto framesBeforeReturn = setupFrames.count();
-        setup.raise();
-        setup.requestActivate();
-        setup.setColor(Qt::green);
-        setup.update();
+        setup.show();
         QTRY_VERIFY(setupFrames.count() > framesBeforeReturn);
         QVERIFY(!backend->qmlWindow());
         QVERIFY(!state->property("host").value<QObject *>());
