@@ -1,0 +1,41 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[42036:44060:1022/171538.744:ERROR:gpu_channel_manager.cc(956)] Failed to create GLES3 context, fallback to GLES2.
+[42036:44060:1022/171538.744:ERROR:gpu_channel_manager.cc(967)] ContextResult::kFatalFailure: Failed to create shared context for virtualization.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171606.289:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171637.275:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171637.275:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171641.816:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171641.816:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171641.816:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171641.816:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171641.831:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171642.784:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171642.784:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171642.784:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171642.802:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171643.552:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171643.552:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171643.552:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171643.552:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[42036:44964:1022/171643.564:ERROR:shared_image_manager.cc(356)] SharedImageManager::ProduceMemory: Trying to Produce a Memory representation from a non-existent mailbox.
+[I] Regist waiting for response
+[I] Regist waiting for response
+[I] Discovery failed to bind port 9304, trying one higher

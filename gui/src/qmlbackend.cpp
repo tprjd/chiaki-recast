@@ -382,6 +382,19 @@ void QmlBackend::attachWindow(QmlMainWindow *native_window)
     emit windowChanged();
 }
 
+void QmlBackend::setSetupNavigationTarget(QObject *target)
+{
+    setup_navigation_target = target;
+    if (!window)
+        for (auto *controller : std::as_const(controllers)) controller->setTarget(target);
+}
+
+void QmlBackend::setControllerNavigationEnabled(bool enabled)
+{
+    controller_navigation_enabled = enabled;
+    for (auto *controller : std::as_const(controllers)) controller->setNavigationEnabled(enabled);
+}
+
 void QmlBackend::detachWindow(QmlMainWindow *native_window)
 {
     if (window != native_window)
@@ -403,7 +416,7 @@ void QmlBackend::detachWindow(QmlMainWindow *native_window)
         disconnect(connection);
     window_connections.clear();
     for (auto *controller : std::as_const(controllers))
-        controller->setTarget(nullptr);
+        controller->setTarget(setup_navigation_target);
     window = nullptr;
     emit windowChanged();
 }
@@ -2415,7 +2428,8 @@ void QmlBackend::updateControllers()
         auto controller = ControllerManager::GetInstance()->OpenController(id);
         if (!controller)
             continue;
-        controllers[id] = new QmlController(controller, stream_shortcut ,window, this);
+        controllers[id] = new QmlController(controller, stream_shortcut, window ? static_cast<QObject *>(window) : setup_navigation_target.data(), this);
+        controllers[id]->setNavigationEnabled(controller_navigation_enabled);
         QString vidpid = controller->GetVIDPIDString();
         QString guid = controller->GetGUIDString();
         QStringList existing_vidpid;

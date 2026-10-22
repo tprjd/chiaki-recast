@@ -1,0 +1,33 @@
+c152f87b3caa01e7c60ea894d578844786064e03
+1f62db8f00d7f1be7e2c11dd806c442a9df6f6dd
+ m third-party/gf-complete
+?? .scratch/web-ui-migration/evidence/ticket07/
+-0ab5b12a5bc3630a3d6c83b20eed2a669ebf7a24 android/app/src/main/cpp/oboe
+-93c5d3b3bf26c8dc45d8d88b03f1b4238aad13dd switch/borealis
+ 439de4a9b136bc3b5163e73d4caf37c590bef875 test/munit (v0.2.0-36-g439de4a)
+ d36565f8eaca113efd454efe714126cd77a01512 third-party/cpp-steam-tools (remotes/origin/change_includes-4-gd36565f)
+ b1ef0e1a01c0bb6ee5367bd9c186a603bde3615a third-party/curl (curl-8_11_0)
+ fa54a4670a5705c84abf6c24b92b0cd479625478 third-party/gf-complete (heads/main)
+ 505ccb4bc69eee8d7ea40a6089a056b99671134f third-party/jerasure (heads/main)
+ cad3c18ef15a663e30e3e43e3a752b66378adec1 third-party/nanopb (nanopb-0.4.9.1)
+
+Algorithm : SHA256
+Hash      : 59E9BBE871EA16981EA1FD5BEB0913760E66D684DE0E3DE8C15F2FED0A6B31E6
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\web\package-lock.json
+
+Algorithm : SHA256
+Hash      : 78F9155009C594CE1C9C0AAFD8A18874DCF33F5A0E07FA40C7D6960A691B94A8
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp
+
+Algorithm : SHA256
+Hash      : BDC7A6E99B7DA9C3BC4E60A6B2F375A1FBE572C9D62EBD33884EDA5A10C06954
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\chiaki-embedded-setup-tests.exe
+
+Algorithm : SHA256
+Hash      : 4FA01C02A1BAAE9CEA62A44E8A1BD9A714FB6505C94550BE1D54440F09415695
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\web\app.js
+
+Algorithm : SHA256
+Hash      : BA2A32BA00581C7EE60CA0947C58D11741A119DA4DB43F41F059CD208A53BA92
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\web\app.css
+

@@ -1,7 +1,9 @@
 <script lang="ts">
   import { tick, onMount } from 'svelte';
   import KeyboardMouse from './KeyboardMouse.svelte';
-  import { generalSettings, mediaSettings, rendererSettings, colorMappingSettings, settingConditionMet, keyboardMouseSettings } from './settings';
+  import Controllers from './Controllers.svelte';
+  import { moveFocus } from './navigation';
+  import { generalSettings, mediaSettings, rendererSettings, colorMappingSettings, settingConditionMet, keyboardMouseSettings, controllerSettings } from './settings';
   import SettingField from './SettingField.svelte';
   import type { State, connectSetup } from './bridge';
   let { current, connection, close, t }: {
@@ -13,17 +15,21 @@
   let message = $state('');
   let pending = $state(false);
   let keyboardMouseTarget = $state('');
+  let controllerTarget = $state('');
   let search: HTMLInputElement;
-  const values = $derived({ ...current.generalSettings, ...current.mediaSettings, ...current.rendererSettings, ...current.keyboardMouse.values });
-  const fields = $derived([...generalSettings, ...mediaSettings, ...rendererSettings, ...colorMappingSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
+  const values = $derived({ ...current.generalSettings, ...current.mediaSettings, ...current.rendererSettings, ...current.keyboardMouse.values, ...current.controllerSetup.values });
+  const fields = $derived([...generalSettings, ...mediaSettings, ...rendererSettings, ...colorMappingSettings, ...controllerSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
     const choices = current.mediaChoices[field.key];
     if (field.key.startsWith('bitrate')) return { ...field, automatic: [0, 2, 6, 10, 15][Number(values[`resolution${field.key.slice(7)}`])] };
     return choices ? { ...field, options: choices.map(choice => choice.label), optionValues: choices.map(choice => choice.value) } : field;
   }));
-  const categories = ['General', 'Video', 'Stream', 'Audio/Wifi', 'Display', 'Renderer', 'Color mapping', 'Keyboard and mouse'];
+  const categories = ['General', 'Video', 'Stream', 'Audio/Wifi', 'Display', 'Renderer', 'Color mapping', 'Keyboard and mouse', 'Controllers'];
   const visibleFields = $derived(fields.filter(field => (field.category ?? 'General') === category));
   const groups = $derived([...new Set(visibleFields.map(field => field.group))]);
   const searchFields = $derived([...fields,
+    ...['controllerMappingChange', 'controllerMappingReset'].map((key, index) => ({ key, label: index ? 'Reset controller mapping' : 'Change controller mapping', category: 'Controllers', group: 'Controller mapping', description: 'Select a controller by pressing a button.' })),
+    ...['enableAnalogStickMapping', 'controllerMappingApply', 'controllerMappingCancel'].map((key, index) => ({ key, label: ['Analog stick and L2/R2 mapping', 'Apply controller mapping', 'Cancel controller mapping'][index], category: 'Controllers', group: 'Controller mapping', description: 'Select a controller before editing its mappings.' })),
+    ...current.controllerSetup.targets.flatMap(mapping => [0, 1].map(slot => ({ key: `controllerMap${mapping.buttonValue}Slot${slot}`, label: `${mapping.buttonName} ${t(slot ? 'alternate input' : 'primary input')}`, category: 'Controllers', group: 'Controller mapping', description: 'Assign a controller input.' }))),
     ...(current.keyboardMouse.supported ? [{ key: 'keyboardMouseReset', label: 'Reset defaults', category: 'Keyboard and mouse', group: 'Keyboard and mouse', description: 'Restore mouse response and bindings and turn mouse camera mode off. Confirmation is required.' },
       ...current.keyboardMouse.bindings.flatMap(binding => [0, 1].map(slot => ({ key: `keyboardMouseBinding${binding.action}_${slot}`, label: `${binding.name} ${t(slot ? 'Alternative' : 'Primary')}`, category: 'Keyboard and mouse', group: 'Bindings', description: 'Assign or clear one key or mouse button.', requires: 'mouseCameraEnabled' })))] : []),
     { key: 'resetAllKeys', label: 'Reset all keys', category: 'Keyboard and mouse', group: 'Key assignments', description: 'Restore all keyboard assignments to their native defaults.' },
@@ -38,6 +44,7 @@
     const unmet = field?.when?.find(condition => !settingConditionMet(condition, values));
     const focusKey = unmet?.key ?? key;
     category = searchFields.find(field => field.key === focusKey)?.category ?? 'General';
+    controllerTarget = key;
     keyboardMouseTarget = requires && !values[requires] ? requires
       : category === 'Keyboard and mouse' && values.mouseCameraEnabled && (key.startsWith('keyMapping') || ['keyboardEnabled', 'mouseTouchEnabled', 'resetAllKeys'].includes(key)) ? 'mouseCameraEnabled' : key;
     if (category === 'Audio/Wifi') connection.refreshAudioDevices();
@@ -52,7 +59,7 @@
     pending = true;
     try {
       const action = key === 'restartRenderer' || rendererSettings.find(field => field.key === key)?.action;
-      const reply = await (action ? connection.rendererAction(key, generation) : Object.hasOwn(current.rendererSettings, key) ? connection.rendererSetting(key, value, generation) : Object.hasOwn(current.generalSettings, key) ? connection.generalSetting(key, value as boolean | number, generation) : connection.mediaSetting(key, value, generation));
+      const reply = await (action ? connection.rendererAction(key, generation) : Object.hasOwn(current.controllerSetup.values, key) ? connection.controllerSetting(key, value, generation) : Object.hasOwn(current.rendererSettings, key) ? connection.rendererSetting(key, value, generation) : Object.hasOwn(current.generalSettings, key) ? connection.generalSetting(key, value as boolean | number, generation) : connection.mediaSetting(key, value, generation));
       if (generation !== current.profileGeneration) return;
       message = reply.message ?? (reply.accepted ? t('Saved') : t('The setting could not be saved.'));
     } catch {
@@ -61,15 +68,19 @@
   }
   function keyboard(event: KeyboardEvent) {
     if (document.querySelector('dialog[open]')) return;
+    moveFocus(event, document.querySelector('[data-setup-panel]')!);
     if (event.key === 'Escape') {
       event.preventDefault();
       if (query) { query = ''; search.focus(); } else if (category === 'Color mapping') reveal('openPlaceboColorMapping'); else close();
     } else if (event.key === 'PageUp') {
       event.preventDefault(); search.focus();
-    } else if (event.key === 'PageDown' && event.target === search) {
+    } else if (event.key === 'PageDown') {
       event.preventDefault();
       if (query) document.querySelector<HTMLButtonElement>('.settings-results button')?.focus();
-      else document.getElementById(visibleFields[0]?.key)?.focus();
+      else {
+        const controls = [...document.querySelectorAll<HTMLElement>('.settings-content button:enabled, .settings-content input:enabled, .settings-content select:enabled')];
+        (controls[controls.indexOf(document.activeElement as HTMLElement) + 1] ?? controls[0])?.focus();
+      }
     }
   }
 </script>
@@ -86,7 +97,7 @@
 <div class="settings-layout">
   <nav class="category-nav" aria-label={t('Settings categories')}>
     {#each categories as item}
-      <button aria-current={category === item ? 'page' : undefined} onclick={() => { category = item; query = ''; if (item === 'Audio/Wifi') connection.refreshAudioDevices(); }}>{t(item)}</button>
+      <button aria-current={category === item ? 'page' : undefined} onclick={() => { category = item; query = ''; controllerTarget = ''; if (item === 'Audio/Wifi') connection.refreshAudioDevices(); }}>{t(item)}</button>
     {/each}
   </nav>
   <div class="settings-content">
@@ -121,6 +132,7 @@
       {#if category === 'Keyboard and mouse'}
         <KeyboardMouse {current} {connection} {t} target={keyboardMouseTarget} />
       {:else}
+      {#if category === 'Controllers'}<Controllers {current} {connection} {t} target={controllerTarget} />{/if}
       {#each groups as group}
         <section class="settings-group" aria-label={t(group)}>
           <h3>{t(group)}</h3>

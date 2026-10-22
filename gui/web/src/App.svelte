@@ -45,6 +45,7 @@
   async function navigate(event: KeyboardEvent) {
     const target = event.target as HTMLElement;
     if (settingsOpen || target.closest('[data-setup-panel]')) return;
+    if (event.key === 'ContextMenu') { event.preventDefault(); settingsOpen = true; return; }
     if (event.key === 'Escape') {
       event.preventDefault();
       query = '';
