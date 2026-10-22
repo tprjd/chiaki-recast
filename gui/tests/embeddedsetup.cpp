@@ -7,6 +7,9 @@
 #include <QElapsedTimer>
 #include <QJsonDocument>
 #include <QFile>
+#include <QDir>
+#include <QScreen>
+#include <QRegularExpression>
 #include <memory>
 #include "qmlnativeservices.h"
 #include "setupwindow.h"
@@ -37,6 +40,115 @@ class EmbeddedSetupTest : public QObject
     }
 
 private slots:
+    void graphicsCoexistence()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetManualHost(ManualHost(-1, "private.example", false, {}));
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        services.backend()->setDiscoveryEnabled(false);
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
+        const QDir evidence(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE", "."));
+        QWebEngineView diagnostics;
+        diagnostics.resize(900, 720);
+        diagnostics.show();
+        diagnostics.load(QUrl("chrome://gpu"));
+        QString gpu;
+        QTRY_VERIFY_WITH_TIMEOUT((gpu = script(&diagnostics,
+            "document.body.innerText + [...document.querySelectorAll('*')].map(e=>e.shadowRoot?.textContent??'').join('\\n')")
+            .toString()).contains("Graphics Feature Status"), 15000);
+        QFile gpuFile(evidence.filePath("chromium-gpu.txt"));
+        QVERIFY(gpuFile.open(QIODevice::WriteOnly));
+        gpuFile.write(gpu.toUtf8());
+        gpuFile.close();
+        QVERIFY2(gpu.contains(QRegularExpression("Compositing\\s*:?\\s*Hardware accelerated")), qPrintable(gpu));
+        diagnostics.close();
+        auto *backend = services.backend();
+        const auto globalApi = QQuickWindow::graphicsApi();
+        const RenderBackend modes[] = {RenderBackend::OpenGL, RenderBackend::Vulkan, RenderBackend::Vulkan, RenderBackend::Vulkan};
+        for (int pass = 0; pass < 4; ++pass) {
+            const bool fallback = pass == 3;
+            if (fallback) qputenv("CHIAKI_FORCE_VULKAN_FALLBACK", "1");
+            const auto resetFallback = qScopeGuard([] { qunsetenv("CHIAKI_FORCE_VULKAN_FALLBACK"); });
+            backend->nativeSettings()->SetRenderBackend(modes[pass]);
+            backend->nativeSettings()->SetStreamGeometry(QRect(80, 80, 960, 640));
+            setup.show();
+            setup.view()->setZoomFactor(1);
+            {
+                QmlMainWindow native(backend, services.engine());
+                QCOMPARE(QQuickWindow::graphicsApi(), globalApi);
+                QCOMPARE(native.nativeGraphicsApi(), modes[pass] == RenderBackend::Vulkan && !fallback
+                    ? QSGRendererInterface::Vulkan : QSGRendererInterface::OpenGL);
+                native.show();
+                QTRY_VERIFY(native.isExposed());
+                setup.hide();
+                native.raise();
+                native.requestActivate();
+                QTRY_VERIFY(native.isActive());
+#ifdef Q_OS_WIN
+                SetForegroundWindow(reinterpret_cast<HWND>(native.winId()));
+                QTRY_VERIFY(GetForegroundWindow() == reinterpret_cast<HWND>(native.winId()));
+#endif
+                AVFrame *frame = av_frame_alloc();
+                QVERIFY(frame);
+                frame->format = AV_PIX_FMT_YUV420P;
+                frame->width = 320;
+                frame->height = 180;
+                frame->colorspace = AVCOL_SPC_SMPTE170M;
+                frame->color_range = AVCOL_RANGE_MPEG;
+                QVERIFY(av_frame_get_buffer(frame, 32) >= 0);
+                for (int plane = 0; plane < 3; ++plane)
+                    for (int y = 0; y < (plane ? 90 : 180); ++y)
+                        memset(frame->data[plane] + y * frame->linesize[plane], plane == 0 ? 81 : plane == 1 ? 90 : 240, plane ? 160 : 320);
+                native.presentFrame({frame, 0.0, 1.0 / 60.0, false}, 0);
+                QTRY_VERIFY(native.hasVideo());
+                emit backend->error("GPU coexistence", "Native overlay rendered");
+                QImage rendered;
+                int bluePixels = 0, redPixels = 0;
+                QTRY_VERIFY_WITH_TIMEOUT(([&] {
+                    const auto position = native.mapToGlobal(QPoint(0, 0));
+                    rendered = native.screen()->grabWindow(0, position.x(), position.y(), native.width(), native.height()).toImage();
+                    bluePixels = redPixels = 0;
+                    for (int y = 0; y < rendered.height(); y += 2)
+                        for (int x = 0; x < rendered.width(); x += 2) {
+                            const auto color = rendered.pixelColor(x, y);
+                            if (color.blue() > color.red() + 40 && color.green() > color.red() + 40) ++bluePixels;
+                            if (color.red() > color.green() + 80 && color.red() > color.blue() + 80) ++redPixels;
+                        }
+                    return bluePixels > 500 && redPixels > 5000;
+                })(), 5000);
+                QVERIFY(rendered.save(evidence.filePath(QString("native-overlay-%1.png").arg(pass))));
+                qInfo() << "Native rendered pass" << pass << "blue overlay pixels" << bluePixels << "native frame pixels" << redPixels;
+                native.resize(900, 600);
+                QTRY_COMPARE(native.size(), QSize(900, 600));
+                native.hide();
+            }
+            QVERIFY(!backend->qmlWindow());
+            setup.show();
+            setup.raise();
+            setup.activateWindow();
+            script(setup.view(), "document.querySelector('input').value='';document.querySelector('input').dispatchEvent(new Event('input',{bubbles:true}))");
+            discover(backend, {});
+            QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+            script(setup.view(), "document.querySelector('.discovery').click()");
+            QTRY_VERIFY(backend->discoveryEnabled());
+            QTRY_VERIFY(!script(setup.view(), "document.querySelector('.discovery').disabled").toBool());
+            script(setup.view(), "document.querySelector('.discovery').click()");
+            QTRY_VERIFY(!backend->discoveryEnabled());
+            QVERIFY(setup.view()->grab().save(evidence.filePath(QString("setup-restored-%1.png").arg(pass))));
+        }
+    }
+
     void consoleLibrary()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -51,6 +163,7 @@ private slots:
         auto *backend = services.backend();
         backend->stopAutoConnect();
         backend->setDiscoveryEnabled(false);
+        QGuiApplication::setApplicationDisplayName("Chiaki Recast: Private profile");
         SetupWindow setup(services.backend());
         QSignalSpy loaded(setup.view(), &QWebEngineView::loadFinished);
         setup.show();
@@ -130,6 +243,7 @@ private slots:
         QTRY_VERIFY(script(setup.view(), "document.querySelector('.console-card')?.dataset.consoleKey").toString() != oldProfileKey);
         backend->nativeSettings()->SetManualHost(ManualHost(-1, "private.example", false, {}));
         backend->qmlSettings()->setStreamerMode(true);
+        QCOMPARE(setup.windowTitle(), QStringLiteral("Chiaki Recast"));
         QTRY_VERIFY(script(setup.view(), "document.body.textContent.includes('Manual console')").toBool());
         const auto json = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
         QVERIFY(!json.contains("private.example"));

@@ -41,8 +41,10 @@ set_tests_properties(chiaki-console-screen PROPERTIES
 if(TARGET chiaki-gui)
     add_executable(chiaki-embedded-setup-tests embeddedsetup.cpp)
     target_link_libraries(chiaki-embedded-setup-tests PRIVATE chiaki-gui Qt6::Test)
-    add_test(NAME chiaki-embedded-setup COMMAND chiaki-embedded-setup-tests)
+    add_test(NAME chiaki-embedded-setup COMMAND chiaki-embedded-setup-tests consoleLibrary)
     set_tests_properties(chiaki-embedded-setup PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-graphics COMMAND chiaki-embedded-setup-tests graphicsCoexistence)
+    set_tests_properties(chiaki-embedded-graphics PROPERTIES LABELS "desktop;gpu")
 
     add_executable(chiaki-native-services-tests nativeservices.cpp)
     target_link_libraries(chiaki-native-services-tests PRIVATE chiaki-gui Qt6::Test)

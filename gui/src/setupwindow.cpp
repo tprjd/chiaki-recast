@@ -45,7 +45,14 @@ protected:
 SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
     : QWidget(parent), backend(backend), webView(new QWebEngineView(this)), setupBridge(new SetupBridge(backend, this))
 {
-    setWindowTitle(QGuiApplication::applicationDisplayName());
+    const auto updateTitle = [this] {
+        const auto profile = this->backend->nativeSettings()->GetCurrentProfile();
+        setWindowTitle(this->backend->qmlSettings()->streamerMode() || profile.isEmpty()
+            ? tr("Chiaki Recast") : QStringLiteral("Chiaki Recast: %1").arg(profile));
+    };
+    connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, updateTitle);
+    connect(backend->qmlSettings(), &QmlSettings::currentProfileChanged, this, updateTitle);
+    updateTitle();
     setMinimumSize(320, 240);
     const auto geometry = backend->nativeSettings()->GetGeometry();
     if (geometry.isEmpty()) resize(1280, 720);

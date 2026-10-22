@@ -10,7 +10,7 @@ add_custom_command(
     COMMAND "${NPM_EXECUTABLE}" ci --ignore-scripts --no-audit --no-fund
     COMMAND "${NPM_EXECUTABLE}" run build -- --outDir "${CMAKE_CURRENT_BINARY_DIR}/web"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/web"
-    DEPENDS ${SETUP_FRONTEND_SOURCES} web/package.json web/package-lock.json web/index.html web/vite.config.ts
+    DEPENDS ${SETUP_FRONTEND_SOURCES} web/package.json web/package-lock.json web/.npmrc web/index.html web/vite.config.ts web/tsconfig.json
     VERBATIM)
 add_custom_target(chiaki-setup-assets DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/web/app.js" "${CMAKE_CURRENT_BINARY_DIR}/web/app.css")
 configure_file(web/resources.qrc.in "${CMAKE_CURRENT_BINARY_DIR}/setup.qrc" @ONLY)
@@ -19,7 +19,8 @@ if(APPLE)
 	enable_language(OBJCXX)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui GuiPrivate Concurrent Svg Qml Quick Widgets WebEngineWidgets WebChannel)
+# Qt 6.9.3 supplies the Chromium 130 baseline targeted by the packaged frontend.
+find_package(Qt6 6.9.3 REQUIRED COMPONENTS Core Gui GuiPrivate Concurrent Svg Qml Quick Widgets WebEngineWidgets WebChannel)
 
 find_package(Qt6 COMPONENTS WebEngineQuick)
 find_package(Qt6 COMPONENTS DBus)
@@ -178,6 +179,9 @@ set_target_properties(chiaki PROPERTIES
 install(TARGETS chiaki
 		RUNTIME DESTINATION bin
 		BUNDLE DESTINATION bin)
+if(WIN32)
+	install(FILES qt.conf DESTINATION bin)
+endif()
 install(FILES chiaking.desktop DESTINATION share/applications)
 install(FILES chiaking.png DESTINATION share/icons/hicolor/512x512/apps)
 install(FILES io.github.streetpea.Chiaki4deck.appdata.xml DESTINATION share/metainfo)
