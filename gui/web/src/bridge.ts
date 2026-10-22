@@ -5,6 +5,7 @@ export interface Console {
 export interface State {
   revision: string; profileGeneration: string; consoles: Console[];
   selectedKey: string; discoveryEnabled: boolean; streamerMode: boolean;
+  generalSettings: Record<string, boolean | number>;
   capabilities: { discovery: boolean }; strings: Record<string, string>;
 }
 interface Reply { accepted: boolean; message?: string }
@@ -12,6 +13,7 @@ interface NativeBridge {
   snapshot(callback: (state: State) => void): void;
   setDiscoveryEnabled(value: boolean, callback: (reply: Reply) => void): void;
   selectConsole(key: string, callback: (reply: Reply) => void): void;
+  setGeneralSetting(name: string, value: boolean | number, profileGeneration: string, callback: (reply: Reply) => void): void;
   stateChanged: { connect(callback: (state: State) => void): void; disconnect(callback: (state: State) => void): void };
 }
 declare global {
@@ -24,6 +26,7 @@ declare global {
 export function connectSetup(receive: (state: State) => void): Promise<{
   discovery(enabled: boolean): Promise<Reply>;
   select(key: string): Promise<Reply>;
+  generalSetting(name: string, value: boolean | number, profileGeneration: string): Promise<Reply>;
   dispose(): void;
 }> {
   return new Promise((resolve, reject) => {
@@ -47,6 +50,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
       resolve({
         discovery: value => new Promise(done => setup.setDiscoveryEnabled(value, done)),
         select: key => new Promise(done => setup.selectConsole(key, done)),
+        generalSetting: (name, value, generation) => new Promise(done => setup.setGeneralSetting(name, value, generation, done)),
         dispose() {
           setup.stateChanged.disconnect(update);
           window.removeEventListener('pageshow', refresh);

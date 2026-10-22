@@ -43,6 +43,8 @@ if(TARGET chiaki-gui)
     target_link_libraries(chiaki-embedded-setup-tests PRIVATE chiaki-gui Qt6::Test)
     add_test(NAME chiaki-embedded-setup COMMAND chiaki-embedded-setup-tests consoleLibrary)
     set_tests_properties(chiaki-embedded-setup PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-settings COMMAND chiaki-embedded-setup-tests generalSettings settingsValidation settingsRestart)
+    set_tests_properties(chiaki-embedded-settings PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-graphics COMMAND chiaki-embedded-setup-tests graphicsCoexistence)
     set_tests_properties(chiaki-embedded-graphics PROPERTIES LABELS "desktop;gpu")
 

@@ -1,0 +1,150 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+-- The C compiler identification is Clang 19.1.7 with MSVC-like command-line
+-- The CXX compiler identification is Clang 19.1.7 with MSVC-like command-line
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Users/david/.cache/chiaki-msvc-native/llvm19/bin/clang-cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Users/david/.cache/chiaki-msvc-native/llvm19/bin/clang-cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: C:/Users/david/.cache/chiaki-msvc-native/installed/x64-windows/tools/pkgconf/pkgconf.exe (found version "2.1.0")
+-- Checking for module 'libplacebo>=7.349.0'
+--   Found libplacebo, version 7.360.1
+-- Checking for one of the modules 'speexdsp'
+-- Checking for module 'speexdsp'
+--   Found speexdsp, version 1.2.0
+-- Speex DSP found echo cancelling and noise suppression enabled
+CMake Warning (dev) at C:/Users/david/.cache/chiaki-msvc-native/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  CMakeLists.txt:114 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found PythonInterp: C:/Users/david/AppData/Local/Programs/Python/Python312/python.exe (found suitable version "3.12.10", minimum required is "3")
+-- Could NOT find nanopb (missing: nanopb_DIR)
+-- Found Python: C:/Program Files/WindowsApps/PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0/python3.13.exe (found version "3.13.14") found components: Interpreter
+-- Python install dir: C:/Program Files/WindowsApps/PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0/Lib/site-packages
+-- Checking for module 'libidn2'
+--   Package 'libidn2', required by 'virtual:world', not found
+-- Using CMake version 3.31.6-msvc6
+-- curl version=[8.11.0-DEV]
+-- CMake platform flags: WIN32 MSVC VCPKG
+-- Performing Test HAVE_WIN32_WINNT
+-- Performing Test HAVE_WIN32_WINNT - Success
+-- Found _WIN32_WINNT=0x0a00
+-- Picky compiler options: /clang:-Werror-implicit-function-declaration /clang:-Wextra /clang:-Wall /clang:-pedantic /clang:-Wbad-function-cast /clang:-Wconversion /clang:-Winline /clang:-Wmissing-declarations /clang:-Wmissing-prototypes /clang:-Wnested-externs /clang:-Wno-long-long /clang:-Wno-multichar /clang:-Wpointer-arith /clang:-Wshadow /clang:-Wsign-compare /clang:-Wundef /clang:-Wunused /clang:-Wwrite-strings /clang:-Waddress /clang:-Wattributes /clang:-Wcast-align /clang:-Wdeclaration-after-statement /clang:-Wdiv-by-zero /clang:-Wempty-body /clang:-Wendif-labels /clang:-Wfloat-equal /clang:-Wformat-security /clang:-Wignored-qualifiers /clang:-Wmissing-field-initializers /clang:-Wmissing-noreturn /clang:-Wno-format-nonliteral /clang:-Wno-system-headers /clang:-Wold-style-definition /clang:-Wredundant-decls /clang:-Wsign-conversion /clang:-Wno-error=sign-conversion /clang:-Wstrict-prototypes /clang:-Wtype-limits /clang:-Wunreachable-code /clang:-Wunused-parameter /clang:-Wvla /clang:-Wshift-sign-overflow /clang:-Wshorten-64-to-32 /clang:-Wformat=2 /clang:-Wdouble-promotion /clang:-Wenum-conversion /clang:-Wpragmas /clang:-Wunused-const-variable /clang:-Wheader-guard /clang:-Wsometimes-uninitialized /clang:-Wcomma /clang:-Wmissing-variable-declarations /clang:-Wassign-enum /clang:-Wextra-semi-stmt /clang:-Wimplicit-fallthrough
+-- Could NOT find Perl (missing: PERL_EXECUTABLE)
+CMake Warning at third-party/curl/CMakeLists.txt:444 (message):
+  Perl not found.  Will not build manuals.
+
+
+-- Could NOT find ZLIB (missing: ZLIB_LIBRARY ZLIB_INCLUDE_DIR)
+-- Checking for module 'libnghttp2'
+--   Package 'libnghttp2', required by 'virtual:world', not found
+-- Could NOT find NGHTTP2 (missing: NGHTTP2_INCLUDE_DIR NGHTTP2_LIBRARY)
+-- Checking for module 'libidn2'
+--   Package 'libidn2', required by 'virtual:world', not found
+-- Could NOT find Libidn2 (missing: LIBIDN2_INCLUDE_DIR LIBIDN2_LIBRARY)
+-- Checking for module 'libpsl'
+--   Package 'libpsl', required by 'virtual:world', not found
+-- Could NOT find Libpsl (missing: LIBPSL_INCLUDE_DIR LIBPSL_LIBRARY)
+CMake Warning at third-party/curl/CMakeLists.txt:1135 (message):
+  libpsl is enabled, but not found.
+
+
+-- Checking for module 'libssh2'
+--   Package 'libssh2', required by 'virtual:world', not found
+-- Could NOT find Libssh2 (missing: LIBSSH2_INCLUDE_DIR LIBSSH2_LIBRARY)
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Check size of size_t
+-- Check size of size_t - done
+-- Check size of ssize_t
+-- Check size of ssize_t - failed
+-- Check size of long long
+-- Check size of long long - done
+-- Check size of long
+-- Check size of long - done
+-- Check size of int
+-- Check size of int - done
+-- Check size of __int64
+-- Check size of __int64 - done
+-- Check size of time_t
+-- Check size of time_t - done
+-- Check size of ADDRESS_FAMILY
+-- Check size of ADDRESS_FAMILY - done
+-- Check size of off_t
+-- Check size of off_t - done
+-- Check size of curl_off_t
+-- Check size of curl_off_t - done
+-- Check size of curl_socket_t
+-- Check size of curl_socket_t - done
+-- Protocols: http https ws wss
+-- Features: alt-svc AsynchDNS HSTS HTTPS-proxy IPv6 Kerberos Largefile NTLM SPNEGO SSL SSPI threadsafe UnixSockets
+-- Enabled SSL backends: Schannel
+-- Found Git: C:/Program Files/Git/cmd/git.exe (found version "2.54.0.windows.1")
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Found WrapVulkanHeaders: C:/Users/david/.cache/chiaki-msvc-native/installed/x64-windows/include
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Steam shortcut enabled
+-- Checking for module 'libavutil'
+--   Found libavutil, version 59.39.100
+-- Checking for module 'libswresample'
+--   Found libswresample, version 5.3.100
+-- Checking for module 'libswscale'
+--   Found libswscale, version 8.3.100
+-- Checking for module 'libavcodec'
+--   Found libavcodec, version 61.19.101
+-- Checking for module 'libavformat'
+--   Found libavformat, version 61.7.100
+-- Found FFMPEG: avcodec;avutil;avformat (found version "59.39.100") found components: avcodec avutil avformat
+-- FFMPEG Decoder enabled
+-- Could NOT find ILClient (missing: ILClient_libbcm_host_LIBRARY ILClient_libvcilcs_LIBRARY ILClient_libvchiq_arm_LIBRARY ILClient_libvcos_LIBRARY ILClient_INCLUDE_DIR ILClient_SOURCE_DIR)
+-- Pi Decoder disabled
+-- Found Opus: C:/Users/david/.cache/chiaki-msvc-native/installed/x64-windows/include
+-- Checking for one of the modules 'json-c'
+-- Checking for one of the modules 'miniupnpc'
+-- Found OpenSSL: optimized;C:/Users/david/.cache/chiaki-msvc-native/installed/x64-windows/lib/libcrypto.lib;debug;C:/Users/david/.cache/chiaki-msvc-native/installed/x64-windows/debug/lib/libcrypto.lib (found version "3.2.0")
+-- Steamdeck native gyro and hatpics disabled
+-- Found SDL2: TRUE (found version "2.30.0")
+-- SDL version 2.30.0 is >= 2.0.14, disabling Setsu
+-- Setsu disabled
+CMake Warning at C:/Users/david/.cache/chiaki-native-qt/6.9.3/msvc2022_64/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:335 (message):
+  This project is using headers of the GuiPrivate module and will therefore
+  be tied to this specific Qt module build version.  Running this project
+  against other versions of the Qt modules may crash at any arbitrary point.
+  This is not a bug, but a result of using Qt internals.  You have been
+  warned!
+
+  You can disable this warning by setting QT_NO_PRIVATE_MODULE_WARNING to ON.
+Call Stack (most recent call first):
+  C:/Users/david/.cache/chiaki-native-qt/6.9.3/msvc2022_64/lib/cmake/Qt6/Qt6Config.cmake:230 (_qt_internal_show_private_module_warning)
+  C:/Users/david/.cache/chiaki-msvc-native/vcpkg/scripts/buildsystems/vcpkg.cmake:939 (_find_package)
+  gui/CMakeLists.txt:23 (find_package)
+
+
+CMake Warning (dev) at gui/CMakeLists.txt:179 (install):
+  Target chiaki has RESOURCE files but no RESOURCE DESTINATION.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Configuring done (14.9s)
+-- Generating done (0.5s)
+-- Build files have been written to: C:/Users/david/.cache/chiaki-msvc-native/ticket11-build

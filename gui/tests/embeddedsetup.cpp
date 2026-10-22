@@ -6,10 +6,12 @@
 #include <QUuid>
 #include <QElapsedTimer>
 #include <QJsonDocument>
+#include <QJsonArray>
 #include <QFile>
 #include <QDir>
 #include <QScreen>
 #include <QRegularExpression>
+#include <QProcess>
 #ifdef Q_OS_WIN
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -90,6 +92,27 @@ class EmbeddedSetupTest : public QObject
         // This is the queued completion boundary used by the native discovery callback.
         QVERIFY(QMetaObject::invokeMethod(backend->discoveryManager(), "DiscoveryServiceHosts",
             Qt::QueuedConnection, Q_ARG(QList<DiscoveryHost>, hosts)));
+    }
+
+    QVariantMap settingRequest(QWebEngineView *view, const QString &name, const QVariant &value, const QString &generation)
+    {
+        const QString arguments = QString::fromUtf8(QJsonDocument(QJsonArray{name, QJsonValue::fromVariant(value), generation}).toJson(QJsonDocument::Compact));
+        // A second real WebChannel client checks rejected public commands, then restores the UI client's receiver.
+        script(view, QString(R"(
+            window.settingsReply = null;
+            { const transport = window.qt.webChannelTransport, receive = transport.onmessage;
+              new QWebChannel(transport, channel => channel.objects.setup.setGeneralSetting(...%1, reply => {
+                window.settingsReply = reply; transport.onmessage = receive;
+              })); }
+        )").arg(arguments));
+        QElapsedTimer timeout;
+        timeout.start();
+        while (timeout.elapsed() < 5000) {
+            const auto reply = script(view, "window.settingsReply").toMap();
+            if (!reply.isEmpty()) return reply;
+            QTest::qWait(10);
+        }
+        return {};
     }
 
 private slots:
@@ -237,6 +260,189 @@ private slots:
             QTRY_VERIFY(!backend->discoveryEnabled());
             QVERIFY(setup.view()->grab().save(evidence.filePath(QString("setup-restored-%1.png").arg(pass))));
         }
+    }
+
+    void generalSettings()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        services.backend()->setDiscoveryEnabled(false);
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#disconnectAction')?.value").toString(), QStringLiteral("2"));
+        script(setup.view(), "const field=document.querySelector('#disconnectAction');field.value='1';field.dispatchEvent(new Event('change',{bubbles:true}))");
+        QTRY_COMPARE(settings.GetDisconnectAction(), DisconnectAction::AlwaysSleep);
+        setup.view()->reload();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#disconnectAction')?.value").toString(), QStringLiteral("1"));
+        Settings restarted(profile);
+        QCOMPARE(restarted.GetDisconnectAction(), DisconnectAction::AlwaysSleep);
+    }
+
+    void settingsValidation()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetManualHost(ManualHost(-1, "private.example", false, {}));
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        backend->setDiscoveryEnabled(false);
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#audioVideoDisabled')?.value").toString(), QStringLiteral("0"));
+        QCOMPARE(script(setup.view(), "document.querySelector('#suspendAction').value").toString(), QStringLiteral("0"));
+        QCOMPARE(script(setup.view(), "document.querySelector('#streamMenuShortcut1').options.length").toInt(), 17);
+        QVERIFY(script(setup.view(), "{const field=document.querySelector('#disconnectAction');field.focus();const key=new KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true,cancelable:true});field.dispatchEvent(key);document.activeElement===field && !key.defaultPrevented;}").toBool());
+#ifndef CHIAKI_GUI_ENABLE_STEAMDECK_NATIVE
+        QVERIFY(script(setup.view(), "!document.querySelector('#steamDeckHaptics') && !document.querySelector('#verticalDeck')").toBool());
+#endif
+        const auto select = [&](const QString &key, int value) {
+            QTRY_VERIFY(script(setup.view(), QString("document.getElementById('%1')?.disabled === false").arg(key)).toBool());
+            script(setup.view(), QString("{const field=document.getElementById('%1');field.value='%2';field.dispatchEvent(new Event('change',{bubbles:true}));}").arg(key).arg(value));
+        };
+        select("suspendAction", 1);
+        QTRY_COMPARE(settings.GetSuspendAction(), SuspendAction::Sleep);
+        select("audioVideoDisabled", 3);
+        QTRY_COMPARE(int(settings.GetAudioVideoDisabled()), 3);
+        select("streamMenuShortcut1", 0);
+        QTRY_COMPARE(settings.GetStreamMenuShortcut1(), 0u);
+        select("streamMenuShortcut2", 16);
+        QTRY_COMPARE(settings.GetStreamMenuShortcut2(), 16u);
+        select("streamMenuShortcut3", 15);
+        QTRY_COMPARE(settings.GetStreamMenuShortcut3(), 15u);
+        select("streamMenuShortcut4", 14);
+        QTRY_COMPARE(settings.GetStreamMenuShortcut4(), 14u);
+
+        script(setup.view(), "{const field=document.querySelector('#disconnectAction');field.add(new Option('Invalid','99'));field.value='99';field.dispatchEvent(new Event('change',{bubbles:true}));}");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.settings-message')?.textContent").toString(), QStringLiteral("Choose a valid setting value."));
+        QCOMPARE(settings.GetDisconnectAction(), DisconnectAction::Ask);
+        QCOMPARE(script(setup.view(), "document.querySelector('#disconnectAction').value").toString(), QStringLiteral("2"));
+        const QString generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+        for (const auto &input : QList<QPair<QString, QVariant>>{{"suspendAction", 2}, {"audioVideoDisabled", -1}, {"streamMenuShortcut1", 17},
+                 {"disconnectAction", 0.5}, {"disconnectAction", QStringLiteral("1")}, {"streamerMode", 1}, {"psnAuthToken", QStringLiteral("forbidden")}}) {
+            const auto reply = settingRequest(setup.view(), input.first, input.second, generation);
+            QVERIFY2(reply.contains("accepted"), "The real WebChannel command did not return");
+            QVERIFY(!reply.value("accepted").toBool());
+        }
+#ifndef CHIAKI_GUI_ENABLE_STEAMDECK_NATIVE
+        const auto unsupported = settingRequest(setup.view(), "steamDeckHaptics", true, generation);
+        QVERIFY(unsupported.contains("accepted"));
+        QVERIFY(!unsupported.value("accepted").toBool());
+#endif
+        QCOMPARE(settings.GetSuspendAction(), SuspendAction::Sleep);
+        QCOMPARE(int(settings.GetAudioVideoDisabled()), 3);
+        QCOMPARE(settings.GetStreamMenuShortcut1(), 0u);
+        QVERIFY(!settings.GetStreamerMode());
+        QVERIFY(settings.GetPsnAuthToken().isEmpty());
+
+        script(setup.view(), "document.querySelector('#streamMenuEnabled').click()");
+        QTRY_VERIFY(!settings.GetStreamMenuEnabled());
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('#streamMenuShortcut1')").toBool());
+        script(setup.view(), "{const field=document.querySelector('.settings-search input');field.value='shortcut button 2';field.dispatchEvent(new Event('input',{bubbles:true}));}");
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 1);
+        script(setup.view(), "document.querySelector('.settings-results button').click()");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("streamMenuEnabled"));
+        script(setup.view(), "document.querySelector('#streamMenuEnabled').click()");
+        QTRY_VERIFY(settings.GetStreamMenuEnabled());
+        script(setup.view(), "{const field=document.querySelector('.settings-search input');field.value='suspend';field.dispatchEvent(new Event('input',{bubbles:true}));}");
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 1);
+        script(setup.view(), "document.querySelector('.settings-results button').click()");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("suspendAction"));
+        script(setup.view(), "{const field=document.querySelector('.settings-search input');field.value='private.example';field.dispatchEvent(new Event('input',{bubbles:true}));}");
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.settings-results button').length").toInt(), 0);
+        script(setup.view(), "{const field=document.querySelector('.settings-search input');field.value='';field.dispatchEvent(new Event('input',{bubbles:true}));}");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#streamerMode')").toBool());
+        script(setup.view(), "document.querySelector('#streamerMode').click()");
+        QTRY_VERIFY(settings.GetStreamerMode());
+        QVERIFY(!QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson().contains("private.example"));
+        script(setup.view(), "document.querySelector('.back-consoles').click()");
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.className").toString(), QStringLiteral("open-settings"));
+        QTRY_VERIFY(script(setup.view(), "document.body.textContent.includes('Manual console') && !document.body.textContent.includes('private.example')").toBool());
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        backend->setDiscoveryEnabled(false);
+        const auto stale = settingRequest(setup.view(), "disconnectAction", 1, generation);
+        QVERIFY(stale.contains("accepted"));
+        QVERIFY(!stale.value("accepted").toBool());
+        QCOMPARE(backend->nativeSettings()->GetDisconnectAction(), DisconnectAction::Ask);
+        QVERIFY(!backend->nativeSettings()->GetStreamerMode());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#audioVideoDisabled')?.value").toString(), QStringLiteral("0"));
+    }
+
+    void settingsRestartRead()
+    {
+        const auto profile = qEnvironmentVariable("CHIAKI_SETTINGS_RESTART_PROFILE");
+        if (profile.isEmpty()) QSKIP("Launched only by settingsRestart with an isolated saved profile");
+        Settings settings(profile);
+        QCOMPARE(settings.GetDisconnectAction(), DisconnectAction::AlwaysSleep);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        services.backend()->setDiscoveryEnabled(false);
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#disconnectAction')?.value").toString(), QStringLiteral("1"));
+    }
+
+    void settingsRestart()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        {
+            Settings settings(profile);
+            settings.SetDiscoveryEnabled(false);
+            QmlNativeServices services(&settings);
+            services.backend()->stopAutoConnect();
+            services.backend()->setDiscoveryEnabled(false);
+            SetupWindow setup(services.backend());
+            setup.show();
+            QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
+            QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+            QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#disconnectAction')").toBool());
+            script(setup.view(), "{const field=document.querySelector('#disconnectAction');field.value='1';field.dispatchEvent(new Event('change',{bubbles:true}));}");
+            QTRY_COMPARE(settings.GetDisconnectAction(), DisconnectAction::AlwaysSleep);
+        }
+        QProcess restarted;
+        auto environment = QProcessEnvironment::systemEnvironment();
+        environment.insert("CHIAKI_SETTINGS_RESTART_PROFILE", profile);
+        restarted.setProcessEnvironment(environment);
+        restarted.start(QCoreApplication::applicationFilePath(), {"settingsRestartRead"});
+        QVERIFY(restarted.waitForStarted());
+        QTRY_COMPARE_WITH_TIMEOUT(restarted.state(), QProcess::NotRunning, 20000);
+        qInfo().noquote() << restarted.readAllStandardOutput();
+        qInfo().noquote() << restarted.readAllStandardError();
+        QCOMPARE(restarted.exitStatus(), QProcess::NormalExit);
+        QCOMPARE(restarted.exitCode(), 0);
     }
 
     void consoleLibrary()

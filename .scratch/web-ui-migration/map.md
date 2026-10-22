@@ -25,7 +25,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [02: Native stream-only interface](issues/02-native-stream-only-interface.md): resolved for the native stream-root milestone. OpenGL and Vulkan production root/input checks pass. Live media and combined graphics acceptance remains with tickets 03, 04, and 23.
 - [03: Accelerated web console library](issues/03-accelerated-web-console-library.md): resolved for the library and graphics foundation milestone. Real bridge/package checks and Windows hardware Chromium plus native Fast-preset GL/Vulkan/recreation/fallback pass. HighQuality/default processing and full hardware acceptance remain in 04 and 23.
 - [04: Local native stream handoff](issues/04-local-native-stream-handoff.md): claimed. Tickets 02 and 03 are integrated.
-- [06: PSN sign-in](issues/06-psn-sign-in.md) and [11: General and stream settings](issues/11-general-and-stream-settings.md): claimed after ticket 03.
+- [06: PSN sign-in](issues/06-psn-sign-in.md): claimed after ticket 03.
+- [11: General and stream settings](issues/11-general-and-stream-settings.md): resolved for the settings shell and general session controls. Real-bridge writes, rejection, search/focus, privacy, reload, and separate-process persistence pass. Physical and platform acceptance remains in the later acceptance tickets.
 - Other tickets 05 through 23: waiting for their declared blockers.
 
 ## Integration history
@@ -38,6 +39,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - fd207526: merged ticket 03 commit ec92fb73 without conflicts. The merged tree matches the worker tree. Source, package executable, frontend lock, and image digests match the recorded evidence. Production source matches the passing library build 0e2702b7; final graphics source matches passing build 713b5861. Reused the passing checks without builds or test reruns. HighQuality/default processing, actual handoff focus, initialization failure, live media, and platform hardware acceptance remain in tickets 04 and 23.
 
 ## Decisions
+
+- [Ticket 11](issues/11-general-and-stream-settings.md) adds the shared settings shell and an explicit native allowlist for general session controls. Native setters retain persistence and side effects. Focused application checks pass save/reload 3/0 and validation/restart 4/0. [Verification](evidence/ticket11/verification.md) records the tested sources, binary hashes, offscreen test conditions, and remaining hardware limits. Existing QML settings routes remain because they still have real callers.
 
 - [Ticket 01](issues/01-application-owned-native-services.md) completes application-owned native services and QML engine lifetime. The pre-edit check established installed module limits and native graphics behavior. It did not prove accelerated WebEngine coexistence or real-console performance. Tickets 03 and 04 retain the required combined graphics acceptance. Ticket 23 retains matched live baseline conditions, predeclared tolerances, live-frame cleanup, and hardware acceptance.
 
