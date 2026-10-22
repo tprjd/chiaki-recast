@@ -1,0 +1,4 @@
+source=e40a6a9c
+executable_sha256=173858C6EC2217A1C4AC28F9AE37502046BBC92765032FA02369829C2E82F509
+Qt=6.9.3 MSVC clang-cl19.1.7 QPA=offscreen Chromium=--disable-gpu
+New unbuilt presentation edits are excluded.

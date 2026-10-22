@@ -1,0 +1,1 @@
+wsl --exec /usr/bin/env QT_QPA_PLATFORM=offscreen /home/david/.cache/chiaki-web-ui/build-ticket03/gui/tests/chiaki-mouse-response-tests -o /mnt/c/Users/david/.codex/worktrees/web-ui-ticket-15/chiaki-ng-ui/.scratch/web-ui-migration/evidence/ticket15/gnu-response.txt,txt
