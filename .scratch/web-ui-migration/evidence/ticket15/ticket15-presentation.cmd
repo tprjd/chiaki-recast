@@ -5,4 +5,3 @@ set CHIAKI_KEYBOARD_MOUSE_EVIDENCE=C:/Users/david/AppData/Local/Temp/chiaki-web-
 set QT_QPA_PLATFORM=offscreen
 set QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu
 C:\Users\david\.cache\chiaki-msvc-native\ticket15-build\gui\tests\chiaki-embedded-setup-tests.exe keyboardMouseGuards keyboardMousePresentation -o C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket15-presentation.txt,txt
-

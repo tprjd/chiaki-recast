@@ -4,4 +4,3 @@ set "PATH=C:\Users\david\.cache\chiaki-msvc-native\ticket15-build\third-party\st
 set QT_QPA_PLATFORM=offscreen
 set QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu
 C:\Users\david\.cache\chiaki-msvc-native\ticket15-build\gui\tests\chiaki-embedded-setup-tests.exe keyboardMouseSettings keyboardMouseCapture -o C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket15-behavior.txt,txt
-

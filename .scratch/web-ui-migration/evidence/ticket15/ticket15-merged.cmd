@@ -6,6 +6,3 @@ set QT_QPA_FONTDIR=C:/Windows/Fonts
 set QT_QPA_PLATFORM=offscreen
 set QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu
 C:\Users\david\.cache\chiaki-msvc-native\ticket15-build\gui\tests\chiaki-embedded-setup-tests.exe keyboardMouseSettings keyboardMouseLegacyAndLifetime rendererSettings -o C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket15-merged.txt,txt
-
-
-

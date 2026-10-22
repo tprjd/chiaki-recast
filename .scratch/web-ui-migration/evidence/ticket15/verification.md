@@ -102,6 +102,8 @@ The images in `layout/` were inspected. Binding and response controls fit at
 390 pixels and at 200 percent zoom. Native capture fits the narrow parent.
 Reset remains readable, starts with Cancel focused, and returns focus on cancel.
 The native offscreen capture uses a fallback font; its image is a layout check.
+These images come from `3eb0f7b8`, before the renderer category merge. The
+KeyboardMouse component is unchanged, and the shared settings merge passed.
 
 ## Retained native evidence and limits
 
