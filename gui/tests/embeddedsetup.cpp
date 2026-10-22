@@ -240,6 +240,55 @@ class EmbeddedSetupTest : public QObject
         return {};
     }
 
+    bool click(QWebEngineView *view, const QString &selector)
+    {
+        const auto args = QString::fromUtf8(QJsonDocument(QJsonArray{selector}).toJson(QJsonDocument::Compact));
+        const auto source = QString(R"((() => {
+            const field = document.querySelector(%1[0]);
+            if (!field || field.disabled) return false;
+            field.click(); return true;
+        })())").arg(args);
+        QElapsedTimer timeout;
+        timeout.start();
+        while (timeout.elapsed() < 5000) {
+            if (script(view, source).toBool()) return true;
+            QTest::qWait(10);
+        }
+        return false;
+    }
+
+    bool fill(QWebEngineView *view, const QString &selector, const QString &value)
+    {
+        const auto args = QString::fromUtf8(QJsonDocument(QJsonArray{selector, value}).toJson(QJsonDocument::Compact));
+        return script(view, QString(R"((() => {
+            const [selector, value] = %1, field = document.querySelector(selector);
+            if (!field) return false;
+            field.value = value;
+            field.dispatchEvent(new Event(field.tagName === 'SELECT' ? 'change' : 'input', {bubbles:true}));
+            return true;
+        })())").arg(args)).toBool();
+    }
+
+    QVariantMap consoleRequest(QWebEngineView *view, const QString &method, const QJsonArray &arguments)
+    {
+        const auto args = QString::fromUtf8(QJsonDocument(arguments).toJson(QJsonDocument::Compact));
+        script(view, QString(R"(
+            window.consoleReply = null;
+            { const transport = window.qt.webChannelTransport, receive = transport.onmessage;
+              new QWebChannel(transport, channel => channel.objects.setup.%1(...%2, reply => {
+                window.consoleReply = reply; transport.onmessage = receive;
+              })); }
+        )").arg(method, args));
+        QElapsedTimer timeout;
+        timeout.start();
+        while (timeout.elapsed() < 5000) {
+            const auto reply = script(view, "window.consoleReply").toMap();
+            if (!reply.isEmpty()) return reply;
+            QTest::qWait(10);
+        }
+        return {};
+    }
+
     QObject *nativeObject(const QString &name)
     {
         const auto find = [&](auto &&self, QQuickItem *item) -> QObject * {
@@ -525,6 +574,67 @@ private slots:
         host.host_addr = "127.0.0.1";
         host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
         discover(backend, {host});
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.connect-console')?.textContent.trim()").toString(), QStringLiteral("Connect"));
+        script(setup.view(), "document.querySelector('.connect-console').click()");
+        QTRY_VERIFY(backend->qmlWindow());
+        QTRY_VERIFY(backend->qmlWindow()->isExposed());
+        QTRY_VERIFY(!setup.isVisible());
+        QTRY_COMPARE(setup.view()->page()->lifecycleState(), QWebEnginePage::LifecycleState::Frozen);
+        QPointer<QmlMainWindow> native = backend->qmlWindow();
+        QPointer<StreamSession> session = backend->qmlSession();
+        QVERIFY(session);
+        native->dismissStreamView();
+        QTest::qWait(30);
+        QVERIFY(native);
+        QVERIFY(!setup.isVisible());
+        QVERIFY(backend->cancelConnection(backend->connectionAttempt().value("id").toString()));
+        QTRY_VERIFY(!session);
+        QTRY_VERIFY(!native);
+        QTRY_VERIFY(setup.isVisible());
+        QCOMPARE(setup.view()->page()->lifecycleState(), QWebEnginePage::LifecycleState::Active);
+        QVERIFY(backend->discoveryEnabled());
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.discovery').getAttribute('aria-pressed')").toString(), QStringLiteral("true"));
+    }
+
+    void manualHandoff()
+    {
+#ifdef Q_OS_WIN
+        if (qEnvironmentVariableIsSet("CHIAKI_HANDOFF_REQUIRE_FOREGROUND"))
+            QVERIFY2(inputDesktopAvailable(), "Handoff requires the active unlocked input desktop");
+#endif
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetHardwareDecoder({});
+        settings.SetPlaceboPreset(PlaceboPreset::Fast);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Office console");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        ApplicationController controller(&services);
+        auto &setup = *controller.setupWindow();
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-add-manual]')").toBool());
+        script(setup.view(), "document.querySelector('[data-add-manual]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-manual-address]')").toBool());
+        QVERIFY(fill(setup.view(), "[data-manual-address]", "127.0.0.1"));
+        const auto registrationKey = script(setup.view(), "document.querySelector('[data-manual-registration]').options[1].value").toString();
+        QVERIFY(fill(setup.view(), "[data-manual-registration]", registrationKey));
+        script(setup.view(), "document.querySelector('[data-save-manual]').click()");
+        QTRY_COMPARE(settings.GetManualHosts().size(), 1);
+        QVERIFY(settings.GetManualHosts().first().GetRegistered());
+        script(setup.view(), "document.querySelector('[data-close-management]').click()");
         QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
         QTRY_COMPARE(script(setup.view(), "document.querySelector('.connect-console')?.textContent.trim()").toString(), QStringLiteral("Connect"));
         script(setup.view(), "document.querySelector('.connect-console').click()");
@@ -1581,6 +1691,285 @@ private slots:
         qInfo().noquote() << restarted.readAllStandardError();
         QCOMPARE(restarted.exitStatus(), QProcess::NormalExit);
         QCOMPARE(restarted.exitCode(), 0);
+    }
+
+    void consoleManagement()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Office console");
+        memcpy(registered.rp_regist_key, "PRIVATEKEY", 10);
+        RegisteredHost paired(registered);
+        paired.SetConsolePin(paired, "0091");
+        settings.AddRegisteredHost(paired);
+        const auto manualId = settings.SetManualHost(ManualHost(-1, "console.example", true, HostMAC(registered.server_mac)));
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+        script(setup.view(), "document.querySelector('.console-details').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog')?.textContent.includes('PlayStation 5')").toBool());
+        QVERIFY(script(setup.view(), "document.querySelector('dialog').textContent.includes('console.example')").toBool());
+        script(setup.view(), "document.querySelector('[data-console-action=pin]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-saved-pin]')").toBool());
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-saved-pin]').value").toString(), QString());
+        QVERIFY(fill(setup.view(), "[data-saved-pin]", "12"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-save-pin]').disabled").toBool());
+        const auto key = setup.bridge()->snapshot().value("selectedKey").toString();
+        QVERIFY(!consoleRequest(setup.view(), "manageConsole", {"pin", key, "12"}).value("accepted").toBool());
+        QVERIFY(fill(setup.view(), "[data-saved-pin]", "0012"));
+        script(setup.view(), "document.querySelector('[data-save-pin]').click()");
+        QTRY_COMPARE(settings.GetRegisteredHost(HostMAC(registered.server_mac)).GetConsolePin(), QStringLiteral("0012"));
+        QTRY_VERIFY(!script(setup.view(), "!!document.querySelector('[data-saved-pin]')").toBool());
+        const auto json = QJsonDocument::fromVariant(consoleRequest(setup.view(), "snapshot", {})).toJson();
+        QVERIFY(!json.contains("\"0012\""));
+        QVERIFY(!json.contains("\"0091\""));
+        QVERIFY(!json.contains("PRIVATEKEY"));
+        QVERIFY(!json.contains("rp_key"));
+        script(setup.view(), "document.querySelector('[data-close-management]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.classList.contains('console-details')").toBool());
+        QVERIFY(click(setup.view(), ".console-details"));
+        QVERIFY(click(setup.view(), "[data-console-action=deleteManual]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-cancel-management]')").toBool());
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-cancel-management')").toBool());
+        script(setup.view(), "document.querySelector('[data-cancel-management]').click()");
+        QCOMPARE(settings.GetManualHosts().size(), 1);
+        QCOMPARE(settings.GetRegisteredHosts().size(), 1);
+        QVERIFY(click(setup.view(), ".console-details"));
+        QVERIFY(click(setup.view(), "[data-console-action=deleteManual]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-confirm-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-confirm-management]').click()");
+        QTRY_COMPARE(settings.GetManualHosts().size(), 0);
+        QCOMPARE(settings.GetRegisteredHosts().size(), 1);
+        QVERIFY(!settings.GetManualHostExists(manualId));
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-add-manual')").toBool());
+        settings.SetManualHost(ManualHost(-1, "still-saved.example", true, HostMAC(registered.server_mac)));
+        script(setup.view(), "document.querySelector('[data-manage-consoles]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-delete-registration]')").toBool());
+        script(setup.view(), "document.querySelector('[data-delete-registration]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-cancel-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-cancel-management]').click()");
+        QCOMPARE(settings.GetRegisteredHosts().size(), 1);
+        QVERIFY(click(setup.view(), "[data-manage-consoles]"));
+        QVERIFY(click(setup.view(), "[data-delete-registration]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-confirm-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-confirm-management]').click()");
+        QTRY_COMPARE(settings.GetRegisteredHosts().size(), 0);
+        QCOMPARE(settings.GetManualHosts().size(), 1);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.console-card').textContent.includes('Not registered')").toBool());
+    }
+
+    void consoleTargetGuards()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        DiscoveryHost first = {};
+        first.ps5 = true;
+        first.host_name = "Office <img src=x onerror=alert(1)>";
+        first.host_id = "001122334455";
+        first.host_addr = "192.0.2.10";
+        first.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        DiscoveryHost second = first;
+        second.host_name = "Other console";
+        second.host_id = "001122334466";
+        second.host_addr = "192.0.2.20";
+        discover(backend, {first, second});
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 2);
+        script(setup.view(), "document.querySelector('.console-details').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-console-action=hide]')").toBool());
+        QVERIFY(!script(setup.view(), "!!document.querySelector('dialog h3 img')").toBool());
+        script(setup.view(), "document.querySelector('[data-console-action=hide]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-cancel-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-cancel-management]').click()");
+        QCOMPARE(settings.GetHiddenHosts().size(), 0);
+        QVERIFY(click(setup.view(), ".console-details"));
+        QVERIFY(click(setup.view(), "[data-console-action=hide]"));
+        discover(backend, {second, first});
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-name').textContent").toString(), second.host_name);
+        script(setup.view(), "document.querySelector('[data-confirm-management]').click()");
+        QTRY_COMPARE(settings.GetHiddenHosts().size(), 1);
+        QCOMPARE(settings.GetHiddenHosts().first().GetMAC().ToString(), QStringLiteral("001122334455"));
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+        script(setup.view(), "document.querySelector('[data-manage-consoles]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-unhide-console]')").toBool());
+        script(setup.view(), "document.querySelector('[data-unhide-console]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-cancel-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-cancel-management]').click()");
+        QCOMPARE(settings.GetHiddenHosts().size(), 1);
+        QVERIFY(click(setup.view(), "[data-manage-consoles]"));
+        QVERIFY(click(setup.view(), "[data-unhide-console]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-confirm-management]')").toBool());
+        script(setup.view(), "document.querySelector('[data-confirm-management]').click()");
+        QTRY_COMPARE(settings.GetHiddenHosts().size(), 0);
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 2);
+        const auto key = script(setup.view(), "document.querySelector('.console-card').dataset.consoleKey").toString();
+        QVERIFY(click(setup.view(), ".console-details"));
+        QVERIFY(click(setup.view(), "[data-console-action=hide]"));
+        discover(backend, {second, second});
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-confirm-management]').disabled").toBool());
+        QVERIFY(!consoleRequest(setup.view(), "manageConsole", {"hide", key, ""}).value("accepted").toBool());
+        QCOMPARE(settings.GetHiddenHosts().size(), 0);
+        discover(backend, {});
+        QVERIFY(!consoleRequest(setup.view(), "manageConsole", {"hide", key, ""}).value("accepted").toBool());
+        script(setup.view(), "document.querySelector('[data-close-management]').click()");
+        const auto id = settings.SetManualHost(ManualHost(-1, "private.example", false, {}));
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+        const auto manualKey = script(setup.view(), "document.querySelector('.console-card').dataset.consoleKey").toString();
+        QVERIFY(click(setup.view(), ".console-details"));
+        QVERIFY(click(setup.view(), "[data-console-action=deleteManual]"));
+        settings.SetManualHost(ManualHost(id, "changed.example", false, {}));
+        QVERIFY(!consoleRequest(setup.view(), "manageConsole", {"deleteManual", manualKey, ""}).value("accepted").toBool());
+        QCOMPARE(settings.GetManualHosts().size(), 1);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-confirm-management]').disabled").toBool());
+        backend->qmlSettings()->setStreamerMode(true);
+        const auto json = QJsonDocument::fromVariant(consoleRequest(setup.view(), "snapshot", {})).toJson();
+        QVERIFY(!json.contains("private.example"));
+        QVERIFY(!json.contains("changed.example"));
+        QVERIFY(!json.contains("192.0.2.10"));
+        QVERIFY(!json.contains("001122334455"));
+        QVERIFY(click(setup.view(), "[data-close-management]"));
+        QVERIFY(click(setup.view(), ".console-details"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').textContent.includes('hidden')").toBool());
+        QVERIFY(!script(setup.view(), "document.body.textContent.includes('changed.example')").toBool());
+        QVERIFY(click(setup.view(), "[data-close-management]"));
+        QVERIFY(click(setup.view(), "[data-add-manual]"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-manual-address]')?.type === 'password'").toBool());
+        QVERIFY(fill(setup.view(), "[data-manual-address]", "private-input.example"));
+        setup.resize(390, 720);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').scrollWidth <= document.querySelector('dialog').clientWidth").toBool());
+        setup.view()->grab().save(qEnvironmentVariable("CHIAKI_MANUAL_PREVIEW", "embedded-manual.png"));
+        setup.resize(900, 600);
+        setup.view()->setZoomFactor(2);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').scrollWidth <= document.querySelector('dialog').clientWidth").toBool());
+        const auto oldGeneration = setup.bridge()->snapshot().value("profileGeneration").toString();
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        backend->setDiscoveryEnabled(false);
+        QVERIFY(!consoleRequest(setup.view(), "saveManualAddress", {"private-input.example", "later", oldGeneration}).value("accepted").toBool());
+        QVERIFY(!consoleRequest(setup.view(), "manageConsole", {"deleteManual", manualKey, ""}).value("accepted").toBool());
+        QCOMPARE(backend->nativeSettings()->GetManualHosts().size(), 0);
+    }
+
+    void manualAddressValidation()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Office console");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-add-manual]')").toBool());
+        script(setup.view(), "document.querySelector('[data-add-manual]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-manual-address]')").toBool());
+        script(setup.view(), "const input=document.querySelector('[data-manual-address]');input.value='https://example.com';input.dispatchEvent(new Event('input',{bubbles:true}));const choice=document.querySelector('[data-manual-registration]');choice.value='later';choice.dispatchEvent(new Event('change',{bubbles:true}));");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-save-manual]').disabled").toBool());
+        QCOMPARE(settings.GetManualHosts().size(), 0);
+        const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+        for (const auto &invalid : {"", "https://example.com", "192.0.2.1:9295", "example.com/path", "bad host", "-console", "999.999.999.999"}) {
+            QVERIFY(fill(setup.view(), "[data-manual-address]", invalid));
+            QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-save-manual]').disabled").toBool());
+            QVERIFY(!consoleRequest(setup.view(), "saveManualAddress", {invalid, "later", generation}).value("accepted").toBool());
+        }
+        QVERIFY(fill(setup.view(), "[data-manual-address]", "  console.example  "));
+        const auto registrationKey = script(setup.view(), "document.querySelector('[data-manual-registration]').options[1].value").toString();
+        QVERIFY(fill(setup.view(), "[data-manual-registration]", registrationKey));
+        ChiakiRegisteredHost other = registered;
+        memcpy(other.server_mac, "\x00\x00\x00\x00\x00\x01", 6);
+        strcpy(other.server_nickname, "Other console");
+        settings.AddRegisteredHost(RegisteredHost(other));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-manual-registration]').options.length").toInt(), 4);
+        script(setup.view(), "document.querySelector('[data-save-manual]').click();document.querySelector('[data-save-manual]').click()");
+        QTRY_COMPARE(settings.GetManualHosts().size(), 1);
+        const auto savedHost = settings.GetManualHosts().first();
+        QCOMPARE(savedHost.GetHost(), QStringLiteral("console.example"));
+        QVERIFY(savedHost.GetRegistered());
+        QCOMPARE(savedHost.GetMAC().ToString(), QStringLiteral("001122334455"));
+        Settings reread(profile);
+        QCOMPARE(reread.GetManualHosts().first().GetHost(), QStringLiteral("console.example"));
+        QVERIFY(click(setup.view(), "[data-close-management]"));
+        QVERIFY(click(setup.view(), "[data-add-manual]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-manual-address]')").toBool());
+        QVERIFY(fill(setup.view(), "[data-manual-address]", "2001:db8::42"));
+        QVERIFY(fill(setup.view(), "[data-manual-registration]", "later"));
+        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-save-manual]').disabled").toBool());
+        script(setup.view(), "document.querySelector('[data-save-manual]').click()");
+        QTRY_COMPARE(settings.GetManualHosts().size(), 2);
+        QVERIFY(click(setup.view(), "[data-close-management]"));
+        QVERIFY(click(setup.view(), "[data-add-manual]"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-manual-address]')").toBool());
+        QVERIFY(fill(setup.view(), "[data-manual-address]", "new.example"));
+        QVERIFY(fill(setup.view(), "[data-manual-registration]", registrationKey));
+        settings.RemoveRegisteredHost(HostMAC(registered.server_mac));
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QVERIFY(!consoleRequest(setup.view(), "saveManualAddress", {"new.example", registrationKey, generation}).value("accepted").toBool());
+        QCOMPARE(settings.GetManualHosts().size(), 2);
+        QCOMPARE(script(setup.view(), "document.querySelector('[data-manual-address]').value").toString(), QStringLiteral("new.example"));
+        services.backend()->qmlSettings()->setCurrentProfile(profile + "-next");
+        services.backend()->setDiscoveryEnabled(false);
+        QVERIFY(!consoleRequest(setup.view(), "saveManualAddress", {"new.example", "later", generation}).value("accepted").toBool());
+        QCOMPARE(services.backend()->nativeSettings()->GetManualHosts().size(), 0);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-save-manual]').disabled").toBool());
+    }
+
+    void manualAddress()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-add-manual]')").toBool());
+        script(setup.view(), "document.querySelector('[data-add-manual]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-manual-address]')").toBool());
+        script(setup.view(), "const input=document.querySelector('[data-manual-address]');input.value='192.0.2.42';input.dispatchEvent(new Event('input',{bubbles:true}));");
+        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-save-manual]').disabled").toBool());
+        script(setup.view(), "document.querySelector('[data-save-manual]').click()");
+        QTRY_COMPARE(settings.GetManualHosts().size(), 1);
+        QCOMPARE(settings.GetManualHosts().first().GetHost(), QStringLiteral("192.0.2.42"));
+        QVERIFY(!settings.GetManualHosts().first().GetRegistered());
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-manual-result]')?.textContent").toString(), QStringLiteral("Address saved"));
+        script(setup.view(), "document.querySelector('[data-close-management]').click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-name')?.textContent").toString(), QStringLiteral("192.0.2.42"));
+        setup.view()->reload();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-name')?.textContent").toString(), QStringLiteral("192.0.2.42"));
+        QVERIFY(script(setup.view(), "document.querySelector('.connect-console').disabled").toBool());
     }
 
     void consoleLibrary()

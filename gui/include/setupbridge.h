@@ -16,6 +16,8 @@ public:
     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
     Q_INVOKABLE QVariantMap connectConsole(const QString &key);
+    Q_INVOKABLE QVariantMap saveManualAddress(const QString &address, const QString &registrationKey, const QString &profile);
+    Q_INVOKABLE QVariantMap manageConsole(const QString &action, const QString &key, const QString &pin);
     void setSuspended(bool suspended);
     void reportStreamError(const QString &title, const QString &text);
     Q_INVOKABLE QVariantMap dismissStreamError(const QString &id);

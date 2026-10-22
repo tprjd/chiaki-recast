@@ -8,11 +8,15 @@
 #include <QGuiApplication>
 #include <QClipboard>
 #include <cmath>
+#include <QHostAddress>
+#include <QRegularExpression>
 
 SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     : QObject(parent), backend(backend)
 {
     connect(backend, &QmlBackend::hostsChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::hiddenHostsChanged, this, &SetupBridge::refresh);
+    connect(backend->qmlSettings(), &QmlSettings::registeredHostsChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::discoveryEnabledChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::connectionAttemptChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::windowChanged, this, &SetupBridge::refresh);
@@ -88,7 +92,7 @@ QString SetupBridge::identity(const QVariantMap &host) const
     else if (!host.value("duid").toString().isEmpty())
         parts = {"psn", host.value("duid").toString()};
     else if (host.value("manual").toBool())
-        parts = {"manual", host.value("address").toString(), host.value("mac").toString().toLower()};
+        parts = {"manual", QString::number(host.value("manualId").toInt()), host.value("address").toString(), host.value("mac").toString().toLower()};
     if (parts.size() < 2 || parts.at(1).toString().isEmpty()) return {};
     return QString::fromUtf8(QJsonDocument(parts).toJson(QJsonDocument::Compact));
 }
@@ -108,8 +112,37 @@ void SetupBridge::refresh()
         if (host.value("display").toBool()) ++counts[identity(host)];
     }
     QHash<QString, QString> currentKeys;
-    QVariantList consoles;
+    QVariantList consoles, registrations, hiddenConsoles;
+    const auto opaqueKey = [&](const QString &id) {
+        auto key = keys.value(id);
+        if (key.isEmpty()) key = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        currentKeys.insert(id, key);
+        return key;
+    };
     const bool privateMode = backend->qmlSettings()->streamerMode();
+    const auto safeName = [&](QString name, const QString &address, const QString &identifier) {
+        bool sensitive = name == address || name == identifier || QHostAddress().setAddress(name);
+        for (const auto &value : hosts) {
+            const auto host = value.toMap();
+            for (const auto &field : {"address", "mac", "duid"})
+                sensitive = sensitive || (!name.isEmpty() && name == host.value(field).toString());
+        }
+        if (privateMode && sensitive) name = tr("Console");
+        return name.isEmpty() ? tr("Console") : name;
+    };
+    for (const auto &registration : backend->qmlSettings()->registeredHosts()) {
+        const auto host = registration.toMap();
+        const auto mac = host.value("mac").toString();
+        registrations.append(QVariantMap{{"key", opaqueKey("registration:" + mac)},
+            {"name", safeName(host.value("name").toString(), {}, mac)},
+            {"ps5", host.value("ps5")}, {"identifier", privateMode ? tr("hidden") : mac}});
+    }
+    for (const auto &entry : backend->hiddenHosts()) {
+        const auto host = entry.toMap();
+        const auto mac = host.value("mac").toString();
+        hiddenConsoles.append(QVariantMap{{"key", opaqueKey("hidden:" + mac)},
+            {"name", safeName(host.value("name").toString(), {}, mac)}, {"identifier", privateMode ? tr("hidden") : mac}});
+    }
     for (const auto &value : hosts) {
         const auto host = value.toMap();
         if (!host.value("display").toBool()) continue;
@@ -117,21 +150,29 @@ void SetupBridge::refresh()
         const bool available = !id.isEmpty() && counts.value(id) == 1;
         QString key;
         if (available) {
-            key = keys.value(id);
-            if (key.isEmpty()) key = QUuid::createUuid().toString(QUuid::WithoutBraces);
-            currentKeys.insert(id, key);
+            key = opaqueKey(id);
         }
         QString name = host.value("name").toString();
         if (privateMode && name == host.value("address").toString()) name = tr("Manual console");
-        if (name.isEmpty()) name = tr("Console");
+        name = safeName(name, host.value("address").toString(), host.value("mac").toString());
         QVariantMap console{{"key", key}, {"name", name}, {"available", available},
             {"registered", host.value("registered").toBool()}, {"state", host.value("state").toString()},
             {"route", host.value("discovered").toBool() ? "local" : host.value("manual").toBool() ? "manual" : "psn"}};
+        console.insert("address", privateMode ? tr("hidden") : host.value("address").toString());
+        console.insert("identifier", privateMode ? tr("hidden") : host.value("mac", host.value("duid")).toString());
+        for (const auto &field : {"app", "titleId"}) console.insert(field, host.value(field).toString());
+        QStringList actions;
+        if (host.value("registered").toBool()) actions.append("pin");
+        if (host.value("manual").toBool()) actions.append("deleteManual");
+        if (host.value("discovered").toBool() && !host.value("registered").toBool() && !host.value("manual").toBool()) actions.append("hide");
+        console.insert("actions", actions);
         if (host.contains("ps5")) console.insert("ps5", host.value("ps5").toBool());
         consoles.append(console);
     }
     keys = currentKeys;
-    if (!keys.values().contains(selectedKey)) {
+    bool selectedPresent = false;
+    for (const auto &console : consoles) if (console.toMap().value("key").toString() == selectedKey && !selectedKey.isEmpty()) selectedPresent = true;
+    if (!selectedPresent) {
         selectedKey.clear();
         for (const auto &console : consoles) {
             const auto key = console.toMap().value("key").toString();
@@ -151,6 +192,56 @@ void SetupBridge::refresh()
         QT_TR_NOOP("After sign-in in an external browser, copy the complete final URL from its address bar. Paste the full URL, including its authorization code, below."),
         QT_TR_NOOP("Sign-in redirect URL"), QT_TR_NOOP("Retry"), QT_TR_NOOP("Complete sign-in"), QT_TR_NOOP("Close"),
         QT_TR_NOOP("Use the same PlayStation account as your console. The Sony sign-in page and your external browser can show account details.")};
+    const char *managementTexts[] = {
+        QT_TR_NOOP("Add console"),
+        QT_TR_NOOP("Address"),
+        QT_TR_NOOP("Address saved"),
+        QT_TR_NOOP("App"),
+        QT_TR_NOOP("Cancel"),
+        QT_TR_NOOP("Choose its registration"),
+        QT_TR_NOOP("Console address"),
+        QT_TR_NOOP("Console details"),
+        QT_TR_NOOP("Console login PIN"),
+        QT_TR_NOOP("Console login PIN saved"),
+        QT_TR_NOOP("Console unavailable. Close this screen and select the console again."),
+        QT_TR_NOOP("Delete manual address"),
+        QT_TR_NOOP("Delete registration"),
+        QT_TR_NOOP("Delete this console registration? You must pair the console again to connect."),
+        QT_TR_NOOP("Delete this saved address? The console registration will be kept."),
+        QT_TR_NOOP("Enter an IP address or hostname without a port or URL."),
+        QT_TR_NOOP("Find your console"),
+        QT_TR_NOOP("Hidden consoles"),
+        QT_TR_NOOP("Hide console"),
+        QT_TR_NOOP("Hide this console? You can restore it from Manage consoles."),
+        QT_TR_NOOP("ID"),
+        QT_TR_NOOP("Manage consoles"),
+        QT_TR_NOOP("No hidden consoles"),
+        QT_TR_NOOP("No registered consoles"),
+        QT_TR_NOOP("PlayStation 4"),
+        QT_TR_NOOP("PlayStation 5"),
+        QT_TR_NOOP("Register on first connection"),
+        QT_TR_NOOP("Registered"),
+        QT_TR_NOOP("Registered console"),
+        QT_TR_NOOP("Registered consoles"),
+        QT_TR_NOOP("Registration"),
+        QT_TR_NOOP("Save PIN"),
+        QT_TR_NOOP("Save address"),
+        QT_TR_NOOP("Save an address when discovery does not show your console."),
+        QT_TR_NOOP("Save console login PIN"),
+        QT_TR_NOOP("Select a console"),
+        QT_TR_NOOP("Show PIN"),
+        QT_TR_NOOP("Show this console in the library again?"),
+        QT_TR_NOOP("Status"),
+        QT_TR_NOOP("The address could not be saved. Try again."),
+        QT_TR_NOOP("The change could not be saved. Try again."),
+        QT_TR_NOOP("The registration is unavailable. Choose a console again."),
+        QT_TR_NOOP("The profile changed. Open this form again."),
+        QT_TR_NOOP("This is the four-digit PIN for your console user. It is different from the eight-digit Remote Play pairing code."),
+        QT_TR_NOOP("Title ID"),
+        QT_TR_NOOP("Unhide console"),
+        QT_TR_NOOP("Use a manual address"),
+        QT_TR_NOOP("Use an existing registration, or register when you first connect. Saving an address does not pair the console or start a connection.")};
+    for (const auto *text : managementTexts) strings.insert(QString::fromUtf8(text), tr(text));
     for (const auto *text : texts) strings.insert(QString::fromUtf8(text), tr(text));
     const auto *native = backend->nativeSettings();
     const bool configured = !native->GetPsnAuthToken().isEmpty() && !native->GetPsnRefreshToken().isEmpty()
@@ -223,7 +314,7 @@ void SetupBridge::refresh()
     addChoices("audioInDevice", settings->availableAudioInDevices(), settings->audioInDevice(), true);
     addChoices("audioOutDevice", settings->availableAudioOutDevices(), settings->audioOutDevice(), true);
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
-        {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
+        {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
         {"streamerMode", privateMode}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
             || backend->connectionAttempt().value("cleanupPending").toBool()}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
     if (!suspended) emit stateChanged(state);
@@ -370,8 +461,9 @@ QVariantMap SetupBridge::connectConsole(const QString &key)
     if (!resolveConsole(key, index, nickname))
         return {{"accepted", false}, {"message", tr("Console unavailable")}};
     const auto host = backend->hosts().at(index).toMap();
-    if (!host.value("registered").toBool() || !host.value("discovered").toBool() || host.value("state") != "ready")
-        return {{"accepted", false}, {"message", tr("Select an online registered local console")}};
+    if (!host.value("registered").toBool() || (!host.value("discovered").toBool() && !host.value("manual").toBool())
+            || (host.value("discovered").toBool() && host.value("state") != "ready"))
+        return {{"accepted", false}, {"message", tr("Select an online registered console or a registered manual address")}};
     selectedKey = key;
     backend->connectToHost(index, nickname);
     return {{"accepted", true}};
@@ -552,4 +644,81 @@ QVariantMap SetupBridge::setMediaSetting(const QString &name, const QVariant &va
     }
 #endif
     return reject(QT_TR_NOOP("This setting is not available."));
+}
+
+QVariantMap SetupBridge::saveManualAddress(const QString &value, const QString &registrationKey, const QString &profile)
+{
+    const auto reject = [this](const char *text) { return QVariantMap{{"accepted", false}, {"message", tr(text)}}; };
+    if (!currentProfile(profile)) return reject(QT_TR_NOOP("The profile changed. Open this form again."));
+    if (state.value("connectionBusy").toBool()) return reject(QT_TR_NOOP("A connection is already active"));
+    const auto address = value.trimmed();
+    static const QRegularExpression hostname(QStringLiteral("^(?=.{1,253}$)(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.)*[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.?$"));
+    static const QRegularExpression numeric(QStringLiteral("^[0-9.]+$"));
+    QHostAddress ip;
+    if (!ip.setAddress(address) && (!hostname.match(address).hasMatch() || numeric.match(address).hasMatch()))
+        return reject(QT_TR_NOOP("Enter an IP address or hostname without a port or URL."));
+    int index = -1;
+    if (registrationKey != "later") {
+        const auto id = keys.key(registrationKey);
+        const auto hosts = backend->qmlSettings()->registeredHosts();
+        for (int i = 0; i < hosts.size(); ++i) {
+            if (id != "registration:" + hosts.at(i).toMap().value("mac").toString()) continue;
+            if (index >= 0) return reject(QT_TR_NOOP("The registration is unavailable. Choose a console again."));
+            index = i;
+        }
+        if (index < 0) return reject(QT_TR_NOOP("The registration is unavailable. Choose a console again."));
+    }
+    for (const auto &host : backend->nativeSettings()->GetManualHosts())
+        if (host.GetHost() == address) return reject(QT_TR_NOOP("This address is already saved."));
+    const auto before = backend->nativeSettings()->GetManualHosts().size();
+    backend->addManualHost(index, address);
+    return {{"accepted", backend->nativeSettings()->GetManualHosts().size() == before + 1}};
+}
+
+QVariantMap SetupBridge::manageConsole(const QString &action, const QString &key, const QString &pin)
+{
+    const auto unavailable = [this] { return QVariantMap{{"accepted", false}, {"message", tr("Console unavailable. Close this screen and select the console again.")}}; };
+    if (generation != backend->profileGeneration() || key.isEmpty() || state.value("connectionBusy").toBool()) return unavailable();
+    const auto id = keys.key(key);
+    if (id.isEmpty()) return unavailable();
+    if (action == "deleteRegistration") {
+        const auto hosts = backend->qmlSettings()->registeredHosts();
+        int found = -1;
+        for (int i = 0; i < hosts.size(); ++i) {
+            if (id != "registration:" + hosts.at(i).toMap().value("mac").toString()) continue;
+            if (found >= 0) return unavailable();
+            found = i;
+        }
+        if (found < 0) return unavailable();
+        backend->qmlSettings()->deleteRegisteredHost(found);
+        return {{"accepted", true}};
+    }
+    if (action == "unhide") {
+        const auto hosts = backend->hiddenHosts();
+        QString mac;
+        for (const auto &value : hosts) {
+            const auto current = value.toMap().value("mac").toString();
+            if (id != "hidden:" + current) continue;
+            if (!mac.isEmpty()) return unavailable();
+            mac = current;
+        }
+        if (mac.isEmpty()) return unavailable();
+        backend->unhideHost(mac);
+        return {{"accepted", true}};
+    }
+    int index;
+    QString nickname;
+    if (!resolveConsole(key, index, nickname)) return unavailable();
+    const auto host = backend->hosts().at(index).toMap();
+    if (action == "pin" && host.value("registered").toBool())
+        return {{"accepted", backend->setConsolePin(index, pin)}};
+    if (action == "deleteManual" && host.value("manual").toBool()) {
+        backend->deleteHost(index);
+        return {{"accepted", true}};
+    }
+    if (action == "hide" && host.value("discovered").toBool() && !host.value("registered").toBool() && !host.value("manual").toBool()) {
+        backend->hideHost(host.value("mac").toString(), host.value("name").toString());
+        return {{"accepted", true}};
+    }
+    return unavailable();
 }

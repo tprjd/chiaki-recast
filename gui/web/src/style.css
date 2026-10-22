@@ -64,3 +64,5 @@ input { width: 280px; max-width: 100%; border: 1px solid var(--line); border-rad
 .settings-results span { color: var(--muted); }
 .settings-message { min-height: 24px; }
 @media (max-width: 760px) { .settings-layout { grid-template-columns: 1fr; gap: 20px; } .category-nav { position: static; } .setting-row { flex-direction: column; align-items: stretch; gap: 12px; } .setting-control { width: 100%; max-width: 100%; } }
+.console-entry { display: grid; min-width: 0; gap: 8px; }
+.console-details { min-height: 44px; padding: 9px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }

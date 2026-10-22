@@ -141,14 +141,25 @@ or `cancel()` when dismissed. PIN requires exactly four ASCII digits and keeps
 leading zeroes. Invalid PIN input leaves the request open. Cancellation,
 repeated acceptance, and callbacks from older requests cannot send a command.
 
-`MainView` supplies `savePin(sourceIndex, pin)` with the native boolean save
-outcome. A PIN acceptance returns true only when this callback confirms the
-save. `ConsolePinDialog` then shows the saved result. It uses the production
-`ConsolePinContent` for validation, masked entry, explicit reveal, privacy,
-focus, and the guided workspace. The live PIN route can use this same content.
-`ConsolePinHarness` composes the library and saved PIN dialog with a supplied
-save outcome. `ConsolePin` tests both the form and its guarded library callbacks,
-including target changes and return focus. Test assertions do not print PINs.
+The embedded setup tests cover saved console login PIN edits and manual
+addresses through compiled Svelte, real WebChannel, and native services.
+`manualAddress` checks save and reload. `manualAddressValidation` checks
+address validation, current registration association, duplicate activation,
+and stale profiles. `consoleManagement` checks PIN validation and leading
+zeroes, secret-free replies, focus return, cancelled confirmations, and the
+distinction between manual address and registration deletion.
+`consoleTargetGuards` checks discovery reorder, ambiguous or removed targets,
+changed manual addresses, privacy masking, and narrow or zoomed forms.
+`manualHandoff` uses the application controller to connect a registered manual
+address, hide and freeze setup, wait for native cleanup, and restore setup.
+The handoff case does not prove real console playback, physical focus, or GPU
+acceleration. Run embedded application cases serially because Qt services
+use a shared application settings identity.
+
+The replaced `ManualHostDialog`, saved `ConsolePinDialog`, and their dedicated
+QML fixtures and tests are removed. `ConsolePinContent` remains shared by the
+native live PIN route. The legacy library and settings resource chains remain
+for the setup flows that later tickets replace.
 
 `StreamRoot.qml` owns the native `LiveConsolePinHost` during playback and connection progress.
 The backend retains `sessionPinRequest` across the route handoff. Its opaque
