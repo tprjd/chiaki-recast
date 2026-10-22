@@ -41,6 +41,7 @@ class BindingCapture : public QDialog
         if (!current()) { reject(); return; }
         if (legacy) {
             settings->changeControllerKey(action, input);
+            emit settings->controllerMappingChanged();
             accept();
             return;
         }
@@ -187,8 +188,9 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
             emit setupBridge->keyboardMouseClosed();
             auto *capture = new BindingCapture(this->backend->qmlSettings(), action, slot, legacy,
                 [this, form, profile, legacy] {
+                    const bool cameraEnabled = this->backend->qmlSettings()->mouseCameraEnabled();
                     return setupBridge->keyboardMouseFormValid(form, profile)
-                        && this->backend->qmlSettings()->mouseCameraEnabled() != legacy;
+                        && (legacy ? !cameraEnabled : cameraEnabled);
                 }, this);
             connect(setupBridge, &SetupBridge::keyboardMouseClosed, capture, &QDialog::reject);
             connect(capture, &QDialog::finished, this, [this, form, profile] {

@@ -1938,7 +1938,6 @@ QString QmlSettings::changeControllerKey(int button, int key)
 {
     Qt::Key qt_key = Qt::Key(key);
     settings->SetControllerButtonMapping(button, qt_key);
-    emit controllerMappingChanged();
     return QKeySequence(qt_key).toString();
 }
 
