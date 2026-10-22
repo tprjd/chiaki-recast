@@ -1,0 +1,11 @@
+{
+  "generated": "C:/Users/david/.cache/chiaki-msvc-native/ticket19-build/gui/web/THIRD-PARTY-NOTICES.txt",
+  "installPath": "share/licenses/chiaki-ng/frontend/THIRD-PARTY-NOTICES.txt",
+  "sha256": "d3faba2278a1fc526b207ccf995125343ba1159470e0675d875ae2381ffc447b",
+  "bytes": 99401,
+  "packages": [
+    "svelte 5.57.2",
+    "vite 8.3.5 browser modulepreload helper"
+  ],
+  "result": "Generated and installed through the existing CMake frontend target. Installed file hash matches."
+}

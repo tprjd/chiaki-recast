@@ -1,5 +1,6 @@
 param(
     [Parameter(Mandatory)][string]$OutputDirectory,
+    [Parameter(Mandatory)][string]$BuildDirectory,
     [Parameter(Mandatory)][string]$QtDirectory,
     [Parameter(Mandatory)][string]$VcpkgDirectory,
     [Parameter(Mandatory)][string]$FFmpegDirectory,
@@ -37,17 +38,13 @@ $licenses = @{
 foreach ($name in $licenses.Keys) {
     Invoke-WebRequest "https://raw.githubusercontent.com/$($licenses[$name])" -OutFile "$OutputDirectory/native/$name-LICENSE.txt"
 }
-Get-ChildItem "$source/gui/web/node_modules" -Recurse -File | Where-Object Name -match '^(LICENSE|COPYING)(\..*)?$' |
-    ForEach-Object {
-        $relative = $_.FullName.Substring((Get-Item "$source/gui/web/node_modules").FullName.Length + 1).Replace('\', '-')
-        Copy-Item -LiteralPath $_.FullName -Destination "$OutputDirectory/frontend/$relative"
-    }
+Copy-Item -LiteralPath "$BuildDirectory/gui/web/THIRD-PARTY-NOTICES.txt" -Destination "$OutputDirectory/frontend"
 @'
 Qt 6.9.3 and Chromium notices are in Qt/, including the SDK's SPDX records and extracted third-party license texts.
 Qt source: https://download.qt.io/archive/qt/6.9/6.9.3/submodules/
 Native dependency notices are in native/. Vulkan SDK shaderc 2026.3 and SPIRV components use SDK 1.4.357.0.
 SDL3 and sdl2-compat use the zlib license. The SDL2 vcpkg notice also applies when that build uses native SDL2.
-Frontend license files come from the locked npm install. Node and npm are build tools and are not required to run this package.
+The frontend notice file is generated from dependency code present in the compiled browser bundle. Node and npm are build tools and are not required to run this package.
 Application and bundled dependency source: https://github.com/streetpea/chiaki-ng
 FFmpeg source and build configuration: https://github.com/streetpea/FFmpeg-Builds
 libplacebo source: https://github.com/haasn/libplacebo/tree/v7.360.1

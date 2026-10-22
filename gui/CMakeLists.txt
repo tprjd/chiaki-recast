@@ -10,13 +10,13 @@ endif()
 find_program(NPM_EXECUTABLE NAMES npm.cmd npm REQUIRED)
 file(GLOB_RECURSE SETUP_FRONTEND_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/web/src/*")
 add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/web/app.js" "${CMAKE_CURRENT_BINARY_DIR}/web/app.css"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/web/app.js" "${CMAKE_CURRENT_BINARY_DIR}/web/app.css" "${CMAKE_CURRENT_BINARY_DIR}/web/THIRD-PARTY-NOTICES.txt"
     COMMAND "${NPM_EXECUTABLE}" ci --ignore-scripts --no-audit --no-fund
     COMMAND "${NPM_EXECUTABLE}" run build -- --outDir "${CMAKE_CURRENT_BINARY_DIR}/web"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/web"
     DEPENDS ${SETUP_FRONTEND_SOURCES} web/package.json web/package-lock.json web/.npmrc web/index.html web/vite.config.ts web/tsconfig.json
     VERBATIM)
-add_custom_target(chiaki-setup-assets DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/web/app.js" "${CMAKE_CURRENT_BINARY_DIR}/web/app.css")
+add_custom_target(chiaki-setup-assets DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/web/app.js" "${CMAKE_CURRENT_BINARY_DIR}/web/app.css" "${CMAKE_CURRENT_BINARY_DIR}/web/THIRD-PARTY-NOTICES.txt")
 configure_file(web/resources.qrc.in "${CMAKE_CURRENT_BINARY_DIR}/setup.qrc" @ONLY)
 
 if(APPLE)
@@ -193,6 +193,7 @@ endif()
 install(FILES chiaking.desktop DESTINATION share/applications)
 install(FILES chiaking.png DESTINATION share/icons/hicolor/512x512/apps)
 install(FILES io.github.streetpea.Chiaki4deck.appdata.xml DESTINATION share/metainfo)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/web/THIRD-PARTY-NOTICES.txt" DESTINATION share/licenses/chiaki-ng/frontend)
 
 if(CHIAKI_ENABLE_TESTS)
 	add_subdirectory(tests)

@@ -81,7 +81,7 @@ foreach ($relative in @(
     'resources/qtwebengine_resources_200p.pak', 'resources/qtwebengine_devtools_resources.pak',
     'resources/icudtl.dat', 'resources/v8_context_snapshot.bin',
     'translations/qtwebengine_locales/en-US.pak', 'notices/COPYING',
-    'notices/Qt/qtwebengine-chromium-webengine-6.9.3.spdx.json', 'notices/frontend/svelte-LICENSE.md',
+    'notices/Qt/qtwebengine-chromium-webengine-6.9.3.spdx.json', 'notices/frontend/THIRD-PARTY-NOTICES.txt',
     'notices/Qt/LGPL-3.0-only.txt', 'notices/Qt/GPL-3.0-only.txt', 'notices/Qt/GPL-2.0-only.txt',
     'notices/native/FFmpeg-LICENSE.txt', 'notices/native/libplacebo-LICENSE',
     'notices/native/shaderc-LICENSE.txt', 'notices/native/SPIRV-Cross-LICENSE.txt',

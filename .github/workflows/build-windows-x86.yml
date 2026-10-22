@@ -176,7 +176,7 @@ jobs:
 
       - name: Collect dependency notices
         run: |
-          ./scripts/windows-vc/notices.ps1 -OutputDirectory package-notices -QtDirectory $env:QT_ROOT_DIR -VcpkgDirectory "$env:VCPKG_INSTALLED_DIR/${{ env.triplet }}" -FFmpegDirectory "${{ env.dep_folder }}" -LibplaceboDirectory libplacebo
+          ./scripts/windows-vc/notices.ps1 -OutputDirectory package-notices -BuildDirectory build -QtDirectory $env:QT_ROOT_DIR -VcpkgDirectory "$env:VCPKG_INSTALLED_DIR/${{ env.triplet }}" -FFmpegDirectory "${{ env.dep_folder }}" -LibplaceboDirectory libplacebo
 
       - name: Deploy and check the Windows package
         run: |

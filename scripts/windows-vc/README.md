@@ -15,7 +15,7 @@ shell. Use a new package directory. Supply the native DLL search directories
 as a PowerShell array.
 
 ```powershell
-	./scripts/windows-vc/notices.ps1 -OutputDirectory package-notices `
+	./scripts/windows-vc/notices.ps1 -OutputDirectory package-notices -BuildDirectory build `
 	    -QtDirectory $env:QT_ROOT_DIR -VcpkgDirectory "$env:VCPKG_INSTALLED_DIR/x64-windows" `
 	    -FFmpegDirectory deps -LibplaceboDirectory libplacebo
 	./scripts/windows-vc/deploy.ps1 -Package "$PWD/chiaki-ng-Win" `
@@ -41,8 +41,9 @@ and one browser resource file in the owned package directory.
 
 The package includes dependency notices and a SHA256 file manifest. Qt notices
 come from the matching SDK SPDX files, including Chromium license texts.
-Native notices come from the selected dependencies. Frontend notices come from
-the locked npm install. The notice collection step downloads pinned license
+Native notices come from the selected dependencies. Vite generates the frontend
+notice from dependency code present in the browser bundle. CMake also installs
+it at `share/licenses/chiaki-ng/frontend/THIRD-PARTY-NOTICES.txt`. The notice collection step downloads pinned license
 texts during the build. Runtime operation is offline.
 
 The existing Inno Setup script includes the complete staged directory. It
