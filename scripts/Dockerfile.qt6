@@ -1,69 +1,21 @@
-FROM docker.io/stateoftheartio/qt6:6.7-gcc-aqt
-
-RUN sudo apt-get update
-RUN sudo apt-get install -y software-properties-common gpg wget
-RUN sudo add-apt-repository ppa:deadsnakes/ppa
-RUN sudo apt-get update
-RUN sudo apt-get -y install \
-    git \
-    g++ \
-    ninja-build \
-    curl \
-    pkg-config \
-    unzip \
-    python3-pip \
-    libglib2.0-0 \
-    libssl-dev \
-    libopus-dev  \
-    libgl1-mesa-dev \
-    nasm \
-    libudev-dev \
-    librsvg2-dev \
-    gobject-introspection \
-    libva-dev \
-    fuse \
-    appstream \
-    file \
-    libevdev-dev \
-    libudev-dev \
-    libhidapi-dev \
-    libfftw3-dev \
-    libspeexdsp-dev \
-    libdrm-dev \
-    liblcms2-dev \
-    libvulkan-dev \
-    libxkbcommon-dev \
-    libasound2-dev  \
-    libminiupnpc-dev \
-    libevent-dev \
-    libjson-c-dev \
-    libxcursor-dev
-
-RUN sudo pip3 install protobuf==3.19.5
-RUN sudo pip3 install meson==1.3.0
-RUN sudo pip3 install aqtinstall==3.1.18
-RUN sudo aqt install-qt -O ${QT_PATH} linux desktop ${QT_VERSION} linux_gcc_64 -m qtwebengine qtpositioning qtwebchannel qtwebsockets qtserialport
-RUN curl -LO https://raw.githubusercontent.com/state-of-the-art/qt6-docker/refs/heads/master/6.7-gcc-aqt/install_packages.sh
-RUN chmod +x install_packages.sh
-RUN sudo "${PWD}/install_packages.sh"
-RUN (curl -L https://apt.kitware.com/kitware-archive.sh | sudo bash) && sudo apt-get -y install cmake
-
-RUN wget https://github.com/KhronosGroup/Vulkan-Headers/archive/v1.3.287.tar.gz && \
-    tar xf v1.3.287.tar.gz && \
-    cd Vulkan-Headers-1.3.287 && \
-    cmake -Bbuild -GNinja -DCMAKE_INSTALL_PREFIX=/usr && \
-    sudo ninja -Cbuild install
-
-RUN wget https://github.com/KhronosGroup/glslang/archive/13.1.1.tar.gz && \
-    tar xf 13.1.1.tar.gz && \
-    cd glslang-13.1.1 && \
-    cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DALLOW_EXTERNAL_SPIRV_TOOLS=ON -DBUILD_SHARED_LIBS=OFF && \
-    sudo ninja -Cbuild install
-
-RUN wget https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/0.3.44/pipewire-0.3.44.tar.gz && \
-    tar xf pipewire-0.3.44.tar.gz && \
-    cd pipewire-0.3.44 && \
-    meson setup --prefix=/usr -Ddbus=disabled -Dsession-managers=[] build && \
-    sudo ninja -Cbuild install
-
-CMD []
+# This complete SDK replaces the builder's Qt 6.9.0, including private headers.
+FROM docker.io/streetpea/chiaki-ng-builder@sha256:0ec92fb1ec689013da112c94d359e783794dbc80f81f0e2a89884e67a6a2bea1
+ENV QT_PATH=/opt/chiaki-qt QT_VERSION=6.9.3
+RUN sudo /home/user/chiaki-venv/bin/python -m pip install --disable-pip-version-check aqtinstall==3.1.18
+COPY install-appimage-qt.py /tmp/install-appimage-qt.py
+RUN sudo /home/user/chiaki-venv/bin/python /tmp/install-appimage-qt.py install-qt -O /opt/chiaki-qt linux desktop 6.9.3 linux_gcc_64 -m qtpositioning qtwebchannel qtwebsockets qtserialport qtshadertools
+# Qt publishes WebEngine in a separate extension repository for this same SDK.
+RUN curl -fL https://download.qt.io/online/qtsdkrepository/linux_x64/extensions/qtwebengine/693/x86_64/extensions.qtwebengine.693.linux_gcc_64/6.9.3-0-202509261208qtwebengine-Linux-RHEL_8_10-GCC-Linux-RHEL_8_10-X86_64.7z -o /tmp/qtwebengine.7z \
+    && echo '8ac7e13152a1d3415e8d274a905c692633152286d815b165378d42a829801236  /tmp/qtwebengine.7z' | sha256sum -c - \
+    && sudo /home/user/chiaki-venv/bin/python -m py7zr x /tmp/qtwebengine.7z /opt/chiaki-qt/6.9.3/gcc_64 \
+    && rm /tmp/qtwebengine.7z
+RUN curl -fL https://nodejs.org/dist/v24.16.0/node-v24.16.0-linux-x64.tar.xz -o /tmp/node.tar.xz \
+    && echo 'd804845d34eddc21dc1092b519d643ef40b1f58ec5dec5c22b1f4bd8fabde6c9  /tmp/node.tar.xz' | sha256sum -c - \
+    && sudo mkdir -p /opt/chiaki-node \
+    && sudo tar -xJf /tmp/node.tar.xz --strip-components=1 -C /opt/chiaki-node \
+    && rm /tmp/node.tar.xz
+ENV PATH=/opt/chiaki-node/bin:/opt/chiaki-qt/6.9.3/gcc_64/bin:/home/user/chiaki-venv/bin:/opt/Qt/Tools/CMake/bin:/opt/Qt/Tools/Ninja:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV LD_LIBRARY_PATH=/opt/chiaki-qt/6.9.3/gcc_64:/opt/chiaki-qt/6.9.3/gcc_64/lib
+RUN test "$(node --version)" = v24.16.0 && test "$(npm --version)" = 11.13.0 && test "$(qmake -query QT_VERSION)" = 6.9.3 \
+    && test -f /opt/chiaki-qt/6.9.3/gcc_64/lib/cmake/Qt6GuiPrivate/Qt6GuiPrivateConfig.cmake \
+    && test -f /opt/chiaki-qt/6.9.3/gcc_64/lib/cmake/Qt6WebEngineWidgets/Qt6WebEngineWidgetsConfig.cmake

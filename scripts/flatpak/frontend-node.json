@@ -1,0 +1,20 @@
+{
+    "name": "frontend-node",
+    "buildsystem": "simple",
+    "build-commands": ["mkdir -p /app/node", "cp -a bin include lib share /app/node/", "test \"$(/app/node/bin/node --version)\" = v24.16.0", "PATH=/app/node/bin:$PATH test \"$(/app/node/bin/node /app/node/lib/node_modules/npm/bin/npm-cli.js --version)\" = 11.13.0"],
+    "cleanup": ["/node", "/lib/debug/node"],
+    "sources": [
+        {
+            "type": "archive",
+            "url": "https://nodejs.org/dist/v24.16.0/node-v24.16.0-linux-x64.tar.xz",
+            "sha256": "d804845d34eddc21dc1092b519d643ef40b1f58ec5dec5c22b1f4bd8fabde6c9",
+            "only-arches": ["x86_64"]
+        },
+        {
+            "type": "archive",
+            "url": "https://nodejs.org/dist/v24.16.0/node-v24.16.0-linux-arm64.tar.xz",
+            "sha256": "524659219d6a207a7400f2bde15d19ba060ffbe0d32a8643319ad67e3bb64c78",
+            "only-arches": ["aarch64"]
+        }
+    ]
+}
