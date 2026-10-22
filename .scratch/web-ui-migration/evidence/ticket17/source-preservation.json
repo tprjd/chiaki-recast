@@ -84,5 +84,40 @@
     "path": "gui/src/qmlmainwindow.cpp",
     "equal": true,
     "reference": "ticket17 start"
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "method": "QVariantMap SetupBridge::wakeConsole(",
+    "equal": true,
+    "reference": "incoming ticket10 root773e08e6"
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "method": "QVariantMap SetupBridge::setAutoConnectTarget(",
+    "equal": true,
+    "reference": "incoming ticket10 root773e08e6"
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "method": "QVariantMap SetupBridge::stopAutoConnect(",
+    "equal": true,
+    "reference": "incoming ticket10 root773e08e6"
+  },
+  {
+    "path": "gui/src/setupbridge.cpp",
+    "method": "bool SetupBridge::currentProfile(",
+    "equal": true,
+    "reference": "incoming ticket10 root773e08e6"
+  },
+  {
+    "path": "gui/tests/embeddedsetup.cpp",
+    "method": "    DiscoveryRequests controlledDiscovery()",
+    "equal": true,
+    "reference": "incoming ticket10 root773e08e6"
+  },
+  {
+    "path": "gui/src/qmlbackend.cpp",
+    "equal": true,
+    "reference": "incoming ticket10, plus only ticket17 old Settings signal disconnect"
   }
 ]

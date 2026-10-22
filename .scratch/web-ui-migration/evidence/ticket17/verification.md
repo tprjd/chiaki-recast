@@ -10,8 +10,12 @@ and the native export title and suggested file name.
 
 The work started at `df307813`. Merge `569448d9` includes ticket 09 through
 `8b28fc1d`. Merge `36f8378f` includes the later claim documentation at `5b026017`.
-The two production merge conflicts retain both the profiles snapshot and native
-registration busy guard, and both focused test registrations.
+The ticket 09 merge retains the profiles snapshot, native registration busy guard,
+and both focused test registrations. Merge `f2f84944` includes ticket 10 at
+`5db47a2d`; merge `5be3f952` includes root `773e08e6`, with identical ticket 10
+sources. These additive conflicts retain Profiles, autoConnectKey, terminal
+`woken` handling, and all test slots. The shared controlled discovery fixture
+includes the new fail-closed wakeup callback before every ticket 17 constructor.
 
 Private build: `C:/Users/david/.cache/chiaki-msvc-native/ticket17-build`.
 Qt 6.9.3 MSVC2022 x64 and clang-cl 19.1.7 use the prepared native dependencies.
@@ -74,8 +78,10 @@ Only the four named affected QML cases ran; no linked inventory or narrow matrix
 
 `source-preservation.json` verifies the earlier passing service/test methods,
 the final default-import implementation, and unchanged native stream input,
-StreamRoot, Controllers, and keyboard/mouse components. The final unused-adapter
-removal rebuilt both tests and the real application; it changed no invoked path.
+StreamRoot, Controllers, and keyboard/mouse components. The unused-adapter removal and actual ticket 10 merge rebuilt both tests and the
+real application. The final source comparison retains incoming wake/auto-connect
+methods, request controls, and the backend except the required old-signal
+disconnect. No invoked ticket 17 file/profile method changed.
 Passing cases were not repeated after additive merges or unused API deletion.
 
 Native store sync errors return failure and attempt to restore the previous
