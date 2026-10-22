@@ -4,7 +4,7 @@
 
 **Blocked by:** 01: Preserve native playback with application-owned services.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 1, 2, 5, 6, 7, 8, 9, 11, 35, 36, 62, 63, 64, 65, 66, 67, 68, 69, 70, 90, 91.
 

@@ -22,8 +22,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 ## Frontier
 
 - [01: Application-owned native services](issues/01-application-owned-native-services.md): resolved for the native ownership milestone. Required graphics, live playback, cleanup, and performance acceptance remains assigned to tickets 03, 04, and 23.
-- [02: Native stream-only interface](issues/02-native-stream-only-interface.md): open and unblocked.
-- [03: Accelerated web console library](issues/03-accelerated-web-console-library.md): open and unblocked. The required combined graphics check from ticket 01 remains pending.
+- [02: Native stream-only interface](issues/02-native-stream-only-interface.md): claimed.
+- [03: Accelerated web console library](issues/03-accelerated-web-console-library.md): claimed. The required combined graphics check from ticket 01 remains pending.
 - Tickets 04 through 23: waiting for their declared blockers.
 
 ## Integration history
