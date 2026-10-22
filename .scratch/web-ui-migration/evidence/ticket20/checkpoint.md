@@ -1,6 +1,6 @@
 # Ticket 20 checkpoint
 
-State: WAITING for the ticket 22 recovery merge and ticket 19 common package preflight and frontend notices. This is not READY or package acceptance.
+Historical preparation checkpoint. The user subsequently skipped the remaining build and performance tests to prioritize prototype fidelity. Integration `1d769ee9ec3bfd267137d8ca738255feed9c7f90` was merged in `4c1e7a08`, including ticket 22 recovery and ticket 19 common package preflight and notices. The source milestone is now READY for merge. [Final evidence](verification.md) supersedes the waiting state and resume plan below. Do not run the remaining commands under the current request. No application package acceptance is claimed.
 
 ## Source and scope
 
@@ -55,7 +55,7 @@ The avformat build is deliberate. The previous static FFmpeg module omitted it a
 
 The offline npm source list was generated from the current lockfile in clean external staging without node_modules. It includes build dependencies. There are 71 locked packages and 144 Flatpak sources. The generator is the prepared pinned flatpak-builder-tools checkout. No final application frontend build in Flatpak has run yet.
 
-## Resume work
+## Historical resume plan
 
 No GUI or native runtime process was started. All builder and dependency processes have finished. There are no application binaries or final package hashes yet. The checkpoint check session also finished with exit 0.
 
