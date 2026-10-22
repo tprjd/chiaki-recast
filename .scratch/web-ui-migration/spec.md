@@ -537,3 +537,13 @@ and their blocking edges. Independent tickets can proceed together.
   have not been validated by this specification task.
 - The user confirmed the application test boundary. No additional triage
   is required. Implementation is tracked in [the implementation map](map.md).
+
+## User priority update, 2026-10-22
+
+The remaining build verification and performance tests are skipped at the
+user's request. Retain their unverified status and all completed evidence.
+The next implementation priority is to match the selected prototypes in
+`gui/prototype/`: B card library, A settings sidebar, and A guided console setup.
+Preserve all native services, media paths, input ownership, and bridge behavior.
+Review the actual visual result at supported widths of at least 1024 CSS pixels.
+No new narrow layout optimization or broad test/build matrix is required.
