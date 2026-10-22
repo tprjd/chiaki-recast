@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { connectSetup, type State, type Console } from './bridge';
 
   let current = $state<State>();
@@ -35,10 +35,16 @@
     const reply = await connection?.select(key);
     message = reply?.accepted ? '' : reply?.message ?? t('Console unavailable');
   }
-  function navigate(event: KeyboardEvent) {
+  async function navigate(event: KeyboardEvent) {
     const target = event.target as HTMLElement;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      query = '';
+      await tick();
+    }
     const cards = [...document.querySelectorAll<HTMLButtonElement>('.console-card:enabled')];
-    const selected = cards.find(card => card.dataset.consoleKey === current?.selectedKey) ?? cards[0];
+    const selected = cards.find(card => card.dataset.consoleKey === current?.selectedKey) ?? cards[0]
+      ?? document.querySelector<HTMLButtonElement>('.discovery:enabled');
     if (event.key === 'PageUp') {
       document.querySelector<HTMLInputElement>('input')?.focus();
       event.preventDefault();
@@ -47,7 +53,6 @@
     if (event.key === 'PageDown' || event.key === 'Escape' ||
       (!target.matches('.console-card') && target.tagName !== 'INPUT' && event.key.startsWith('Arrow')) ||
       (target.tagName === 'INPUT' && event.key === 'ArrowDown')) {
-      if (event.key === 'Escape') query = '';
       selected?.focus();
       event.preventDefault();
       return;

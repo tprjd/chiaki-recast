@@ -10,6 +10,9 @@
 #include <QDir>
 #include <QScreen>
 #include <QRegularExpression>
+#ifdef CHIAKI_HAVE_WEBENGINE
+#include <QtWebEngineQuick>
+#endif
 #include <memory>
 #include "qmlnativeservices.h"
 #include "setupwindow.h"
@@ -172,6 +175,10 @@ private slots:
         QCOMPARE(loaded.last().first().toBool(), true);
         QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
         QTRY_COMPARE(script(setup.view(), "document.querySelector('.empty h2')?.textContent").toString(), QStringLiteral("No consoles found"));
+        setup.view()->setFocus();
+        script(setup.view(), "document.querySelector('input').focus()");
+        QTest::keyClick(setup.windowHandle(), Qt::Key_PageDown);
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.classList.contains('discovery')").toBool());
         DiscoveryHost first = {};
         first.ps5 = true;
         first.host_name = "Office <img src=x onerror=alert(1)>";
@@ -217,6 +224,11 @@ private slots:
         script(setup.view(), "document.querySelector('input').value='PS4';document.querySelector('input').dispatchEvent(new Event('input',{bubbles:true}))");
         QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
         QCOMPARE(script(setup.view(), "document.querySelector('.console-name').textContent").toString(), second.host_name);
+        script(setup.view(), "document.querySelector('input').value='absent';document.querySelector('input').dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('input').focus()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 0);
+        QTest::keyClick(setup.windowHandle(), Qt::Key_Escape);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('input').value").toString(), QString());
+        QTRY_COMPARE(script(setup.view(), "document.activeElement?.dataset.consoleKey").toString(), key);
         setup.view()->reload();
         QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 2);
         QTRY_COMPARE(script(setup.view(), "document.querySelector('.selected')?.dataset.consoleKey").toString(), key);
@@ -269,6 +281,9 @@ int main(int argc, char **argv)
 {
     if (chiaki_lib_init() != CHIAKI_ERR_SUCCESS) return 1;
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+#ifdef CHIAKI_HAVE_WEBENGINE
+    QtWebEngineQuick::initialize();
+#endif
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("Chiaki embedded setup tests");
     QCoreApplication::setApplicationName("Chiaki embedded setup tests");
