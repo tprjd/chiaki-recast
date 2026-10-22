@@ -2088,15 +2088,6 @@ private slots:
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.settings-search input')").toBool());
         search("perceptual deadzone");
         QTRY_COMPARE(script(setup.view(), "document.querySelector('#placeboGamutMappingPerceptualDeadzone')?.value").toString(), QStringLiteral("0.42"));
-        const auto capture = [&](int width, int height, double zoom, const QString &name) {
-            setup.resize(width, height);
-            setup.view()->setZoomFactor(zoom);
-            QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth<=innerWidth && [...document.querySelectorAll('.settings-content input,.settings-content select,.settings-content button')].every(e=>{const r=e.getBoundingClientRect();return r.left>=0 && r.right<=innerWidth})").toBool());
-            setup.view()->grab().save(qEnvironmentVariable("CHIAKI_EMBEDDED_LAYOUT_DIR", QDir::tempPath()) + "/" + name);
-        };
-        capture(900, 600, 1, "color-900.png");
-        capture(800, 900, 2, "color-200-percent.png");
-        capture(390, 720, 1, "color-390.png");
         QSettings(QCoreApplication::organizationName(), "pl_render_params").sync();
         QProcess restarted;
         auto environment = QProcessEnvironment::systemEnvironment();
@@ -2108,6 +2099,47 @@ private slots:
         QTRY_COMPARE_WITH_TIMEOUT(restarted.state(), QProcess::NotRunning, 20000);
         QCOMPARE(restarted.exitStatus(), QProcess::NormalExit);
         QCOMPARE(restarted.exitCode(), 0);
+    }
+
+    void colorMappingLayout()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+            QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
+        });
+        QSettings(QCoreApplication::organizationName(), "pl_render_params").clear();
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetPlaceboPreset(PlaceboPreset::Custom);
+        settings.SetPlaceboGamutMappingPerceptualDeadzone(0.42);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        services.backend()->setDiscoveryEnabled(false);
+        SetupWindow setup(services.backend());
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled===false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.category-nav')").toBool());
+        script(setup.view(), "[...document.querySelectorAll('.category-nav button')].find(e=>e.textContent==='Color mapping').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('#placeboGamutMappingFunction')").toBool());
+        const auto capture = [&](int width, int height, double zoom, const QString &name) {
+            setup.resize(width, height);
+            setup.view()->setZoomFactor(zoom);
+            QTRY_COMPARE(script(setup.view(), "innerWidth").toInt(), qRound(setup.view()->width() / zoom));
+            QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth<=innerWidth && [...document.querySelectorAll('.settings-content input,.settings-content select,.settings-content button')].every(e=>{const r=e.getBoundingClientRect();return r.left>=0 && r.right<=innerWidth})").toBool());
+            script(setup.view(), "document.querySelector('.settings-content h2').scrollIntoView()");
+            QTRY_VERIFY(script(setup.view(), "['.settings-content h2','#placeboGamutMappingFunction'].every(s=>{const r=document.querySelector(s).getBoundingClientRect();return r.top>=0 && r.bottom<=innerHeight})").toBool());
+            script(setup.view(), "window.__colorPainted=false;requestAnimationFrame(()=>requestAnimationFrame(()=>window.__colorPainted=true))");
+            QTRY_VERIFY(script(setup.view(), "window.__colorPainted===true").toBool());
+            QTest::qWait(100);
+            QVERIFY(setup.view()->grab().save(qEnvironmentVariable("CHIAKI_EMBEDDED_LAYOUT_DIR", QDir::tempPath()) + "/" + name));
+        };
+        capture(1280, 720, 1, "color-1280.png");
+        capture(900, 600, 1, "color-900.png");
+        capture(800, 900, 2, "color-200-percent.png");
+        capture(390, 720, 1, "color-390.png");
     }
 
     void colorMappingRestartRead()

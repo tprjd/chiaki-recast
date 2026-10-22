@@ -102,10 +102,10 @@
       <h2>{t(category)}</h2>
       <p class="settings-note">{t('Changes are saved automatically.')}</p>
       {#if category === 'Color mapping'}
-        <button id="backRenderer" onclick={() => reveal('openPlaceboColorMapping')}>{t('Back to Renderer')}</button>
+        <button class="back-consoles" id="backRenderer" onclick={() => reveal('openPlaceboColorMapping')}>{t('Back to Renderer')}</button>
         {#if values.videoPreset !== 5 || !values.placeboColorMappingEnabled || values.placeboColorMappingPreset !== 0}
           <p>{t('Requires the Custom render preset, Color Mapping Enabled, and the Custom color mapping preset in Renderer.')}</p>
-          <button onclick={() => reveal('openPlaceboColorMapping')}>{t('Configure color mapping in Renderer')}</button>
+          <button class="back-consoles" onclick={() => reveal('openPlaceboColorMapping')}>{t('Configure color mapping in Renderer')}</button>
         {/if}
       {/if}
       {#if ['Video', 'Stream', 'Audio/Wifi'].includes(category)}<p class="settings-note">{t('Stream settings apply to the next session. Audio volume also changes the current session.')}</p>{/if}
