@@ -6,7 +6,7 @@ Publication: published to the local issue tracker through to-spec.
 Test boundary: confirmed by the user on 2026-10-22.
 Scope update: GPU-accelerated web setup without a QML setup fallback, confirmed on 2026-10-22.
 Ticket and test-policy update: approved by the user on 2026-10-22.
-Task scope: specification and implementation tickets only. Do not start implementation from this request.
+Task scope: the user invoked implement-spec on 2026-10-22. Implement the approved specification and all 23 tickets on the integration branch. The earlier planning-only restriction is superseded.
 
 ## Problem Statement
 
@@ -488,7 +488,6 @@ and their blocking edges. Independent tickets can proceed together.
 
 ## Out of Scope
 
-- Application implementation during this specification task.
 - Electron or a replacement native streaming backend.
 - Video frames, decoded audio, GPU handles, or raw game input through
   JavaScript, Chromium, or WebChannel.
@@ -531,4 +530,4 @@ and their blocking edges. Independent tickets can proceed together.
   Builds, native sessions, hardware measurements, and release packages
   have not been validated by this specification task.
 - The user confirmed the application test boundary. No additional triage
-  is required. Implementation remains outside this specification request.
+  is required. Implementation is tracked in [the implementation map](map.md).
