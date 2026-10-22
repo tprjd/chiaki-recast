@@ -655,7 +655,7 @@ void QmlMainWindow::show()
         QWindow::show();
         return;
     }
-    QQmlComponent component(qml_engine, QUrl(QStringLiteral("qrc:/Main.qml")));
+    QQmlComponent component(qml_engine, QUrl(QStringLiteral("qrc:/StreamRoot.qml")));
     if (!component.isReady()) {
         qCCritical(chiakiGui) << "Component not ready\n" << component.errors();
         QMetaObject::invokeMethod(QGuiApplication::instance(), &QGuiApplication::quit, Qt::QueuedConnection);
@@ -689,9 +689,9 @@ void QmlMainWindow::show()
         fullscreenTime();
     else
     {
-        if(!settings->GetGeometry().isEmpty())
+        if(!settings->GetStreamGeometry().isEmpty())
         {
-            setGeometry(settings->GetGeometry());
+            setGeometry(settings->GetStreamGeometry());
             showNormal();
         }
         else
@@ -1889,20 +1889,8 @@ renderer_backend_ready:
         }
         if (!session && had_session && (direct_stream || exit_app_on_stream_exit))
             QGuiApplication::quit();
-        if(!session)
-        {
+        if (!session)
             setStreamWindowAdjustable(false);
-            if(qEnvironmentVariable("XDG_CURRENT_DESKTOP") != "gamescope")
-            {
-                if(!this->settings->GetGeometry().isEmpty())
-                {
-                    setGeometry(this->settings->GetGeometry());
-                    normalTime();
-                }
-                else
-                    showMaximized();
-            }
-        }
     });
     connect(backend, &QmlBackend::windowTypeUpdated, this, &QmlMainWindow::updateWindowType);
 
@@ -3214,15 +3202,11 @@ bool QmlMainWindow::event(QEvent *event)
                 QMetaObject::invokeMethod(quick_render, std::bind(&QmlMainWindow::destroySwapchain, this), Qt::BlockingQueuedConnection);
         break;
     case QEvent::Move:
-        if(!session && isWindowAdjustable())
-            settings->SetGeometry(geometry());
-        else if(session && settings->GetWindowType() == WindowType::AdjustableResolution && isStreamWindowAdjustable())
+        if(settings->GetWindowType() == WindowType::AdjustableResolution && isStreamWindowAdjustable())
             settings->SetStreamGeometry(geometry());
         break;
     case QEvent::Resize:
-        if(!session && isWindowAdjustable())
-            settings->SetGeometry(geometry());
-        else if(session && settings->GetWindowType() == WindowType::AdjustableResolution && isStreamWindowAdjustable())
+        if(settings->GetWindowType() == WindowType::AdjustableResolution && isStreamWindowAdjustable())
             settings->SetStreamGeometry(geometry());
         if (isExposed())
             updateSwapchain();

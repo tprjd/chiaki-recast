@@ -9,8 +9,6 @@ Item {
     id: root
     required property var nativeWindow
     property string settingsPresentation: ""
-    property bool initialAsk: false
-    property var librarySelection: null
     readonly property bool preferSeparateStreamSettingsWindows: root.nativeWindow.runtimeRendererBackend === 1 && Chiaki.session
     property bool useSeparateStreamSettingsWindows: false
     readonly property bool streamSettingsOpen: displaySettingsRect.opacity > 0 || placeboSettingsRect.opacity > 0 || colorMappingSettingsRect.opacity > 0 || keyboardMouseSettingsRect.opacity > 0
@@ -125,8 +123,6 @@ Item {
         loader.item.restoreFocusItem = Window.window.activeFocusItem;
         root.openPlaceboSettings();
        }
-       else
-        stack.pop();
     }
 
     function showMainView() {
@@ -152,33 +148,11 @@ Item {
             dismissSettings();
             useSeparateStreamSettingsWindows = false;
         }
-        if (stack.depth > 1)
-            stack.pop(stack.get(0));
-        else
-            stack.replace(stack.get(0), mainViewComponent);
-    }
-
-    function showStreamView() {
-        if (stack.currentItem instanceof StreamView) return;
-        stack.replace(stack.get(0), streamViewComponent);
-    }
-
-    function showPsnView() {
-        if (stack.currentItem instanceof PsnView || stack.currentItem instanceof StreamView || stack.currentItem instanceof PSNTokenDialog) return;
-        stack.replace(stack.get(0), psnViewComponent, {}, StackView.Immediate)
-    }
-
-    function showManualHostDialog() {
-        stack.push(manualHostDialogComponent);
-    }
-
-    function rememberMainFocus() {
-        if (stack.currentItem instanceof MainView) stack.currentItem.rememberFocus();
+        root.nativeWindow.dismissStreamView();
     }
 
     function restoreMainFocus() {
         const view = stack.currentItem;
-        if (view instanceof MainView) { view.restoreFocus(); return; }
         if (!view) return;
         let item = view.nextItemInFocusChain();
         for (let count = 0; item && item !== view && count < 256; ++count) {
@@ -192,51 +166,10 @@ Item {
         }
     }
 
-    function showConfirmDialog(title, text, actionText, callback, rejectCallback = null) {
-        rememberMainFocus();
-        confirmDialog.title = title;
-        confirmDialog.text = text;
-        confirmDialog.actionText = actionText;
-        confirmDialog.callback = callback;
-        confirmDialog.rejectCallback = rejectCallback;
-        confirmDialog.restoreFocusItem = Window.window.activeFocusItem;
-        confirmDialog.open();
-    }
-
     function showRendererFallbackDialog(reason) {
-        rememberMainFocus();
         infoDialog.reason = reason;
         infoDialog.restoreFocusItem = Window.window.activeFocusItem;
         infoDialog.open();
-    }
-
-    function showPsnReminder() { remindDialog.offerPsnReminder(); }
-
-    function showRemindDialog(title, text, remotePlay, callback) {
-        if (remindDialog.visible) return false;
-        rememberMainFocus();
-        return remindDialog.showReminder(title, text, remotePlay, callback, Window.window.activeFocusItem);
-    }
-
-
-    function showRegistDialog(host, ps5, context) {
-        stack.push(registDialogComponent, {host: host, ps5: ps5,
-            registrationContext: context || Chiaki.createRegistrationContext()});
-    }
-
-    function showSettingsDialog() {
-        if (livePinHost.blocking) return;
-        stack.push(settingsDialogComponent);
-    }
-
-    function showDisplaySettingsDialog(route) {
-        if (route) stack.push(displaySettingsDialogComponent, {searchRoute: route});
-        else stack.push(displaySettingsDialogComponent);
-    }
-
-    function showPlaceboSettingsDialog(route) {
-        if (route) stack.push(placeboSettingsDialogComponent, {searchRoute: route});
-        else stack.push(placeboSettingsDialogComponent);
     }
 
     function showPlaceboColorMappingDialog(route) {
@@ -261,44 +194,6 @@ Item {
                 if (route) loader.item.revealSetting(route);
             }
         }
-        else if (route)
-            stack.push(placeboColorMappingDialogComponent, {searchRoute: route});
-        else
-            stack.push(placeboColorMappingDialogComponent);
-    }
-
-    function showProfileDialog(route) {
-        if (route) stack.push(profileDialogComponent, {searchRoute: route});
-        else stack.push(profileDialogComponent)
-    }
-
-    function showConsolePinDialog(submitPin, cancelPin, consoleName) {
-        stack.push(consolePinDialogComponent, {submitPin, cancelPin, consoleName: Qt.binding(consoleName)});
-    }
-
-    function showSteamShortcutDialog(fromReminder) {
-        stack.push(steamShortcutDialogComponent, {fromReminder: fromReminder});
-    }
-
-    function showPSNTokenDialog(psnurl, expired) {
-        stack.push(psnTokenDialogComponent, {psnurl: psnurl || "", expired: !!expired});
-    }
-
-    function showControllerMappingDialog(route) {
-        if (route) stack.push(controllerMappingDialogComponent, {searchRoute: route});
-        else stack.push(controllerMappingDialogComponent)
-    }
-
-    Component.onCompleted: {
-        if (Chiaki.connectionAttempt.presented && Chiaki.connectionAttempt.waitingForWake)
-            stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
-        else if (Chiaki.connectionAttempt.presented && Chiaki.connectionAttempt.route === "psn"
-                && Chiaki.connectionAttempt.phase !== "video" && Chiaki.connectionAttempt.phase !== "ready")
-            stack.replace(stack.get(0), psnViewComponent, {}, StackView.Immediate);
-        else if (Chiaki.session || Chiaki.connectionAttempt.presented)
-            stack.replace(stack.get(0), streamViewComponent, {}, StackView.Immediate);
-        else if (Chiaki.autoConnect)
-            stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
     }
 
     Pane {
@@ -309,10 +204,10 @@ Item {
     StackView {
         id: stack
         enabled: !livePinHost.blocking
-        objectName: "mainNavigation"
+        objectName: "streamNavigation"
         anchors.fill: parent
         hoverEnabled: false
-        initialItem: mainViewComponent
+        initialItem: streamViewComponent
         font.pixelSize: 20
 
         replaceEnter: Transition {
@@ -336,6 +231,8 @@ Item {
 
     LiveConsolePinHost {
         id: livePinHost
+        hostWindow: root.nativeWindow
+        navigation: root
         anchors.fill: parent
     }
 
@@ -553,57 +450,23 @@ Item {
 
     RendererFallbackDialog {
         id: infoDialog
+        property string presentation: ""
         navigation: root
-    }
-
-    ConfirmDialog {
-        id: confirmDialog
-        navigation: root
-    }
-
-    RegistrationMethodDialog {
-        id: registrationMethodDialog
-        navigation: root
-    }
-
-    RemindDialog {
-        id: remindDialog
-        navigation: root
+        onAboutToShow: presentation = root.nativeWindow.streamInput.present(infoDialog, "renderer-fallback", null)
+        onAboutToHide: {
+            const id = presentation;
+            root.nativeWindow.streamInput.dismiss(id);
+            const complete = function() {
+                infoDialog.closed.disconnect(complete);
+                root.nativeWindow.streamInput.settled(id);
+                if (infoDialog.presentation === id) infoDialog.presentation = "";
+            };
+            infoDialog.closed.connect(complete);
+        }
     }
 
     Connections {
         target: Chiaki
-
-        function onConnectionAttemptChanged() {
-            const attempt = Chiaki.connectionAttempt;
-            if (attempt.presented && attempt.waitingForWake) {
-                if (!stack.currentItem || stack.currentItem.objectName !== "autoConnectView")
-                    stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
-                return;
-            }
-            if (!attempt.presented || attempt.waitingForWake || Chiaki.autoConnect) return;
-            if (attempt.route === "psn" && attempt.phase !== "video" && attempt.phase !== "ready")
-                root.showPsnView();
-            else if (attempt.phase !== "ready") root.showStreamView();
-        }
-
-        function onSessionChanged() {
-            if (Chiaki.session)
-                root.showStreamView();
-        }
-
-        function onShowPsnView() {
-            root.showPsnView();
-        }
-
-        function onPsnCredsExpired() {
-            Chiaki.settings.psnRefreshToken = ""
-            Chiaki.settings.psnAuthToken = ""
-            Chiaki.settings.psnAuthTokenExpiry = ""
-            Chiaki.settings.psnAccountId = ""
-            root.showPSNTokenDialog("", true);
-        }
-
         function onError(title, text) {
             const attempt = Chiaki.connectionAttempt;
             if (attempt.presented && attempt.errorTitle === title && attempt.errorText === text) return;
@@ -611,50 +474,11 @@ Item {
             errorTextLabel.text = text;
             errorHideTimer.start();
         }
-
-        function onRegistDialogRequested(host, ps5, duid, context) {
-            if(!duid)
-                showRegistDialog(host, ps5, context);
-            else {
-                rememberMainFocus();
-                registrationMethodDialog.chooseRegistration(host, ps5, context, Window.window.activeFocusItem);
-            }
-        }
-
-        function onWakeupStartInitiated() {
-            if (!stack.currentItem || stack.currentItem.objectName !== "autoConnectView")
-                stack.replace(stack.get(0), autoConnectViewComponent, {}, StackView.Immediate);
-        }
-    }
-
-    Component {
-        id: mainViewComponent
-        MainView { }
     }
 
     Component {
         id: streamViewComponent
-        StreamView { }
-    }
-
-    Component {
-        id: autoConnectViewComponent
-        AutoConnectView { }
-    }
-
-    Component {
-        id: psnViewComponent
-        PsnView {}
-    }
-
-    Component {
-        id: manualHostDialogComponent
-        ManualHostDialog { }
-    }
-
-    Component {
-        id: settingsDialogComponent
-        SettingsDialog { }
+        StreamView { streamWindow: root.nativeWindow; navigation: root }
     }
 
     Component {
@@ -677,33 +501,4 @@ Item {
         PlaceboColorMappingDialog { }
     }
 
-    Component {
-        id: profileDialogComponent
-        ProfileDialog { }
-    }
-
-    Component {
-        id: consolePinDialogComponent
-        ConsolePinDialog { }
-    }
-
-    Component {
-        id: steamShortcutDialogComponent
-        SteamShortcutDialog { }
-    }
-
-    Component {
-        id: psnTokenDialogComponent
-        PSNTokenDialog { }
-    }
-
-    Component {
-        id: registDialogComponent
-        RegistDialog { }
-    }
-
-    Component {
-        id: controllerMappingDialogComponent
-        ControllerMappingDialog { }
-    }
 }
