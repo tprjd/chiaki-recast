@@ -39,7 +39,7 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [08: PSN native streaming](issues/08-psn-native-streaming.md): resolved for native remote refresh, current opaque target connection, token-wait recovery, and guarded worker cleanup. Focused web/native and Windows worker checks pass. Live PSN playback remains hardware acceptance.
 - [19: Windows package](issues/19-windows-web-native-package.md): resolved Windows x64 package milestone. Offline normal startup, restricted renderer, hardware Chromium and native Fast GL/Vulkan package checks pass. Portable ZIP verified; local installer and remaining physical/live/default HighQuality acceptance stay explicit in ticket 23. [Evidence](evidence/ticket19/verification.md).
 - [20: Linux packages](issues/20-linux-web-native-packages.md): resolved for the packaging source milestone. Matching AppImage toolchain, Flatpak dependencies, locked offline frontend inputs, package gates, and maintained callers are implemented. [Evidence](evidence/ticket20/verification.md) separates completed preparation from remaining build, package, runtime, and performance checks skipped at the user's request. No Linux package or release acceptance is claimed.
-- [21: macOS package](issues/21-macos-web-native-package.md): claimed after ticket 04. Source and package workflow checks are available; native Mac build, signing, and hardware acceptance are unavailable on this host.
+- [21: macOS package](issues/21-macos-web-native-package.md): resolved for the packaging source milestone. All ten maintained jobs use the shared locked frontend, matching SDK, deployment, notices, and conditional signing action. [Evidence](evidence/ticket21/verification.md) records prior focused checks and remaining Mac build, signing, package, runtime, and performance checks skipped at the user's request. No Mac package or hardware acceptance is claimed.
 - [09: Automatic PSN registration](issues/09-automatic-psn-registration.md): resolved. Independent automatic action, current target guards, native save-once completion, hidden resource preparation, native progress/retry/cancel, and cleanup before playback are verified. The carried local-DUID manual context case is verified. All ten automatic rows and affected manual form/progress pass across the final groups. Latest controller integration is merged; bounded source checks preserve valid passes. [Verification](evidence/ticket09/verification.md) records identities and limits. Live services, physical input/focus, graphics, packages, and the combined chooser remain in ticket 23.
 - [10: Wake and auto-connect](issues/10-wake-and-auto-connect.md): resolved for native wake, saved startup target, progress, cancellation, and guarded local/PSN startup. [Evidence](evidence/ticket10/verification.md) records page-independent native resources, controlled transport, late reply rejection, and limits. Ticket 23 retains real-console and hardware acceptance.
 - [22: Session and setup recovery](issues/22-session-and-setup-recovery.md): resolved for actual renderer recovery, fresh channel/state, scoped web action invalidation, and guarded native resume. [Verification](evidence/ticket22/verification.md) records local/PSN decoded recovery, complete buffer release, focus/selection/search, pending-request preservation, and hidden/frozen resource measurements. Physical power/input/focus, live consoles, GPU/presets, performance, packages, and platforms remain in 23.
@@ -104,6 +104,19 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [Ticket 15](issues/15-keyboard-and-mouse-controls.md) adds native physical capture, all keyboard and mouse slots, response controls, legacy keys, and complete reset to the web settings page. Form/profile/window guards cancel stale capture and reset work across handoff. [Verification](evidence/ticket15/verification.md) records focused application passes, current-source GNU numeric response 10/0, source preservation, and hardware limits. Physical calibration remains provisional.
 
 - [Ticket 16](issues/16-controller-setup-and-mapping.md) adds Controllers to shared web settings. Existing native services retain capture, conflict movement, mapping persistence, reset, and cancellation. Opaque operation and profile guards reject stale commands. Native controller navigation reaches WebEngine and resumes after capture. [Verification](evidence/ticket16/verification.md) records controlled SDL virtual-device checks, source preservation, setup-only QML removal, and the invalid 200 percent widget grab. Physical controllers, real-console input, haptics, graphics, and final zoom visual acceptance remain in ticket 23.
+
+- [Ticket 21](issues/21-macos-web-native-package.md) implements one macOS package
+  action for all maintained Intel and Apple silicon routes. It uses the locked
+  frontend and official Qt 6.9.3 universal SDK, package checks, matching notices,
+  and explicit conditional Developer ID signing and notarization.
+  [Verification](evidence/ticket21/verification.md) records local fixture, shell,
+  YAML, partial-signing rejection, and source checks. No Mac build or runtime
+  result is claimed. The source milestone is resolved after merging integration
+  `1d769ee9ec3bfd267137d8ca738255feed9c7f90`, including ticket 19 common notices
+  and preflight. The preflight checks the final signed app with no inherited Qt
+  or DYLD environment. The user skipped remaining build and performance tests
+  to focus on prototype UI fidelity. Mac package and hardware checks remain
+  unverified.
 
 ## User priority update, 2026-10-22
 
