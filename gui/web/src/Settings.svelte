@@ -54,8 +54,9 @@
     if (category === 'Audio/Wifi') connection.refreshAudioDevices();
     await tick();
     const target = document.getElementById(unmet ? unmet.key : requires && !values[requires] ? requires : field?.requiresValue && values[field.requiresValue.key] !== field.requiresValue.value ? field.requiresValue.key : key);
-    target?.focus();
-    target?.scrollIntoView({ block: 'nearest' });
+    const available = target ?? (category === 'Profiles' ? document.getElementById('profileSelection') : null);
+    available?.focus();
+    available?.scrollIntoView({ block: 'nearest' });
   }
   async function change(key: string, value: boolean | number | string, generation = current.profileGeneration) {
     if (key === 'openPlaceboColorMapping') { await reveal('placeboGamutMappingFunction'); return; }

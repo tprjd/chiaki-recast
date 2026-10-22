@@ -697,6 +697,72 @@ private slots:
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-active-profile]')?.textContent.includes('Hidden')").toBool());
     }
 
+    void profileSearch()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            for(const auto &name : {profile, profile + "-new"}) QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        QVERIFY(settings.SetCurrentProfile(profile));
+        settings.SetDiscoveryEnabled(false);
+        QList<QPointer<PsnReply>> network;
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, controlledProfileRequests(network), {}, registration.boundary(), controlledDiscovery());
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 900);
+        setup.show();
+        QVERIFY(click(setup.view(), ".open-settings"));
+        QVERIFY(fill(setup.view(), ".settings-search input", "New profile name"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-results button')?.textContent.includes('New profile name')").toBool());
+        QVERIFY(click(setup.view(), ".settings-results button"));
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.id==='profileSelection'").toBool());
+        script(setup.view(), "{const select=document.querySelector('#profileSelection');select.value='create';select.dispatchEvent(new Event('change',{bubbles:true}));}");
+        QVERIFY(fill(setup.view(), "#newProfileName", profile + "-new"));
+        services.backend()->qmlSettings()->setLogVerbose(true);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#newProfileName')?.value").toString(), profile + "-new");
+        QVERIFY(click(setup.view(), "#profileAction"));
+        QTRY_COMPARE(services.backend()->qmlSettings()->currentProfile(), profile + "-new");
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.id==='profileSelection'").toBool());
+        QVERIFY(fill(setup.view(), ".settings-search input", "Delete selected profile"));
+        QVERIFY(click(setup.view(), ".settings-results button"));
+        QTRY_VERIFY(script(setup.view(), "document.activeElement?.id==='profileSelection'").toBool());
+        setup.resize(2560, 1800);
+        setup.view()->setZoomFactor(2);
+        QTRY_VERIFY(script(setup.view(), "innerWidth>=1024 && document.documentElement.scrollWidth<=innerWidth && !!document.querySelector('#profileSelection')").toBool());
+    }
+
+    void profileDefaultImport()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        QVERIFY(settings.SetCurrentProfile(profile));
+        settings.SetAudioVolume(37);
+        QTemporaryDir files;
+        const auto input = files.filePath("default.ini");
+        {
+            QSettings file(input, QSettings::IniFormat);
+            file.setValue("version", 2);
+            file.setValue("settings/audio_volume", 21);
+            file.beginWriteArray("profiles", 1);
+            file.setArrayIndex(0);
+            file.setValue("settings/profile_name", "Imported profile");
+            file.endArray();
+        }
+        QVERIFY(settings.ImportSettings(input));
+        Settings restored(QString{});
+        QCOMPARE(restored.GetAudioVolume(), 21);
+        QCOMPARE(restored.GetCurrentProfile(), QString{});
+        QCOMPARE(restored.GetProfiles(), QList<QString>{"Imported profile"});
+        Settings named(profile);
+        QCOMPARE(named.GetAudioVolume(), 37);
+    }
+
     void profileRestartRead()
     {
         const auto profile = qEnvironmentVariable("CHIAKI_PROFILE_RESTART");

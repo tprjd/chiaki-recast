@@ -2019,7 +2019,7 @@ QVariantMap SetupBridge::profileAction(const QString &action, const QString &key
     if(action != "create" && action != "switch") return {{"accepted", false}};
     const bool saved = backend->nativeSettings()->SetCurrentProfile(target);
     refresh();
-    return {{"accepted", saved}, {"message", saved ? tr("Profile selected.") : tr("The profile could not be selected.")}};
+    return {{"accepted", saved}, {"profileGeneration", QString::number(backend->profileGeneration())}, {"message", saved ? tr("Profile selected.") : tr("The profile could not be selected.")}};
 }
 
 QVariantMap SetupBridge::settingsFileAction(const QString &action, const QString &profile)

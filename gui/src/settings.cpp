@@ -358,8 +358,8 @@ bool Settings::ImportSettings(QString filepath)
 		replace(destination, previous);
 		return false;
 	}
-	if(!profile.isEmpty() && !profiles.contains(profile)) profiles.append(profile);
-	// Keep the local profile catalog while replacing the selected profile's values.
+	if(profile.isEmpty()) LoadProfiles();
+	else if(!profiles.contains(profile)) profiles.append(profile);
 	SaveProfiles();
 	default_settings.setValue("settings/current_profile", profile);
 	default_settings.sync();

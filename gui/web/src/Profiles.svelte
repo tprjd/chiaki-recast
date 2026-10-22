@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
+  import { tick, untrack } from 'svelte';
   import type { State, connectSetup } from './bridge';
   let { current, connection, t }: { current: State; connection: Awaited<ReturnType<typeof connectSetup>>; t: (text: string) => string } = $props();
   let selected = $state('');
@@ -10,10 +10,12 @@
   let generation = '';
   const item = $derived(current.profiles.items.find(item => item.key === selected));
   const creating = $derived(selected === 'create');
+  const profileGeneration = $derived(current.profileGeneration);
+  const catalog = $derived(current.profiles.items.map(item => item.key).join(','));
   $effect(() => {
-    generation = current.profileGeneration;
-    const active = current.profiles.items.find(item => item.active)?.key ?? '';
-    untrack(() => { selected = active; name = ''; deleting = false; message = ''; });
+    generation = profileGeneration;
+    void catalog;
+    untrack(() => { selected = current.profiles.items.find(item => item.active)?.key ?? ''; name = ''; deleting = false; message = ''; });
   });
   async function apply() {
     if (pending) return;
@@ -21,7 +23,13 @@
     const owner = generation;
     try {
       const result = await connection.profileAction(creating ? 'create' : deleting ? 'delete' : 'switch', selected, name, deleting, owner);
-      if (owner === current.profileGeneration || result.accepted) message = result.message ?? '';
+      if (owner !== current.profileGeneration && result.profileGeneration !== current.profileGeneration) return;
+      message = result.message ?? '';
+      if (result.accepted) {
+        pending = false;
+        await tick();
+        document.getElementById('profileSelection')?.focus();
+      }
     } finally { pending = false; }
   }
 </script>

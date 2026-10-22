@@ -57,7 +57,7 @@ if(TARGET chiaki-gui)
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
     add_test(NAME chiaki-remote-native-connection COMMAND chiaki-embedded-setup-tests remoteNativeConnection)
     set_tests_properties(chiaki-remote-native-connection PROPERTIES LABELS desktop)
-    add_test(NAME chiaki-embedded-profiles COMMAND chiaki-embedded-setup-tests profileImportValidation profileSettingsPage profileFiles)
+    add_test(NAME chiaki-embedded-profiles COMMAND chiaki-embedded-setup-tests profileImportValidation profileSettingsPage profileFiles profileSearch profileDefaultImport)
     set_tests_properties(chiaki-embedded-profiles PROPERTIES
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
     add_test(NAME chiaki-embedded-automatic-registration COMMAND chiaki-embedded-setup-tests automaticRegistration)
