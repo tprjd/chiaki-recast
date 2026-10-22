@@ -4,7 +4,7 @@
 
 **Blocked by:** 08: Stream from a registered console through PSN.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 28, 29, 30, 35, 36, 46.
 
@@ -17,3 +17,7 @@
 - [ ] Missing, hidden, ambiguous, removed, or stale-profile targets do not connect to another console.
 - [ ] Embedded tests cover startup timing, wake wait, wake failure, explicit cancellation, local and PSN routes, and late native replies.
 - [ ] Remove setup-only routes, resources, callback adapters, and tests replaced by this slice once no caller needs them. Preserve shared native stream components and their tests.
+
+## Comments
+
+- Claimed after native PSN streaming. Prepare an isolated worktree for native wake and startup auto-connect. Follow the current 1024 CSS pixel design scope and reuse current target/profile/attempt guards.
