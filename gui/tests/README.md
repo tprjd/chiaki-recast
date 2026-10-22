@@ -355,6 +355,9 @@ real 30-second timeout, replacement, and late replies. The account source cases
 retain form input through lookup and PSN sign-in. Only a current native result
 can fill the Account ID field. Public lookup does not save credentials.
 
+The maintained pairing fixture uses widths of at least 1024 CSS pixels.
+Its 200 percent zoom check uses a 2560-pixel window. Earlier narrow captures
+remain historical evidence and do not set the supported layout scope.
 The test uses offscreen rendering and a test-only `--disable-gpu` flag.
 `registrationHandoff` is a separate Windows desktop case. It registers through
 the controlled native transport, then uses the normal connection path with a

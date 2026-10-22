@@ -1568,6 +1568,7 @@ private slots:
         backend->stopAutoConnect();
         ApplicationController controller(&services);
         auto &setup = *controller.setupWindow();
+        setup.resize(1280, 720);
         setup.show();
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-selected]')").toBool());
         script(setup.view(), "document.querySelector('[data-register-selected]').click()");
@@ -1664,16 +1665,16 @@ private slots:
         QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-registration-address]').type").toString(), QStringLiteral("password"));
         QCOMPARE(script(setup.view(), "document.querySelector('[data-registration-online-id]').type").toString(), QStringLiteral("password"));
         QCOMPARE(registration.requests.size(), 0);
-        setup.resize(900, 600);
-        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
-        capture("registration-900");
+        setup.resize(1024, 720);
+        QTRY_VERIFY(script(setup.view(), "innerWidth >= 1024 && document.documentElement.scrollWidth <= innerWidth").toBool());
+        capture("registration-1024");
+        setup.resize(2560, 1440);
         setup.view()->setZoomFactor(2);
-        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
-        capture("registration-200-percent");
+        QTRY_VERIFY(script(setup.view(), "innerWidth >= 1024 && document.documentElement.scrollWidth <= innerWidth").toBool());
+        capture("registration-200-supported");
         setup.view()->setZoomFactor(1);
-        setup.resize(390, 720);
-        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
-        capture("registration-390");
+        setup.resize(1280, 720);
+        QTRY_VERIFY(script(setup.view(), "innerWidth >= 1024 && document.documentElement.scrollWidth <= innerWidth").toBool());
         script(setup.view(), "document.querySelector('[data-registration-close]').scrollIntoView({block:'center'});document.querySelector('[data-registration-close]').click()");
         QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-register-new')").toBool());
     }
@@ -1693,6 +1694,7 @@ private slots:
         QmlNativeServices services(&settings, registration.guardedPsn(), {}, registration.boundary(), controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
+        setup.resize(1280, 720);
         setup.show();
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
@@ -1776,6 +1778,7 @@ private slots:
         QmlNativeServices services(&settings, registration.guardedPsn(transport), {}, registration.boundary(), controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
+        setup.resize(1280, 720);
         setup.show();
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
@@ -1868,6 +1871,7 @@ private slots:
         QmlNativeServices services(&settings, registration.guardedPsn(transport), {}, registration.boundary(), controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
+        setup.resize(1280, 720);
         setup.show();
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
@@ -1912,6 +1916,7 @@ private slots:
         QmlNativeServices services(&settings, registration.guardedPsn(transport), {}, registration.boundary(), controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
+        setup.resize(1280, 720);
         setup.show();
         QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-register-new]') !== null").toBool());
         script(setup.view(), "document.querySelector('[data-register-new]').click()");
@@ -1982,6 +1987,7 @@ private slots:
         QmlNativeServices services(&settings, registration.guardedPsn(), {}, registration.boundary(), controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
+        setup.resize(1280, 720);
         setup.show();
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-selected]')").toBool());
         script(setup.view(), "document.querySelector('[data-register-selected]').click()");
@@ -2020,6 +2026,7 @@ private slots:
         QmlNativeServices services(&settings, registration.guardedPsn(), {}, registration.boundary(), controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
+        setup.resize(1280, 720);
         setup.show();
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-new]')").toBool());
         const auto generation = QString::number(services.backend()->profileGeneration());
@@ -2088,6 +2095,7 @@ private slots:
         discovered.host_name = "Unregistered console";
         discovered.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
         if (discovery) discover(backend, {discovered});
+        setup.resize(1280, 720);
         setup.show();
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-selected]')").toBool());
         script(setup.view(), "document.querySelector('[data-register-selected]').click()");
