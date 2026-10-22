@@ -1,4 +1,5 @@
 #include "qmlbackend.h"
+#include <QHostAddress>
 #include "qmlsettings.h"
 #include "qmlmainwindow.h"
 #include "streamsession.h"
@@ -105,15 +106,25 @@ static void msg_handler(QtMsgType type, const QMessageLogContext &context, const
     chiaki_log(chiaki_log_ctx, chiaki_level, "%s", qPrintable(msg));
 }
 
-QmlRegist::QmlRegist(uint32_t log_mask, QObject *parent)
-    : QObject(parent)
+QmlRegist::QmlRegist(uint32_t log_mask, QObject *parent, RegistrationRequests requests)
+    : QObject(parent), requests(std::move(requests))
 {
     chiaki_log_init(&chiaki_log, log_mask, &QmlRegist::log_cb, this);
 }
 
 ChiakiErrorCode QmlRegist::start(const ChiakiRegistInfo &regist_info)
 {
-    return chiaki_regist_start(&chiaki_regist, &chiaki_log, &regist_info, &QmlRegist::regist_cb, this);
+    const auto result = requests.start(&chiaki_regist, &chiaki_log, &regist_info, &QmlRegist::regist_cb, this);
+    started = result == CHIAKI_ERR_SUCCESS;
+    return result;
+}
+
+QmlRegist::~QmlRegist()
+{
+    if (started) {
+        requests.stop(&chiaki_regist);
+        requests.fini(&chiaki_regist);
+    }
 }
 
 void QmlRegist::log_cb(ChiakiLogLevel level, const char *msg, void *user)
@@ -131,6 +142,7 @@ void QmlRegist::regist_cb(ChiakiRegistEvent *event, void *user)
         QMetaObject::invokeMethod(r, std::bind(&QmlRegist::success, r, *event->registered_host), Qt::QueuedConnection);
         QMetaObject::invokeMethod(r, &QObject::deleteLater, Qt::QueuedConnection);
         break;
+    case CHIAKI_REGIST_EVENT_TYPE_FINISHED_CANCELED:
     case CHIAKI_REGIST_EVENT_TYPE_FINISHED_FAILED:
         QMetaObject::invokeMethod(r, &QmlRegist::failed, Qt::QueuedConnection);
         QMetaObject::invokeMethod(r, &QObject::deleteLater, Qt::QueuedConnection);
@@ -140,11 +152,12 @@ void QmlRegist::regist_cb(ChiakiRegistEvent *event, void *user)
     }
 }
 
-QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests, QmlSettings::ProcessLauncher launcher, DiscoveryRequests discovery)
+QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests, QmlSettings::ProcessLauncher launcher, RegistrationRequests registration, DiscoveryRequests discovery)
     : QObject(parent)
     , settings(settings)
     , settings_qml(new QmlSettings(settings, this, std::move(launcher)))
     , discovery_manager(nullptr, std::move(discovery))
+    , registration_requests(std::move(registration))
     , psn_requests(std::move(requests))
 {
     qt_msg_handler = qInstallMessageHandler(msg_handler);
@@ -311,6 +324,7 @@ bool QmlBackend::prepareFrameForPresentation(ChiakiFfmpegFrame &frame, bool use_
 
 QmlBackend::~QmlBackend()
 {
+    qDeleteAll(findChildren<QmlRegist *>());
     psn_hosts_future.waitForFinished();
     releaseSession();
     qInstallMessageHandler(qt_msg_handler);
@@ -527,7 +541,14 @@ void QmlBackend::reconnectPsn()
 
 void QmlBackend::profileChanged()
 {
+    cancelAccountLookup(account_lookup_attempt.value("id").toString());
     ++profile_generation;
+    if (!registration_attempt.isEmpty()) {
+        registration_attempt["phase"] = "failure";
+        registration_attempt["profileValid"] = false;
+        registration_attempt["message"] = tr("The profile changed. The registration was not saved.");
+        emit registrationAttemptChanged();
+    }
     for (auto *request : findChildren<PSNAccountID *>())
         request->Invalidate();
     if (!psn_auth_attempt.isEmpty()) {
@@ -1717,110 +1738,149 @@ QVariantList QmlBackend::hiddenHosts() const
 }
 
 
-QVariantMap QmlBackend::createRegistrationContext() const
+QVariantMap QmlBackend::createRegistrationContext(int index) const
 {
-    return {{"profileGeneration", QVariant::fromValue(profile_generation)},
+    QVariantMap context{{"profileGeneration", QString::number(profile_generation)},
         {"discovered", false}, {"manualId", -1}, {"manualAddress", QString()}};
+    if (index < 0) return context;
+    const auto server = displayServerAt(index);
+    if (!server.valid || !server.duid.isEmpty()) return {};
+    context["address"] = server.GetHostAddr();
+    context["ps5"] = server.IsPS5();
+    context["discovered"] = server.discovered;
+    if (server.discovered)
+        context["mac"] = server.discovery_host.GetHostMAC().ToString();
+    else {
+        context["manualId"] = server.manual_host.GetID();
+        context["manualAddress"] = server.manual_host.GetHost();
+        context["manualMac"] = server.manual_host.GetMAC().ToString();
+        context["manualRegistered"] = server.manual_host.GetRegistered();
+    }
+    return context;
 }
 
-bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QJSValue &callback, const QVariantMap &context)
+bool QmlBackend::registrationContextCurrent(const QVariantMap &context, const QString &address) const
 {
-    if(!context.contains("profileGeneration") || context.value("profileGeneration").toULongLong() != profile_generation)
-    {
-        emit error(tr("Profile changed"), tr("Close this screen and open registration again for the current profile."));
+    if (!context.contains("profileGeneration") || context.value("profileGeneration").toULongLong() != profile_generation)
         return false;
+    if (context.value("discovered").toBool()) {
+        int found = 0;
+        for (const auto &value : hosts()) {
+            const auto host = value.toMap();
+            if (host.value("discovered").toBool() && host.value("display").toBool()
+                && host.value("mac") == context.value("mac") && host.value("address").toString() == address) ++found;
+        }
+        return found == 1 && address == context.value("address").toString();
     }
-    if(registration_active)
-    {
-        emit error(tr("Registration in progress"), tr("Wait for the current registration to finish before starting another request."));
-        return false;
+    const int manual_id = context.value("manualId", -1).toInt();
+    if (manual_id < 0) return true;
+    if (!settings->GetManualHostExists(manual_id)) return false;
+    const auto host = settings->GetManualHost(manual_id);
+    return address == context.value("manualAddress").toString() && host.GetHost() == address
+        && host.GetMAC().ToString() == context.value("manualMac").toString()
+        && host.GetRegistered() == context.value("manualRegistered").toBool();
+}
+
+bool QmlBackend::registerHost(const QString &host, const QString &psn_id, const QString &pin, const QString &cpin, bool broadcast, int target, const QVariantMap &original_context)
+{
+    if (registration_active) return false;
+    QVariantMap context = original_context;
+    // An entered address can use an existing manual entry, but must never guess between duplicates.
+    if (!context.value("discovered").toBool() && context.value("manualId", -1).toInt() < 0) {
+        int matches = 0;
+        for (const auto &manual : settings->GetManualHosts()) {
+            if (manual.GetHost() != host) continue;
+            ++matches;
+            context["manualId"] = manual.GetID();
+            context["manualAddress"] = manual.GetHost();
+            context["manualMac"] = manual.GetMAC().ToString();
+            context["manualRegistered"] = manual.GetRegistered();
+        }
+        if (matches > 1) return false;
     }
+    const QByteArray account = psn_id.toLatin1();
+    const auto decoded = QByteArray::fromBase64Encoding(account, QByteArray::AbortOnBase64DecodingErrors);
+    const bool legacy = target == CHIAKI_TARGET_PS4_8;
+    static const QRegularExpression hostname(QStringLiteral("^(?=.{1,253}$)(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.)*[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.?$"));
+    static const QRegularExpression numeric(QStringLiteral("^[0-9.]+$"));
+    QHostAddress ip;
+    const bool validAddress = ip.setAddress(host) || (hostname.match(host).hasMatch() && !numeric.match(host).hasMatch());
+    if (!registrationContextCurrent(context, host) || !validAddress || host != host.trimmed()
+        || (target != CHIAKI_TARGET_PS5_1 && target != CHIAKI_TARGET_PS4_8 && target != CHIAKI_TARGET_PS4_9 && target != CHIAKI_TARGET_PS4_10)
+        || !QRegularExpression("^[0-9]{8}$").match(pin).hasMatch()
+        || !QRegularExpression("^$|^[0-9]{4}$").match(cpin).hasMatch()
+        || (legacy ? psn_id.trimmed().isEmpty() || psn_id.size() > 128
+            : !decoded || decoded.decoded.size() != CHIAKI_PSN_ACCOUNT_ID_SIZE || decoded.decoded.toBase64() != account)
+        || broadcast != (host == "255.255.255.255")) return false;
+
     ChiakiRegistInfo info = {};
-    QByteArray hostb = host.toUtf8();
-    info.host = hostb.constData();
+    const auto host_bytes = host.toUtf8();
+    const auto online_id = psn_id.toUtf8();
+    info.host = host_bytes.constData();
     info.target = static_cast<ChiakiTarget>(target);
     info.broadcast = broadcast;
-    info.pin = (uint32_t)pin.toULong();
-    info.console_pin = (uint32_t)cpin.toULong();
-    info.holepunch_info = nullptr;
-    info.rudp = nullptr;
-    QByteArray psn_idb;
-    if (target == CHIAKI_TARGET_PS4_8) {
-        psn_idb = psn_id.toUtf8();
-        info.psn_online_id = psn_idb.constData();
-    } else {
-        QByteArray account_id = QByteArray::fromBase64(psn_id.toUtf8());
-        if (account_id.size() != CHIAKI_PSN_ACCOUNT_ID_SIZE) {
-            emit error(tr("Invalid Account-ID"), tr("The PSN Account-ID must be exactly %1 bytes encoded as base64.").arg(CHIAKI_PSN_ACCOUNT_ID_SIZE));
-            return false;
-        }
-        info.psn_online_id = nullptr;
-        memcpy(info.psn_account_id, account_id.constData(), CHIAKI_PSN_ACCOUNT_ID_SIZE);
-    }
-    auto regist = new QmlRegist(settings->GetLogLevelMask(), this);
-    auto completed = std::make_shared<bool>(false);
+    info.pin = pin.toUInt();
+    info.console_pin = cpin.toUInt();
+    if (legacy) info.psn_online_id = online_id.constData();
+    else memcpy(info.psn_account_id, decoded.decoded.constData(), CHIAKI_PSN_ACCOUNT_ID_SIZE);
+
+    const auto id = QString::number(++registration_generation);
     const auto generation = profile_generation;
     registration_active = true;
-    connect(regist, &QmlRegist::log, this, [callback, completed](ChiakiLogLevel level, QString msg) {
-        if(*completed)
-            return;
-        QJSValue cb = callback;
-        if (cb.isCallable())
-            cb.call({QString("[%1] %2").arg(chiaki_log_level_char(level)).arg(msg), true, false});
+    registration_attempt = {{"id", id}, {"phase", "progress"}, {"profileValid", true}, {"diagnostics", QString()}};
+    auto *regist = new QmlRegist(settings->GetLogLevelMask(), this, registration_requests);
+    auto completed = std::make_shared<bool>(false);
+    connect(regist, &QmlRegist::log, this, [this, completed, generation](ChiakiLogLevel level, const QString &message) {
+        if (*completed || generation != profile_generation || level == CHIAKI_LOG_VERBOSE || level == CHIAKI_LOG_DEBUG) return;
+        // Raw payload dumps and server-defined keys must not enter the web page.
+        if ((!message.startsWith("Regist ") && !message.startsWith("REGIST - ")) || message.contains("unknown key")) return;
+        registration_attempt["diagnostics"] = (registration_attempt.value("diagnostics").toString()
+            + QString("[%1] %2\n").arg(chiaki_log_level_char(level)).arg(message)).right(16384);
+        emit registrationAttemptChanged();
     });
-    connect(regist, &QmlRegist::failed, this, [this, callback, completed, generation]() {
-        if(*completed)
-            return;
+    const auto finish = [this, completed, generation](const QString &message, bool success) {
+        if (*completed) return;
         *completed = true;
         registration_active = false;
-        QJSValue cb = callback;
-        if (cb.isCallable())
-            cb.call({generation == profile_generation ? QString() : tr("The profile changed. The registration was not saved."), false, true});
+        registration_attempt["phase"] = success ? "success" : "failure";
+        registration_attempt["message"] = generation == profile_generation ? message : tr("The profile changed. The registration was not saved.");
+        registration_attempt["profileValid"] = generation == profile_generation;
+        emit registrationAttemptChanged();
+    };
+    connect(regist, &QmlRegist::failed, this, [this, finish] {
+        finish(tr("The console could not be registered. Check your details and try again. Open diagnostics for available information."), false);
     });
-    connect(regist, &QmlRegist::success, this, [this, host, callback, context, generation, completed](const RegisteredHost &rhost) {
-        if(*completed)
+    connect(regist, &QmlRegist::success, this, [this, context, host, cpin, completed, generation, finish](const RegisteredHost &result) {
+        if (*completed) return;
+        if (generation != profile_generation || !registrationContextCurrent(context, host)) {
+            finish(tr("The profile or original console address changed. The registration was not saved. Open registration again."), false);
             return;
-        *completed = true;
-        QString completion_error;
-        if(generation != profile_generation)
-            completion_error = tr("The profile changed. The registration was not saved.");
-        const int manual_id = context.value("manualId").toInt();
-        const QString address = context.value("manualAddress").toString();
-        const auto manual_target_valid = [this, manual_id, address] {
-            return manual_id < 0 || (settings->GetManualHostExists(manual_id)
-                && settings->GetManualHost(manual_id).GetHost() == address);
-        };
-        if(completion_error.isEmpty() && !context.value("discovered").toBool() && !manual_target_valid())
-            completion_error = tr("The original console address changed or was removed. Open registration again.");
-        if(completion_error.isEmpty())
-        {
-            settings->AddRegisteredHost(rhost);
-            if(generation != profile_generation)
-                completion_error = tr("The profile changed during the update. Check the original profile before trying again.");
-            else if(!context.value("discovered").toBool())
-            {
-                if(!manual_target_valid())
-                    completion_error = tr("The console address changed during the update. Check registration before trying again.");
-                else
-                {
-                    ManualHost manual_host(manual_id, address.isEmpty() ? host : address, false, {});
-                    manual_host.Register(rhost);
-                    settings->SetManualHost(manual_host);
-                }
-            }
         }
-        registration_active = false;
-        QJSValue cb = callback;
-        if(cb.isCallable())
-            cb.call({completion_error, completion_error.isEmpty(), true});
+        RegisteredHost registered(result);
+        registered.SetConsolePin(registered, cpin);
+        settings->AddRegisteredHost(registered);
+        if (generation != profile_generation) {
+            finish(tr("The profile changed during the update. Check the original profile before trying again."), false);
+            return;
+        }
+        if (!context.value("discovered").toBool()) {
+            if (!registrationContextCurrent(context, host)) {
+                finish(tr("The console address changed during the update. Check registration before trying again."), false);
+                return;
+            }
+            ManualHost manual(context.value("manualId", -1).toInt(), host, false, {});
+            manual.Register(registered);
+            settings->SetManualHost(manual);
+        }
+        registration_attempt["resultMac"] = registered.GetServerMAC().ToString();
+        registration_attempt["resultAddress"] = host;
+        finish({}, true);
     });
-    const auto err = regist->start(info);
-    if(err != CHIAKI_ERR_SUCCESS)
-    {
-        *completed = true;
-        registration_active = false;
+    emit registrationAttemptChanged();
+    const auto result = regist->start(info);
+    if (result != CHIAKI_ERR_SUCCESS) {
         regist->deleteLater();
-        emit error(tr("Registration did not start"), QString::fromUtf8(chiaki_error_string(err)));
+        finish(tr("Registration did not start. Check the console address and try again.") + " " + QString::fromUtf8(chiaki_error_string(result)), false);
         return false;
     }
     return true;
@@ -3040,6 +3100,81 @@ QString QmlBackend::startPsnAuth(const QUrl &url)
     emit psnAuthAttemptChanged();
     request->GetPsnAccountId(codes.first());
     return id;
+}
+
+QString QmlBackend::startAccountLookup(const QString &username)
+{
+    cancelAccountLookup(account_lookup_attempt.value("id").toString());
+    const auto id = QString::number(++account_lookup_generation);
+    const auto generation = profile_generation;
+    account_lookup_attempt = {{"id", id}, {"phase", "pending"}};
+    if (username.trimmed().isEmpty() || username.size() > 128 || username.contains(QRegularExpression("[\\x00-\\x1f]"))) {
+        account_lookup_attempt["phase"] = "failure";
+        account_lookup_attempt["message"] = tr("Enter your PSN username.");
+        emit accountLookupChanged();
+        return id;
+    }
+    auto *operation = new QObject(this);
+    auto *manager = psn_requests.networkManager ? psn_requests.networkManager(operation) : new QNetworkAccessManager(operation);
+    QNetworkRequest request(QUrl("https://psn.flipscreen.games/search.php?username="
+        + QString::fromLatin1(QUrl::toPercentEncoding(username.trimmed()))));
+    auto *reply = manager->get(request);
+    account_lookup_reply = reply;
+    auto owned = [this, id, generation] {
+        return generation == profile_generation && account_lookup_attempt.value("id") == id && account_lookup_attempt.value("phase") == "pending";
+    };
+    auto *timer = new QTimer(operation);
+    timer->setSingleShot(true);
+    connect(timer, &QTimer::timeout, this, [this, owned, reply] {
+        if (!owned()) return;
+        account_lookup_attempt["phase"] = "failure";
+        account_lookup_attempt["message"] = tr("The lookup timed out. Check your connection and try again.");
+        emit accountLookupChanged();
+        reply->abort();
+    });
+    connect(reply, &QNetworkReply::finished, this, [this, operation, owned, reply, timer] {
+        timer->stop();
+        operation->deleteLater();
+        if (!owned()) return;
+        QString message;
+        QString account;
+        if (reply->error() == QNetworkReply::TimeoutError)
+            message = tr("The lookup timed out. Check your connection and try again.");
+        else if (reply->error() != QNetworkReply::NoError || reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() != 200)
+            message = tr("The lookup service could not be reached. Check your connection and try again.");
+        else {
+            QJsonParseError error;
+            const auto data = reply->read(65537);
+            const auto document = QJsonDocument::fromJson(data, &error);
+            if (error.error != QJsonParseError::NoError || data.size() > 65536 || !document.isObject())
+                message = tr("The lookup service returned an unreadable response. Try again.");
+            else {
+                account = document.object().value("encoded_id").toString();
+                const auto bytes = account.toLatin1();
+                const auto decoded = QByteArray::fromBase64Encoding(bytes, QByteArray::AbortOnBase64DecodingErrors);
+                if (!decoded || decoded.decoded.size() != CHIAKI_PSN_ACCOUNT_ID_SIZE || decoded.decoded.toBase64() != bytes)
+                    message = tr("No valid Account ID was found. Check your username and allow anyone to find you in PSN search, then try again.");
+            }
+        }
+        account_lookup_attempt["phase"] = message.isEmpty() ? "success" : "failure";
+        if (message.isEmpty()) account_lookup_attempt["accountId"] = account;
+        else account_lookup_attempt["message"] = message;
+        account_lookup_reply = nullptr;
+        emit accountLookupChanged();
+    });
+    timer->start(30000);
+    emit accountLookupChanged();
+    return id;
+}
+
+bool QmlBackend::cancelAccountLookup(const QString &id)
+{
+    if (id.isEmpty() || account_lookup_attempt.value("id") != id) return false;
+    account_lookup_attempt = {{"id", id}, {"phase", "cancelled"}};
+    if (account_lookup_reply) account_lookup_reply->abort();
+    account_lookup_reply = nullptr;
+    emit accountLookupChanged();
+    return true;
 }
 
 void QmlBackend::refreshAuth()

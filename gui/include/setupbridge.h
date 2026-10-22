@@ -16,6 +16,13 @@ public:
     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
     Q_INVOKABLE QVariantMap connectConsole(const QString &key);
+    Q_INVOKABLE QVariantMap openRegistration(const QString &key, const QString &profile);
+    Q_INVOKABLE QVariantMap submitRegistration(const QString &context, const QVariantMap &fields);
+    Q_INVOKABLE QVariantMap connectRegistration(const QString &attempt);
+    Q_INVOKABLE QVariantMap beginRegistrationAccount(const QString &context, const QString &source);
+    Q_INVOKABLE QVariantMap lookupRegistrationAccount(const QString &context, const QString &route, const QString &username);
+    Q_INVOKABLE QVariantMap readRegistrationAccount(const QString &context, const QString &route, const QString &request);
+    Q_INVOKABLE QVariantMap endRegistrationAccount(const QString &context, const QString &route);
     Q_INVOKABLE QVariantMap refreshPsnConsoles(const QString &profile);
     Q_INVOKABLE QVariantMap cancelConnection(const QString &attempt);
     Q_INVOKABLE QVariantMap retryConnection(const QString &attempt);
@@ -73,4 +80,13 @@ private:
     int startupRendererBackend = 0;
     bool startupVSync = true;
     bool currentProfile(const QString &profile) const;
+    QVariantMap registrationContext;
+    QString registrationContextId;
+    QString registrationAttemptContext;
+    QString registrationAddress;
+    QString accountRouteId;
+    QString accountSource;
+    QString accountRequest;
+    QString accountAuthBaseline;
+    bool registrationAccountCurrent(const QString &context, const QString &route) const;
 };
