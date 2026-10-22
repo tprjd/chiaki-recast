@@ -1,5 +1,6 @@
 #include "setupbridge.h"
 #include "qmlbackend.h"
+#include "keyboardmousebindings.h"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QUuid>
@@ -32,6 +33,13 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     accountExpiry.setSingleShot(true);
     connect(&accountExpiry, &QTimer::timeout, this, &SetupBridge::refresh);
     auto *settings = backend->qmlSettings();
+    connect(settings, &QmlSettings::currentProfileChanged, this, &SetupBridge::invalidateKeyboardMouse);
+    connect(settings, &QmlSettings::mouseCameraEnabledChanged, this, [this] { emit keyboardMouseClosed(); refresh(); });
+    connect(settings, &QmlSettings::mouseResponseChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::keyboardMouseBindingsChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::keyboardEnabledChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::mouseTouchEnabledChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::controllerMappingChanged, this, &SetupBridge::refresh);
     decoders = settings->availableDecoders();
     connect(settings, &QmlSettings::disconnectActionChanged, this, &SetupBridge::refresh);
     connect(settings, &QmlSettings::suspendActionChanged, this, &SetupBridge::refresh);
@@ -326,6 +334,18 @@ void SetupBridge::refresh()
     addChoices("decoder", decoders, settings->decoder(), false);
     addChoices("audioInDevice", settings->availableAudioInDevices(), settings->audioInDevice(), true);
     addChoices("audioOutDevice", settings->availableAudioOutDevices(), settings->audioOutDevice(), true);
+    QVariantMap keyboardMouse{{"supported", settings->mouseCameraSupported()}, {"windowGeneration", QString::number(keyboardMouseWindowGeneration)},
+        {"values", QVariantMap{{"mouseCameraEnabled", settings->mouseCameraEnabled()},
+            {"mouseHorizontalSensitivity", settings->mouseHorizontalSensitivity()},
+            {"mouseVerticalSensitivity", settings->mouseVerticalSensitivity()},
+            {"mouseDeadZoneCompensation", settings->mouseDeadZoneCompensation()},
+            {"mouseResponseExponent", settings->mouseResponseExponent()},
+            {"mouseInvertVertical", settings->mouseInvertVertical()},
+            {"keyboardEnabled", settings->keyboardEnabled()}, {"mouseTouchEnabled", settings->mouseTouchEnabled()}}},
+        {"limits", QVariantMap{{"sensitivityMinimum", settings->mouseSensitivityMinimum()},
+            {"sensitivityMaximum", settings->mouseSensitivityMaximum()}, {"compensationMaximum", settings->mouseCompensationMaximum()},
+            {"exponentMinimum", settings->mouseExponentMinimum()}, {"exponentMaximum", settings->mouseExponentMaximum()}}},
+        {"bindings", settings->keyboardMouseBindings()}, {"keys", settings->controllerMapping()}};
     QVariantMap renderer{{"vSyncEnabled", settings->vSyncEnabled()},
         {"videoPreset", settings->videoPreset()},
         {"queueDepthLimit", settings->queueDepthLimit()},
@@ -375,7 +395,7 @@ void SetupBridge::refresh()
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
         {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
         {"streamerMode", privateMode}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
-            || backend->connectionAttempt().value("cleanupPending").toBool()}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
+            || backend->connectionAttempt().value("cleanupPending").toBool()}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
     if (!suspended) emit stateChanged(state);
 }
 
@@ -494,6 +514,7 @@ QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &
 void SetupBridge::setSuspended(bool value)
 {
     suspended = value;
+    if (suspended) invalidateKeyboardMouse();
     if (!suspended) refresh();
 }
 
@@ -531,6 +552,108 @@ QVariantMap SetupBridge::connectConsole(const QString &key)
 QVariantMap SetupBridge::refreshAudioDevices()
 {
     backend->qmlSettings()->refreshAudioDevices();
+    return {{"accepted", true}};
+}
+
+bool SetupBridge::keyboardMouseFormValid(const QString &form, const QString &profile) const
+{
+    return !suspended && keyboardMouseAvailable && !form.isEmpty() && form == keyboardMouseForm && currentProfile(profile);
+}
+
+void SetupBridge::invalidateKeyboardMouse()
+{
+    keyboardMouseForm.clear();
+    emit keyboardMouseClosed();
+}
+
+void SetupBridge::setKeyboardMouseAvailable(bool available)
+{
+    if (keyboardMouseAvailable == available) return;
+    keyboardMouseAvailable = available;
+    ++keyboardMouseWindowGeneration;
+    if (!available) invalidateKeyboardMouse();
+    refresh();
+}
+
+QVariantMap SetupBridge::beginKeyboardMouse(const QString &profile)
+{
+    if (suspended || !keyboardMouseAvailable || !currentProfile(profile)) return {{"accepted", false}};
+    invalidateKeyboardMouse();
+    keyboardMouseForm = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    return {{"accepted", true}, {"form", keyboardMouseForm}};
+}
+
+QVariantMap SetupBridge::endKeyboardMouse(const QString &form)
+{
+    if (!form.isEmpty() && form == keyboardMouseForm) invalidateKeyboardMouse();
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::setKeyboardMouseSetting(const QString &name, const QVariant &value, const QString &form, const QString &profile)
+{
+    const auto invalid = [this] { return QVariantMap{{"accepted", false}, {"message", tr("Choose a valid setting value.")}}; };
+    if (!keyboardMouseFormValid(form, profile)) return invalid();
+    auto *settings = backend->qmlSettings();
+    if (name == "keyboardEnabled" || name == "mouseTouchEnabled") {
+        if (settings->mouseCameraEnabled() || value.metaType().id() != QMetaType::Bool) return invalid();
+        if (name == "keyboardEnabled") settings->setKeyboardEnabled(value.toBool());
+        else settings->setMouseTouchEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if (!settings->mouseCameraSupported()) return invalid();
+    if (name == "mouseCameraEnabled" || name == "mouseInvertVertical") {
+        if (value.metaType().id() != QMetaType::Bool || (name != "mouseCameraEnabled" && !settings->mouseCameraEnabled())) return invalid();
+        if (name == "mouseCameraEnabled") settings->setMouseCameraEnabled(value.toBool());
+        else settings->setMouseInvertVertical(value.toBool());
+        return {{"accepted", true}};
+    }
+    const auto type = value.metaType().id();
+    if (!settings->mouseCameraEnabled() || (type != QMetaType::Double && type != QMetaType::Int && type != QMetaType::UInt && type != QMetaType::LongLong)) return invalid();
+    const double number = value.toDouble();
+    if (!std::isfinite(number)) return invalid();
+    if (name == "mouseHorizontalSensitivity" || name == "mouseVerticalSensitivity") {
+        if (number < settings->mouseSensitivityMinimum() || number > settings->mouseSensitivityMaximum()) return invalid();
+        if (name == "mouseHorizontalSensitivity") settings->setMouseHorizontalSensitivity(number);
+        else settings->setMouseVerticalSensitivity(number);
+    } else if (name == "mouseDeadZoneCompensation") {
+        if (number < 0 || number > settings->mouseCompensationMaximum()) return invalid();
+        settings->setMouseDeadZoneCompensation(number);
+    } else if (name == "mouseResponseExponent") {
+        if (number < settings->mouseExponentMinimum() || number > settings->mouseExponentMaximum()) return invalid();
+        settings->setMouseResponseExponent(number);
+    } else return invalid();
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::captureKeyboardMouse(const QVariant &action, const QVariant &slot, bool legacy, const QString &form, const QString &profile)
+{
+    if (!keyboardMouseFormValid(form, profile)) return {{"accepted", false}};
+    const auto integer = [](const QVariant &value) {
+        const auto type = value.metaType().id();
+        return (type == QMetaType::Double || type == QMetaType::Int || type == QMetaType::UInt || type == QMetaType::LongLong)
+            && std::isfinite(value.toDouble()) && value.toDouble() == std::floor(value.toDouble());
+    };
+    if (!integer(action) || !integer(slot) || action.toDouble() < 0 || action.toDouble() > std::numeric_limits<int>::max()) return {{"accepted", false}};
+    auto *settings = backend->qmlSettings();
+    if (legacy) {
+        if (settings->mouseCameraEnabled() || slot.toDouble() != 0 || !backend->nativeSettings()->GetControllerMapping().contains(action.toInt())) return {{"accepted", false}};
+    } else if (!settings->mouseCameraSupported() || !settings->mouseCameraEnabled()
+        || action.toDouble() < 0 || action.toDouble() >= KeyboardMouseAction::Count || slot.toDouble() < 0 || slot.toDouble() > 1) return {{"accepted", false}};
+    emit keyboardMouseCaptureRequested(action.toInt(), slot.toInt(), legacy, form, profile);
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::resetKeyboardMouse(const QString &form, const QString &profile)
+{
+    if (!keyboardMouseFormValid(form, profile) || !backend->qmlSettings()->mouseCameraSupported()) return {{"accepted", false}};
+    backend->qmlSettings()->resetKeyboardMouseDefaults();
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::resetKeyboardKeys(const QString &form, const QString &profile)
+{
+    if (!keyboardMouseFormValid(form, profile) || backend->qmlSettings()->mouseCameraEnabled()) return {{"accepted", false}};
+    backend->qmlSettings()->clearKeyMapping();
     return {{"accepted", true}};
 }
 

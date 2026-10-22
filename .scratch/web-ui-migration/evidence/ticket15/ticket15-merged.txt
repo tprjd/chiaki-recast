@@ -1,0 +1,16 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QDEBUG : EmbeddedSetupTest::keyboardMouseSettings() FT_New_Face failed with index 0 : 2
+PASS   : EmbeddedSetupTest::keyboardMouseSettings()
+QWARN  : EmbeddedSetupTest::keyboardMouseLegacyAndLifetime() This plugin does not support propagateSizeHints()
+QWARN  : EmbeddedSetupTest::keyboardMouseLegacyAndLifetime() This plugin does not support propagateSizeHints()
+QWARN  : EmbeddedSetupTest::keyboardMouseLegacyAndLifetime() This plugin does not support propagateSizeHints()
+QWARN  : EmbeddedSetupTest::keyboardMouseLegacyAndLifetime() This plugin does not support propagateSizeHints()
+QWARN  : EmbeddedSetupTest::keyboardMouseLegacyAndLifetime() This plugin does not support raise()
+PASS   : EmbeddedSetupTest::keyboardMouseLegacyAndLifetime()
+QWARN  : EmbeddedSetupTest::rendererSettings() Failed to relaunch application for renderer settings
+PASS   : EmbeddedSetupTest::rendererSettings()
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 5 passed, 0 failed, 0 skipped, 0 blacklisted, 8729ms
+********* Finished testing of EmbeddedSetupTest *********
