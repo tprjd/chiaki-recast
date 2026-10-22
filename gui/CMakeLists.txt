@@ -67,6 +67,8 @@ set(SOURCE_FILES
 	src/setupwindow.cpp
 	include/applicationcontroller.h
 	src/applicationcontroller.cpp
+	include/psnsigninwindow.h
+	src/psnsigninwindow.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/setup.qrc
 	include/qmlbackend.h
 	src/qmlbackend.cpp

@@ -6,6 +6,7 @@
 #define PSNACCOUNTID_H
 
 #include "settings.h"
+#include "jsonrequester.h"
 
 #include <ostream>
 #include <QNetworkReply>
@@ -28,7 +29,7 @@ class PSNAccountID : public QObject {
     Q_OBJECT
 
 public:
-    PSNAccountID(Settings *settings, QObject *parent = nullptr);
+    PSNAccountID(Settings *settings, QObject *parent = nullptr, JsonRequester::ManagerFactory factory = {});
 
 
     void GetPsnAccountId(QString redirectCode);
@@ -43,6 +44,7 @@ signals:
 
 private:
     QString basicAuthHeader;
+    JsonRequester::ManagerFactory network_factory;
     Settings *settings = {};
     QString access_token;
     QString refresh_token;

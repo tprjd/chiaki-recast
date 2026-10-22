@@ -334,7 +334,7 @@ int RunStream(QGuiApplication &app, const StreamSessionConnectInfo &connect_info
 		qCritical() << main_window.initializationError();
 		return 1;
 	}
-	QObject::connect(&main_window, &QmlMainWindow::initializationFailed, &app, [] { QCoreApplication::exit(1); });
+	QObject::connect(&main_window, &QmlMainWindow::initializationFailed, &app, [] { QCoreApplication::exit(1); }, Qt::QueuedConnection);
 	main_window.show();
 	return app.exec();
 }

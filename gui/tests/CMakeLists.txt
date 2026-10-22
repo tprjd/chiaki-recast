@@ -41,16 +41,22 @@ set_tests_properties(chiaki-console-screen PROPERTIES
 if(TARGET chiaki-gui)
     add_executable(chiaki-embedded-setup-tests embeddedsetup.cpp)
     target_link_libraries(chiaki-embedded-setup-tests PRIVATE chiaki-gui Qt6::Test)
+    target_compile_definitions(chiaki-embedded-setup-tests PRIVATE CHIAKI_TEST_PYTHON="${PYTHON_EXECUTABLE}")
     add_test(NAME chiaki-embedded-setup COMMAND chiaki-embedded-setup-tests consoleLibrary)
     set_tests_properties(chiaki-embedded-setup PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-psn COMMAND chiaki-embedded-setup-tests psnAccountStatus psnSignIn psnRefreshCredentials psnEmbeddedIsolation psnAccountPresentation)
+    set_tests_properties(chiaki-embedded-psn PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-settings COMMAND chiaki-embedded-setup-tests generalSettings settingsValidation settingsRestart)
+    set_tests_properties(chiaki-embedded-settings PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-graphics COMMAND chiaki-embedded-setup-tests graphicsCoexistence)
     set_tests_properties(chiaki-embedded-graphics PROPERTIES LABELS "desktop;gpu")
     add_test(NAME chiaki-local-handoff COMMAND chiaki-embedded-setup-tests localHandoff)
     add_test(NAME chiaki-decoded-session-cleanup COMMAND chiaki-embedded-setup-tests decodedSessionCleanup)
     set_tests_properties(chiaki-local-handoff chiaki-decoded-session-cleanup PROPERTIES LABELS "desktop;gpu")
     if(WIN32)
+        add_test(NAME chiaki-suspend-sign-in COMMAND chiaki-embedded-setup-tests suspendClosesSignIn)
         add_test(NAME chiaki-native-initialization-failure COMMAND chiaki-embedded-setup-tests nativeInitializationFailure)
-        set_tests_properties(chiaki-native-initialization-failure PROPERTIES
+        set_tests_properties(chiaki-native-initialization-failure chiaki-suspend-sign-in PROPERTIES
             ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
     endif()
 

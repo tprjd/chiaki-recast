@@ -2,6 +2,7 @@
 #define PSNTOKEN_H
 
 #include "settings.h"
+#include "jsonrequester.h"
 #include "chiaki/log.h"
 
 #include <ostream>
@@ -13,8 +14,7 @@ class PSNToken : public QObject {
     Q_OBJECT
 
 public:
-    PSNToken(Settings *settings, QObject* parent = nullptr);
-    void InitPsnToken(QString redirectCode);
+    PSNToken(Settings *settings, QObject* parent = nullptr, JsonRequester::ManagerFactory factory = {});
     void RefreshPsnToken(QString refreshToken);
 
 signals:
@@ -25,6 +25,7 @@ signals:
 
 private:
     QString basicAuthHeader;
+    JsonRequester::ManagerFactory network_factory;
     Settings *settings = {};
 
 private slots:

@@ -4,12 +4,14 @@
 #include <QJsonDocument>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <functional>
 
 class JsonRequester : public QObject {
     Q_OBJECT
 
 public:
-    explicit JsonRequester(QObject* parent = nullptr);
+    using ManagerFactory = std::function<QNetworkAccessManager *(QObject *)>;
+    explicit JsonRequester(QObject* parent = nullptr, const ManagerFactory &factory = {});
 
     void makePostRequest(const QString& url, const QString& authHeader, QString contentType = "application/json",
     QString body = "");

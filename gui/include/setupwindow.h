@@ -6,6 +6,7 @@ class QmlBackend;
 class SetupBridge;
 class QWebEngineView;
 class QCloseEvent;
+class PsnSignInWindow;
 
 class SetupWindow : public QWidget
 {
@@ -27,4 +28,5 @@ private:
     QmlBackend *backend;
     QWebEngineView *webView;
     SetupBridge *setupBridge;
+    PsnSignInWindow *signInWindow = nullptr;
 };

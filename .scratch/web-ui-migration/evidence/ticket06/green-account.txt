@@ -1,0 +1,9 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QWARN  : EmbeddedSetupTest::psnAccountStatus() QFontDatabase: Cannot find font directory C:/Users/david/.cache/chiaki-native-qt/6.9.3/msvc2022_64/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+PASS   : EmbeddedSetupTest::psnAccountStatus()
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 822ms
+********* Finished testing of EmbeddedSetupTest *********

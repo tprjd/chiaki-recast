@@ -1,0 +1,14 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/pure-libplacebo-control/build
+[1/2] Building CXX object CMakeFiles\chiaki-libplacebo-control.dir\main.cpp.obj
+In file included from C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\pure-libplacebo-control\main.cpp:15:
+C:\Users\david\.cache\chiaki-msvc-native\libplacebo-prefix\include\libplacebo/utils/libav.h(29,3): warning: Remember to include this file with a PL_LIBAV_IMPLEMENTATION set to 1 in           C translation unit to provide implementation. Suppress this warning by           defining PL_LIBAV_IMPLEMENTATION to 0 in C++ files. [-W#warnings]
+   29 | # warning Remember to include this file with a PL_LIBAV_IMPLEMENTATION set to 1 in \
+      |   ^
+1 warning generated.
+[2/2] Linking CXX executable chiaki-libplacebo-control.exe

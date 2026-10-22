@@ -2,12 +2,15 @@
   import { onMount, tick } from 'svelte';
   import { connectSetup, type State, type Console } from './bridge';
   import ConnectAction from './ConnectAction.svelte';
+  import PsnAccount from './PsnAccount.svelte';
+  import Settings from './Settings.svelte';
 
   let current = $state<State>();
   let connection = $state<Awaited<ReturnType<typeof connectSetup>>>();
   let query = $state('');
   let message = $state('');
   let changingDiscovery = $state(false);
+  let settingsOpen = $state(false);
   const t = (text: string) => current?.strings[text] ?? text;
   const type = (console: Console) => console.ps5 === undefined ? t('Console') : console.ps5 ? 'PlayStation 5' : 'PlayStation 4';
   const status = (console: Console) => !console.available ? t('Console unavailable') : !console.registered ? t('Not registered')
@@ -38,6 +41,7 @@
   }
   async function navigate(event: KeyboardEvent) {
     const target = event.target as HTMLElement;
+    if (settingsOpen || target.closest('[data-setup-panel]')) return;
     if (event.key === 'Escape') {
       event.preventDefault();
       query = '';
@@ -70,6 +74,11 @@
     next?.focus();
     event.preventDefault();
   }
+  async function closeSettings() {
+    settingsOpen = false;
+    await tick();
+    document.querySelector<HTMLButtonElement>('.open-settings')?.focus();
+  }
 </script>
 
 <svelte:window onkeydown={navigate} />
@@ -77,6 +86,9 @@
   <img class="logo" src="qrc:/icons/chiaking-logo-white.svg" alt="Chiaki Recast" />
 </header>
 <main>
+  {#if settingsOpen && current && connection}
+    <Settings {current} {connection} close={closeSettings} {t} />
+  {:else}
   <div class="library-heading">
     <h1>{t('Consoles')}</h1>
     <label class="search">{t('Search consoles')}
@@ -84,6 +96,7 @@
     </label>
   </div>
   <div class="library-tools">
+    <button class="open-settings" disabled={!current || !connection} onclick={() => { settingsOpen = true; }}>{t('Settings')}</button>
     <button class="discovery" aria-pressed={current?.discoveryEnabled ?? false}
       disabled={!connection || changingDiscovery || !current?.capabilities.discovery} onclick={discovery}>
       {t('Discovery')}<span>{t(current?.discoveryEnabled ? 'Discovery is on' : 'Discovery is off')}</span>
@@ -97,6 +110,7 @@
       {#if !query}<p>{t('Turn on discovery to find consoles on your local network.')}</p>{/if}
     </section>
   {/if}
+  {#if current && connection}<PsnAccount {current} {connection} />{/if}
   <div class="console-grid">
     {#each consoles as console, index (console.key || `unavailable-${index}`)}
       <button class="console-card" class:selected={current?.selectedKey === console.key && !!console.key}
@@ -118,4 +132,5 @@
       </button>
     {/each}
   </div>
+  {/if}
 </main>

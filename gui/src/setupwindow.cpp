@@ -1,6 +1,7 @@
 #include "setupwindow.h"
 #include "setupbridge.h"
 #include "qmlbackend.h"
+#include "psnsigninwindow.h"
 #include <QCloseEvent>
 #include <QVBoxLayout>
 #include <QWebChannel>
@@ -53,6 +54,16 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
     connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, updateTitle);
     connect(backend->qmlSettings(), &QmlSettings::currentProfileChanged, this, updateTitle);
     updateTitle();
+    connect(setupBridge, &SetupBridge::psnSignInRequested, this, [this] {
+        if (!signInWindow) {
+            signInWindow = new PsnSignInWindow(this->backend, this);
+            signInWindow->setAttribute(Qt::WA_DeleteOnClose);
+            connect(signInWindow, &QObject::destroyed, this, [this] { signInWindow = nullptr; });
+            signInWindow->start();
+        } else {
+            signInWindow->start();
+        }
+    });
     setMinimumSize(320, 240);
     const auto geometry = backend->nativeSettings()->GetGeometry();
     if (geometry.isEmpty()) resize(1280, 720);
@@ -84,6 +95,8 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
 
 void SetupWindow::suspend()
 {
+    if(signInWindow)
+        signInWindow->close();
     setupBridge->setSuspended(true);
     hide();
     auto *page = webView->page();
@@ -103,6 +116,7 @@ void SetupWindow::resume()
 
 void SetupWindow::closeEvent(QCloseEvent *event)
 {
+    if (signInWindow) signInWindow->close();
     backend->nativeSettings()->SetGeometry(geometry());
     QWidget::closeEvent(event);
     if (event->isAccepted()) emit closed();
