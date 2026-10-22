@@ -4,7 +4,7 @@
 
 **Blocked by:** 04: Connect locally from web setup to native playback.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 89, 90, 91, 94.
 
@@ -16,3 +16,7 @@
 - [ ] Native video, overlays, keyboard and mouse input, controller input, microphone behavior, window handoff, and setup restoration pass package smoke checks.
 - [ ] Each published Windows architecture uses a compatible toolchain and matching WebEngine modules. Unsupported combinations are reported explicitly without a QML setup fallback.
 - [ ] Missing packaged assets or helper files fail the release check. Reuse passing package evidence until relevant code, dependencies, package contents, or environment change.
+
+## Comments
+
+- Claimed after ticket 04. Prepare the matching MSVC and WebEngine package path and update its actual published callers. Keep platform and hardware acceptance explicit and reuse source-equivalent evidence.

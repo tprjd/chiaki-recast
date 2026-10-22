@@ -1,0 +1,106 @@
+diff --git a/gui/src/qml/SettingsDialog.qml b/gui/src/qml/SettingsDialog.qml
+index dd784a07..fe57a7b6 100644
+--- a/gui/src/qml/SettingsDialog.qml
++++ b/gui/src/qml/SettingsDialog.qml
+@@ -240,7 +240,7 @@ FocusScope {
+         case 3: item = audioOutDevice; break;
+         case 4: item = registerNewButton; break;
+         case 5: item = dialog.backend.settings.mouseCameraSupported ? keyboardMousePage.firstFocusItem : resetAllKeys; break;
+-        case 6: item = controllerMappingChange; break;
++        case 6: item = allowJoystickBackgroundEvents; break;
+         case 7: item = firstRemoteFocusableItem(); break;
+         case 8: item = profile; break;
+         }
+@@ -1722,6 +1722,7 @@ FocusScope {
+                                 anchors.fill: parent
+                                 spacing: 12
+                             C.CheckBox {
++                                id: allowJoystickBackgroundEvents
+                                 objectName: "allowJoystickBackgroundEvents"
+                                 text: qsTr("Process controller input in the background. Default: On")
+                                 font.pixelSize: 14
+diff --git a/gui/src/setupbridge.cpp b/gui/src/setupbridge.cpp
+index cc2c2cfb..7cccfedf 100644
+--- a/gui/src/setupbridge.cpp
++++ b/gui/src/setupbridge.cpp
+@@ -21,7 +21,10 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
+     connect(backend->qmlSettings(), &QmlSettings::registeredHostsChanged, this, &SetupBridge::refresh);
+     connect(backend, &QmlBackend::discoveryEnabledChanged, this, &SetupBridge::refresh);
+     connect(backend, &QmlBackend::connectionAttemptChanged, this, &SetupBridge::refresh);
+-    connect(backend, &QmlBackend::windowChanged, this, &SetupBridge::refresh);
++    connect(backend, &QmlBackend::windowChanged, this, [this] {
++        if (this->backend->qmlWindow()) invalidateControllerMapping();
++        refresh();
++    });
+     connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, &SetupBridge::refresh);
+     connect(backend->qmlSettings(), &QmlSettings::currentProfileChanged, this, &SetupBridge::refresh);
+     connect(backend, &QmlBackend::psnAuthAttemptChanged, this, &SetupBridge::refresh);
+@@ -990,6 +993,7 @@ QVariantMap SetupBridge::cancelConnection(const QString &attempt)
+ 
+ QVariantMap SetupBridge::retryConnection(const QString &attempt)
+ {
++    if (!controllerOperation.isEmpty()) return {{"accepted", false}};
+     return {{"accepted", backend->retryConnection(attempt)}};
+ }
+ 
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 68cf9a6a..f61c320e 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -497,7 +497,8 @@ private slots:
+             QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("controller-mapping.png")));
+             setup.resize(2560, 1800);
+             setup.view()->setZoomFactor(2);
+-            QTRY_VERIFY(script(setup.view(), "innerWidth >= 1024 && document.documentElement.scrollWidth <= innerWidth").toBool());
++            QTRY_VERIFY(script(setup.view(), "devicePixelRatio === 2 && innerWidth === 1280 && document.documentElement.scrollWidth <= innerWidth").toBool());
++            QTest::qWait(250);
+             QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("controller-mapping-200-percent.png")));
+             setup.view()->setZoomFactor(1);
+             setup.resize(1280, 900);
+@@ -507,6 +508,14 @@ private slots:
+         tap(14);
+         QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("controllerMap1Slot1"));
+         const auto original = backend->currentControllerMapping();
++        description.product_id = 0x0017;
++        const int unrelated = SDL_JoystickAttachVirtualEx(&description);
++        QVERIFY2(unrelated >= 0, SDL_GetError());
++        const auto devices = backend->qmlControllers().size();
++        QTRY_COMPARE(backend->qmlControllers().size(), devices + 1);
++        QCOMPARE(SDL_JoystickDetachVirtual(unrelated), 0);
++        QTRY_COMPARE(backend->qmlControllers().size(), devices);
++        QVERIFY(backend->controllerMappingInProgress());
+         const auto mappingInput = [&](int action, int slot) {
+             for (const auto &row : backend->currentControllerMapping()) {
+                 const auto entry = row.toMap();
+@@ -516,6 +525,12 @@ private slots:
+         };
+         QVERIFY(click(setup.view(), "#controllerMap1Slot1"));
+         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-controller-capture]')").toBool());
++        QVERIFY(click(setup.view(), "#controllerCaptureCancel"));
++        QTRY_VERIFY(!script(setup.view(), "!!document.querySelector('[data-controller-capture]')").toBool());
++        QCOMPARE(backend->currentControllerMapping(), original);
++        QVERIFY(click(setup.view(), "#enableAnalogStickMapping"));
++        QTRY_VERIFY(backend->enableAnalogStickMapping());
++        QVERIFY(click(setup.view(), "#controllerMap1Slot1"));
+         tap(1);
+         QTRY_COMPARE(mappingInput(1, 1), QStringLiteral("b1"));
+         QVERIFY(mappingInput(2, 0).isEmpty());
+@@ -572,6 +587,12 @@ private slots:
+         QVERIFY(click(setup.view(), "#controllerMappingChange"));
+         tap(0);
+         QTRY_VERIFY(backend->controllerMappingInProgress());
++        setup.hide();
++        QTRY_VERIFY(!backend->controllerMappingInProgress());
++        setup.show();
++        QVERIFY(click(setup.view(), "#controllerMappingChange"));
++        tap(0);
++        QTRY_VERIFY(backend->controllerMappingInProgress());
+         const auto oldOperation = setup.bridge()->snapshot().value("controllerSetup").toMap().value("operation").toString();
+         const auto generation = QString::number(backend->profileGeneration());
+         QVERIFY(click(setup.view(), "#controllerMap1Slot1"));
+diff --git a/third-party/gf-complete b/third-party/gf-complete
+--- a/third-party/gf-complete
++++ b/third-party/gf-complete
+@@ -1 +1 @@
+-Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478
++Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478-dirty

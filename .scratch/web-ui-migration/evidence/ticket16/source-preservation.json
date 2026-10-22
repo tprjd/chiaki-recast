@@ -1,0 +1,29 @@
+{
+  "sourceCount": 189,
+  "mismatches": [],
+  "baselineGui": "c3e47fc49ca8c566079614c2eb3d7b773c9b5823",
+  "latestIntegrationGui": "c3e47fc49ca8c566079614c2eb3d7b773c9b5823",
+  "mergedHead": "5ba1ca0c0d244ff60d7960e4fc8c416c6fb149d0",
+  "artifacts": [
+    {
+      "Algorithm": "SHA256",
+      "Hash": "3215ABB2F83A98A3F4222339E5D48A3C3E6D185BFEC3781EDDC1B39812F9DC59",
+      "Path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket16-build\\gui\\tests\\chiaki-embedded-setup-tests.exe"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "4CB35676642607BE05F3DEFEACA8C069A68EC6874EEBD2ACA78AF8D1FF93EC04",
+      "Path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket16-build\\gui\\tests\\chiaki-console-screen-tests.exe"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "79DF1A2F61FAADB15E1303F9157351A3AB7D1830DB5D22D0E2F2D82B60EFAE36",
+      "Path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket16-build\\gui\\web\\app.js"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "0FF905CD7DDBF2181823D32C26192B07363D4F5526F7A93C416CE0E1F193EF03",
+      "Path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket16-build\\gui\\web\\app.css"
+    }
+  ]
+}

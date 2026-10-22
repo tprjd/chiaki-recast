@@ -66,6 +66,16 @@ export const mediaSettings: Setting[] = [
   { key: 'showStreamStats', label: 'Show stream stats during gameplay', category: 'Audio/Wifi', group: 'Connection feedback', description: 'Show statistics in the native stream window.', defaultLabel: 'Unchecked' }
 ];
 
+export const controllerSettings: Setting[] = [
+  { key: 'allowJoystickBackgroundEvents', label: 'Process controller input in the background', group: 'Controller input', description: 'Receive controller input when another application has focus.', defaultLabel: 'On' },
+  { key: 'buttonsByPosition', label: 'Interpret buttons by position', group: 'Controller input', description: 'Use button positions instead of labels.', defaultLabel: 'Off' },
+  { key: 'dpadTouchEnabled', label: 'D-pad touchpad emulation', group: 'Touchpad', description: 'Use the D-pad to move the emulated touchpad.', defaultLabel: 'On' },
+  { key: 'dpadTouchIncrement', label: 'D-pad touch increment', group: 'Touchpad', description: 'Set the distance for each touchpad movement.', defaultLabel: '0.3 mm', min: 0.01, max: 10.79, step: 0.01, factor: 100, unit: 'mm', requires: 'dpadTouchEnabled' },
+  ...[1, 2, 3, 4].map(index => ({ key: `dpadTouchShortcut${index}`, label: `D-pad shortcut button ${index}`, group: 'Touchpad', description: 'Switch between regular D-pad input and touchpad emulation.', defaultLabel: ['L1', 'R1', 'Dpad Up', 'Not Used'][index - 1], requires: 'dpadTouchEnabled', options: ['Not Used', 'Cross', 'Moon', 'Box', 'Pyramid', 'Dpad Left', 'Dpad Right', 'Dpad Up', 'Dpad Down', 'L1', 'R1', 'L3', 'R3', 'Options', 'Share', 'Touchpad', 'PS'] })),
+  { key: 'rumbleHapticsIntensity', label: 'Rumble haptics intensity', group: 'Haptics', description: 'Set rumble feedback strength.', defaultLabel: 'Normal', options: ['Off', 'Very Weak', 'Weak', 'Normal', 'Strong', 'Very Strong'] },
+  { key: 'hapticOverride', label: 'True haptics intensity', group: 'Haptics', description: 'Set the multiplier for the console setting. 1.0 uses the console setting.', defaultLabel: 'Console setting', min: 0, max: 2, step: 0.1 }
+].map(field => ({ ...field, category: 'Controllers' }));
+
 export const keyboardMouseSettings: Setting[] = [
   { key: 'mouseCameraEnabled', label: 'Enable mouse camera mode', group: 'Keyboard and mouse', description: 'During a stream, press F8 to capture or release your controls.', defaultLabel: 'Off' },
   { key: 'mouseHorizontalSensitivity', label: 'Horizontal sensitivity', group: 'Mouse response', description: 'Set the horizontal mouse sensitivity multiplier.', defaultLabel: '1.00 ×', min: 0.05, max: 8, step: 0.05, unit: '×', requires: 'mouseCameraEnabled' },

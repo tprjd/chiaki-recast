@@ -4,7 +4,7 @@
 
 **Blocked by:** 06: Sign in to PSN independently from web setup.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 38, 60, 61, 62, 69.
 
@@ -17,3 +17,7 @@
 - [ ] Information and confirmation dialogs, permitted help links, privacy masking, and keyboard or controller focus return remain usable.
 - [ ] Embedded tests verify reminder persistence, shortcut native results, cancelled actions, and stale completion.
 - [ ] Remove setup-only routes, resources, callback adapters, and tests replaced by this slice once no caller needs them. Preserve shared native stream components and their tests.
+
+## Comments
+
+- Claimed after ticket 06. Prepare the native reminder and Steam shortcut workflow in an isolated worktree. Use the 1024 CSS pixel design scope and focused embedded checks.
