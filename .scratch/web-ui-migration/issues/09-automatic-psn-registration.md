@@ -4,7 +4,7 @@
 
 **Blocked by:** 08: Stream from a registered console through PSN.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 16, 21, 24, 25, 26, 27, 32, 46.
 
@@ -18,3 +18,7 @@
 - [ ] Session, worker, and hidden native resources are cleaned up before another request or playback attempt starts.
 - [ ] Embedded tests distinguish registration-only work from playback and verify saved native state and cleanup.
 - [ ] Remove setup-only routes, resources, callback adapters, and tests replaced by this slice once no caller needs them. Preserve shared native stream components and their tests.
+
+## Comments
+
+- Claimed after native PSN streaming. Reuse native registration-only attempts, profile/target guards, and hidden native resource preparation. Manual pairing is finishing separately; retain its form and completion interface.
