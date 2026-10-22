@@ -1177,6 +1177,7 @@ private slots:
         settings.SetAddSteamShortcutAsk(false);
         settings.SetHardwareDecoder({});
         settings.SetPlaceboPreset(PlaceboPreset::Fast);
+        const int manualId = settings.SetManualHost(ManualHost(-1, "127.0.0.1", false, {}));
         RegistrationTransport registration;
         QmlNativeServices services(&settings, {}, {}, registration.boundary());
         auto *backend = services.backend();
@@ -1184,8 +1185,8 @@ private slots:
         ApplicationController controller(&services);
         auto &setup = *controller.setupWindow();
         setup.show();
-        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-new]')").toBool());
-        script(setup.view(), "document.querySelector('[data-register-new]').click()");
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-register-selected]')").toBool());
+        script(setup.view(), "document.querySelector('[data-register-selected]').click()");
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-form]')").toBool());
         QVERIFY(fill(setup.view(), "[data-registration-address]", "127.0.0.1"));
         QVERIFY(fill(setup.view(), "[data-registration-account]", "AQAAAAAAAAA="));
@@ -1200,7 +1201,8 @@ private slots:
         QCOMPARE(registration.requests.size(), 1);
         registration.complete(0, true);
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-connect]')").toBool());
-        QVERIFY(settings.GetManualHosts().first().GetRegistered());
+        QCOMPARE(settings.GetManualHosts().size(), 1);
+        QVERIFY(settings.GetManualHost(manualId).GetRegistered());
         QCOMPARE(settings.GetRegisteredHosts().first().GetConsolePin(), QString());
         script(setup.view(), "document.querySelector('[data-registration-connect]').click()");
         QTRY_VERIFY(backend->qmlWindow());
@@ -1209,12 +1211,18 @@ private slots:
         QPointer<QmlMainWindow> native = backend->qmlWindow();
         QPointer<StreamSession> session = backend->qmlSession();
         QVERIFY(session);
+        native->dismissStreamView();
+        QTest::qWait(30);
+        QVERIFY(native);
+        QVERIFY(!setup.isVisible());
         QVERIFY(backend->cancelConnection(backend->connectionAttempt().value("id").toString()));
         QTRY_VERIFY(!session);
         QTRY_VERIFY(!native);
         QTRY_VERIFY(setup.isVisible());
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-registration-connect]')").toBool());
         QCOMPARE(registration.requests.size(), 1);
+        script(setup.view(), "document.querySelector('[data-registration-close]').click()");
+        QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-register-new')").toBool());
     }
 
     void registrationForm()

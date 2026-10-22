@@ -96,7 +96,7 @@
     if (accountRoute) { connection.accountEnd(context, accountRoute); accountRoute = ''; username = ''; }
     open = false; pin = ''; consolePin = '';
     await tick();
-    if (opener?.isConnected) opener.focus();
+    (opener?.isConnected ? opener : document.querySelector<HTMLElement>('[data-register-new]'))?.focus();
   }
   async function submit(event: SubmitEvent) {
     event.preventDefault();
