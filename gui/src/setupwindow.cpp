@@ -4,12 +4,14 @@
 #include "psnsigninwindow.h"
 #include "keyboardmousebindings.h"
 #include <QDialog>
+#include <QFileDialog>
 #include <QLabel>
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QPointer>
+#include <QTimer>
 #include <functional>
 #include <QCloseEvent>
 #include <QVBoxLayout>
@@ -216,19 +218,60 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(webView);
-    auto *profile = new QWebEngineProfile(this);
-    profile->setHttpCacheType(QWebEngineProfile::MemoryHttpCache);
-    profile->setPersistentCookiesPolicy(QWebEngineProfile::NoPersistentCookies);
-    profile->setUrlRequestInterceptor(new SetupRequests(profile));
-    auto *page = new SetupPage(profile, webView);
-    webView->setPage(page);
+    webProfile = new QWebEngineProfile(this);
+    webProfile->setHttpCacheType(QWebEngineProfile::MemoryHttpCache);
+    webProfile->setPersistentCookiesPolicy(QWebEngineProfile::NoPersistentCookies);
+    webProfile->setUrlRequestInterceptor(new SetupRequests(webProfile));
     backend->setSetupNavigationTarget(webView);
-    connect(page, &QWebEnginePage::loadStarted, this, [this] { setupBridge->invalidateControllerMapping(); });
-    connect(page, &QWebEnginePage::renderProcessTerminated, this, [this] { setupBridge->invalidateControllerMapping(); });
-    connect(page, &QWebEnginePage::loadStarted, setupBridge, &SetupBridge::invalidateSteamShortcut);
-    connect(page, &QWebEnginePage::renderProcessTerminated, setupBridge, &SetupBridge::invalidateSteamShortcut);
-    connect(page, &QWebEnginePage::loadStarted, setupBridge, &SetupBridge::invalidateKeyboardMouse);
-    connect(page, &QWebEnginePage::renderProcessTerminated, setupBridge, &SetupBridge::invalidateKeyboardMouse);
+    webView->setContextMenuPolicy(Qt::NoContextMenu);
+    createPage();
+}
+
+void SetupWindow::invalidatePage()
+{
+    setupBridge->invalidatePage();
+    for (auto *dialog : findChildren<QFileDialog *>()) dialog->reject();
+    if (signInWindow) signInWindow->close();
+}
+
+void SetupWindow::resetChannel(QWebEnginePage *page)
+{
+    auto *old = page->webChannel();
+    page->setWebChannel(nullptr);
+    if (old) {
+        old->deregisterObject(setupBridge);
+        old->deleteLater();
+    }
+    auto *channel = new QWebChannel(page);
+    channel->registerObject(QStringLiteral("setup"), setupBridge);
+    page->setWebChannel(channel);
+}
+
+void SetupWindow::createPage()
+{
+    QPointer<QWebEnginePage> old = setupPage;
+    auto *page = new SetupPage(webProfile, webView);
+    setupPage = page;
+    webView->setPage(page);
+    if (old) old->deleteLater();
+    pageFailed = false;
+    connect(page, &QWebEnginePage::loadStarted, this, [this, page] {
+        if (webView->page() != page) return;
+        invalidatePage();
+        resetChannel(page);
+    });
+    connect(page, &QWebEnginePage::renderProcessTerminated, this, [this, page] {
+        if (webView->page() != page) return;
+        invalidatePage();
+        auto *channel = page->webChannel();
+        page->setWebChannel(nullptr);
+        if (channel) { channel->deregisterObject(setupBridge); channel->deleteLater(); }
+        pageFailed = true;
+        // Hidden setup stays inactive until native playback returns to setup.
+        if (isVisible()) QTimer::singleShot(0, this, [this, page] {
+            if (pageFailed && webView->page() == page && isVisible()) createPage();
+        });
+    });
     connect(page, &QWebEnginePage::recommendedStateChanged, this, [this, page](QWebEnginePage::LifecycleState state) {
         if (!isVisible() && state != QWebEnginePage::LifecycleState::Active)
             page->setLifecycleState(QWebEnginePage::LifecycleState::Frozen);
@@ -238,10 +281,7 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
     page->settings()->setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, false);
     page->settings()->setAttribute(QWebEngineSettings::JavascriptCanAccessClipboard, false);
     page->settings()->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, false);
-    auto *channel = new QWebChannel(page);
-    channel->registerObject(QStringLiteral("setup"), setupBridge);
-    page->setWebChannel(channel);
-    webView->setContextMenuPolicy(Qt::NoContextMenu);
+    resetChannel(page);
     webView->load(setupUrl);
 }
 
@@ -263,8 +303,7 @@ bool SetupWindow::eventFilter(QObject *object, QEvent *event)
 
 void SetupWindow::suspend()
 {
-    if(signInWindow)
-        signInWindow->close();
+    invalidatePage();
     setupBridge->setSuspended(true);
     hide();
     auto *page = webView->page();
@@ -274,6 +313,7 @@ void SetupWindow::suspend()
 
 void SetupWindow::resume()
 {
+    if (pageFailed) createPage();
     webView->page()->setLifecycleState(QWebEnginePage::LifecycleState::Active);
     setupBridge->setSuspended(false);
     show();
@@ -284,10 +324,7 @@ void SetupWindow::resume()
 
 void SetupWindow::closeEvent(QCloseEvent *event)
 {
-    setupBridge->invalidateControllerMapping();
-    setupBridge->invalidateKeyboardMouse();
-    setupBridge->invalidateSteamShortcut();
-    if (signInWindow) signInWindow->close();
+    invalidatePage();
     backend->nativeSettings()->SetGeometry(geometry());
     QWidget::closeEvent(event);
     if (event->isAccepted()) emit closed();

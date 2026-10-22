@@ -10,11 +10,15 @@
   import ConsoleManagement from './ConsoleManagement.svelte';
 
   let current = $state<State>();
+  let profileGeneration = $derived(current?.profileGeneration);
   let connection = $state<Awaited<ReturnType<typeof connectSetup>>>();
   let query = $state('');
   let message = $state('');
   let changingDiscovery = $state(false);
   let settingsOpen = $state(false);
+  let settingsCategory = $state('General');
+  let settingsSearch = $state('');
+  let restoredProfile = '';
   let accountRoute = $state(false);
   let detailsKey = $state('');
   const t = (text: string) => current?.strings[text] ?? text;
@@ -27,10 +31,30 @@
 
   onMount(() => {
     let disposed = false;
-    connectSetup(value => { current = value; }).then(value => {
+    connectSetup(value => {
+      const restore = restoredProfile !== value.profileGeneration;
+      if (restore) {
+        restoredProfile = value.profileGeneration;
+        query = value.viewState.search;
+        settingsOpen = value.viewState.route === 'settings';
+        accountRoute = value.viewState.route === 'account';
+        settingsCategory = value.viewState.category;
+        settingsSearch = value.viewState.settingsSearch;
+      }
+      current = value;
+      if (restore) tick().then(() => {
+        if (!disposed && !settingsOpen && !document.querySelector('dialog[open]'))
+          (document.querySelector<HTMLElement>(accountRoute ? '.psn-account h2' : '.console-card.selected:enabled')
+            ?? document.querySelector<HTMLElement>('.discovery:enabled'))?.focus();
+      });
+    }).then(value => {
       if (disposed) value.dispose(); else connection = value;
     }).catch(() => { message = t('Setup unavailable'); });
     return () => { disposed = true; connection?.dispose(); };
+  });
+
+  $effect(() => {
+    if (connection && profileGeneration) connection.saveViewState(settingsOpen ? 'settings' : accountRoute ? 'account' : 'consoles', query, settingsCategory, settingsSearch, profileGeneration);
   });
 
   async function discovery() {
@@ -99,6 +123,8 @@
   }
   async function closeSettings() {
     settingsOpen = false;
+    settingsCategory = 'General';
+    settingsSearch = '';
     await tick();
     document.querySelector<HTMLButtonElement>('.open-settings')?.focus();
   }
@@ -110,12 +136,12 @@
 </header>
 <main>
   {#if settingsOpen && current && connection}
-    <Settings {current} {connection} close={closeSettings} {t} />
+    <Settings {current} {connection} close={closeSettings} {t} bind:category={settingsCategory} bind:query={settingsSearch} />
   {:else}
   <div class="library-heading">
     <h1>{t('Consoles')}</h1>
     <label class="search">{t('Search consoles')}
-      <input type="search" bind:value={query} aria-label={t('Search consoles')} />
+      <input type="search" maxlength="256" bind:value={query} aria-label={t('Search consoles')} />
     </label>
   </div>
   <div class="library-tools">
