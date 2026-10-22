@@ -240,7 +240,7 @@ FocusScope {
         case 3: item = audioOutDevice; break;
         case 4: item = registerNewButton; break;
         case 5: item = dialog.backend.settings.mouseCameraSupported ? keyboardMousePage.firstFocusItem : resetAllKeys; break;
-        case 6: item = controllerMappingChange; break;
+        case 6: item = allowJoystickBackgroundEvents; break;
         case 7: item = firstRemoteFocusableItem(); break;
         case 8: item = profile; break;
         }
@@ -1722,6 +1722,7 @@ FocusScope {
                                 anchors.fill: parent
                                 spacing: 12
                             C.CheckBox {
+                                id: allowJoystickBackgroundEvents
                                 objectName: "allowJoystickBackgroundEvents"
                                 text: qsTr("Process controller input in the background. Default: On")
                                 font.pixelSize: 14

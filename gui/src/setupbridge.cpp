@@ -21,7 +21,10 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     connect(backend->qmlSettings(), &QmlSettings::registeredHostsChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::discoveryEnabledChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::connectionAttemptChanged, this, &SetupBridge::refresh);
-    connect(backend, &QmlBackend::windowChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::windowChanged, this, [this] {
+        if (this->backend->qmlWindow()) invalidateControllerMapping();
+        refresh();
+    });
     connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, &SetupBridge::refresh);
     connect(backend->qmlSettings(), &QmlSettings::currentProfileChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::psnAuthAttemptChanged, this, &SetupBridge::refresh);
@@ -990,6 +993,7 @@ QVariantMap SetupBridge::cancelConnection(const QString &attempt)
 
 QVariantMap SetupBridge::retryConnection(const QString &attempt)
 {
+    if (!controllerOperation.isEmpty()) return {{"accepted", false}};
     return {{"accepted", backend->retryConnection(attempt)}};
 }
 

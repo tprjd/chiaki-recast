@@ -497,7 +497,8 @@ private slots:
             QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("controller-mapping.png")));
             setup.resize(2560, 1800);
             setup.view()->setZoomFactor(2);
-            QTRY_VERIFY(script(setup.view(), "innerWidth >= 1024 && document.documentElement.scrollWidth <= innerWidth").toBool());
+            QTRY_VERIFY(script(setup.view(), "devicePixelRatio === 2 && innerWidth === 1280 && document.documentElement.scrollWidth <= innerWidth").toBool());
+            QTest::qWait(250);
             QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("controller-mapping-200-percent.png")));
             setup.view()->setZoomFactor(1);
             setup.resize(1280, 900);
@@ -507,6 +508,14 @@ private slots:
         tap(14);
         QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("controllerMap1Slot1"));
         const auto original = backend->currentControllerMapping();
+        description.product_id = 0x0017;
+        const int unrelated = SDL_JoystickAttachVirtualEx(&description);
+        QVERIFY2(unrelated >= 0, SDL_GetError());
+        const auto devices = backend->qmlControllers().size();
+        QTRY_COMPARE(backend->qmlControllers().size(), devices + 1);
+        QCOMPARE(SDL_JoystickDetachVirtual(unrelated), 0);
+        QTRY_COMPARE(backend->qmlControllers().size(), devices);
+        QVERIFY(backend->controllerMappingInProgress());
         const auto mappingInput = [&](int action, int slot) {
             for (const auto &row : backend->currentControllerMapping()) {
                 const auto entry = row.toMap();
@@ -516,6 +525,12 @@ private slots:
         };
         QVERIFY(click(setup.view(), "#controllerMap1Slot1"));
         QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-controller-capture]')").toBool());
+        QVERIFY(click(setup.view(), "#controllerCaptureCancel"));
+        QTRY_VERIFY(!script(setup.view(), "!!document.querySelector('[data-controller-capture]')").toBool());
+        QCOMPARE(backend->currentControllerMapping(), original);
+        QVERIFY(click(setup.view(), "#enableAnalogStickMapping"));
+        QTRY_VERIFY(backend->enableAnalogStickMapping());
+        QVERIFY(click(setup.view(), "#controllerMap1Slot1"));
         tap(1);
         QTRY_COMPARE(mappingInput(1, 1), QStringLiteral("b1"));
         QVERIFY(mappingInput(2, 0).isEmpty());
@@ -569,6 +584,12 @@ private slots:
         QTRY_VERIFY(script(setup.view(), "!document.querySelector('dialog[open]') && document.querySelector('[data-controller-status]').textContent.includes('profile changed')").toBool());
         QVERIFY(!setupRequest(setup.view(), "captureControllerMapping", {1, 1, previousOperation, previousGeneration}).value("accepted").toBool());
         QVERIFY(!setupRequest(setup.view(), "controllerMappingAction", {"apply", previousOperation, previousGeneration}).value("accepted").toBool());
+        QVERIFY(click(setup.view(), "#controllerMappingChange"));
+        tap(0);
+        QTRY_VERIFY(backend->controllerMappingInProgress());
+        setup.hide();
+        QTRY_VERIFY(!backend->controllerMappingInProgress());
+        setup.show();
         QVERIFY(click(setup.view(), "#controllerMappingChange"));
         tap(0);
         QTRY_VERIFY(backend->controllerMappingInProgress());
