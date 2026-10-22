@@ -1,0 +1,1 @@
+Native backend matches last passing source after removal of only two unused signal emissions. Embedded harness matches exactly after line-ending normalization.

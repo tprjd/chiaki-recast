@@ -293,9 +293,9 @@ void DiscoveryManager::SendWakeup(const QString &host, const QByteArray &regist_
 	char *ipv6 = strchr(host.toUtf8().data(), ':');
 	ChiakiErrorCode err;
 	if(ipv6)
-		err = chiaki_discovery_wakeup(&log, service_active_ipv6 ? &service_ipv6.discovery : nullptr, host.toUtf8().constData(), credential, ps5);
+		err = requests.wakeup(&log, service_active_ipv6 ? &service_ipv6.discovery : nullptr, host.toUtf8().constData(), credential, ps5);
 	else
-		err = chiaki_discovery_wakeup(&log, service_active ? &service.discovery : nullptr, host.toUtf8().constData(), credential, ps5);
+		err = requests.wakeup(&log, service_active ? &service.discovery : nullptr, host.toUtf8().constData(), credential, ps5);
 
 	if(err != CHIAKI_ERR_SUCCESS)
 		throw Exception(QString("Failed to send Packet: %1").arg(chiaki_error_string(err)));

@@ -1,0 +1,66 @@
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index f3e0585b..039fe6a5 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -383,6 +383,55 @@ class EmbeddedSetupTest : public QObject
+     }
+ 
+ private slots:
++    void autoConnectTarget()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto removeSettings = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        settings.SetRemotePlayAsk(false);
++        settings.SetAddSteamShortcutAsk(false);
++        ChiakiRegisteredHost registered = {};
++        registered.target = CHIAKI_TARGET_PS5_1;
++        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
++        strcpy(registered.server_nickname, "Startup console");
++        settings.AddRegisteredHost(RegisteredHost(registered));
++        QList<QPointer<PsnReply>> requests;
++        PsnRequests transport;
++        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
++        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **, size_t *, ChiakiLog *) {
++            QTest::qFail("Unexpected PSN list in auto-connect settings", __FILE__, __LINE__);
++            return CHIAKI_ERR_CANCELED;
++        };
++        transport.connect = [](StreamSession *, const QString &, bool) {
++            QTest::qFail("Unexpected PSN connection in auto-connect settings", __FILE__, __LINE__);
++            return CHIAKI_ERR_CANCELED;
++        };
++        transport.startSession = [](ChiakiSession *) {
++            QTest::qFail("Unexpected native start in auto-connect settings", __FILE__, __LINE__);
++            return CHIAKI_ERR_CANCELED;
++        };
++        QmlNativeServices services(&settings, transport, {}, {}, controlledDiscovery());
++        SetupWindow setup(services.backend());
++        setup.resize(1280, 720);
++        setup.show();
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-auto-connect-target]') !== null").toBool());
++        const auto key = setup.bridge()->snapshot().value("registrations").toList().first().toMap().value("key").toString();
++        QVERIFY(fill(setup.view(), "[data-auto-connect-target]", key));
++        QTRY_COMPARE(settings.GetAutoConnectHost().GetServerMAC().ToString(), QStringLiteral("001122334455"));
++        QVERIFY(services.backend()->connectionAttempt().isEmpty());
++        Settings restarted(profile);
++        QCOMPARE(restarted.GetAutoConnectHost().GetServerMAC().ToString(), QStringLiteral("001122334455"));
++        setup.view()->reload();
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-auto-connect-target]')?.value").toString(), key);
++        QVERIFY(fill(setup.view(), "[data-auto-connect-target]", ""));
++        QTRY_VERIFY(!settings.GetAutoConnectHost().GetServerMAC().GetValue());
++        QVERIFY(requests.isEmpty());
++    }
++
+     void remoteNativeConnection()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+diff --git a/third-party/gf-complete b/third-party/gf-complete
+--- a/third-party/gf-complete
++++ b/third-party/gf-complete
+@@ -1 +1 @@
+-Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478
++Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478-dirty

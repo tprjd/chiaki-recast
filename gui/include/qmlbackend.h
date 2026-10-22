@@ -204,7 +204,7 @@ public:
     void enableZeroCopy()  { disable_zero_copy = false; };
 
     Q_INVOKABLE void deleteHost(int index);
-    Q_INVOKABLE void wakeUpHost(int index, QString nickname = QString());
+    Q_INVOKABLE bool wakeUpHost(int index, QString nickname = QString());
     Q_INVOKABLE void addManualHost(int index, const QString &address);
     Q_INVOKABLE void hideHost(const QString &mac_string, const QString &host_nickname);
     Q_INVOKABLE void unhideHost(const QString &mac_string);
@@ -230,7 +230,7 @@ public:
     QVariantMap accountLookupAttempt() const { return account_lookup_attempt; }
     QString startAccountLookup(const QString &username);
     bool cancelAccountLookup(const QString &id);
-    Q_INVOKABLE void stopAutoConnect();
+    Q_INVOKABLE bool stopAutoConnect(const QString &attempt_id = QString());
     Q_INVOKABLE bool setConsolePin(int index, QString console_pin);
     Q_INVOKABLE QString openPsnLink();
     Q_INVOKABLE QString openPlaceboOptionsLink();
@@ -284,8 +284,6 @@ signals:
     void accountLookupChanged();
     void psnCredsExpired();
     void autoConnectChanged();
-    void wakeupStartInitiated();
-    void wakeupStartFailed();
     void windowTypeUpdated(WindowType type);
 
     void error(const QString &title, const QString &text);

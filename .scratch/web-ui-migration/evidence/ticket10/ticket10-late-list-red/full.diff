@@ -1,0 +1,194 @@
+diff --git a/gui/src/qmlbackend.cpp b/gui/src/qmlbackend.cpp
+index c1e33c71..f2ed52a1 100644
+--- a/gui/src/qmlbackend.cpp
++++ b/gui/src/qmlbackend.cpp
+@@ -188,6 +188,11 @@ QmlBackend::QmlBackend(Settings *settings, QObject *parent, PsnRequests requests
+             finishPsnCleanup();
+             return;
+         }
++        if (connection_attempt.value("phase") == "failure" || !connectionTargetValid()) {
++            failConnection(tr("Console is unavailable"), tr("Select the console again from the current profile."));
++            finishPsnCleanup();
++            return;
++        }
+         checkPsnConnection(err);
+     });
+     connect(&psn_hosts_watcher, &QFutureWatcher<void>::finished, [this] {
+@@ -934,6 +939,15 @@ bool QmlBackend::connectionTargetValid() const
+ {
+     if (connection_profile_generation != profile_generation)
+         return false;
++    if (connection_attempt.value("context") == "startup") {
++        const auto mac = connection_attempt.value("automaticMac").toString();
++        bool registered = false;
++        for (const auto &host : settings->GetRegisteredHosts())
++            if (host.GetServerMAC().ToString() == mac && !settings->GetHiddenHostHidden(host.GetServerMAC())
++                    && host.GetServerNickname() == connection_attempt.value("automaticNickname").toString())
++                registered = true;
++        if (!registered) return false;
++    }
+     const auto mac = QByteArray::fromHex(connection_target.value("mac").toString().toLatin1());
+     if (mac.size() == 6 && settings->GetHiddenHostHidden(HostMAC(reinterpret_cast<const uint8_t *>(mac.constData()))))
+         return false;
+@@ -996,6 +1010,10 @@ void QmlBackend::beginConnection(const StreamSessionConnectInfo &info, const QVa
+         {"ps5", chiaki_target_is_ps5(info.target)}, {"cleanupPending", context != "startup"}, {"cancelable", true},
+         {"waitingForWake", waiting}, {"context", context.isEmpty() && waiting ? QStringLiteral("wake") : context},
+         {"registrationOnly", info.auto_regist}, {"errorTitle", ""}, {"errorText", ""}};
++    if (context == "startup") {
++        connection_attempt["automaticMac"] = target.value("mac");
++        connection_attempt["automaticNickname"] = info.nickname;
++    }
+     const int index = resolveConnectionTarget();
+     if (index >= 0)
+         connection_attempt["name"] = hosts().at(index).toMap().value("name");
+@@ -2057,6 +2075,8 @@ void QmlBackend::connectToHost(int index, QString nickname)
+     const bool continue_attempt = connection_attempt.value("phase") == "waiting"
+         && connection_attempt.value("waitingForWake").toBool() && !connection_cancelled && !connection_dismissed
+         && connection_profile_generation == profile_generation && connectionTargetValid();
++    if (continue_attempt && connection_attempt.value("context") == "startup" && !server.duid.isEmpty())
++        server.registered_host = settings->GetRegisteredHost(auto_connect_mac);
+     if (continue_attempt) {
+         const auto attempt_id = connection_generation;
+         setConnectionPhase(QStringLiteral("found"));
+@@ -2285,11 +2305,18 @@ void QmlBackend::autoConnectPsn()
+     if (settings->GetPsnAuthTokenExpiry().isEmpty() || settings->GetPsnRefreshToken().isEmpty())
+         return;
+     const auto listed = hosts();
++    const auto selected = settings->GetRegisteredHost(auto_connect_mac);
++    const bool ps5 = chiaki_target_is_ps5(selected.GetTarget());
++    int ps4_registrations = 0;
++    for (const auto &host : settings->GetRegisteredHosts())
++        if (!chiaki_target_is_ps5(host.GetTarget()) && !settings->GetHiddenHostHidden(host.GetServerMAC()))
++            ++ps4_registrations;
+     int found = -1;
+     for (int i = 0; i < listed.size(); ++i) {
+         const auto host = listed.at(i).toMap();
+         if (!host.value("discovered").toBool() && !host.value("duid").toString().isEmpty()
+-                && host.value("name").toString() == auto_connect_nickname && host.value("display").toBool()) {
++                && host.value("ps5").toBool() == ps5 && host.value("display").toBool()
++                && (ps5 ? host.value("name").toString() == auto_connect_nickname : ps4_registrations == 1)) {
+             if (found != -1) return;
+             found = i;
+         }
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 815c67a2..972c4f1e 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -409,7 +409,7 @@ private slots:
+     void startupNativeConnection_data()
+     {
+         QTest::addColumn<QString>("mode");
+-        for (const auto &mode : {"local-ready", "local-wake", "psn-ready", "psn-ps4", "psn-cancel", "psn-profile", "psn-removed", "psn-replaced"})
++        for (const auto &mode : {"local-ready", "local-wake", "psn-ready", "psn-late-list", "psn-ps4", "psn-ps4-ambiguous", "psn-cancel", "psn-profile", "psn-removed", "psn-replaced"})
+             QTest::newRow(mode) << QString::fromLatin1(mode);
+     }
+ 
+@@ -417,8 +417,8 @@ private slots:
+     {
+         QFETCH(QString, mode);
+         const bool local = mode.startsWith("local");
+-        const bool ps5 = mode != "psn-ps4";
+-        const bool success = mode == "local-ready" || mode == "local-wake" || mode == "psn-ready" || mode == "psn-ps4";
++        const bool ps5 = !mode.startsWith("psn-ps4");
++        const bool success = mode == "local-ready" || mode == "local-wake" || mode == "psn-ready" || mode == "psn-late-list" || mode == "psn-ps4";
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+         const auto removeSettings = qScopeGuard([&] {
+             for (const auto &name : {profile, profile + "-next"})
+@@ -448,14 +448,22 @@ private slots:
+         RegisteredHost paired(registered);
+         paired.SetConsolePin(paired, {});
+         settings.AddRegisteredHost(paired);
++        if (mode == "psn-ps4-ambiguous") {
++            auto second = registered;
++            second.server_mac[5] = 0x66;
++            strcpy(second.server_nickname, "Other PS4");
++            settings.AddRegisteredHost(RegisteredHost(second));
++        }
+         settings.SetAutoConnectHost(QByteArray::fromHex("001122334455"));
+         QList<QPointer<PsnReply>> requests;
+-        QSemaphore release;
++        QSemaphore release, listRelease;
++        std::atomic<int> lists = 0;
+         std::atomic<int> workers = 0;
+         int starts = 0, wakes = 0;
+         bool selectedRoute = false;
+         auto transport = controlledPsn(requests);
+-        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
++        transport.listDevices = [&](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
++            if (mode == "psn-late-list") { ++lists; listRelease.acquire(); }
+             *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
+             *count = 1;
+             strcpy((*devices)[0].device_name, "Startup console");
+@@ -473,7 +481,8 @@ private slots:
+         transport.startSession = [&](ChiakiSession *session) {
+             ++starts;
+             if (!success) return CHIAKI_ERR_CANCELED;
+-            if (local) selectedRoute = QString::fromUtf8(session->connect_info.hostname) == "127.0.0.1" && session->connect_info.ps5;
++            if (local) selectedRoute = session->connect_info.host_addrinfos
++                && QHostAddress(session->connect_info.host_addrinfos->ai_addr) == QHostAddress::LocalHost && session->connect_info.ps5;
+             return chiaki_thread_create(&session->session_thread, [](void *user) -> void * {
+                 auto *session = static_cast<ChiakiSession *>(user);
+                 ChiakiEvent connected = {};
+@@ -491,10 +500,11 @@ private slots:
+         };
+         auto discovery = controlledDiscovery();
+         discovery.wakeup = [&](ChiakiLog *, ChiakiDiscovery *, const char *, uint64_t, bool) { ++wakes; return CHIAKI_ERR_SUCCESS; };
+-        QmlNativeServices services(&settings, transport, {}, {}, discovery);
+-        const auto releaseOnExit = qScopeGuard([&] { release.release(); });
++        Settings startupSettings(profile);
++        QmlNativeServices services(&startupSettings, transport, {}, {}, discovery);
+         auto *backend = services.backend();
+         ApplicationController controller(&services);
++        const auto releaseOnExit = qScopeGuard([&] { release.release(); listRelease.release(); });
+         auto &setup = *controller.setupWindow();
+         setup.view()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, false);
+         setup.resize(1280, 720);
+@@ -508,11 +518,28 @@ private slots:
+         host.state = mode == "local-wake" ? CHIAKI_DISCOVERY_HOST_STATE_STANDBY : CHIAKI_DISCOVERY_HOST_STATE_READY;
+         if (local) discover(backend, {host});
+         else {
+-            QTRY_VERIFY(!backend->hosts().isEmpty());
++            if (mode == "psn-late-list") QTRY_COMPARE(lists.load(), 1);
++            else QTRY_VERIFY(!backend->hosts().isEmpty());
+             bool accelerated = false;
+             for (auto *timer : backend->findChildren<QTimer *>())
+                 if (timer->isActive() && timer->interval() == 5000) { timer->start(1); accelerated = true; }
+             QVERIFY(accelerated);
++            if (mode == "psn-late-list") {
++                QTest::qWait(40);
++                listRelease.release();
++            }
++        }
++        if (mode == "psn-ps4-ambiguous") {
++            QTest::qWait(40);
++            QCOMPARE(workers.load(), 0);
++            QCOMPARE(starts, 0);
++            QVERIFY(!backend->qmlSession());
++            QVERIFY(!backend->qmlWindow());
++            setup.view()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
++            setup.view()->reload();
++            QVERIFY(click(setup.view(), "[data-stop-auto-connect]"));
++            QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("cancelled"));
++            return;
+         }
+         QTRY_VERIFY(backend->qmlSession());
+         QTRY_VERIFY(backend->qmlWindow());
+@@ -532,10 +559,10 @@ private slots:
+             if (mode == "psn-cancel") QVERIFY(backend->stopAutoConnect(attempt));
+             else if (mode == "psn-profile") backend->qmlSettings()->setCurrentProfile(profile + "-next");
+             else if (mode == "psn-removed" || mode == "psn-replaced") {
+-                settings.RemoveRegisteredHost(paired.GetServerMAC());
++                backend->nativeSettings()->RemoveRegisteredHost(paired.GetServerMAC());
+                 if (mode == "psn-replaced") {
+                     registered.server_mac[5] = 0x66;
+-                    settings.AddRegisteredHost(RegisteredHost(registered));
++                    backend->nativeSettings()->AddRegisteredHost(RegisteredHost(registered));
+                 }
+             }
+             release.release();
+diff --git a/third-party/gf-complete b/third-party/gf-complete
+--- a/third-party/gf-complete
++++ b/third-party/gf-complete
+@@ -1 +1 @@
+-Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478
++Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478-dirty

@@ -11,6 +11,7 @@
 #include <QApplication>
 #include <QWebEnginePage>
 #include <QWebEngineView>
+#include <QWebEngineSettings>
 #include <QScopeGuard>
 #include <QUuid>
 #include <QElapsedTimer>
@@ -290,7 +291,29 @@ class EmbeddedSetupTest : public QObject
     DiscoveryRequests controlledDiscovery()
     {
         return {[](ChiakiDiscoveryService *, ChiakiDiscoveryServiceOptions *, ChiakiLog *) { return CHIAKI_ERR_SUCCESS; },
-            [](ChiakiDiscoveryService *) {}};
+            [](ChiakiDiscoveryService *) {}, [](ChiakiLog *, ChiakiDiscovery *, const char *, uint64_t, bool) {
+                QTest::qFail("Unexpected wake packet in a controlled discovery fixture", __FILE__, __LINE__);
+                return CHIAKI_ERR_CANCELED;
+            }};
+    }
+
+    PsnRequests controlledPsn(QList<QPointer<PsnReply>> &requests)
+    {
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **, size_t *, ChiakiLog *) {
+            QTest::qFail("Unexpected PSN list in a wake fixture", __FILE__, __LINE__);
+            return CHIAKI_ERR_CANCELED;
+        };
+        transport.connect = [](StreamSession *, const QString &, bool) {
+            QTest::qFail("Unexpected PSN worker in a wake fixture", __FILE__, __LINE__);
+            return CHIAKI_ERR_CANCELED;
+        };
+        transport.startSession = [](ChiakiSession *) {
+            QTest::qFail("Unexpected native start in a wake fixture", __FILE__, __LINE__);
+            return CHIAKI_ERR_CANCELED;
+        };
+        return transport;
     }
 
     QVariantMap settingRequest(QWebEngineView *view, const QString &name, const QVariant &value, const QString &generation, const QString &method = "setGeneralSetting")
@@ -386,6 +409,261 @@ class EmbeddedSetupTest : public QObject
     }
 
 private slots:
+    void startupNativeConnection_data()
+    {
+        QTest::addColumn<QString>("mode");
+        for (const auto &mode : {"local-ready", "local-wake", "psn-ready", "psn-late-list", "psn-ps4", "psn-ps4-ambiguous", "psn-cancel", "psn-profile", "psn-removed", "psn-replaced"})
+            QTest::newRow(mode) << QString::fromLatin1(mode);
+    }
+
+    void startupNativeConnection()
+    {
+        QFETCH(QString, mode);
+        const bool local = mode.startsWith("local");
+        const bool ps5 = !mode.startsWith("psn-ps4");
+        const bool success = mode == "local-ready" || mode == "local-wake" || mode == "psn-ready" || mode == "psn-late-list" || mode == "psn-ps4";
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetHardwareDecoder({});
+        settings.SetCodecLocalPS5(CHIAKI_CODEC_H264);
+        settings.SetCodecRemotePS5(CHIAKI_CODEC_H264);
+        settings.SetRenderBackend(RenderBackend::OpenGL);
+        settings.SetPlaceboPreset(PlaceboPreset::Fast);
+        settings.SetWindowType(WindowType::AdjustableResolution);
+        settings.SetStreamGeometry(QRect(80, 80, 960, 640));
+        settings.SetPsnAuthToken("startup-access-secret");
+        settings.SetPsnRefreshToken("startup-refresh-secret");
+        settings.SetPsnAccountId("AQAAAAAAAAA=");
+        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(3600).toString(settings.GetTimeFormat()));
+        ChiakiRegisteredHost registered = {};
+        registered.target = ps5 ? CHIAKI_TARGET_PS5_1 : CHIAKI_TARGET_PS4_10;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Startup console");
+        strcpy(registered.rp_regist_key, "12345678");
+        RegisteredHost paired(registered);
+        paired.SetConsolePin(paired, {});
+        settings.AddRegisteredHost(paired);
+        if (mode == "psn-ps4-ambiguous") {
+            auto second = registered;
+            second.server_mac[5] = 0x66;
+            strcpy(second.server_nickname, "Other PS4");
+            settings.AddRegisteredHost(RegisteredHost(second));
+        }
+        settings.SetAutoConnectHost(QByteArray::fromHex("001122334455"));
+        QList<QPointer<PsnReply>> requests;
+        QSemaphore release, listRelease;
+        std::atomic<int> lists = 0;
+        std::atomic<int> workers = 0;
+        int starts = 0, wakes = 0;
+        bool selectedRoute = false;
+        auto transport = controlledPsn(requests);
+        transport.listDevices = [&](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            if (mode == "psn-late-list") { ++lists; listRelease.acquire(); }
+            *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
+            *count = 1;
+            strcpy((*devices)[0].device_name, "Startup console");
+            memset((*devices)[0].device_uid, 0x12, sizeof((*devices)[0].device_uid));
+            (*devices)[0].remoteplay_enabled = true;
+            return CHIAKI_ERR_SUCCESS;
+        };
+        transport.connect = [&](StreamSession *, const QString &duid, bool remotePs5) {
+            if (ps5) selectedRoute = remotePs5 && duid == QString("12").repeated(32);
+            else selectedRoute = !remotePs5 && duid == QString("41").repeated(32);
+            ++workers;
+            release.acquire();
+            return CHIAKI_ERR_SUCCESS;
+        };
+        transport.startSession = [&](ChiakiSession *session) {
+            ++starts;
+            if (!success) return CHIAKI_ERR_CANCELED;
+            if (local) selectedRoute = session->connect_info.host_addrinfos
+                && QHostAddress(session->connect_info.host_addrinfos->ai_addr) == QHostAddress::LocalHost && session->connect_info.ps5;
+            return chiaki_thread_create(&session->session_thread, [](void *user) -> void * {
+                auto *session = static_cast<ChiakiSession *>(user);
+                ChiakiEvent connected = {};
+                connected.type = CHIAKI_EVENT_CONNECTED;
+                session->event_cb(&connected, session->event_cb_user);
+                chiaki_mutex_lock(&session->state_mutex);
+                while (!session->should_stop) chiaki_cond_wait(&session->state_cond, &session->state_mutex);
+                chiaki_mutex_unlock(&session->state_mutex);
+                ChiakiEvent event = {};
+                event.type = CHIAKI_EVENT_QUIT;
+                event.quit.reason = CHIAKI_QUIT_REASON_STOPPED;
+                session->event_cb(&event, session->event_cb_user);
+                return nullptr;
+            }, session);
+        };
+        auto discovery = controlledDiscovery();
+        discovery.wakeup = [&](ChiakiLog *, ChiakiDiscovery *, const char *, uint64_t, bool) { ++wakes; return CHIAKI_ERR_SUCCESS; };
+        Settings startupSettings(profile);
+        QmlNativeServices services(&startupSettings, transport, {}, {}, discovery);
+        auto *backend = services.backend();
+        ApplicationController controller(&services);
+        const auto releaseOnExit = qScopeGuard([&] { release.release(); listRelease.release(); });
+        auto &setup = *controller.setupWindow();
+        setup.view()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, false);
+        setup.resize(1280, 720);
+        setup.show();
+        const auto attempt = backend->connectionAttempt().value("id").toString();
+        DiscoveryHost host = {};
+        host.ps5 = true;
+        host.host_id = "001122334455";
+        host.host_name = "Startup console";
+        host.host_addr = "127.0.0.1";
+        host.state = mode == "local-wake" ? CHIAKI_DISCOVERY_HOST_STATE_STANDBY : CHIAKI_DISCOVERY_HOST_STATE_READY;
+        if (local) discover(backend, {host});
+        else {
+            if (mode == "psn-late-list") QTRY_COMPARE(lists.load(), 1);
+            else QTRY_VERIFY(!backend->hosts().isEmpty());
+            bool accelerated = false;
+            for (auto *timer : backend->findChildren<QTimer *>())
+                if (timer->isActive() && timer->interval() == 5000) { timer->start(1); accelerated = true; }
+            QVERIFY(accelerated);
+            if (mode == "psn-late-list") {
+                QTest::qWait(40);
+                listRelease.release();
+            }
+        }
+        if (mode == "psn-ps4-ambiguous") {
+            QTest::qWait(40);
+            QCOMPARE(workers.load(), 0);
+            QCOMPARE(starts, 0);
+            QVERIFY(!backend->qmlSession());
+            QVERIFY(!backend->qmlWindow());
+            setup.view()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+            setup.view()->reload();
+            QVERIFY(click(setup.view(), "[data-stop-auto-connect]"));
+            QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("cancelled"));
+            return;
+        }
+        QTRY_VERIFY(backend->qmlSession());
+        QTRY_VERIFY(backend->qmlWindow());
+        QPointer<QmlMainWindow> native = backend->qmlWindow();
+        QPointer<StreamSession> session = backend->qmlSession();
+        QCOMPARE(backend->connectionAttempt().value("id").toString(), attempt);
+        QVERIFY(!script(setup.view(), "!!document.querySelector('.connect-console')").toBool());
+        if (mode == "local-wake") {
+            QCOMPARE(starts, 0);
+            QCOMPARE(wakes, 1);
+            host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+            discover(backend, {host});
+        }
+        if (!local) {
+            QTRY_COMPARE(workers.load(), 1);
+            QCOMPARE(starts, 0);
+            if (mode == "psn-cancel") QVERIFY(backend->stopAutoConnect(attempt));
+            else if (mode == "psn-profile") backend->qmlSettings()->setCurrentProfile(profile + "-next");
+            else if (mode == "psn-removed" || mode == "psn-replaced") {
+                backend->nativeSettings()->RemoveRegisteredHost(paired.GetServerMAC());
+                if (mode == "psn-replaced") {
+                    registered.server_mac[5] = 0x66;
+                    backend->nativeSettings()->AddRegisteredHost(RegisteredHost(registered));
+                }
+            }
+            release.release();
+        }
+        if (success) {
+            QTRY_COMPARE(starts, 1);
+            QVERIFY(selectedRoute);
+            QCOMPARE(workers.load(), local ? 0 : 1);
+            QTRY_VERIFY(!setup.isVisible());
+            QTRY_VERIFY(backend->connectionAttempt().value("cancelable").toBool());
+            QVERIFY(backend->stopAutoConnect(attempt));
+        }
+        QTRY_VERIFY(!session);
+        native->dismissStreamView();
+        QTRY_VERIFY(!native);
+        QTRY_VERIFY(setup.isVisible());
+        if (!success) QCOMPARE(starts, 0);
+        setup.view()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+        setup.view()->reload();
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.connect-console')").toBool());
+        QCOMPARE(starts, success ? 1 : 0);
+        QVERIFY(requests.isEmpty());
+    }
+
+    void wakeFailures_data()
+    {
+        QTest::addColumn<QString>("mode");
+        for (const auto &mode : {"transport", "timeout", "duplicate", "removed", "hidden", "profile"})
+            QTest::newRow(mode) << QString::fromLatin1(mode);
+    }
+
+    void wakeFailures()
+    {
+        QFETCH(QString, mode);
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Sleeping console");
+        strcpy(registered.rp_regist_key, "12345678");
+        const RegisteredHost paired(registered);
+        settings.AddRegisteredHost(paired);
+        QList<QPointer<PsnReply>> requests;
+        int wakes = 0;
+        auto discovery = controlledDiscovery();
+        discovery.wakeup = [&](ChiakiLog *, ChiakiDiscovery *, const char *, uint64_t, bool) {
+            ++wakes;
+            return mode == "transport" && wakes == 1 ? CHIAKI_ERR_NETWORK : CHIAKI_ERR_SUCCESS;
+        };
+        QmlNativeServices services(&settings, controlledPsn(requests), {}, {}, discovery);
+        auto *backend = services.backend();
+        SetupWindow setup(backend);
+        setup.resize(1280, 720);
+        setup.show();
+        DiscoveryHost host = {};
+        host.ps5 = true;
+        host.host_id = "001122334455";
+        host.host_name = "Sleeping console";
+        host.host_addr = "192.0.2.10";
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_STANDBY;
+        discover(backend, {host});
+        QVERIFY(click(setup.view(), "[data-wake-console]"));
+        QTRY_COMPARE(wakes, 1);
+        if (mode == "timeout") {
+            bool accelerated = false;
+            for (auto *timer : backend->findChildren<QTimer *>())
+                if (timer->isActive() && timer->interval() == 25000) { timer->start(1); accelerated = true; }
+            QVERIFY(accelerated);
+        } else if (mode == "duplicate") discover(backend, {host, host});
+        else if (mode == "removed") settings.RemoveRegisteredHost(paired.GetServerMAC());
+        else if (mode == "hidden") settings.AddHiddenHost(HiddenHost(paired.GetServerMAC(), "Sleeping console"));
+        else if (mode == "profile") backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("failure"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-connection] h2')?.textContent.length > 0").toBool());
+        if (mode == "transport" || mode == "timeout") {
+            QVERIFY(click(setup.view(), "[data-connection-retry]"));
+            QTRY_COMPARE(wakes, 2);
+            QVERIFY(click(setup.view(), "[data-connection-cancel]"));
+            QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("cancelled"));
+        }
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        discover(backend, {host});
+        QTest::qWait(30);
+        QVERIFY(backend->connectionAttempt().value("phase") != "woken");
+        QVERIFY(!backend->qmlSession());
+        QVERIFY(!backend->qmlWindow());
+        QVERIFY(requests.isEmpty());
+    }
+
     void setupReminders()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -985,6 +1263,190 @@ private slots:
         QTRY_VERIFY(script(setup.view(), "!document.querySelector('dialog[open]') && document.querySelector('[data-controller-status]').textContent.includes('disconnected')").toBool());
         QVERIFY(!setupRequest(setup.view(), "controllerMappingAction", {"apply", oldOperation, generation}).value("accepted").toBool());
         QVERIFY(settings.GetControllerMappings().isEmpty());
+    }
+
+
+    void autoConnectCancellation()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Startup console");
+        strcpy(registered.rp_regist_key, "12345678");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        settings.SetAutoConnectHost(QByteArray::fromHex("001122334455"));
+        QList<QPointer<PsnReply>> requests;
+        auto transport = controlledPsn(requests);
+        auto discovery = controlledDiscovery();
+        int wakes = 0;
+        discovery.wakeup = [&](ChiakiLog *, ChiakiDiscovery *, const char *, uint64_t, bool) { ++wakes; return CHIAKI_ERR_SUCCESS; };
+        QmlNativeServices services(&settings, transport, {}, {}, discovery);
+        auto *backend = services.backend();
+        SetupWindow setup(backend);
+        setup.resize(1280, 720);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-stop-auto-connect]')?.disabled === false").toBool());
+        const auto attempt = backend->connectionAttempt().value("id").toString();
+        QVERIFY(click(setup.view(), "[data-stop-auto-connect]"));
+        QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("cancelled"));
+        QCOMPARE(settings.GetAutoConnectHost().GetServerMAC().ToString(), QStringLiteral("001122334455"));
+        QVERIFY(click(setup.view(), "[data-connection-back]"));
+        DiscoveryHost host = {};
+        host.ps5 = true;
+        host.host_id = "001122334455";
+        host.host_name = "Startup console";
+        host.host_addr = "192.0.2.10";
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_STANDBY;
+        discover(backend, {host});
+        QVERIFY(click(setup.view(), "[data-wake-console]"));
+        QTRY_COMPARE(wakes, 1);
+        const auto manual = backend->connectionAttempt().value("id").toString();
+        QVERIFY(manual != attempt);
+        QVERIFY(!setupRequest(setup.view(), "stopAutoConnect", {attempt}).value("accepted").toBool());
+        backend->stopAutoConnect();
+        QCOMPARE(backend->connectionAttempt().value("id").toString(), manual);
+        QCOMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("waking"));
+        QVERIFY(click(setup.view(), "[data-connection-cancel]"));
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        discover(backend, {host});
+        QTest::qWait(30);
+        QCOMPARE(wakes, 1);
+        QVERIFY(!backend->qmlWindow());
+        QVERIFY(!backend->qmlSession());
+        QVERIFY(requests.isEmpty());
+    }
+
+    void wakeConsole()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Sleeping console");
+        strcpy(registered.rp_regist_key, "12345678");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QList<QPointer<PsnReply>> requests;
+        RegistrationTransport guarded;
+        auto transport = guarded.guardedPsn();
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **, size_t *, ChiakiLog *) {
+            QTest::qFail("Unexpected PSN list in wake fixture", __FILE__, __LINE__);
+            return CHIAKI_ERR_CANCELED;
+        };
+        transport.connect = [](StreamSession *, const QString &, bool) {
+            QTest::qFail("Unexpected PSN worker in wake fixture", __FILE__, __LINE__);
+            return CHIAKI_ERR_CANCELED;
+        };
+        int wakes = 0;
+        bool wakeMatches = false;
+        auto discovery = controlledDiscovery();
+        discovery.wakeup = [&](ChiakiLog *, ChiakiDiscovery *, const char *address, uint64_t credential, bool ps5) {
+            ++wakes;
+            wakeMatches = QString::fromUtf8(address) == "192.0.2.10" && credential == 0x12345678 && ps5;
+            return CHIAKI_ERR_SUCCESS;
+        };
+        QmlNativeServices services(&settings, transport, {}, {}, discovery);
+        auto *backend = services.backend();
+        SetupWindow setup(backend);
+        setup.resize(1280, 720);
+        setup.show();
+        DiscoveryHost host = {};
+        host.ps5 = true;
+        host.host_id = "001122334455";
+        host.host_name = "Sleeping console";
+        host.host_addr = "192.0.2.10";
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_STANDBY;
+        discover(backend, {host});
+        QVERIFY(click(setup.view(), "[data-wake-console]"));
+        QTRY_COMPARE(wakes, 1);
+        QVERIFY(wakeMatches);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-connection-phase]')?.textContent.includes('Waiting for the console to wake')").toBool());
+        QVERIFY(!backend->qmlWindow());
+        QVERIFY(!backend->qmlSession());
+        setup.view()->reload();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-connection-phase]')?.textContent.includes('Waiting for the console to wake')").toBool());
+        QCOMPARE(wakes, 1);
+        auto other = host;
+        other.host_id = "aabbccddeeff";
+        other.host_name = "Other console";
+        other.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        discover(backend, {other, host});
+        QTest::qWait(40);
+        QCOMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("waking"));
+        host.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        discover(backend, {host, other});
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-connection-phase]')?.textContent.includes('Console is awake')").toBool());
+        QVERIFY(click(setup.view(), "[data-connection-back]"));
+        QTRY_VERIFY(!script(setup.view(), "!!document.querySelector('[data-connection-phase]')").toBool());
+        QVERIFY(!backend->qmlSession());
+        QVERIFY(requests.isEmpty());
+    }
+
+    void autoConnectTarget()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Startup console");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **, size_t *, ChiakiLog *) {
+            QTest::qFail("Unexpected PSN list in auto-connect settings", __FILE__, __LINE__);
+            return CHIAKI_ERR_CANCELED;
+        };
+        transport.connect = [](StreamSession *, const QString &, bool) {
+            QTest::qFail("Unexpected PSN connection in auto-connect settings", __FILE__, __LINE__);
+            return CHIAKI_ERR_CANCELED;
+        };
+        transport.startSession = [](ChiakiSession *) {
+            QTest::qFail("Unexpected native start in auto-connect settings", __FILE__, __LINE__);
+            return CHIAKI_ERR_CANCELED;
+        };
+        QmlNativeServices services(&settings, transport, {}, {}, controlledDiscovery());
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 720);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-auto-connect-target]') !== null").toBool());
+        const auto key = setup.bridge()->snapshot().value("registrations").toList().first().toMap().value("key").toString();
+        QVERIFY(fill(setup.view(), "[data-auto-connect-target]", key));
+        QTRY_COMPARE(settings.GetAutoConnectHost().GetServerMAC().ToString(), QStringLiteral("001122334455"));
+        QVERIFY(services.backend()->connectionAttempt().isEmpty());
+        Settings restarted(profile);
+        QCOMPARE(restarted.GetAutoConnectHost().GetServerMAC().ToString(), QStringLiteral("001122334455"));
+        setup.view()->reload();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-auto-connect-target]')?.value").toString(), key);
+        QVERIFY(fill(setup.view(), "[data-auto-connect-target]", ""));
+        QTRY_VERIFY(!settings.GetAutoConnectHost().GetServerMAC().GetValue());
+        QVERIFY(requests.isEmpty());
     }
 
     void remoteNativeConnection()

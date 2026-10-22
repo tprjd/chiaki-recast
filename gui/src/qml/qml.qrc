@@ -34,7 +34,6 @@
     <file>LiveConsolePinContent.qml</file>
     <file>LiveConsolePinHost.qml</file>
     <file>PSNTokenDialog.qml</file>
-    <file>AutoConnectView.qml</file>
     <file>PsnView.qml</file>
     <file>controls/Button.qml</file>
     <file>controls/CheckBox.qml</file>
