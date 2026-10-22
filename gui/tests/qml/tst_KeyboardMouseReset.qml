@@ -25,6 +25,7 @@ TestCase {
     function openReset(h, tab) {
         h.settings.mouseCameraEnabled = true;
         h.settings.mouseHorizontalSensitivity = 2;
+        h.settings.mouseResponseExponent = 0.5;
         h.page.currentTab = tab;
         const reset = findChild(h, "keyboardMouseReset");
         verify(reset, "Reset defaults is available on either tab");
@@ -52,6 +53,7 @@ TestCase {
         tryCompare(dialog, "opened", false);
         tryCompare(h.settings, "mouseCameraEnabled", !data.accept);
         compare(h.settings.mouseHorizontalSensitivity, data.accept ? 1 : 2);
+        compare(h.settings.mouseResponseExponent, data.accept ? 1 : 0.5);
         tryCompare(findChild(h, "keyboardMouseReset"), "activeFocus", true);
         compare(h.page.currentTab, data.tab);
     }

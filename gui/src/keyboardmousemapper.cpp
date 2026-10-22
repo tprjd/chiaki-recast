@@ -9,7 +9,9 @@ bool MouseResponse::valid() const
         && horizontalSensitivity <= MaximumSensitivity && std::isfinite(verticalSensitivity)
         && verticalSensitivity >= MinimumSensitivity && verticalSensitivity <= MaximumSensitivity
         && std::isfinite(deadZoneCompensation) && deadZoneCompensation >= 0
-        && deadZoneCompensation <= MaximumCompensation;
+        && deadZoneCompensation <= MaximumCompensation
+        && std::isfinite(responseExponent) && responseExponent >= MinimumExponent
+        && responseExponent <= MaximumExponent;
 }
 
 bool KeyboardMouseMapper::setMouseResponse(const MouseResponse &value)
@@ -24,6 +26,7 @@ void KeyboardMouseMapper::reset(const QSet<qint64> &held)
     pressed.clear();
     ignored = held;
     mouse_samples.clear();
+    mouse_timestamp = 0;
     right_x = right_y = 0;
 }
 
@@ -53,17 +56,26 @@ void KeyboardMouseMapper::mouseMove(double dx, double dy, qint64 timestampUs)
 
 bool KeyboardMouseMapper::advanceMouse(qint64 timestampUs)
 {
-    while (!mouse_samples.empty() && timestampUs - mouse_samples.front().time >= MouseResponse::ObservationUs)
-        mouse_samples.pop_front();
+    if (timestampUs <= mouse_timestamp) return false;
+    const double gain = MouseResponse::VelocityGain / (timestampUs - mouse_timestamp);
+    mouse_timestamp = timestampUs;
     double x = 0, y = 0;
-    for (const auto &sample : mouse_samples) {
-        x += sample.x * MouseResponse::Gain * response.horizontalSensitivity;
-        y += sample.y * MouseResponse::Gain * response.verticalSensitivity;
+    while (!mouse_samples.empty() && mouse_samples.front().time <= timestampUs) {
+        const auto &sample = mouse_samples.front();
+        // Discard old movement after a stalled event loop instead of replaying it.
+        if (timestampUs - sample.time <= MouseResponse::UpdateUs * 2) {
+            x += sample.x;
+            y += sample.y;
+        }
+        mouse_samples.pop_front();
     }
+    x *= gain * response.horizontalSensitivity;
+    y *= gain * response.verticalSensitivity;
     if (response.invertVertical) y = -y;
     const double magnitude = std::hypot(x, y);
     if (magnitude > 0) {
-        const double output = std::min(32767.0, magnitude + response.deadZoneCompensation * (32767 - magnitude));
+        const double speed = std::pow(std::min(1.0, magnitude / 32767.0), response.responseExponent);
+        const double output = 32767.0 * (speed + response.deadZoneCompensation * (1.0 - speed));
         x = x / magnitude * output;
         y = y / magnitude * output;
     }

@@ -316,3 +316,34 @@ Limits and outstanding acceptance:
 Repeatable configure, build, native, and separate OS-key commands are in
 [`gui/tests/stream-input.md`](../../gui/tests/stream-input.md). The full existing
 QML target and its scenarios remain available.
+
+## Comments
+
+### Acceptance status check, 2026-10-21
+
+`Status: claimed` remains correct. Full acceptance requires the matrix above.
+Later keyboard and mouse work adds evidence, but does not complete that matrix.
+This check reviewed saved logs and current test sources. No tests ran again.
+
+- The [saved native log](../keyboard-mouse-controls/evidence/keyboard-native.log)
+  records passing OpenGL and Vulkan session and feedback checks.
+  These checks cover controlled session changes and settings transitions.
+  They do not complete the connection, PSN retirement, legacy-error timeout,
+  pending-key cancellation, native child-window, and obsolete adapter-event cases.
+- The [notice log](../keyboard-mouse-controls/evidence/chiaki-review-notice-qml.txt)
+  records ten passing case rows across inline and separate windows.
+  The [ownership log](../keyboard-mouse-controls/evidence/chiaki-review-notice-green.txt)
+  confirms focus handoff between notice hosts. These focused checks do not
+  establish a complete rerun of the required QML scenarios.
+- The [test guide](../../gui/tests/stream-input.md#check-native-keys-separately)
+  records partial Win32 injected-key success after the earlier failed attempt.
+  Later attempts failed the Windows foreground precondition. The complete final
+  injected-key case and physical-input acceptance remain unverified.
+- The [later acceptance record](../keyboard-mouse-controls/acceptance.md#open-acceptance-gates)
+  retains an unexplained Space-output failure in `platformKeyboard`.
+  One diagnostic run passed, but did not establish the earlier failure's cause.
+  Live console input, console sleep, physical controllers, desktop composition,
+  and display scaling also lack complete acceptance evidence for this refactor.
+
+Close this specification after the missing automated cases and QML checks pass,
+with desktop and hardware results or explicit unavailable-check limits recorded.

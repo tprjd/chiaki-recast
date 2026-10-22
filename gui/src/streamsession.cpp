@@ -338,7 +338,7 @@ StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObje
 	dpad_touch_timer = new QTimer(this);
 	gameplay_mouse_timer = new QTimer(this);
 	gameplay_mouse_timer->setTimerType(Qt::PreciseTimer);
-	gameplay_mouse_timer->setInterval(4);
+	gameplay_mouse_timer->setInterval(MouseResponse::UpdateUs / 1000);
 	connect(gameplay_mouse_timer, &QTimer::timeout, this, [this] {
 		if(gameplay_captured && keyboard_mouse.advanceMouse(gameplay_mouse_clock.nsecsElapsed() / 1000))
 			SendFeedbackState();

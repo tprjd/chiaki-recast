@@ -34,6 +34,14 @@ TestCase {
         keyClick(Qt.Key_Tab);
         compare(h.settings.mouseHorizontalSensitivity, 2.25);
         compare(field.text, "2.25");
+        const curve = findChild(h, "mouseResponseExponent");
+        verify(curve, "Game response correction is available");
+        curve.forceActiveFocus();
+        keyClick(Qt.Key_Return);
+        keyClick(Qt.Key_A, Qt.ControlModifier);
+        curve.text = "0.50";
+        keyClick(Qt.Key_Tab);
+        compare(h.settings.mouseResponseExponent, 0.5);
         findChild(h, "keyboardMouseTabs").currentIndex = 1;
         const search = findChild(h, "settingsSearch");
         search.text = "Horizontal sensitivity";
@@ -41,6 +49,12 @@ TestCase {
         keyClick(Qt.Key_Return);
         tryCompare(field, "activeFocus", true);
         compare(findChild(h, "keyboardMouseTabs").currentIndex, 0);
+        search.text = "Game response correction";
+        search.forceActiveFocus();
+        keyClick(Qt.Key_Return);
+        tryCompare(curve, "activeFocus", true);
+        const curvePoint = curve.mapToItem(h, 0, 0);
+        verify(curvePoint.y >= 0 && curvePoint.y + curve.height <= h.height);
         const point = field.mapToItem(h, 0, 0);
         verify(point.x >= 0 && point.x + field.width <= h.width);
         verify(point.y >= 0 && point.y + field.height <= h.height);

@@ -93,6 +93,7 @@ function entries(settings) {
         {category: 5, group: qsTranslate("SettingsSearch", "Mouse response"), target: "mouseHorizontalSensitivity", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Horizontal sensitivity"), description: qsTranslate("SettingsSearch", "Set the horizontal mouse sensitivity multiplier.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Mouse response"), target: "mouseVerticalSensitivity", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Vertical sensitivity"), description: qsTranslate("SettingsSearch", "Set the vertical mouse sensitivity multiplier.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Mouse response"), target: "mouseDeadZoneCompensation", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Game dead-zone compensation"), description: qsTranslate("SettingsSearch", "Help small mouse movements cross the game stick dead zone.")},
+        {category: 5, group: qsTranslate("SettingsSearch", "Mouse response"), target: "mouseResponseExponent", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Game response correction"), description: qsTranslate("SettingsSearch", "Adjust small mouse movements for the game's stick response curve.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Mouse response"), target: "mouseInvertVertical", fallback: "mouseCameraEnabled", title: qsTranslate("SettingsSearch", "Invert vertical camera movement"), description: qsTranslate("SettingsSearch", "Reverse the vertical camera direction.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Keyboard and mouse"), target: "mouseCameraEnabled", keywords: qsTranslate("SettingsSearch", "F8 gameplay capture keyboard mouse camera controls"), title: qsTranslate("SettingsSearch", "Enable mouse camera mode"), description: qsTranslate("SettingsSearch", "During a stream, press F8 to capture or release your controls.")},
         {category: 5, group: qsTranslate("SettingsSearch", "Keyboard and mouse"), target: "keyboardMouseReset", title: qsTranslate("SettingsSearch", "Reset defaults"), description: qsTranslate("SettingsSearch", "Restore mouse response and bindings and turn mouse camera mode off. Confirmation is required.")},
@@ -223,7 +224,7 @@ function entries(settings) {
     ];
     const platform = {steamDeckHaptics: "steamDeckHaptics", verticalDeck: "verticalDeck",
         speechProcessing: "speechProcessing", noiseSuppressLevel: "speechProcessing", echoSuppressLevel: "speechProcessing"};
-    const mouseTargets = ["mouseCameraEnabled", "keyboardMouseReset", "mouseHorizontalSensitivity", "mouseVerticalSensitivity", "mouseDeadZoneCompensation", "mouseInvertVertical"];
+    const mouseTargets = ["mouseCameraEnabled", "keyboardMouseReset", "mouseHorizontalSensitivity", "mouseVerticalSensitivity", "mouseDeadZoneCompensation", "mouseResponseExponent", "mouseInvertVertical"];
     const supported = result.filter(entry => (!platform[entry.target] || typeof settings[platform[entry.target]] !== "undefined")
         && (mouseTargets.indexOf(entry.target) < 0 || settings.mouseCameraSupported));
     for (const mapping of settings.controllerMapping) {

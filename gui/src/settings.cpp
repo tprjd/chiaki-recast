@@ -950,6 +950,7 @@ MouseResponse Settings::GetMouseResponse() const
 	response.horizontalSensitivity = number("horizontal_sensitivity", 1.0, MouseResponse::MinimumSensitivity, MouseResponse::MaximumSensitivity);
 	response.verticalSensitivity = number("vertical_sensitivity", 1.0, MouseResponse::MinimumSensitivity, MouseResponse::MaximumSensitivity);
 	response.deadZoneCompensation = number("dead_zone_compensation", 0.0, 0, MouseResponse::MaximumCompensation);
+	response.responseExponent = number("response_exponent", 1.0, MouseResponse::MinimumExponent, MouseResponse::MaximumExponent);
 	const auto invert = settings.value("settings/keyboard_mouse/invert_vertical", false).toString();
 	response.invertVertical = invert == "true" || invert == "1";
 	return response;
@@ -961,6 +962,7 @@ bool Settings::SetMouseResponse(const MouseResponse &response)
 	settings.setValue("settings/keyboard_mouse/horizontal_sensitivity", response.horizontalSensitivity);
 	settings.setValue("settings/keyboard_mouse/vertical_sensitivity", response.verticalSensitivity);
 	settings.setValue("settings/keyboard_mouse/dead_zone_compensation", response.deadZoneCompensation);
+	settings.setValue("settings/keyboard_mouse/response_exponent", response.responseExponent);
 	settings.setValue("settings/keyboard_mouse/invert_vertical", response.invertVertical);
 	return true;
 }

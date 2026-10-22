@@ -88,6 +88,9 @@ class QmlSettings : public QObject
     Q_PROPERTY(double mouseHorizontalSensitivity READ mouseHorizontalSensitivity WRITE setMouseHorizontalSensitivity NOTIFY mouseResponseChanged)
     Q_PROPERTY(double mouseVerticalSensitivity READ mouseVerticalSensitivity WRITE setMouseVerticalSensitivity NOTIFY mouseResponseChanged)
     Q_PROPERTY(double mouseDeadZoneCompensation READ mouseDeadZoneCompensation WRITE setMouseDeadZoneCompensation NOTIFY mouseResponseChanged)
+    Q_PROPERTY(double mouseResponseExponent READ mouseResponseExponent WRITE setMouseResponseExponent NOTIFY mouseResponseChanged)
+    Q_PROPERTY(double mouseExponentMinimum READ mouseExponentMinimum CONSTANT)
+    Q_PROPERTY(double mouseExponentMaximum READ mouseExponentMaximum CONSTANT)
     Q_PROPERTY(bool mouseInvertVertical READ mouseInvertVertical WRITE setMouseInvertVertical NOTIFY mouseResponseChanged)
     Q_PROPERTY(double mouseSensitivityMinimum READ mouseSensitivityMinimum CONSTANT)
     Q_PROPERTY(double mouseSensitivityMaximum READ mouseSensitivityMaximum CONSTANT)
@@ -546,6 +549,9 @@ public:
     double mouseHorizontalSensitivity() const { return settings->GetMouseResponse().horizontalSensitivity; }
     double mouseVerticalSensitivity() const { return settings->GetMouseResponse().verticalSensitivity; }
     double mouseDeadZoneCompensation() const { return settings->GetMouseResponse().deadZoneCompensation; }
+    double mouseResponseExponent() const { return settings->GetMouseResponse().responseExponent; }
+    double mouseExponentMinimum() const { return MouseResponse::MinimumExponent; }
+    double mouseExponentMaximum() const { return MouseResponse::MaximumExponent; }
     bool mouseInvertVertical() const { return settings->GetMouseResponse().invertVertical; }
     double mouseSensitivityMinimum() const { return MouseResponse::MinimumSensitivity; }
     double mouseSensitivityMaximum() const { return MouseResponse::MaximumSensitivity; }
@@ -553,6 +559,7 @@ public:
     void setMouseHorizontalSensitivity(double value);
     void setMouseVerticalSensitivity(double value);
     void setMouseDeadZoneCompensation(double value);
+    void setMouseResponseExponent(double value);
     void setMouseInvertVertical(bool value);
 
     bool dpadTouchEnabled() const;

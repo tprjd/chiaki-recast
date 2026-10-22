@@ -24,6 +24,7 @@ The logo and Steam artwork are inherited from chiaki-ng.
 
 See the [contributor guide](CONTRIBUTOR_GUIDE.md) for the source layout and
 [screen test guide](gui/tests/README.md) for production QML checks.
+For the Windows launcher, see the [local launch instructions](docs/setup/launch-local-windows.md).
 The [upstream documentation](https://chiaki-ng.github.io/chiaki-ng/) describes
 Remote Play setup. Its interface and release instructions can differ from this fork.
 
