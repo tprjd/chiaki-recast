@@ -1,0 +1,18 @@
+
+7-Zip 26.03 (x64) : Copyright (c) 1999-2026 Igor Pavlov : 2026-09-03
+
+Scanning the drive for archives:
+1 file, 190837567 bytes (182 MiB)
+
+Testing archive: C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\chiaki-recast-windows-x64-web-native-584d6471.zip
+--
+Path = C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\chiaki-recast-windows-x64-web-native-584d6471.zip
+Type = zip
+Physical Size = 190837567
+
+Everything is Ok
+
+Folders: 70
+Files: 1541
+Size:       520315789
+Compressed: 190837567

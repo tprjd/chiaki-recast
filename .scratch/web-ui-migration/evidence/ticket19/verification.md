@@ -1,92 +1,107 @@
 # Windows package verification
 
-Status: deployment code and initial package checks pass. Final source and
-runtime acceptance are pending ticket 22 integration.
+The Windows package milestone passes. Source `584d6471d81092a4a7c63eb78ab220539f198702`
+includes audited tickets 18 and 22 and integration `0c982b32`. `final-source.json`
+records the clean source, executable hashes, and excluded existing gf-complete
+Windows patch. Production defaults are unchanged.
 
-## Package implementation
+## Final artifact
 
-The x64 release, weekly, pull request, and manual routes use the same MSVC
-workflow. It selects LLVM 19.1.7, MSVC 14.44, Qt 6.9.3, Node 24.16.0,
-and Vulkan SDK 1.4.357.0. An STL compile check rejects an incompatible compiler.
-The old shaderc badge download returns 404. The workflow now uses the selected
-Vulkan SDK shaderc and SPIRV-Cross binaries and pkg-config metadata.
+- Stage: `C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket19-package-final`.
+- ZIP: `C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/chiaki-recast-windows-x64-web-native-584d6471.zip`.
+- ZIP SHA256: `94ff670d03f1a9eea6cb4227336e3f0a18d170cb7fdcc98e44b4cdd25077f62a`.
+- Application SHA256: `6e268c734f0c3d9b5b48a84740323af35106042b4a238dafd6e9530384f0bc0a`.
+- Harness SHA256: `15b62ffe223a29313ded0bc0310755643b363b346097e07cd571112948824744`.
+- Production manifest SHA256: `33a727071260a778f31a2b349be50f0f882076976171671cd6d379968bc6cecc`.
 
-The GUI target owns the locked frontend build and RCC compilation. Deployment
-scans actual PE imports, stages matching Qt widget, Quick, WebChannel and
-WebEngine files, copies app-local MSVC runtime DLLs, and includes dependency
-notices. It copies all 53 selected WebEngine locale PAKs. The current SDK lacks
-Qt message catalogs and `catalogs.json`. The deployment log retains that warning.
-The package has English setup text and the complete Chromium locale set. This
-does not prove translated Qt dialogs.
+The ZIP has 1,541 files and is 190,837,567 bytes. Extracted contents total
+520,315,789 bytes. Every ZIP member SHA256 equals the prelaunch production
+manifest, including the manifest file. ZIP integrity passes. QA executables
+and QtTest were removed. No Node runtime, server, or external frontend source
+is needed. See `final-artifact.json`, `final-package-manifest.json.gz`, and
+`zip-test.txt`.
 
-The package uses the relative paths in `gui/qt.conf`. Its resource preflight
-opens the compiled index, script, style, and actual WebChannel resource. It also
-checks the index references. This preflight runs before SDL, settings, native
-services, QApplication, and Chromium.
+## Deployment and build
 
-MinGW and Windows ARM64 workflows report the selected SDK support limit. They
-do not publish a package or select a QML setup fallback. The installer accepts
-native x64 Windows only.
+The final native build, deployment, and clean-PATH RCC preflight pass. Release,
+weekly, PR, and manual x64 routes share LLVM 19.1.7, MSVC 14.44, Qt 6.9.3,
+Node 24.16.0, and Vulkan SDK 1.4.357.0. The actual generated SDK metadata passes.
+All nine changed workflows pass actionlint, with the existing `macos-15-intel`
+runner label supplied to its older inventory. Non-Windows job objects are
+unchanged. Hosted CI execution is unverified.
 
-## Initial checks
+The stage includes matching widget, Quick, WebChannel, WebEngine, helper,
+native, and app-local CRT files. Actual PE imports are checked. Resources and
+all 53 locale PAKs match the SDK. Relative `qt.conf` paths keep Qt inside the
+stage. QtCore's patched hash is recorded separately. The SDK lacks Qt message
+catalogs and `catalogs.json`; the log retains that warning. Chromium locales
+are complete; translated Qt dialogs are unverified.
 
-The initial application and embedded test program build passed against
-integration `478a116d` plus the ticket 19 resource preflight. This was before
-the ticket 18 and ticket 22 source merges. It is package-boundary evidence, not
-the final application runtime result.
+The initial helper and browser-PAK removal cases fail the release check.
+Their required-file checks are unchanged. Initial records remain available.
+The common Vite runtime notice builds and installs through CMake under
+`share/licenses/chiaki-ng/frontend`. It contains Svelte and Vite's browser
+preload helper licenses. The existing common notice install
+pass is reused. Windows packages it with matching Qt/Chromium SDK SPDX and
+native notices.
 
-- `initial-before-preflight.json.gz` records the source commit, source diff,
-  new file hashes, and application executable hash before the preflight.
-- `initial-deploy.txt` records successful deployment and the resource preflight
-  with the development PATH and Qt overrides removed.
-- `initial-package-test.txt` records the complete package pass and rejection
-  after removal of `QtWebEngineProcess.exe` and
-  `resources/qtwebengine_resources.pak`. Each file was restored.
-- `initial-package-manifest.json.gz` has 1,582 files and 520,097,130 bytes.
-  The uncompressed manifest SHA256 is
-  `a49e16b3825aecca35eff20c00fe1ecb26646ac11eb1a2234aa5fd3626c02f9a`.
-- `initial-runtime-identities.json` records staged Qt, helper, native, and CRT
-  file versions and hashes. `windeployqt` patches QtCore's prefix. Its staged
-  hash is recorded separately from the SDK hash.
+## Actual packaged runtime
 
-All nine changed workflows pass actionlint 1.7.7. Its older runner inventory
-needs the existing `macos-15-intel` label in an external configuration. A
-structural YAML comparison confirms that the non-Windows jobs in release,
-weekly, and pull request workflows are unchanged. Each workflow PowerShell
-step parses. The actual changed SDK metadata step ran in an external directory.
-`pkgconf` resolved versions `2026.3` and `0.68.0` and the expected SDK libraries.
-These checks do not establish a hosted CI run.
+Normal production `RunMain` displayed the actual Consoles page at 1280 pixels
+and exited 0. A fresh profile had no consoles or PSN credentials. The full native
+settings tree was privately saved and restored. Ordinary LAN discovery was
+allowed. No real registration, authentication, console connection, or Steam
+write was requested. Both observations restored the original full state hash.
+An independent read-only check confirmed the current state still matches.
+Private settings backups remain outside Git.
 
-## Common frontend notices
+The focused group passed **5/0 in 7,789 ms**: `startupNativeConnection:local-ready`,
+`setupReload:reload`, and `graphicsCoexistence`, plus QtTest setup/cleanup.
+External boundaries are controlled before fixture services start. Native
+rendering remains real. Deeper source-equivalent ticket 22 lifetime results
+are reused. No GPU group was repeated.
 
-`frontend-notices-build.txt` records the existing CMake frontend target emitting
-`build/gui/web/THIRD-PARTY-NOTICES.txt`. The generator reads license files only
-for dependency modules with rendered bundle code. The current bundle includes
-Svelte 5.57.2 and Vite 8.3.5's injected browser modulepreload helper. It retains
-the packages' original license texts. It does not label the TypeScript compiler
-as shipped runtime code.
+Chromium reports hardware compositing, WebGL, and rasterization on RTX 5090,
+ANGLE D3D11, and Skia 130. Fast native OpenGL, Vulkan, recreation, and fallback
+rendered real frame/overlay pixels and restored setup. Saved GL/Vulkan images
+were inspected. Desktop names were both `Default`; no protected dialog was
+present. Win32 foreground remained Codex during the fixture, so physical focus
+and input are unverified. Actual app, harness, and renderer observations found
+all relevant Qt/native/CRT modules inside the stage, with no observation errors.
+Commands have a stage-and-Windows-only PATH and empty Qt overrides.
+See `module-validation.json`, compressed module records, `package-qt.txt.gz`,
+`chromium-gpu.txt.gz`, command records, and saved images.
 
-`frontend-notices-install.txt` records the actual CMake GUI install at
-`share/licenses/chiaki-ng/frontend/THIRD-PARTY-NOTICES.txt`.
-`frontend-notices.json` records the equal generated and installed file hash.
-Windows now copies this common notice file. The initial package above predates
-this change and includes the prior full npm license collection. The final
-package will use the common generated file.
+## Renderer sandbox
 
-## Installer limit
+A bounded read-only observation found the exact staged renderer at integrity
+RID 0, restricted SID `S-1-0-0`, and `IsTokenRestricted=true`. Its parent had
+medium integrity RID 8192 and an unrestricted token. `TokenIsAppContainer=false`
+for both. No elevation, debugging, or sandbox-disable flag was used.
+`renderer-token.json` records the actual result.
 
-The official Inno Setup 6.5.4 tool download matches the GitHub release SHA256
-recorded in `inno-tool-source.txt`. Authenticode reports a valid signature from
-Pyrsys B.V. No installer or OS change ran. Automatic approval review rejected
-the proposed tool installation with the stated reason "blocked by policy".
-There is no existing local ISCC compiler. The ZIP can be checked locally;
-installer compilation and installation remain unverified. The existing CI
-Inno Setup path includes the complete staged directory.
+Qt 6.9.3 [adds the in-process GPU switch](https://github.com/qt/qtwebengine/blob/v6.9.3/src/core/web_engine_context.cpp#L961).
+The GPU report's `Sandboxed=false` field describes that application-process GPU,
+not the restricted renderer. Versioned [platform notes](https://github.com/qt/qtwebengine/blob/v6.9.3/src/core/doc/src/qtwebengine-platform-notes.qdoc.in)
+describe default renderer sandbox support. The Windows helper
+[initializes sandbox information](https://github.com/qt/qtwebengine/blob/v6.9.3/src/core/process_main.cpp#L24).
+Source hashes are in `qt-sandbox-source-refs.json`.
+Computer Use stopped after this observation. The owned helper reached its
+existing timeout, closed the app, and restored native settings. Actual process
+completion and restoration were checked. The first startup had closed normally.
 
-## Acceptance limits
+## Remaining limits
 
-Only this Windows PC is available. No Linux or macOS GPU result is inferred.
-Package file checks do not establish a GPU, sandbox, native playback, physical
-input, microphone, foreground, or performance result. The existing hardware
-graphics fixture uses the Fast preset. The independent native HighQuality
-control failure remains in ticket 23. Production defaults are unchanged.
+Physical controller, keyboard/mouse output, microphone, live-console/direct CLI
+streaming, full scaling/accessibility, matched performance, and default
+HighQuality acceptance remain in ticket 23. The independent native HighQuality
+failure is unchanged. Fast results do not certify other presets.
+
+MinGW and Windows ARM64 workflows explicitly report the selected SDK support
+limit, with no QML setup fallback. Only this Windows PC was available. The x64
+installer includes the complete stage, but local compilation and installation
+remain unverified. Automatic approval review rejected the Inno Setup tool
+installation with reason "blocked by policy". It was not retried. The verified
+tool download does not replace an installer result. The portable ZIP is complete;
+the existing CI installer path remains available.
+User priority update: remaining build, test, runtime, package, and performance checks were skipped at the user's request. The completed source, ZIP, and evidence are preserved. No further verification ran after that instruction.

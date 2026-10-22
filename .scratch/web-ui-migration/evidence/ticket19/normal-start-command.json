@@ -1,0 +1,11 @@
+{
+  "command": [
+    "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final\\chiaki.exe",
+    "--profile",
+    "package-check-7aaeefd2537f4ede9c2b58572a6e26c0"
+  ],
+  "cwd": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final",
+  "PATH": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final;C:\\Windows\\System32;C:\\Windows",
+  "qt_overrides": {},
+  "safety": "Fresh profile with no consoles or credentials; full native settings privately backed up and restored. Ordinary production LAN discovery is not isolated."
+}
