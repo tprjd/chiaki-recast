@@ -9,6 +9,8 @@
 #include <limits>
 #include <QGuiApplication>
 #include <QClipboard>
+#include <QDesktopServices>
+#include <QDir>
 #include <cmath>
 #include <QHostAddress>
 #include <QRegularExpression>
@@ -16,13 +18,24 @@
 SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     : QObject(parent), backend(backend)
 {
+    connect(backend, &QmlBackend::steamShortcutMessage, this,
+        [this](const QString &operation, const QString &message, bool ok, bool done) {
+            if (operation != steamForm || steamPhase != "progress" || steamProfile != this->backend->profileGeneration()) return;
+            steamDiagnostics += message + "\n";
+            if (done) {
+                steamPhase = ok ? "success" : "failure";
+                if (ok) this->backend->qmlSettings()->setAddSteamShortcutAsk(false);
+            }
+            refresh();
+        });
+    connect(backend, &QmlBackend::autoConnectChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::hostsChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::hiddenHostsChanged, this, &SetupBridge::refresh);
     connect(backend->qmlSettings(), &QmlSettings::registeredHostsChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::discoveryEnabledChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::connectionAttemptChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::windowChanged, this, [this] {
-        if (this->backend->qmlWindow()) invalidateControllerMapping();
+        if (this->backend->qmlWindow()) { invalidateControllerMapping(); invalidateSteamShortcut(); }
         refresh();
     });
     connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, &SetupBridge::refresh);
@@ -185,6 +198,15 @@ void SetupBridge::refresh()
         keys.clear();
         selectedKey.clear();
         credentialsRejected = false;
+        reminderKind.clear();
+        reminderId.clear();
+        steamForm.clear();
+        steamPhase.clear();
+        steamPath.clear();
+        steamName.clear();
+        steamOptions.clear();
+        steamDiagnostics.clear();
+        steamFromReminder = false;
     }
     const auto hosts = backend->hosts();
     QHash<QString, int> counts;
@@ -372,7 +394,31 @@ void SetupBridge::refresh()
         QT_TRANSLATE_NOOP("SettingsSearch", "Recover contrast after tone mapping."),
         QT_TRANSLATE_NOOP("SettingsSearch", "Set contrast recovery smoothing.")};
     for(const auto *text : colorSearchTexts) strings.insert(QString::fromUtf8(text), QCoreApplication::translate("SettingsSearch", text));
-    const char *texts[] = {QT_TR_NOOP("Back to Renderer"), QT_TR_NOOP("Configure color mapping in Renderer"),
+    const char *texts[] = {QT_TR_NOOP("Steam shortcut"),
+        QT_TR_NOOP("PSN sign-in"),
+        QT_TR_NOOP("Set up now"),
+        QT_TR_NOOP("Don't ask again"),
+        QT_TR_NOOP("Later"),
+        QT_TR_NOOP("Add to Steam"),
+        QT_TR_NOOP("Create or update a non-Steam game for the selected profile."),
+        QT_TR_NOOP("Steam game name"),
+        QT_TR_NOOP("Enter a name for the Steam game."),
+        QT_TR_NOOP("Launch options (optional)"),
+        QT_TR_NOOP("Current profile default"),
+        QT_TR_NOOP("The default launch options select the current profile. You can edit them before you create the shortcut."),
+        QT_TR_NOOP("Choose Steam folder"),
+        QT_TR_NOOP("Create shortcut"),
+        QT_TR_NOOP("Wait for Steam files to finish writing. This operation cannot be cancelled."),
+        QT_TR_NOOP("Steam shortcut ready"),
+        QT_TR_NOOP("Steam shortcut was not completed"),
+        QT_TR_NOOP("Restart Steam yourself to see the shortcut in your library."),
+        QT_TR_NOOP("Check the details and Steam folder, then try again. Some files may already have changed."),
+        QT_TR_NOOP("Technical details"),
+        QT_TR_NOOP("A shortcut with the same executable and launch options is updated. Artwork and the Steam Deck controller configuration are also applied."),
+        QT_TR_NOOP("Steam setup help"),
+        QT_TR_NOOP("Create or update a non-Steam game for Chiaki Recast with the official artwork and controller layout. You can also set this up later from the console library."),
+        QT_TR_NOOP("Sign in to PSN to register consoles automatically and use Remote Play outside your home network. Sign-in saves your account credentials in Chiaki Recast. You can also set this up later from PSN account."),
+        QT_TR_NOOP("Back to Renderer"), QT_TR_NOOP("Configure color mapping in Renderer"),
         QT_TR_NOOP("Requires the Custom render preset, Color Mapping Enabled, and the Custom color mapping preset in Renderer."), QT_TR_NOOP("Consoles"), QT_TR_NOOP("Search consoles"), QT_TR_NOOP("Discovery"), QT_TR_NOOP("Discovery is on"), QT_TR_NOOP("Discovery is off"),
         QT_TR_NOOP("No consoles found"), QT_TR_NOOP("No matching consoles"), QT_TR_NOOP("Turn on discovery to find consoles on your local network."),
         QT_TR_NOOP("Online"), QT_TR_NOOP("In standby"), QT_TR_NOOP("Status unknown"), QT_TR_NOOP("Not registered"), QT_TR_NOOP("Local network"), QT_TR_NOOP("Manual address"),
@@ -704,7 +750,20 @@ void SetupBridge::refresh()
     const auto phase = nativeAttempt.value("phase").toString();
     const bool pending = nativeAttempt.value("presented").toBool() && !phase.isEmpty()
         && phase != "failure" && phase != "cancelled" && phase != "registered";
-    state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
+    QVariantMap reminder{{"id", reminderId}, {"kind", reminderKind}, {"eligible", !initialAsk && !backend->autoConnect()
+        && !backend->qmlWindow() && !backend->qmlSession() && !pending && !backend->registrationBusy()}};
+    QVariantMap steam{{"supported", false}, {"form", steamForm}, {"phase", steamPhase}};
+#if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
+    steam["supported"] = true;
+#endif
+    if (!steamForm.isEmpty()) {
+        steam["name"] = privateMode ? QString() : steamName;
+        steam["options"] = privateMode ? QString() : steamOptions;
+        steam["path"] = steamPath.isEmpty() ? tr("Use the default Steam folder")
+            : privateMode ? tr("Folder hidden") : QDir::toNativeSeparators(steamPath);
+        steam["diagnostics"] = privateMode ? tr("Technical details hidden in streamer mode.") : steamDiagnostics;
+    }
+    state = {{"steam", steam}, {"reminder", reminder}, {"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
         {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
         {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->registrationBusy() || backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
             || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
@@ -828,6 +887,7 @@ void SetupBridge::setSuspended(bool value)
     suspended = value;
     if (suspended) invalidateControllerMapping();
     if (suspended) invalidateKeyboardMouse();
+    if (suspended) invalidateSteamShortcut();
     if (!suspended) refresh();
 }
 
@@ -1156,7 +1216,7 @@ void SetupBridge::setKeyboardMouseAvailable(bool available)
     if (keyboardMouseAvailable == available) return;
     keyboardMouseAvailable = available;
     ++keyboardMouseWindowGeneration;
-    if (!available) { invalidateKeyboardMouse(); invalidateControllerMapping(); }
+    if (!available) { invalidateKeyboardMouse(); invalidateControllerMapping(); invalidateSteamShortcut(); }
     refresh();
 }
 
@@ -1970,4 +2030,156 @@ QVariantMap SetupBridge::rendererAction(const QString &action, const QString &pr
     }
     if(action == "restartRenderer") return settings->restartApplication();
     return {{"accepted", false}};
+}
+
+void SetupBridge::offerPsnReminder()
+{
+    auto *settings = backend->qmlSettings();
+    if (!settings->remotePlayAsk()) return;
+    if (!settings->psnRefreshToken().isEmpty() && !settings->psnAuthToken().isEmpty()
+        && !settings->psnAuthTokenExpiry().isEmpty() && !settings->psnAccountId().isEmpty()) {
+        settings->setRemotePlayAsk(false);
+        return;
+    }
+    reminderKind = "psn";
+    reminderId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+}
+
+QVariantMap SetupBridge::startReminders(const QString &profile)
+{
+    if (initialAsk || suspended || !currentProfile(profile) || backend->autoConnect()
+        || backend->qmlWindow() || backend->qmlSession() || state.value("connectionBusy").toBool()) return {{"accepted", false}};
+    initialAsk = true;
+#if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
+    if (backend->qmlSettings()->addSteamShortcutAsk()) {
+        reminderKind = "steam";
+        reminderId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    } else
+#endif
+        offerPsnReminder();
+    refresh();
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::reminderAction(const QString &id, const QString &action, const QString &profile)
+{
+    if (suspended || !currentProfile(profile) || id.isEmpty() || id != reminderId
+        || (action != "now" && action != "never" && action != "later")) return {{"accepted", false}};
+    const QString kind = reminderKind;
+    reminderId.clear();
+    reminderKind.clear();
+    if (action == "never") {
+        if (kind == "steam") backend->qmlSettings()->setAddSteamShortcutAsk(false);
+        else backend->qmlSettings()->setRemotePlayAsk(false);
+    }
+    if (kind == "steam") {
+        if (action == "now") {
+            const auto reply = beginSteamShortcut(profile);
+            if (!reply.value("accepted").toBool()) { refresh(); return reply; }
+            steamFromReminder = true;
+        } else offerPsnReminder();
+    }
+    refresh();
+    return {{"accepted", true}, {"route", action == "now" ? kind : QString()}};
+}
+
+bool SetupBridge::steamFormValid(const QString &form, const QString &profile) const
+{
+    return !suspended && keyboardMouseAvailable && !form.isEmpty() && form == steamForm
+        && currentProfile(profile) && steamProfile == backend->profileGeneration()
+        && !backend->qmlWindow() && !backend->qmlSession();
+}
+
+QVariantMap SetupBridge::beginSteamShortcut(const QString &profile)
+{
+#if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
+    if (suspended || !keyboardMouseAvailable || !currentProfile(profile) || !steamForm.isEmpty()
+        || backend->qmlWindow() || backend->qmlSession() || state.value("connectionBusy").toBool()) return {{"accepted", false}};
+    const auto name = backend->nativeSettings()->GetCurrentProfile();
+    steamName = name.isEmpty() ? tr("Chiaki Recast") : tr("Chiaki Recast %1").arg(name);
+    steamOptions = name.isEmpty() ? QString() : "--profile=" + name;
+    steamForm = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    steamProfile = backend->profileGeneration();
+    steamPhase = "form";
+    steamPath.clear();
+    steamDiagnostics.clear();
+    steamFromReminder = false;
+    refresh();
+    return {{"accepted", true}, {"form", steamForm}};
+#else
+    return {{"accepted", false}};
+#endif
+}
+
+QVariantMap SetupBridge::chooseSteamFolder(const QString &form, const QString &profile)
+{
+    if (!steamFormValid(form, profile) || (steamPhase != "form" && steamPhase != "failure")) return {{"accepted", false}};
+    steamPhase = "choosing";
+    refresh();
+    const auto path = backend->qmlSettings()->chooseSteamBasePath();
+    if (!steamFormValid(form, profile) || steamPhase != "choosing") return {{"accepted", false}};
+    if (!path.isEmpty()) steamPath = path;
+    steamPhase = "form";
+    refresh();
+    return {{"accepted", true}, {"cancelled", path.isEmpty()}};
+}
+
+QVariantMap SetupBridge::submitSteamShortcut(const QString &form, const QVariantMap &fields, const QString &profile)
+{
+#if CHIAKI_GUI_ENABLE_STEAM_SHORTCUT
+    if (!steamFormValid(form, profile) || (steamPhase != "form" && steamPhase != "failure")
+        || state.value("connectionBusy").toBool()) return {{"accepted", false}};
+    for (auto it = fields.begin(); it != fields.end(); ++it)
+        if ((it.key() != "name" && it.key() != "options") || it.value().metaType().id() != QMetaType::QString)
+            return {{"accepted", false}};
+    const auto name = fields.value("name", steamName).toString().trimmed();
+    const auto options = fields.value("options", steamOptions).toString().trimmed();
+    if (name.isEmpty() || name.size() > 256 || options.size() > 4096 || name.contains(QChar::Null) || options.contains(QChar::Null))
+        return {{"accepted", false}, {"message", tr("Enter a name for the Steam game.")}};
+    steamName = name;
+    steamOptions = options;
+    steamDiagnostics.clear();
+    steamPhase = "progress";
+    refresh();
+    QTimer::singleShot(50, this, [this, form, profile] {
+        if (!steamFormValid(form, profile) || steamPhase != "progress") return;
+        backend->createSteamShortcut(form, steamName, steamOptions, steamPath);
+    });
+    return {{"accepted", true}};
+#else
+    return {{"accepted", false}};
+#endif
+}
+
+QVariantMap SetupBridge::endSteamShortcut(const QString &form, const QString &profile)
+{
+    if (!steamFormValid(form, profile) || steamPhase == "progress" || steamPhase == "choosing") return {{"accepted", false}};
+    const bool next = steamFromReminder;
+    steamFromReminder = false;
+    invalidateSteamShortcut();
+    if (next) offerPsnReminder();
+    refresh();
+    return {{"accepted", true}};
+}
+
+void SetupBridge::invalidateSteamShortcut()
+{
+    steamForm.clear();
+    steamPhase.clear();
+    steamPath.clear();
+    steamName.clear();
+    steamOptions.clear();
+    steamDiagnostics.clear();
+    steamFromReminder = false;
+    refresh();
+}
+
+QVariantMap SetupBridge::openSetupHelp(const QString &topic)
+{
+    static const QMap<QString, QUrl> links{
+        {"steam", QUrl("https://streetpea.github.io/chiaki-ng/setup/steaming/")},
+        {"psn", QUrl("https://streetpea.github.io/chiaki-ng/setup/remoteconnection/")}};
+    const auto link = links.constFind(topic);
+    if (suspended || link == links.constEnd()) return {{"accepted", false}};
+    return {{"accepted", QDesktopServices::openUrl(*link)}};
 }

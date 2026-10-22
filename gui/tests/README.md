@@ -244,18 +244,14 @@ Real registration and native input capture require separate acceptance checks.
 
 ## Startup reminder tests
 
-`RemindersHarness.qml` loads production `MainView.qml`, `RemindDialog.qml`, and
-the Steam setup screen through a real `StackView`. `Reminders` checks all three
-choices, Escape, the controller triangle/Y dismissal key, initial Later focus,
-focus return, duplicate requests, startup eligibility, and Steam-then-PSN order.
-The long-text checks use 900 by 600 and 1280 by 720 logical pixels.
-
-The navigation contract remains `showRemindDialog(title, text, remotePlay, callback)`.
-Set up now starts that callback after the popup closes. Later leaves the preference
-unchanged. Don't ask again disables the selected reminder. Setup completion uses
-the existing preference and credential-presence contract. The Steam route tests
-use controlled final outcomes and check that success alone disables its reminder.
-These tests do not create Steam files or authenticate a PSN account.
+The embedded `setupReminders`, `setupReminderOwnership`, and
+`setupReminderEligibility` cases use compiled Svelte, WebEngine, WebChannel,
+the production bridge, and native settings. They check Steam-before-PSN order,
+Later and Don't ask again, stored and reopened values, account route focus,
+page reload, complete credentials, auto-connect suppression, and the native
+triangle/Y key. Autorepeat and key release cannot dismiss a later reminder.
+The 200 percent DOM bounds check keeps at least 1024 CSS pixels. Offscreen
+checks do not establish physical focus, controller, or display acceptance.
 
 ## Settings screen tests
 
@@ -479,39 +475,23 @@ composition, live media, physical controllers, or other display scales.
 
 ## Steam shortcut checks
 
-`SteamShortcut` loads the production `SteamShortcutDialog.qml` with a supplied
-backend and navigation object. The checks use the production controls. They cover
-profile defaults, name validation, custom options and folders, persistent failure,
-retry, terminal success, privacy, keyboard input, controller key mappings, and
-return focus. Layout checks use 900 by 600 and 1280 by 720 logical pixels.
-`SteamShortcutHarness` composes the production Library and Steam form.
+`steamShortcutWorkflow` and `steamShortcutGuards` use the embedded application
+and native folder picker. All Steam writes use an isolated temporary tree.
+The cases read the actual shortcut records, five artwork files, controller
+configuration, backup, matching-entry update, and partial failure. Retry must
+report its actual result. Success alone clears the stored reminder choice.
 
-The separate `gui/tests/steam` CMake target builds the exact Steam command from
-`qmlbackend.cpp` with the real pinned SteamTools dependency and artwork. The test
-supplies only the executable path boundary. It creates a temporary Steam directory
-and checks the written shortcut records, matching-entry updates, artwork, and
-controller configuration. Windows file locks test backup and write failures.
-The checks do not access the user's Steam installation.
+The bridge retains the selected native path and profile defaults. Commands use
+opaque form and profile identities. Tests reject repeated activation, empty
+names, path injection, changed profiles, obsolete completions, and closed or
+reloaded presentations. Cancelled folder selection keeps the prior path.
+Streamer mode masks the path, diagnostics, and profile defaults before transport.
+A queued operation cannot write after its presentation closes.
 
-Build it with the same Qt and compiler environment as the screen target:
-
-```powershell
-& $cmake -S gui/tests/steam -B build/steam-native -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_PREFIX_PATH=$qtPrefix"
-& $cmake --build build/steam-native
-$env:PATH = (Resolve-Path build/steam-native/steam-tools).Path + ';' + $env:PATH
-$env:QT_QPA_PLATFORM = 'offscreen'
-& .\build\steam-native\chiaki-steam-shortcut-tests.exe
-```
-
-`cmake/SteamTools.cmake` applies `cmake/steam-tools.patch` to a build copy of the
-pinned dependency. Both the normal application and the native check use this
-copy. The source submodule stays unchanged. The patch fixes custom folder checks,
-new shortcut files, Windows backup names, artwork error reporting, and failed
-backup or write results. Reconfiguration copies the original source before the
-patch is applied again.
-
-These controlled checks do not verify physical controllers, native display
-scaling, or shortcut visibility after the user restarts Steam.
+`cmake/SteamTools.cmake` still applies `cmake/steam-tools.patch` to a build copy
+of the pinned dependency. The native command retains its existing file checks,
+backup rules, error handling, and partial-write result. Steam is not restarted.
+These checks do not establish visibility in the user's Steam library.
 
 ## About and renderer information
 

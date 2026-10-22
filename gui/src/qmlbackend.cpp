@@ -2945,13 +2945,12 @@ QString QmlBackend::getExecutable() {
     return QCoreApplication::applicationFilePath();
 }
 
-void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions, const QJSValue &callback, QString steamDir)
+void QmlBackend::createSteamShortcut(const QString &operation, QString shortcutName, QString launchOptions, QString steamDir)
 {
-    QJSValue cb = callback;
     shortcutName = shortcutName.trimmed();
     if (shortcutName.isEmpty())
     {
-        if (cb.isCallable()) cb.call({QString("Enter a name for the Steam game."), false, true});
+        emit steamShortcutMessage(operation, QString("Enter a name for the Steam game."), false, true);
         return;
     }
     QString failure;
@@ -2971,24 +2970,19 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
     artwork.insert("icon", &icon);
     artwork.insert("logo", &logo);
     
-    auto infoLambda = [callback](const QString &infoMessage) {
-        QJSValue icb = callback;
-        if (icb.isCallable())
-            icb.call({infoMessage, true, false});
+    auto infoLambda = [this, operation](const QString &infoMessage) {
+        emit steamShortcutMessage(operation, infoMessage, true, false);
     };
 
-    auto errorLambda = [callback, &failure](const QString &errorMessage) {
+    auto errorLambda = [this, operation, &failure](const QString &errorMessage) {
         failure += errorMessage + "\n";
-        QJSValue icb = callback;
-        if (icb.isCallable())
-            icb.call({errorMessage, false, false});
+        emit steamShortcutMessage(operation, errorMessage, false, false);
     };
     SteamTools* steam_tools = new SteamTools(infoLambda, errorLambda, steamDir);
     bool steamExists = steam_tools->steamExists();
     if(!steamExists || !failure.isEmpty())
     {
-        if (cb.isCallable())
-            cb.call({failure.isEmpty() ? QString("[E] Steam does not exist, cannot create Steam Shortcut") : failure, false, true});
+        emit steamShortcutMessage(operation, failure.isEmpty() ? QString("[E] Steam does not exist, cannot create Steam Shortcut") : failure, false, true);
         delete steam_tools;
         return;
     }
@@ -3005,7 +2999,7 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
     QVector<SteamShortcutEntry> shortcuts = steam_tools->parseShortcuts();
     if (!failure.isEmpty())
     {
-        if (cb.isCallable()) cb.call({failure, false, true});
+        emit steamShortcutMessage(operation, failure, false, true);
         delete steam_tools;
         return;
     }
@@ -3014,8 +3008,7 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
         if (map.getExe() == newShortcut.getExe() && map.getLaunchOptions() == newShortcut.getLaunchOptions()) {
             // Replace the entire map with the new one
             
-            if (cb.isCallable())
-                cb.call({QString("[I] Updating Steam entry"), true, false});
+            emit steamShortcutMessage(operation, QString("[I] Updating Steam entry"), true, false);
             map = newShortcut;
             found = true;
             break;  // Stop iterating once a match is found
@@ -3024,8 +3017,7 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
 
    //If we didn't find it to update, let's add it to the end
     if (!found) {
-        if (cb.isCallable())
-            cb.call({QString("[I] Adding Steam entry ") + QString(newShortcut.getAppName().toStdString().c_str()), true, false});
+        emit steamShortcutMessage(operation, QString("[I] Adding Steam entry ") + QString(newShortcut.getAppName().toStdString().c_str()), true, false);
         shortcuts.append(newShortcut);
     }
     steam_tools->updateShortcuts(std::move(shortcuts));
@@ -3033,17 +3025,15 @@ void QmlBackend::createSteamShortcut(QString shortcutName, QString launchOptions
         steam_tools->updateControllerConfig(newShortcut.getAppName(), std::move(controller_layout_workshop_id));
     if (!failure.isEmpty())
     {
-        if (cb.isCallable()) cb.call({failure, false, true});
+        emit steamShortcutMessage(operation, failure, false, true);
     }
     else if (!found)
     {
-        if (cb.isCallable())
-            cb.call({QString("[I] Added Steam entry: ") + QString(newShortcut.getAppName().toStdString().c_str()), true, true});
+        emit steamShortcutMessage(operation, QString("[I] Added Steam entry: ") + QString(newShortcut.getAppName().toStdString().c_str()), true, true);
     }
     else
     {
-        if (cb.isCallable())
-            cb.call({QString("[I] Updated Steam entry: ") + QString(newShortcut.getAppName().toStdString().c_str()), true, true});
+        emit steamShortcutMessage(operation, QString("[I] Updated Steam entry: ") + QString(newShortcut.getAppName().toStdString().c_str()), true, true);
     }
     delete steam_tools;
 }

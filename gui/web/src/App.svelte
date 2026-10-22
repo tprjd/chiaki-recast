@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { connectSetup, type State, type Console } from './bridge';
+  import SteamShortcut from './SteamShortcut.svelte';
+  import Reminders from './Reminders.svelte';
   import ConnectAction from './ConnectAction.svelte';
   import PsnAccount from './PsnAccount.svelte';
   import Pairing from './Pairing.svelte';
@@ -13,6 +15,7 @@
   let message = $state('');
   let changingDiscovery = $state(false);
   let settingsOpen = $state(false);
+  let accountRoute = $state(false);
   let detailsKey = $state('');
   const t = (text: string) => current?.strings[text] ?? text;
   const type = (console: Console) => console.ps5 === undefined ? t('Console') : console.ps5 ? 'PlayStation 5' : 'PlayStation 4';
@@ -78,6 +81,17 @@
     next?.focus();
     event.preventDefault();
   }
+  async function openReminderRoute(route: string) {
+    if (route !== 'psn') return;
+    accountRoute = true;
+    await tick();
+    document.querySelector<HTMLElement>('.psn-account h2')?.focus();
+  }
+  async function closeAccountRoute() {
+    accountRoute = false;
+    await tick();
+    document.querySelector<HTMLElement>('[data-psn-account]')?.focus();
+  }
   async function closeSettings() {
     settingsOpen = false;
     await tick();
@@ -109,6 +123,7 @@
       onclick={() => current && connection?.refreshPsnConsoles(current.profileGeneration)}>{t('Refresh remote consoles')}</button>
     <span role="status" data-psn-refresh-status>{current?.psn.refresh.phase === 'refreshing' ? t('Refreshing PSN credentials')
       : current?.psn.refresh.phase === 'listing' ? t('Finding remote consoles') : current?.psn.refresh.message ?? ''}</span>
+    {#if current && connection && current.steam.supported}<SteamShortcut {current} {connection} />{/if}
     <span role="status" class="message">{message || (!current ? t('Loading consoles') : '')}</span>
   </div>
   <ConnectAction {current} {connection} />
@@ -120,7 +135,10 @@
       {#if !query}<p>{t('Turn on discovery to find consoles on your local network.')}</p>{/if}
     </section>
   {/if}
-  {#if current && connection}<PsnAccount {current} {connection} />{/if}
+  {#if current && connection}
+    <Reminders {current} {connection} setup={openReminderRoute} />
+    {#key accountRoute}<PsnAccount {current} {connection} route={accountRoute} close={closeAccountRoute} />{/key}
+  {/if}
   <div class="console-grid">
     {#each consoles as console, index (console.key || `unavailable-${index}`)}
       <div class="console-entry">

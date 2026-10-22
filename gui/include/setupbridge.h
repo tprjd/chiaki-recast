@@ -13,6 +13,14 @@ class SetupBridge : public QObject
 public:
     explicit SetupBridge(QmlBackend *backend, QObject *parent = nullptr);
     ~SetupBridge() override;
+    Q_INVOKABLE QVariantMap beginSteamShortcut(const QString &profile);
+    Q_INVOKABLE QVariantMap chooseSteamFolder(const QString &form, const QString &profile);
+    Q_INVOKABLE QVariantMap submitSteamShortcut(const QString &form, const QVariantMap &fields, const QString &profile);
+    Q_INVOKABLE QVariantMap endSteamShortcut(const QString &form, const QString &profile);
+    Q_INVOKABLE QVariantMap openSetupHelp(const QString &topic);
+    void invalidateSteamShortcut();
+    Q_INVOKABLE QVariantMap startReminders(const QString &profile);
+    Q_INVOKABLE QVariantMap reminderAction(const QString &id, const QString &action, const QString &profile);
     Q_INVOKABLE QVariantMap snapshot() const { return state; }
     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
@@ -68,6 +76,14 @@ signals:
 
 private:
     void refresh();
+    void offerPsnReminder();
+    bool steamFormValid(const QString &form, const QString &profile) const;
+    QString steamForm, steamPhase, steamPath, steamName, steamOptions, steamDiagnostics;
+    quint64 steamProfile = 0;
+    bool steamFromReminder = false;
+    bool initialAsk = false;
+    QString reminderKind;
+    QString reminderId;
     QString identity(const QVariantMap &host) const;
     QmlBackend *backend;
     QHash<QString, QString> keys;

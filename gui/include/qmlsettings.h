@@ -621,7 +621,7 @@ public:
     Q_INVOKABLE QString changeControllerKey(int button, int key);
     Q_INVOKABLE void clearKeyMapping();
     Q_INVOKABLE void exportSettings();
-    Q_INVOKABLE QString chooseSteamBasePath();
+    QString chooseSteamBasePath();
     Q_INVOKABLE QVariantMap exportPlaceboSettings();
     Q_INVOKABLE void importSettings();
     Q_INVOKABLE QVariantMap importPlaceboSettings();
