@@ -483,3 +483,36 @@ The former also checks renderer-fallback input ownership while live settings clo
 Use a direct process launch for normal saved-size window checks. On Windows,
 `Start-Process -WindowStyle Hidden` can suppress the native first normal show,
 although Qt reports the window as visible.
+
+## Web setup and native stream handoff
+
+`chiaki-embedded-setup-tests localHandoff` starts a connection through the
+compiled Svelte page, WebChannel, and production bridge. The application
+controller prepares the native renderer before session creation. Setup hides
+after the native window presents its first frame. The check covers page
+freezing, cancellation, cleanup, and setup restoration.
+
+`decodedSessionCleanup` supplies native session events and encoded H.264
+samples at the existing transport and decoder boundaries. It uses the real
+decoder, frame worker, native renderer, QML PIN form, menu, and disconnect
+dialog. It tracks decoded AVBuffer lifetimes through normal OpenGL disconnect
+and Vulkan controller destruction with queued GUI delivery. The same native
+backend and QML engine serve both connections.
+
+The fixture explicitly clears the saved console login PIN. A zeroed
+`ChiakiRegisteredHost` otherwise creates the saved string `0`, which selects
+the existing automatic PIN submission route. The frame fixture is generated
+with FFmpeg 7.1:
+
+```text
+ffmpeg -f lavfi -i color=c=red:s=320x180:r=60 -frames:v 1 -c:v libx264 -preset ultrafast -tune zerolatency -f h264 red.h264
+```
+
+On Windows, `nativeInitializationFailure` uses the offscreen platform's real
+OpenGL context creation failure. Its test process disables Chromium GPU use
+and crash-report UI. It checks that setup remains visible and presents the
+native error once. These process options do not change production startup.
+
+The native tests use the existing Fast preset. They do not certify other
+presets, real-console playback, hardware decoding, physical input, or screen
+output. Actual foreground checks require the active unlocked input desktop.

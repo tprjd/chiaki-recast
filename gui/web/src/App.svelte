@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { connectSetup, type State, type Console } from './bridge';
+  import ConnectAction from './ConnectAction.svelte';
 
   let current = $state<State>();
   let connection = $state<Awaited<ReturnType<typeof connectSetup>>>();
@@ -89,6 +90,7 @@
     </button>
     <span role="status" class="message">{message || (!current ? t('Loading consoles') : '')}</span>
   </div>
+  <ConnectAction {current} {connection} />
   {#if current && !consoles.length}
     <section class="empty" aria-live="polite">
       <h2>{t(query ? 'No matching consoles' : 'No consoles found')}</h2>

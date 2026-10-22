@@ -238,6 +238,7 @@ public:
 #endif
 
 signals:
+    void streamWindowRequested();
     void windowChanged();
     void sessionChanged(StreamSession *session);
     void connectionAttemptChanged();
