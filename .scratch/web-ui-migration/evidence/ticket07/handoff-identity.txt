@@ -1,0 +1,22 @@
+8a01913ec0ff0abb5857c84128079454d2d09e96
+d45cfbd0bb6c35f55d23d5e7d095f4b68f3c82c0
+ m third-party/gf-complete
+?? .scratch/web-ui-migration/evidence/ticket07/
+?? embedded-manual.png
+
+Algorithm : SHA256
+Hash      : 5D9E68BAA22699C61A36DA7CF802C40718EE919AEFA2CAE018681AC8A9E759B2
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp
+
+Algorithm : SHA256
+Hash      : 10EF3837BD03F4A76AED5808186255F4253399277E56D2D09D09FC275E118FA9
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\src\qmlbackend.cpp
+
+Algorithm : SHA256
+Hash      : B9C2C0CE404889562374D9E284FD4B2F1A334DA1AC30FC580CFF6A501FE9FCED
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\src\setupbridge.cpp
+
+Algorithm : SHA256
+Hash      : 33A63B62D436E8BDBE334E589F3A3B50AE1B2FC5FB20069FA9E8585627C60C45
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\chiaki-embedded-setup-tests.exe
+

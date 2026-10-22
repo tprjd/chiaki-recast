@@ -1,0 +1,18 @@
+691342dfac10d6e5857190ba40808247a2e8a879
+
+Algorithm : SHA256
+Hash      : 8434E8FA1B5B633D25489AA61228B68CCACCF5A77A49A098B43099D1EA473BE8
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\web\src\App.svelte
+
+Algorithm : SHA256
+Hash      : AE26A37C847949E3B611D85D4D89C6B70D4E5711837119D3B88C37D8945F7D83
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\web\src\Pairing.svelte
+
+Algorithm : SHA256
+Hash      : 757C53F811AE59DD54FEBC285387437F25BE666C22D993118A955CE8608951B9
+Path      : C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp
+
+Algorithm : SHA256
+Hash      : 5D97EF73D86BEA011D35045DF8D355854D6C7D5B8E674AF30793BE986F439514
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\chiaki-embedded-setup-tests.exe
+
