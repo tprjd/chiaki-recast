@@ -19,9 +19,9 @@
 #include <QPointer>
 #ifdef CHIAKI_HAVE_WEBENGINE
 #include <QQuickWebEngineProfile>
+#endif
 #include <QWebEngineProfile>
 #include <QWebEngineUrlRequestInterceptor>
-#endif
 
 class SystemdInhibit;
 class PSNToken;
@@ -69,7 +69,6 @@ private:
     PsnRequests::Connect request;
 };
 
-#ifdef CHIAKI_HAVE_WEBENGINE
 class SecUaRequestInterceptor : public QWebEngineUrlRequestInterceptor {
     Q_OBJECT
 
@@ -85,7 +84,6 @@ public:
 private:
     QString chrome_version;
 };
-#endif
 class QmlBackend : public QObject
 {
     friend class StreamInputNativeTest;
@@ -251,9 +249,9 @@ public:
 #endif
 #ifdef CHIAKI_HAVE_WEBENGINE
     Q_INVOKABLE void setWebEngineHints(QQuickWebEngineProfile *profile);
-    void setWebEngineHints(QWebEngineProfile *profile);
     Q_INVOKABLE void clearCookies(QQuickWebEngineProfile *profile);
 #endif
+    void setWebEngineHints(QWebEngineProfile *profile);
 
 signals:
     void steamShortcutMessage(const QString &operation, const QString &message, bool ok, bool done);

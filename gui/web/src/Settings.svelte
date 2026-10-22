@@ -90,8 +90,8 @@
     } finally { pending = false; }
   }
   function keyboard(event: KeyboardEvent) {
-    if (document.querySelector('dialog[open]')) return;
-    moveFocus(event, document.querySelector('[data-setup-panel]')!);
+    if (event.defaultPrevented || document.querySelector('dialog[open]')) return;
+    if (event.key !== 'PageUp' && event.key !== 'PageDown') moveFocus(event, document.querySelector('[data-setup-panel]')!);
     if (event.key === 'Escape') {
       event.preventDefault();
       if (query) { query = ''; search.focus(); } else if (category === 'Color mapping') reveal('openPlaceboColorMapping'); else close();

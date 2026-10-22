@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { Snippet } from 'svelte';
+  import { moveFocus } from './navigation';
   let { label, close, children }: { label: string; close: () => void; children: Snippet } = $props();
   let dialog: HTMLDialogElement;
   onMount(() => {
@@ -15,7 +16,7 @@
   });
 </script>
 
-<dialog bind:this={dialog} data-setup-panel aria-label={label} oncancel={event => { event.preventDefault(); close(); }}>
+<dialog bind:this={dialog} data-setup-panel aria-label={label} onkeydown={event => moveFocus(event, dialog)} oncancel={event => { event.preventDefault(); close(); }}>
   {@render children()}
 </dialog>
 

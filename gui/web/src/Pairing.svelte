@@ -137,7 +137,8 @@
   }
 </script>
 <svelte:window onkeydown={event => {
-  if (open && event.key === 'Escape' && (event.target as Element).closest('.pairing')) { event.preventDefault(); close(); }
+  const target = event.target as Element;
+  if (!event.defaultPrevented && open && event.key === 'Escape' && target.closest('.pairing') && !target.closest('.psn-account')) { event.preventDefault(); close(); }
 }} />
 <section data-setup-panel class="pairing">
   {#if open}

@@ -128,7 +128,7 @@
           <dt>{t('Registration')}</dt><dd>{t(console.registered ? 'Registered' : 'Not registered')}</dd>
           <dt>{t('Address')}</dt><dd>{console.address || '—'}</dd><dt>{t('ID')}</dt><dd>{console.identifier || '—'}</dd>
           {#if console.app}<dt>{t('App')}</dt><dd>{console.app}</dd>{/if}{#if console.titleId}<dt>{t('Title ID')}</dt><dd>{console.titleId}</dd>{/if}
-        </dl><div class="actions">{#each console.actions as item}<button data-console-action={item} disabled={current.connectionBusy} onclick={() => request(item, target)}>{t(actions[item])}</button>{/each}</div>
+        </dl><div class="actions">{#each console.actions.filter(item => Object.hasOwn(actions, item)) as item}<button data-console-action={item} disabled={current.connectionBusy} onclick={() => request(item, target)}>{t(actions[item])}</button>{/each}</div>
       {:else}<p role="alert">{t('Console unavailable. Close this screen and select the console again.')}</p>{/if}
     {:else if mode === 'pin'}
       <h3>{targetName}</h3><p>{t('This is the four-digit PIN for your console user. It is different from the eight-digit Remote Play pairing code.')}</p>

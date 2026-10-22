@@ -9,6 +9,7 @@
   import Settings from './Settings.svelte';
   import ConsoleManagement from './ConsoleManagement.svelte';
   import Icon from './Icon.svelte';
+  import { moveFocus } from './navigation';
 
   let current = $state<State>();
   let profileGeneration = $derived(current?.profileGeneration);
@@ -75,7 +76,11 @@
   }
   async function navigate(event: KeyboardEvent) {
     const target = event.target as HTMLElement;
-    if (settingsOpen || pairingOpen || target.closest('[data-setup-panel]') || document.querySelector('dialog[open]')) return;
+    if (event.defaultPrevented || settingsOpen || document.querySelector('dialog[open]')) return;
+    if (pairingOpen || accountRoute || target.closest('[data-setup-panel]')) {
+      moveFocus(event, document.querySelector<HTMLElement>(pairingOpen ? '.pairing' : accountRoute ? '[data-account-route]' : '.app-shell')!);
+      return;
+    }
     if (event.key === 'F1') {
       event.preventDefault();
       if (!event.repeat) document.querySelector<HTMLButtonElement>('[data-steam-open]:enabled')?.click();
@@ -95,24 +100,13 @@
       event.preventDefault();
       return;
     }
-    if (event.key === 'PageDown' || event.key === 'Escape' ||
-      (!target.matches('.console-card') && target.tagName !== 'INPUT' && event.key.startsWith('Arrow')) ||
-      (target.tagName === 'INPUT' && event.key === 'ArrowDown')) {
+    if (event.key === 'Escape' ||
+      (target.matches('input[type=search]') && event.key === 'ArrowDown')) {
       selected?.focus();
       event.preventDefault();
       return;
     }
-    if (!target.matches('.console-card') || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
-    const columns = Math.max(1, Math.round(document.querySelector('.console-grid')!.clientWidth / (target.clientWidth + 18)));
-    const offset = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : event.key === 'ArrowUp' ? -columns : columns;
-    if (cards.indexOf(target as HTMLButtonElement) + offset < 0 && event.key === 'ArrowUp') {
-      document.querySelector<HTMLButtonElement>('.discovery')?.focus();
-      event.preventDefault();
-      return;
-    }
-    const next = cards[Math.max(0, Math.min(cards.length - 1, cards.indexOf(target as HTMLButtonElement) + offset))];
-    next?.focus();
-    event.preventDefault();
+    moveFocus(event, document.querySelector<HTMLElement>('.app-shell')!);
   }
   async function showLibrary() {
     if (pairingOpen) await pairing?.close();
@@ -174,7 +168,7 @@
     <div class:hidden={pairingOpen || accountRoute}>
       <div class="library-heading">
         <div><div class="library-title"><h1>{t('Consoles')}</h1><span class="heading-count">{current?.consoles.length ?? 0}</span></div></div>
-        <button class="add-console" data-register-new={current && connection ? '' : undefined} disabled={!current || !connection || current.connectionBusy} onclick={event => pairing?.choose('', event.currentTarget)}><Icon name="plus" />{t(current?.registration.busy ? 'View registration progress' : 'Add console')}</button>
+        <button class="add-console" data-register-new={current && connection ? '' : undefined} disabled={!current || !connection || current.connectionBusy && !current.registration.busy} onclick={event => pairing?.choose('', event.currentTarget)}><Icon name="plus" />{t(current?.registration.busy ? 'View registration progress' : 'Add console')}</button>
       </div>
       <div class="library-toolbar">
         <label class="search"><Icon name="search" size={17} /><input type="search" maxlength="256" bind:value={query} placeholder={t('Search consoles')} aria-label={t('Search consoles')} /></label>
