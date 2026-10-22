@@ -1,2 +1,2 @@
-*.txt -text
-*.json -text
+*.txt -text -whitespace
+*.json -text -whitespace
