@@ -38,6 +38,13 @@ endif()
 set_tests_properties(chiaki-console-screen PROPERTIES
     ENVIRONMENT "${screen_test_environment}")
 
+if(TARGET chiaki-gui)
+    add_executable(chiaki-native-services-tests nativeservices.cpp)
+    target_link_libraries(chiaki-native-services-tests PRIVATE chiaki-gui Qt6::Test)
+    add_test(NAME chiaki-native-services COMMAND chiaki-native-services-tests)
+    set_tests_properties(chiaki-native-services PROPERTIES LABELS desktop)
+endif()
+
 if(TARGET chiaki-gui AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_executable(chiaki-mouse-response-tests mouseresponse.cpp)
     target_link_libraries(chiaki-mouse-response-tests PRIVATE chiaki-gui Qt6::Test)

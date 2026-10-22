@@ -1,6 +1,5 @@
 #include "qmlmainwindow.h"
 #include "qmlbackend.h"
-#include "qmlsvgprovider.h"
 #include "chiaki/log.h"
 #include "chiaki/time.h"
 #include "streamsession.h"
@@ -398,20 +397,21 @@ private:
     QWindow *window = {};
 };
 
-QmlMainWindow::QmlMainWindow(Settings *settings, bool exit_app_on_stream_exit)
+QmlMainWindow::QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, bool exit_app_on_stream_exit)
     : QWindow()
-    , settings(settings)
+    , settings(backend->nativeSettings())
+    , backend(backend)
+    , qml_engine(engine)
 {
     init(settings, exit_app_on_stream_exit);
+    backend->attachWindow(this);
 }
 
-QmlMainWindow::QmlMainWindow(const StreamSessionConnectInfo &connect_info)
-    : QWindow()
-    , settings(connect_info.settings)
+QmlMainWindow::QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, const StreamSessionConnectInfo &connect_info)
+    : QmlMainWindow(backend, engine)
 {
     direct_stream = true;
     emit directStreamChanged();
-    init(connect_info.settings);
     backend->createSession(connect_info);
 
     if (connect_info.fullscreen || connect_info.zoom || connect_info.stretch)
@@ -420,14 +420,18 @@ QmlMainWindow::QmlMainWindow(const StreamSessionConnectInfo &connect_info)
         setVideoMode(VideoMode::Zoom);
     else if (connect_info.stretch)
         setVideoMode(VideoMode::Stretch);
-
-    connect(session, &StreamSession::SessionQuit, qGuiApp, &QGuiApplication::quit);
 }
 
 QmlMainWindow::~QmlMainWindow()
 {
     releaseGameplayCapture();
-    Q_ASSERT(!placebo_swapchain);
+    disconnect(backend, nullptr, this, nullptr);
+    session = nullptr;
+    update_timer->stop();
+    if (quick_render->thread() == QThread::currentThread())
+        destroySwapchain();
+    else
+        QMetaObject::invokeMethod(quick_render, std::bind(&QmlMainWindow::destroySwapchain, this), Qt::BlockingQueuedConnection);
 
     if (render_backend == RenderBackend::Vulkan)
         av_buffer_unref(&vulkan_hw_dev_ctx);
@@ -440,7 +444,7 @@ QmlMainWindow::~QmlMainWindow()
 
 #ifndef Q_OS_MACOS
     if (owns_render_thread) {
-        QMetaObject::invokeMethod(quick_render, &QQuickRenderControl::invalidate);
+        QMetaObject::invokeMethod(quick_render, &QQuickRenderControl::invalidate, Qt::BlockingQueuedConnection);
         render_thread->quit();
         render_thread->wait();
     } else {
@@ -449,13 +453,17 @@ QmlMainWindow::~QmlMainWindow()
 #else
     // On macOS, we still need to invalidate to prevent leaks
     if (owns_render_thread) {
-        QMetaObject::invokeMethod(quick_render, &QQuickRenderControl::invalidate);
+        QMetaObject::invokeMethod(quick_render, &QQuickRenderControl::invalidate, Qt::BlockingQueuedConnection);
         render_thread->quit();
         render_thread->wait();
     } else {
         quick_render->invalidate();
     }
 #endif
+
+    delete quick_item;
+    backend->detachWindow(this);
+    qml_engine->setIncubationController(nullptr);
 
     if (pl_gpu gpu = placeboGpu()) {
         pl_tex_destroy(gpu, &quick_tex);
@@ -500,13 +508,11 @@ QmlMainWindow::~QmlMainWindow()
     if (hasOpenGlContextCurrent)
         doneOpenGLContextCurrent();
 
-    delete quick_item;
     delete quick_window;
     // calls invalidate here if not already called
     delete quick_render;
     if (owns_render_thread)
-        delete render_thread->parent();
-    delete qml_engine;
+        delete render_thread;
 
     FILE *file = fopen(qPrintable(shader_cache_path()), "wb");
     if (file) {
@@ -645,6 +651,10 @@ void QmlMainWindow::setSettings(Settings *new_settings)
 
 void QmlMainWindow::show()
 {
+    if (quick_item) {
+        QWindow::show();
+        return;
+    }
     QQmlComponent component(qml_engine, QUrl(QStringLiteral("qrc:/Main.qml")));
     if (!component.isReady()) {
         qCCritical(chiakiGui) << "Component not ready\n" << component.errors();
@@ -654,6 +664,7 @@ void QmlMainWindow::show()
 
     QVariantMap props;
     props[QStringLiteral("parent")] = QVariant::fromValue(quick_window->contentItem());
+    props[QStringLiteral("nativeWindow")] = QVariant::fromValue(this);
     quick_item = qobject_cast<QQuickItem*>(component.createWithInitialProperties(props));
     if (!quick_item) {
         qCCritical(chiakiGui) << "Failed to create root item\n" << component.errors();
@@ -666,6 +677,11 @@ void QmlMainWindow::show()
         QMetaObject::invokeMethod(quick_item, "showRendererFallbackDialog",
                                   Q_ARG(QVariant, QVariant::fromValue(reason)));
     }
+    if (direct_stream) {
+        QWindow::show();
+        return;
+    }
+
     auto screen_size = QGuiApplication::primaryScreen()->availableSize();
     resize(screen_size);
 
@@ -1791,10 +1807,7 @@ renderer_backend_ready:
     quick_window->setColor(QColor(0, 0, 0, 0));
     connect(quick_window, &QQuickWindow::focusObjectChanged, this, &QmlMainWindow::focusObjectChanged);
 
-    qml_engine = new QQmlEngine(this);
-    qml_engine->addImageProvider(QStringLiteral("svg"), new QmlSvgProvider);
-    if (!qml_engine->incubationController())
-        qml_engine->setIncubationController(quick_window->incubationController());
+    qml_engine->setIncubationController(quick_window->incubationController());
     connect(qml_engine, &QQmlEngine::quit, this, &QWindow::close);
 
     stream_input = new StreamInputOwnership(this, quick_window, this);
@@ -1804,7 +1817,6 @@ renderer_backend_ready:
         if (session) session->BlockInput(blocked);
         emit gameplayCaptureChanged();
     });
-    backend = new QmlBackend(settings, this);
     mouse_camera_connection = connect(settings, &Settings::MouseCameraEnabledChanged, this, &QmlMainWindow::updateMouseCameraMode);
     connect(this, &QWindow::activeChanged, this, [this] {
         if (!isActive()) releaseGameplayCapture();
@@ -1819,6 +1831,7 @@ renderer_backend_ready:
         if (state != Qt::ApplicationActive) releaseGameplayCapture();
     });
     connect(backend, &QmlBackend::sessionChanged, this, [this, exit_app_on_stream_exit](StreamSession *s) {
+        const bool had_session = stream_session_active.loadAcquire() != 0;
         releaseGameplayCapture();
         session = s;
         if (s) {
@@ -1874,10 +1887,8 @@ renderer_backend_ready:
             setCursor(Qt::ArrowCursor);
             emit hasVideoChanged();
         }
-        if(session && exit_app_on_stream_exit)
-        {
-            connect(session, &StreamSession::SessionQuit, qGuiApp, &QGuiApplication::quit);
-        }
+        if (!session && had_session && (direct_stream || exit_app_on_stream_exit))
+            QGuiApplication::quit();
         if(!session)
         {
             setStreamWindowAdjustable(false);

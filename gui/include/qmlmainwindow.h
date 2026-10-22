@@ -82,8 +82,8 @@ public:
     };
     Q_ENUM(VideoPreset);
 
-    QmlMainWindow(Settings *settings,  bool exit_app_on_stream_exit = false);
-    QmlMainWindow(const StreamSessionConnectInfo &connect_info);
+    QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, bool exit_app_on_stream_exit = false);
+    QmlMainWindow(QmlBackend *backend, QQmlEngine *engine, const StreamSessionConnectInfo &connect_info);
     ~QmlMainWindow();
     void updateWindowType(WindowType type);
     void setSettings(Settings *new_settings);

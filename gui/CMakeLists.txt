@@ -49,6 +49,8 @@ set(SOURCE_FILES
 	src/qml/qml.qrc
 	include/qmlmainwindow.h
 	src/qmlmainwindow.cpp
+	include/qmlnativeservices.h
+	src/qmlnativeservices.cpp
 	include/qmlbackend.h
 	src/qmlbackend.cpp
 	include/qmlcontroller.h
