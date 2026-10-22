@@ -61,10 +61,13 @@ class PsnConnectionWorker : public QObject
     Q_OBJECT
 
 public:
+    explicit PsnConnectionWorker(PsnRequests::Connect request = {}) : request(std::move(request)) {}
     void ConnectPsnConnection(StreamSession *session, const QString &duid, const bool &ps5, quint64 attempt_id);
 
 signals:
     void resultReady(StreamSession *session, quint64 attempt_id, const ChiakiErrorCode &err);
+private:
+    PsnRequests::Connect request;
 };
 
 #ifdef CHIAKI_HAVE_WEBENGINE
@@ -94,6 +97,7 @@ class QmlBackend : public QObject
     Q_PROPERTY(QVariantMap connectionAttempt READ connectionAttempt NOTIFY connectionAttemptChanged)
     Q_PROPERTY(QVariantMap sessionPinRequest READ sessionPinRequest NOTIFY sessionPinRequestChanged)
     Q_PROPERTY(QVariantMap psnAuthAttempt READ psnAuthAttempt NOTIFY psnAuthAttemptChanged)
+    Q_PROPERTY(QVariantMap psnRefresh READ psnRefresh NOTIFY psnRefreshChanged)
     Q_PROPERTY(QList<QmlController*> controllers READ qmlControllers NOTIFY controllersChanged)
     Q_PROPERTY(bool discoveryEnabled READ discoveryEnabled WRITE setDiscoveryEnabled NOTIFY discoveryEnabledChanged)
     Q_PROPERTY(QVariantList hosts READ hosts NOTIFY hostsChanged)
@@ -124,7 +128,7 @@ public:
         ConnectFailedConsoleUnreachable,
     };
     Q_ENUM(PsnConnectState);
-    explicit QmlBackend(Settings *settings, QObject *parent = nullptr, PsnRequests requests = {}, QmlSettings::ProcessLauncher launcher = {}, RegistrationRequests registration = {});
+    explicit QmlBackend(Settings *settings, QObject *parent = nullptr, PsnRequests requests = {}, QmlSettings::ProcessLauncher launcher = {}, RegistrationRequests registration = {}, DiscoveryRequests discovery = {});
     ~QmlBackend();
 
     QmlMainWindow *qmlWindow() const;
@@ -220,6 +224,7 @@ public:
     Q_INVOKABLE QUrl psnLoginUrl() const;
     Q_INVOKABLE bool checkPsnRedirectURL(const QUrl &url) const;
     QVariantMap psnAuthAttempt() const { return psn_auth_attempt; }
+    QVariantMap psnRefresh() const { return psn_refresh; }
     Q_INVOKABLE QString startPsnAuth(const QUrl &url);
     QVariantMap accountLookupAttempt() const { return account_lookup_attempt; }
     QString startAccountLookup(const QString &username);
@@ -270,6 +275,7 @@ signals:
     void hostsChanged();
     void hiddenHostsChanged();
     void psnTokenChanged();
+    void psnRefreshChanged();
     void psnAuthAttemptChanged();
     void registrationAttemptChanged();
     void accountLookupChanged();
@@ -388,6 +394,8 @@ private:
     bool controller_mapping_altered = false;
     bool updating_psn_hosts = false;
     bool psn_hosts_refresh_pending = false;
+    QVariantMap psn_refresh;
+    QPointer<PSNToken> refresh_token;
     PsnRequests psn_requests;
     QFutureWatcher<void> psn_hosts_watcher;
     QFuture<void> psn_hosts_future;

@@ -171,9 +171,11 @@ static void SessionSDeckCb(SDeckEvent *event, void *user);
 #endif
 static void FfmpegFrameCb(ChiakiFfmpegDecoder *decoder, void *user);
 
-StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObject *parent)
+StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObject *parent,
+	std::function<ChiakiErrorCode(ChiakiSession *)> start_request)
 	: QObject(parent),
 		log(this, connect_info.log_level_mask, connect_info.log_file, connect_info.log_sanitize),
+	start_request(std::move(start_request)),
 	ffmpeg_decoder(nullptr),
 #if CHIAKI_LIB_ENABLE_PI_DECODER
 	pi_decoder(nullptr),
@@ -626,7 +628,7 @@ void StreamSession::Start()
 {
 	if(!connect_timer.isValid())
 		connect_timer.start();
-	ChiakiErrorCode err = chiaki_session_start(&session);
+	ChiakiErrorCode err = start_request(&session);
 	if(err != CHIAKI_ERR_SUCCESS)
 	{
 		throw ChiakiException("Chiaki Session Start failed");

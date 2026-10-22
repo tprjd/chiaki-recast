@@ -1,0 +1,157 @@
+{
+  "head": "bf4c7e01251168b12a5ddcf26f1d63ea96902bf4",
+  "tree": "b4ee1c4d7c64a2c2a25ad25d379fe1864cebb5fd",
+  "status": " M gui/tests/README.md\n m third-party/gf-complete\n?? .scratch/web-ui-migration/evidence/ticket08/\n",
+  "sourceBase": "5a61e86a7a2a190a147e9036b2c11dbbde98d079",
+  "sources": {
+    "gui/include/discoverymanager.h": "09f01d790c372a5a350ed93baeabc219953694d5c41ceec358e3647a81d86caa",
+    "gui/include/psnrequests.h": "239a8a106c759a1cf3d29e17f633f6b080ce4eb5325214e205d014acddc2e135",
+    "gui/include/qmlbackend.h": "d7070acfde020e389a660816756e174def9deb9fa9367343d011ecea8e623f3d",
+    "gui/include/qmlnativeservices.h": "1ac0ef0f2d0df0af6d92cca693b197c46c9d68cd5d06b9e4c954340b99947085",
+    "gui/include/setupbridge.h": "14f37003b7f22ca06be9b0f3e8532f7466530383e8befc6b5d6ae6f42b14078e",
+    "gui/include/streamsession.h": "853487e349df45c7eed9b7cc41a2e5d92e716aacfc02aaeb59e0bfb1e8127cb0",
+    "gui/src/applicationcontroller.cpp": "c9e5aa6a29ff0ec1eca5021e1f8fb75aec95a9d2dcbfa0c0f60bdca1a630002e",
+    "gui/src/discoverymanager.cpp": "30c4e7b003d4674ce1d847b2e8d41c2c9e7cbb40baef1c0d53d7d1196e48be5b",
+    "gui/src/psntoken.cpp": "8af9915196f0e793a831923c4fee241f07cc57e5a31f33955cda186c0297ce14",
+    "gui/src/qml/ConnectionView.qml": "526327167c56ae9460da23ad79bbf873f7702e5a70a9cb1da881d4ddcb7413dd",
+    "gui/src/qml/LiveConsolePinContent.qml": "5283815a8904058dee1a98795e400cd97310c1634c3a8333b34491df2636b44e",
+    "gui/src/qml/LiveConsolePinHost.qml": "4b8f486d59953984c54f89a12adadfff4fbd0d4eecce32e16066735d54eb59ff",
+    "gui/src/qml/StreamRoot.qml": "0230636dda942df8a61bf47c31db10af5fbcaa5eb49428db442f4d6df2678f03",
+    "gui/src/qml/StreamView.qml": "99813186f57611e186bbd1bd055517095ad5b4df0b3f3ce90bff83f2704de602",
+    "gui/src/qmlbackend.cpp": "94328e0d6f6b801fc1fce3bc52ad66490e1cdd7b024e0aa7798ccf7a04681585",
+    "gui/src/qmlmainwindow.cpp": "3ebee06e2ebb95f8bc7344f536ffada8a04942415a903b5b06c782956ab45d66",
+    "gui/src/qmlnativeservices.cpp": "5a1d17b1bdb46891d9bd63cf413a39aec1ad0d0512ee4053d6502e8614d094b2",
+    "gui/src/setupbridge.cpp": "d2a615b2976a48ba0c6de2829f72c0cd613aac6484a573ffb57632b1375d776d",
+    "gui/src/streaminputownership.cpp": "632c9244d560e773f65306fc951de161cb16809f251c6079eea682cebfa9573b",
+    "gui/src/streamsession.cpp": "56f9ae77a54ba88b83b37d050a675454a8f0960129edcecf8a5bb4d27e53c074",
+    "gui/tests/CMakeLists.txt": "53b597b8f9e269edbf1e53fa636d149e1187120fadf34c2477b1cff57c337678",
+    "gui/tests/README.md": "a85a6e4daf7d61697730da384a78bc0c8decb2d9ccf0a4c2276b383b3dcb7051",
+    "gui/tests/embeddedsetup.cpp": "1b3398a65bc302588e5f30c42f72cc308181699f9770f8713479e0e5025472c6",
+    "gui/web/package-lock.json": "337af3ce297ac50327b7714ceabeb1141ac2cc3b30df52bf043270ce247a6358",
+    "gui/web/src/App.svelte": "f9655e271781a44417794e0f998294bf02844868c312fd6f0eea24cb7ac16bf6",
+    "gui/web/src/ConnectAction.svelte": "acb9819884d784f2416c11f2a420c3d8ae3ebe35962e419f67d0e8a0b2b440f5",
+    "gui/web/src/bridge.ts": "fb14fa4934d6d852ed53787f973e07ba553ba4251c47fe6f46fafcc4c20eae61",
+    "gui/web/src/style.css": "6a4a7edfce4c4188f569feb186dc227489121db43cdbbe8bc35716a8beb283c5"
+  },
+  "artifacts": {
+    "gui/chiaki.exe": "9f9cdebcf97e29f3931c696d4e0a25a7a020f763efea2712f9b3558cbb889fec",
+    "gui/tests/chiaki-embedded-setup-tests.exe": "fcd205eeb9ba9eeaee4978d9d5bc3a35063017824bbb4e9864fe3e5e19c085e4",
+    "gui/web/app.js": "f196dad97e962e59c51715a2b25118ad1436d370a39b1738025c7d6056f52618",
+    "gui/web/app.css": "d239f952e525958d386b8416eb6f07dae578f1b43aa288188f012ca8609f791c"
+  },
+  "preserved": [
+    {
+      "path": "gui/src/qmlmainwindow.cpp",
+      "equal": true,
+      "sha256": "3ebee06e2ebb95f8bc7344f536ffada8a04942415a903b5b06c782956ab45d66"
+    },
+    {
+      "path": "gui/src/applicationcontroller.cpp",
+      "equal": true,
+      "sha256": "c9e5aa6a29ff0ec1eca5021e1f8fb75aec95a9d2dcbfa0c0f60bdca1a630002e"
+    },
+    {
+      "path": "gui/src/streaminputownership.cpp",
+      "equal": true,
+      "sha256": "632c9244d560e773f65306fc951de161cb16809f251c6079eea682cebfa9573b"
+    },
+    {
+      "path": "gui/src/qml/ConnectionView.qml",
+      "equal": true,
+      "sha256": "526327167c56ae9460da23ad79bbf873f7702e5a70a9cb1da881d4ddcb7413dd"
+    },
+    {
+      "path": "gui/src/qml/StreamRoot.qml",
+      "equal": true,
+      "sha256": "0230636dda942df8a61bf47c31db10af5fbcaa5eb49428db442f4d6df2678f03"
+    },
+    {
+      "path": "gui/src/qml/StreamView.qml",
+      "equal": true,
+      "sha256": "99813186f57611e186bbd1bd055517095ad5b4df0b3f3ce90bff83f2704de602"
+    },
+    {
+      "path": "gui/src/qml/LiveConsolePinHost.qml",
+      "equal": true,
+      "sha256": "4b8f486d59953984c54f89a12adadfff4fbd0d4eecce32e16066735d54eb59ff"
+    },
+    {
+      "path": "gui/src/qml/LiveConsolePinContent.qml",
+      "equal": true,
+      "sha256": "5283815a8904058dee1a98795e400cd97310c1634c3a8333b34491df2636b44e"
+    },
+    {
+      "path": "gui/src/streamsession.cpp",
+      "equal": true,
+      "sha256": "56f9ae77a54ba88b83b37d050a675454a8f0960129edcecf8a5bb4d27e53c074",
+      "allowedTransportSubstitutions": [
+        [
+          "StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObject *parent,\n\tstd::function<ChiakiErrorCode(ChiakiSession *)> start_request)",
+          "StreamSession::StreamSession(const StreamSessionConnectInfo &connect_info, QObject *parent)"
+        ],
+        [
+          "\n\tstart_request(std::move(start_request)),",
+          ""
+        ],
+        [
+          "ChiakiErrorCode err = start_request(&session);",
+          "ChiakiErrorCode err = chiaki_session_start(&session);"
+        ]
+      ]
+    },
+    {
+      "function": "startPsnConnection",
+      "equal": true,
+      "sha256": "d64902239c0c61f94186b86f0fdb00c529cf0bc1010e77b8636d37b363aff5c4",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "retryConnection",
+      "equal": true,
+      "sha256": "a4127b43a3177df2e02ac5d15e9c3a8dc1827c0e249c35f5a24bf8028fc53340",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "cancelConnection",
+      "equal": true,
+      "sha256": "3af1a7ab1a3340bfec380e45acb336fc4e6043a3ed791b0d0d6124c7a6317bf2",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "dismissConnection",
+      "equal": true,
+      "sha256": "b22b7336e18d985b82239ac54d3ad2ca4e6429a330bf7ed67523862d2bdd6321",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "finishPsnCleanup",
+      "equal": true,
+      "sha256": "fd676a86ef781cc55108f3378388d8d372fd2f8c01fe5a38e9bb31ef2e866c13",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "checkPsnConnection",
+      "equal": true,
+      "sha256": "756cfd18f69fd41149f2b0f66ceecd03e0489dde25a45f371a8ad6815e6e5f39",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "setConnectState",
+      "equal": true,
+      "sha256": "c139c42d793b00c48c8a33c3be9029bd20a3197091069007e2c47bdca64c0e52",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "releaseSession",
+      "equal": true,
+      "sha256": "ca0af3de8ff979d13be4c476ba004464717213a79dcc2d90014ec745e6f31403",
+      "allowedTransportSubstitution": false
+    },
+    {
+      "function": "createSession",
+      "equal": true,
+      "sha256": "e072dd3454d9e75b30f2f736042efc627423ada748f398895e00d1e8dc1c2733",
+      "allowedTransportSubstitution": true
+    }
+  ]
+}

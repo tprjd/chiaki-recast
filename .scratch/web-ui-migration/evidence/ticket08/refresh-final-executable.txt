@@ -1,0 +1,5 @@
+
+Algorithm : SHA256
+Hash      : 92357B491C4C230CBDFB3134941F079A987E8BD47CB0ED7D073DB7468925901C
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket08-build\gui\tests\chiaki-embedded-setup-tests.exe
+

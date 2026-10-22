@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QDebug>
+#include <QPointer>
 
 PSNToken::PSNToken(Settings *settings, QObject *parent, JsonRequester::ManagerFactory factory)
     : QObject(parent)
@@ -30,8 +31,9 @@ void PSNToken::handleAccessTokenResponse(const QString&, const QJsonDocument& js
     QDateTime currentTime = QDateTime::currentDateTime();
     auto secondsLeft = object.value("expires_in").toInt();
     if (access_token.trimmed().isEmpty() || refresh_token.trimmed().isEmpty() || secondsLeft <= 0) {
+        const QPointer<PSNToken> owned(this);
         emit PSNTokenError(tr("PSN returned incomplete credentials. Sign in again."));
-        emit Finished();
+        if (owned) emit Finished();
         return;
     }
     QDateTime expiry = currentTime.addSecs(secondsLeft);
@@ -39,17 +41,20 @@ void PSNToken::handleAccessTokenResponse(const QString&, const QJsonDocument& js
     settings->SetPsnAuthToken(std::move(access_token));
     settings->SetPsnRefreshToken(std::move(refresh_token));
     settings->SetPsnAuthTokenExpiry(std::move(access_token_expiry));
+    const QPointer<PSNToken> owned(this);
     emit PSNTokenSuccess();
-    emit Finished();
+    if (owned) emit Finished();
 }
 
 void PSNToken::handleErrorResponse(const QString&, const QString&, const QNetworkReply::NetworkError& err) {
     const bool unauthorized = err == QNetworkReply::ProtocolInvalidOperationError
         || err == QNetworkReply::ContentAccessDenied || err == QNetworkReply::AuthenticationRequiredError;
     // Reply URLs and error strings can contain authentication credentials.
+    const QPointer<PSNToken> owned(this);
     emit PSNTokenError(unauthorized ? tr("PSN credentials expired. Sign in again.")
         : tr("Could not reach PSN. Check your connection and try again."));
+    if (!owned) return;
     if(unauthorized)
         emit UnauthorizedError();
-    emit Finished();
+    if (owned) emit Finished();
 }

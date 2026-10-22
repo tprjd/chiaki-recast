@@ -22,9 +22,28 @@
     <button class="dismiss-stream-error" onclick={() => connection?.dismissStreamError(current!.streamError!.id)}>{t('Dismiss')}</button>
   </section>
 {/if}
+{#if current?.connection.id}
+  <section class="stream-error" data-psn-connection aria-live="polite">
+    <h2>{current.connection.phase === 'failure' ? current.connection.errorTitle : current.connection.phase === 'cancelled'
+      ? t('Connection cancelled') : t('Connecting through PSN')}</h2>
+    <p>{current.connection.errorText || (current.connection.cleanupPending && ['failure', 'cancelled'].includes(current.connection.phase ?? '')
+      ? t('Waiting for connection cleanup') : '')}</p>
+    {#if current.connection.phase === 'failure'}
+      <button data-connection-retry disabled={current.connection.cleanupPending || !current.connection.targetValid}
+        onclick={() => connection?.retryConnection(current!.connection.id!)}>{t('Retry')}</button>
+    {:else if current.connection.phase !== 'cancelled'}
+      <button data-connection-cancel disabled={!current.connection.cancelable || current.connection.phase === 'cancelling'}
+        onclick={() => connection?.cancelConnection(current!.connection.id!)}>{t('Cancel')}</button>
+    {/if}
+    {#if ['failure', 'cancelled'].includes(current.connection.phase ?? '')}
+      <button data-connection-back disabled={current.connection.cleanupPending}
+        onclick={() => connection?.dismissConnection(current!.connection.id!)}>{t('Back to consoles')}</button>
+    {/if}
+  </section>
+{/if}
 <div class="connect-action">
   <button class="connect-console" disabled={!connection || pending || current?.connectionBusy || !selected?.available
-    || !selected.registered || (selected.route !== 'manual' && (selected.route !== 'local' || selected.state !== 'ready'))} onclick={connect}>{t('Connect')}</button>
+    || !selected.registered || (selected.route === 'local' && selected.state !== 'ready')} onclick={connect}>{t('Connect')}</button>
   <span role="status">{message}</span>
 </div>
 

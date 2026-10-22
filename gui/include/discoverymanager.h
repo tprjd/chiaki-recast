@@ -10,6 +10,13 @@
 #include <QObject>
 #include <QList>
 #include <QHash>
+#include <functional>
+
+struct DiscoveryRequests
+{
+	std::function<ChiakiErrorCode(ChiakiDiscoveryService *, ChiakiDiscoveryServiceOptions *, ChiakiLog *)> init = chiaki_discovery_service_init;
+	std::function<void(ChiakiDiscoveryService *)> fini = chiaki_discovery_service_fini;
+};
 
 struct DiscoveryHost
 {
@@ -28,7 +35,8 @@ Q_DECLARE_METATYPE(DiscoveryHost)
 
 struct ManualService
 {
-	~ManualService() { chiaki_discovery_service_fini(&service); }
+	~ManualService() { requests.fini(&service); }
+	DiscoveryRequests requests;
 
 	class DiscoveryManager *manager;
 	bool discovered = false;
@@ -46,6 +54,7 @@ class DiscoveryManager : public QObject
 
 	private:
 		ChiakiLog log;
+		DiscoveryRequests requests;
 		QList<ChiakiDiscoveryService> services;
 		ChiakiDiscoveryService service;
 		ChiakiDiscoveryService service_ipv6;
@@ -60,7 +69,7 @@ class DiscoveryManager : public QObject
 		void UpdateManualServices();
 
 	public:
-		explicit DiscoveryManager(QObject *parent = nullptr);
+		explicit DiscoveryManager(QObject *parent = nullptr, DiscoveryRequests requests = {});
 		~DiscoveryManager();
 
 		void SetActive(bool active);

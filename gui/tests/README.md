@@ -40,6 +40,19 @@ recorded in ticket 03 evidence remains acceptance work for tickets 04 and 23.
 The standalone QML checks below retain coverage for setup flows that have not
 yet moved to the web page and for shared native components.
 
+`chiaki-embedded-psn-remote` checks remote refresh, expired credentials,
+token-wait cancellation, retry, and profile ownership through the production
+page and native bridge. It uses offscreen WebEngine with a test-only
+`--disable-gpu` flag. Its HTTP, device-list, and discovery transports are
+controlled before native services start.
+
+`chiaki-remote-native-connection` needs a Windows native window. It checks
+remote target dispatch, unreachable-console recovery, retry, late worker
+success after cancellation, and profile changes during cleanup. The fixture
+selects the existing Fast preset and controls native discovery, PSN requests,
+and the raw session-start boundary. It cannot establish live PSN playback,
+actual focus, hardware acceleration, or physical input behavior.
+
 The `chiaki-console-screen-tests` target loads the complete production
 `ConsoleLibrary.qml` with supplied host records. It uses the production
 controls, Material configuration, console artwork, and C++ SVG image provider.
