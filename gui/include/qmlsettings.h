@@ -618,11 +618,15 @@ public:
     Q_INVOKABLE void refreshAudioDevices();
     Q_INVOKABLE QString changeControllerKey(int button, int key);
     Q_INVOKABLE void clearKeyMapping();
-    Q_INVOKABLE QVariantMap exportSettings();
+    Q_INVOKABLE QVariantMap exportSettings() { return exportSettings({}); }
+    QVariantMap exportSettings(std::function<bool()> current);
     QString chooseSteamBasePath();
-    Q_INVOKABLE QVariantMap exportPlaceboSettings();
-    Q_INVOKABLE QVariantMap importSettings();
-    Q_INVOKABLE QVariantMap importPlaceboSettings();
+    Q_INVOKABLE QVariantMap exportPlaceboSettings() { return exportPlaceboSettings({}); }
+    QVariantMap exportPlaceboSettings(std::function<bool()> current);
+    Q_INVOKABLE QVariantMap importSettings() { return importSettings({}); }
+    QVariantMap importSettings(std::function<bool()> current);
+    Q_INVOKABLE QVariantMap importPlaceboSettings() { return importPlaceboSettings({}); }
+    QVariantMap importPlaceboSettings(std::function<bool()> current);
     Q_INVOKABLE QString stringForDpadShortcut() const;
     Q_INVOKABLE QString stringForStreamMenuShortcut() const;
 

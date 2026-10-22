@@ -202,6 +202,8 @@ void SetupBridge::refresh()
         keys.clear();
         profileKeys.clear();
         selectedKey.clear();
+        viewState["search"] = "";
+        viewState["settingsSearch"] = "";
         credentialsRejected = false;
         reminderKind.clear();
         reminderId.clear();
@@ -792,7 +794,7 @@ void SetupBridge::refresh()
     profileKeys = updatedProfileKeys;
     const QVariantMap profileState{{"items", profiles}, {"current", privateMode ? tr("Hidden") : backend->qmlSettings()->currentProfile().isEmpty() ? tr("default") : backend->qmlSettings()->currentProfile()},
         {"logDirectory", privateMode ? tr("Log directory hidden") : backend->qmlSettings()->logDirectory()}};
-    state = {{"steam", steam}, {"reminder", reminder}, {"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
+    state = {{"steam", steam}, {"reminder", reminder}, {"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)}, {"viewState", viewState},
         {"profiles", profileState}, {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"autoConnectKey", autoConnectKey}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
         {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->registrationBusy() || backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
             || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
@@ -913,12 +915,29 @@ QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &
     return {{"accepted", true}};
 }
 
+QVariantMap SetupBridge::saveViewState(const QString &route, const QString &search, const QString &category, const QString &settingsSearch, const QString &profile)
+{
+    static const QStringList categories{"General", "Video", "Stream", "Audio/Wifi", "Display", "Renderer", "Color mapping", "Keyboard and mouse", "Controllers", "Profiles"};
+    if (!currentProfile(profile) || (route != "consoles" && route != "settings" && route != "account")
+            || !categories.contains(category) || search.size() > 256 || settingsSearch.size() > 256)
+        return {{"accepted", false}};
+    const QVariantMap next{{"route", route}, {"search", search}, {"category", category}, {"settingsSearch", settingsSearch}};
+    if (next != viewState) { viewState = next; refresh(); }
+    return {{"accepted", true}};
+}
+
+void SetupBridge::invalidatePage()
+{
+    ++pageGeneration;
+    invalidateControllerMapping();
+    invalidateKeyboardMouse();
+    invalidateSteamShortcut();
+}
+
 void SetupBridge::setSuspended(bool value)
 {
     suspended = value;
-    if (suspended) invalidateControllerMapping();
-    if (suspended) invalidateKeyboardMouse();
-    if (suspended) invalidateSteamShortcut();
+    if (suspended) invalidatePage();
     if (!suspended) refresh();
 }
 
@@ -1279,7 +1298,7 @@ void SetupBridge::setKeyboardMouseAvailable(bool available)
     if (keyboardMouseAvailable == available) return;
     keyboardMouseAvailable = available;
     ++keyboardMouseWindowGeneration;
-    if (!available) { invalidateKeyboardMouse(); invalidateControllerMapping(); invalidateSteamShortcut(); }
+    if (!available) invalidatePage();
     refresh();
 }
 
@@ -2081,8 +2100,9 @@ QVariantMap SetupBridge::rendererAction(const QString &action, const QString &pr
 {
     if(!currentProfile(profileGeneration)) return {{"accepted", false}, {"message", tr("The profile changed. Try again in the current profile.")}};
     auto *settings = backend->qmlSettings();
-    if(action == "importPlaceboSettings") return settings->importPlaceboSettings();
-    if(action == "exportPlaceboSettings") return settings->exportPlaceboSettings();
+    const auto current = [this, page = pageGeneration] { return page == pageGeneration; };
+    if(action == "importPlaceboSettings") return settings->importPlaceboSettings(current);
+    if(action == "exportPlaceboSettings") return settings->exportPlaceboSettings(current);
     if(action == "openRendererDocumentation") {
         backend->openPlaceboOptionsLink();
         return {{"accepted", true}, {"message", tr("Renderer documentation opened.")}};
@@ -2276,10 +2296,11 @@ QVariantMap SetupBridge::profileAction(const QString &action, const QString &key
 QVariantMap SetupBridge::settingsFileAction(const QString &action, const QString &profile)
 {
     if(!currentProfile(profile)) return {{"accepted", false}, {"message", tr("The profile changed. Try again in the current profile.")}};
-    if(action == "exportSettings") return backend->qmlSettings()->exportSettings();
+    const auto current = [this, page = pageGeneration] { return page == pageGeneration; };
+    if(action == "exportSettings") return backend->qmlSettings()->exportSettings(current);
     if(action == "importSettings") {
         if(suspended || state.value("connectionBusy").toBool()) return {{"accepted", false}, {"message", tr("Finish the current connection before importing settings.")}};
-        auto reply = backend->qmlSettings()->importSettings();
+        auto reply = backend->qmlSettings()->importSettings(current);
         reply.insert("profileGeneration", QString::number(backend->profileGeneration()));
         refresh();
         return reply;
