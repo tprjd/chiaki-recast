@@ -1,0 +1,186 @@
+{
+  "tested_source": "6faf8ff3ebded10c6de035d5b2cc5a4a78efa227",
+  "merged_source": "6a18262dcefe4e4ce72011c5b21713bf98e1b2b5",
+  "checks": [
+    {
+      "file": "gui/src/qmlbackend.cpp",
+      "name": "QmlBackend::createSession(",
+      "equal": true,
+      "tested_sha256": "57fba99c960cd04216eb02c69942b1152324d0de3f788a3848a021bee5b0e3dd",
+      "merged_sha256": "57fba99c960cd04216eb02c69942b1152324d0de3f788a3848a021bee5b0e3dd",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/qmlbackend.cpp",
+      "name": "QmlBackend::resolveConnectionTarget(",
+      "equal": true,
+      "tested_sha256": "bd7e81df404a79facc924023ff03ade89bab93aed2cc5ed617caf086e9fd52ca",
+      "merged_sha256": "bd7e81df404a79facc924023ff03ade89bab93aed2cc5ed617caf086e9fd52ca",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/qmlbackend.cpp",
+      "name": "QmlBackend::retryConnection(",
+      "equal": true,
+      "tested_sha256": "17308ba5f65d8d58b5baa08e44015fa01e96471facf145aaab920262fcc77924",
+      "merged_sha256": "17308ba5f65d8d58b5baa08e44015fa01e96471facf145aaab920262fcc77924",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/qmlbackend.cpp",
+      "name": "QmlBackend::createRegistrationContext(",
+      "equal": true,
+      "tested_sha256": "9f4c5f873010a7ad398b093767726751b1de6bfc5ae30382744b69f2cb2a8a90",
+      "merged_sha256": "9f4c5f873010a7ad398b093767726751b1de6bfc5ae30382744b69f2cb2a8a90",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/qmlbackend.cpp",
+      "name": "QmlBackend::registrationContextCurrent(",
+      "equal": true,
+      "tested_sha256": "3acb75d90ecd871c28a93c3d60676565ae25fc5d02ab267af7541903f5e0afee",
+      "merged_sha256": "3acb75d90ecd871c28a93c3d60676565ae25fc5d02ab267af7541903f5e0afee",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/qmlbackend.cpp",
+      "name": "QmlBackend::registerHost(",
+      "equal": true,
+      "tested_sha256": "58215997b9da56d18a8cd7c67065edd077a6ce4890ea85adc5fc45a59f59c16c",
+      "merged_sha256": "58215997b9da56d18a8cd7c67065edd077a6ce4890ea85adc5fc45a59f59c16c",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/qmlbackend.cpp",
+      "name": "QmlBackend::autoRegisterHost(",
+      "equal": true,
+      "tested_sha256": "b2ce4c76de3729ab3f1163981777c53ee0cea8b0b7eda75ae22f78a4cd2b88b3",
+      "merged_sha256": "b2ce4c76de3729ab3f1163981777c53ee0cea8b0b7eda75ae22f78a4cd2b88b3",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/qmlbackend.cpp",
+      "name": "QmlBackend::autoRegister(",
+      "equal": true,
+      "tested_sha256": "7d413f098e14d84cbc7463de3ea91c3612510bb1845e9713616b70194a7b124c",
+      "merged_sha256": "7d413f098e14d84cbc7463de3ea91c3612510bb1845e9713616b70194a7b124c",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/qmlbackend.cpp",
+      "name": "QmlBackend::finishAutoRegister(",
+      "equal": true,
+      "tested_sha256": "30e7001361ee00d9fe91774cc25d851df170c2c1a340fed9710c23416720d316",
+      "merged_sha256": "30e7001361ee00d9fe91774cc25d851df170c2c1a340fed9710c23416720d316",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/qmlbackend.cpp",
+      "name": "QmlBackend::connectToHost(",
+      "equal": true,
+      "tested_sha256": "d728113d68f40b3e7718b1e42b323070710a95efead29a8981047043282589ef",
+      "merged_sha256": "d728113d68f40b3e7718b1e42b323070710a95efead29a8981047043282589ef",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/setupbridge.cpp",
+      "name": "SetupBridge::autoRegisterConsole(",
+      "equal": true,
+      "tested_sha256": "fc3bbf7307a4b5eb398575f1f45f60dae8bcfb6872ef5036b359decd8d0210d1",
+      "merged_sha256": "fc3bbf7307a4b5eb398575f1f45f60dae8bcfb6872ef5036b359decd8d0210d1",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/setupbridge.cpp",
+      "name": "SetupBridge::openRegistration(",
+      "equal": true,
+      "tested_sha256": "12abd9564af4cde4df980e9b9d3ceaaed016272d922123b9e03244752102f15d",
+      "merged_sha256": "12abd9564af4cde4df980e9b9d3ceaaed016272d922123b9e03244752102f15d",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/setupbridge.cpp",
+      "name": "SetupBridge::submitRegistration(",
+      "equal": true,
+      "tested_sha256": "4ce83ac0928fece6a9d9e263c3a806e402dd3ec777332dd45a29bd991114b03d",
+      "merged_sha256": "4ce83ac0928fece6a9d9e263c3a806e402dd3ec777332dd45a29bd991114b03d",
+      "allowed_delta": null
+    },
+    {
+      "file": "gui/src/setupbridge.cpp",
+      "name": "SetupBridge::connectConsole(",
+      "equal": true,
+      "tested_sha256": "97cf159caa11751f6f544811c3c1f101ec1fe6a839dd21de7a75bc2f3b69f985",
+      "merged_sha256": "96fac32b65881918214f2f097c50a59717d49fdf9b6d7e76f3b019038a2d6c19",
+      "allowed_delta": "Ticket16 controller-operation rejection. The ticket09 fixture has no mapping operation."
+    },
+    {
+      "file": "gui/src/applicationcontroller.cpp",
+      "equal": true,
+      "tested_sha256": "a6ff9bfbda243ed8223b36de22355abd973f406dd0ee13565baee40581f61145",
+      "merged_sha256": "a6ff9bfbda243ed8223b36de22355abd973f406dd0ee13565baee40581f61145"
+    },
+    {
+      "file": "gui/web/src/ConnectAction.svelte",
+      "equal": true,
+      "tested_sha256": "fa8113542feb911498ebbb5ddf5d6934a4ed47d6f90b1293a67d38fdbef90f79",
+      "merged_sha256": "fa8113542feb911498ebbb5ddf5d6934a4ed47d6f90b1293a67d38fdbef90f79"
+    },
+    {
+      "file": "gui/web/src/Pairing.svelte",
+      "equal": true,
+      "tested_sha256": "efc9496a8e03dd308fe54d0a82f044c2a5116111b241586bf83dfa7d36514eb3",
+      "merged_sha256": "efc9496a8e03dd308fe54d0a82f044c2a5116111b241586bf83dfa7d36514eb3"
+    },
+    {
+      "file": "gui/tests/embeddedsetup.cpp",
+      "name": "void automaticRegistration_data()",
+      "equal": true,
+      "tested_sha256": "7ec9d29ab803549a40a917d4cb44a6dd0893df5e11d3b02c3e96a1d5bfea064b",
+      "merged_sha256": "7ec9d29ab803549a40a917d4cb44a6dd0893df5e11d3b02c3e96a1d5bfea064b"
+    },
+    {
+      "file": "gui/tests/embeddedsetup.cpp",
+      "name": "void automaticRegistration()",
+      "equal": true,
+      "tested_sha256": "fb790273c75e23d743f90609c319cba69d948ab38867647e741c7529df38bb50",
+      "merged_sha256": "fb790273c75e23d743f90609c319cba69d948ab38867647e741c7529df38bb50"
+    },
+    {
+      "file": "gui/src/qmlcontroller.cpp",
+      "source": "ticket16 integration",
+      "equal": true,
+      "tested_sha256": "c23d950c26f0dafe666242aa620fecf094c06c1963a516257c80470d4de5768f",
+      "merged_sha256": "c23d950c26f0dafe666242aa620fecf094c06c1963a516257c80470d4de5768f"
+    },
+    {
+      "file": "gui/src/setupwindow.cpp",
+      "source": "ticket16 integration",
+      "equal": true,
+      "tested_sha256": "4bc0833b244a98424c00551d79d83fe18cf3066bcd0f29aed61a410d97bcea3e",
+      "merged_sha256": "4bc0833b244a98424c00551d79d83fe18cf3066bcd0f29aed61a410d97bcea3e"
+    },
+    {
+      "file": "gui/web/src/navigation.ts",
+      "source": "ticket16 integration",
+      "equal": true,
+      "tested_sha256": "13b257cf15b2da80b1341841a44ee0db76b5fd5e38528297bcb242833bee018b",
+      "merged_sha256": "13b257cf15b2da80b1341841a44ee0db76b5fd5e38528297bcb242833bee018b"
+    },
+    {
+      "file": "gui/web/src/App.svelte",
+      "source": "ticket16 integration",
+      "equal": true,
+      "tested_sha256": "060a504e6f7b1bf229700e7b9c68490d21f3443b7bf0ee713065508f8c1d70b5",
+      "merged_sha256": "060a504e6f7b1bf229700e7b9c68490d21f3443b7bf0ee713065508f8c1d70b5"
+    },
+    {
+      "file": "gui/include/qmlnativeservices.h",
+      "source": "ticket16 integration",
+      "equal": true,
+      "tested_sha256": "5cac25a33c4d53feca724f49215cfea1effc64700e246897b142d359bd9e44c9",
+      "merged_sha256": "5cac25a33c4d53feca724f49215cfea1effc64700e246897b142d359bd9e44c9"
+    }
+  ],
+  "passed": 24
+}

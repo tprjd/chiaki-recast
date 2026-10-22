@@ -22,10 +22,11 @@ ApplicationController::~ApplicationController() = default;
 void ApplicationController::prepareStreamWindow()
 {
     if (stream) return;
-    returnRequested = false;
+    const bool registrationOnly = services->backend()->connectionAttempt().value("registrationOnly").toBool();
+    returnRequested = registrationOnly;
     stream = std::make_unique<QmlMainWindow>(services->backend(), services->engine(), exitOnStreamEnd);
     if (!stream->initializationError().isEmpty()) {
-        setup.bridge()->reportStreamError(tr("Stream window is unavailable"), stream->initializationError());
+        if (!registrationOnly) setup.bridge()->reportStreamError(tr("Stream window is unavailable"), stream->initializationError());
         returnRequested = true;
         returnToSetup();
         return;
@@ -50,7 +51,7 @@ void ApplicationController::prepareStreamWindow()
         returnRequested = true;
         returnToSetup();
     });
-    stream->show();
+    if (!registrationOnly) stream->show();
 }
 
 bool ApplicationController::eventFilter(QObject *object, QEvent *event)
@@ -75,6 +76,6 @@ void ApplicationController::returnToSetup()
                 || services->backend()->connectionAttempt().value("cleanupPending").toBool()) return;
         stream.reset();
         returnRequested = false;
-        setup.resume();
+        if (!setup.isVisible()) setup.resume();
     });
 }
