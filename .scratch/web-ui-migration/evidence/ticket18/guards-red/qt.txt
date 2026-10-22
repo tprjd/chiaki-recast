@@ -1,0 +1,15 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QWARN  : EmbeddedSetupTest::setupReminderOwnership() QFontDatabase: Cannot find font directory C:/Users/david/.cache/chiaki-native-qt/6.9.3/msvc2022_64/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+FAIL!  : EmbeddedSetupTest::setupReminderOwnership() Compared values are not the same
+   Actual   (script(setup.view(), "document.querySelector('[data-reminder]')?.getAttribute('data-reminder')").toString()): "steam"
+   Expected (QString("psn"))                                                                                             : "psn"
+C:\Users\david\.codex\worktrees\web-ui-ticket-18\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(569) : failure location
+QWARN  : EmbeddedSetupTest::steamShortcutGuards() This plugin does not support propagateSizeHints()
+FAIL!  : EmbeddedSetupTest::steamShortcutGuards() 'setup.bridge()->snapshot().value("steam").toMap().value("form").toString().isEmpty()' returned FALSE. ()
+C:\Users\david\.codex\worktrees\web-ui-ticket-18\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(651) : failure location
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 2 passed, 2 failed, 0 skipped, 0 blacklisted, 23875ms
+********* Finished testing of EmbeddedSetupTest *********

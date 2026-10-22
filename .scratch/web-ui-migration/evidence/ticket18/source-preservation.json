@@ -1,0 +1,116 @@
+{
+  "integration": "478a116d",
+  "finalSource": "80503e5773f811b38c0df7aa7e3efe219313b6e1",
+  "protectedFiles": {
+    "gui/include/qmlmainwindow.h": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "a9593414ddb9e3b8dab9a23c5b4609be26733d4f723b918d1a3f46eeabfe7ffe"
+    },
+    "gui/src/qmlmainwindow.cpp": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "bafe7723f7ba9fd0d844451a97d27656935ee9ca455f29436df1993f43d1b207"
+    },
+    "gui/include/streamsession.h": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "40d9123cd7b5437174b3f4f638383f7eb4f3b03183ff25cd440bd4e16eae81f7"
+    },
+    "gui/src/streamsession.cpp": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "cad35c7bb6feef5beda935b53c9bc79bd550cd3da881aa9491895265ec200a6d"
+    },
+    "gui/include/streaminputownership.h": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "2cbae4908ada8b44fb3a3b80e660067de2e619e6f6c5f835ac1a1e10b87e39c4"
+    },
+    "gui/src/streaminputownership.cpp": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "58101083ffd9c03f4c230ef200372fb1cdc3f10f84e40e66b1fd1cd668c337d7"
+    },
+    "gui/include/qmlcontroller.h": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "fcd355dd671db92f7596f74f9e7715ae2e1d88934281f22bb5a58c87397d809c"
+    },
+    "gui/src/qmlcontroller.cpp": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "b3a7dbf2dff83b0d2c082699d56ac6dd6b665c9388be7bcfbf31718e8b8f45ad"
+    },
+    "gui/include/keyboardmousebindings.h": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "7b7cda3900c213dcbab40000ca368275c91f1cfc33d81a3d5ba12062811d004a"
+    },
+    "gui/src/keyboardmousebindings.cpp": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "eb9ad9878ae2477b3d4abf6ff7c7c0d059b04f6131a194b6e019c94e3c9ba778"
+    },
+    "gui/include/qmlnativeservices.h": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "8c621d9d3b3fd2a971d0c687e453f9aa3b506de4da5b6cb5ea4395a0e1e4b686"
+    },
+    "gui/src/qmlnativeservices.cpp": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "17fa438748072bea165523666d9d66f5506046caba8ef5b4caf92416026e29a4"
+    },
+    "gui/src/qml/StreamView.qml": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "610323919e9e6a7df987e61d8d34bc27dcd993ab4001c845e523a7d2451781b9"
+    },
+    "gui/src/qml/StreamActionNotice.qml": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "7c4208e143c3063373d9b24d23aaf417184f38ef255c9472fdac6249bfc5a4cf"
+    },
+    "gui/src/qml/StreamDisconnectDialog.qml": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "3538010413a5d311d86d33e24e77361cb0e538d0678ab3171bcb6b2d5554dee8"
+    },
+    "gui/src/qml/StreamMenuContent.qml": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "2c4d7e88e140a217a6d99a21a5bfc4501f647db7e9ccf52d19bfe30b483865f9"
+    },
+    "gui/src/qml/StreamMenuWindow.qml": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "f180f01924fd0b2c19d867ee9a83f3563583acc829aea21e675f8f4091fc6f65"
+    },
+    "gui/src/qml/StreamNotice.qml": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "904598e1dacd6c0c51f90f56bab1be1baf03c3bec247728748906fa7e7931981"
+    },
+    "gui/src/qml/StreamPassiveNotices.qml": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "4d16030e81c3473d9818d316b0730d01dfb40f8b0d5f980b25a6389e8a45c5c6"
+    },
+    "gui/src/qml/StreamRoot.qml": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "bfe553d36afaa6512af579cdea713765b22f16ceeeb7731e249222cc32930eec"
+    },
+    "gui/src/qml/StreamStatsContent.qml": {
+      "equalAfterLineEndingNormalization": true,
+      "sha256": "e5052f476fd3edb6843fcd7b2d82ff6c42aff8ef8516551712c26725b2e04b8e"
+    }
+  },
+  "backendOutsideSteamOperationUnchanged": true,
+  "bridgeMethodsUnchanged": {
+    "setRendererSetting": true,
+    "setMediaSetting": true,
+    "setControllerSetting": true,
+    "beginControllerMapping": true,
+    "setKeyboardMouseSetting": true,
+    "saveManualAddress": true,
+    "openRegistration": true,
+    "submitRegistration": true,
+    "autoRegisterConsole": true,
+    "wakeConsole": true,
+    "profileAction": true,
+    "settingsFileAction": true,
+    "openPsnSignIn": true,
+    "submitPsnRedirect": true
+  },
+  "savedPassingTestBodiesUnchangedSince8aa79312": {
+    "setupReminders": true,
+    "steamShortcutWorkflow": true,
+    "setupReminderOwnership": true,
+    "setupReminderEligibility_data": true,
+    "setupReminderEligibility": true
+  },
+  "nativeSteamOperationUnchangedSince8aa79312": true,
+  "vendorDiffSha256": "44b9b3710790c388323f84f2b3aada58eae5719d749930e0d277accad082f7da"
+}
