@@ -65,6 +65,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 
 ## Decisions
 
+- User layout scope update: support design widths of at least 1024 CSS pixels. Keep existing responsive CSS, stop new narrower layout work, and keep 200 percent zoom checks within the supported CSS viewport width. Earlier narrow captures remain historical evidence. See the updated spec and ticket 23.
+
 - [Ticket 08](issues/08-psn-native-streaming.md) uses the existing native refresh, connection attempt, worker, and window controller. The web page presents token-wait progress before native handoff. Native failure, retry, late cancellation, stale-profile rejection, session/window cleanup, and setup restoration pass. [Verification](evidence/ticket08/verification.md) records the fail-closed session-start fixture, discovery-isolation limits, source preservation, identities, and captures. Real PSN playback and physical/hardware acceptance remain open.
 
 - [Ticket 05](issues/05-console-management-and-manual-addresses.md) adds current opaque target keys for console actions, hidden consoles, and registration choices. Manual entries retain their native identity and address. [Verification](evidence/ticket05/verification.md) records native saves and association, deletion distinctions, PIN leading zeroes, secret-free replies, streamer masking, stale target/profile rejection, focus, reload, and registered manual handoff. Native connection state remains in QmlBackend. Ticket 03/04 graphics and decoder evidence is reused. Ticket 07 owns pairing; tickets 19 through 23 retain physical, platform, hardware, and performance acceptance.

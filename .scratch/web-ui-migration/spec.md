@@ -6,6 +6,7 @@ Publication: published to the local issue tracker through to-spec.
 Test boundary: confirmed by the user on 2026-10-22.
 Scope update: GPU-accelerated web setup without a QML setup fallback, confirmed on 2026-10-22.
 Ticket and test-policy update: approved by the user on 2026-10-22.
+Layout scope update: minimum design width is 1024 CSS pixels, confirmed by the user on 2026-10-22.
 Task scope: the user invoked implement-spec on 2026-10-22. Implement the approved specification and all 23 tickets on the integration branch. The earlier planning-only restriction is superseded.
 
 ## Problem Statement
@@ -102,8 +103,8 @@ and the QML components used by native stream overlays and live settings.
 62. As a keyboard user, I want visible focus and predictable navigation, so that I can complete setup without a mouse.
 63. As a controller user, I want the existing setup navigation and actions, so that I can use the application from a controller.
 64. As a touch user, I want reachable controls and scrolling, so that supported desktop touch use remains possible.
-65. As a desktop user, I want layouts that support narrow windows, long text, and display scaling, so that all actions remain readable and reachable.
-66. As a user who enlarges text, I want usable layouts at 200 percent zoom, so that I do not lose controls.
+65. As a desktop user, I want layouts that support widths of at least 1024 CSS pixels, long text, and display scaling, so that all actions remain readable and reachable.
+66. As a user who enlarges text, I want usable layouts at 200 percent zoom within the supported design width, so that I do not lose controls.
 67. As a screen-reader user, I want labels, status messages, and dialog focus handling, so that I can understand and operate the setup UI.
 68. As a user who reduces motion, I want the UI to respect that setting, so that animations do not prevent comfortable use.
 69. As a user in streamer mode, I want private identifiers, account details, profile names, and paths to retain their masking, so that setup does not reveal them on screen.
@@ -290,9 +291,14 @@ and the QML components used by native stream overlays and live settings.
   native controller navigation and browser events.
 - Provide labels, visible focus, predictable dialog focus return, status
   announcements, scrolling, and reduced-motion support.
-- Retain checks at 900 by 600 and 1280 by 720 logical pixels. Add narrow
-  reflow, long text, display scaling, and 200 percent zoom checks.
-  Keep every action reachable.
+- Use 1024 CSS pixels as the minimum setup design width. Check 1024 by 600
+  and 1280 by 720 CSS pixels, long text, and display scaling. At 200 percent
+  zoom, use a window wide enough to retain at least 1024 CSS pixels.
+  Keep every action reachable within this supported range.
+- Do not optimize or add acceptance work below 1024 CSS pixels. Keep existing
+  working responsive CSS. Earlier narrower checks remain historical evidence;
+  they do not require repetition or new work. This scope change does not add
+  a hard native window-size limit.
 
 ### Browser resource use and release support
 
