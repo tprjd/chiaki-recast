@@ -57,6 +57,22 @@ step parses. The actual changed SDK metadata step ran in an external directory.
 `pkgconf` resolved versions `2026.3` and `0.68.0` and the expected SDK libraries.
 These checks do not establish a hosted CI run.
 
+## Common frontend notices
+
+`frontend-notices-build.txt` records the existing CMake frontend target emitting
+`build/gui/web/THIRD-PARTY-NOTICES.txt`. The generator reads license files only
+for dependency modules with rendered bundle code. The current bundle includes
+Svelte 5.57.2 and Vite 8.3.5's injected browser modulepreload helper. It retains
+the packages' original license texts. It does not label the TypeScript compiler
+as shipped runtime code.
+
+`frontend-notices-install.txt` records the actual CMake GUI install at
+`share/licenses/chiaki-ng/frontend/THIRD-PARTY-NOTICES.txt`.
+`frontend-notices.json` records the equal generated and installed file hash.
+Windows now copies this common notice file. The initial package above predates
+this change and includes the prior full npm license collection. The final
+package will use the common generated file.
+
 ## Installer limit
 
 The official Inno Setup 6.5.4 tool download matches the GitHub release SHA256
