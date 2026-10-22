@@ -1,0 +1,285 @@
+diff --git a/gui/src/qmlmainwindow.cpp b/gui/src/qmlmainwindow.cpp
+index 43c05688..cfa8cb93 100644
+--- a/gui/src/qmlmainwindow.cpp
++++ b/gui/src/qmlmainwindow.cpp
+@@ -1943,6 +1943,12 @@ renderer_backend_ready:
+     connect(update_timer, &QTimer::timeout, this, &QmlMainWindow::update);
+ 
+     const auto initializeQuick = [this] {
++        if (render_backend == RenderBackend::OpenGL && qEnvironmentVariableIsSet("CHIAKI_GL_OLD_CONTROL")) {
++            quick_window->setGraphicsDevice(QQuickGraphicsDevice::fromOpenGLContext(qt_gl_context));
++            if (!quick_render->initialize()) qFatal("Old-path diagnostic render control initialization failed");
++            qInfo() << "TEMP old fromOpenGLContext actual QRhi" << quick_render->rhi()->backendName();
++            return;
++        }
+         if (render_backend == RenderBackend::Vulkan) {
+             QRhiVulkanInitParams params;
+             params.inst = qt_vk_inst;
+@@ -2142,6 +2148,108 @@ void QmlMainWindow::createSwapchain()
+         struct pl_opengl_swapchain_params sw_params = {
+             .swap_buffers = [](void *priv) {
+                 auto q = static_cast<QmlMainWindow *>(priv);
++                static int diagnosticSamples = 0;
++                static QElapsedTimer diagnosticTimer;
++                static bool lateSample = false;
++                if (qEnvironmentVariableIsSet("CHIAKI_GL_DIAGNOSTIC") && q->has_video) {
++                    if (!diagnosticTimer.isValid()) diagnosticTimer.start();
++                    const auto elapsed = diagnosticTimer.elapsed();
++                    ++diagnosticSamples;
++                    const bool record = diagnosticSamples <= 24 || (!lateSample && elapsed >= 750);
++                    if (!record) {
++                        if (q->qt_gl_context) q->qt_gl_context->swapBuffers(q);
++                        return;
++                    }
++                    if (elapsed >= 750) lateSample = true;
++                    auto *context = QOpenGLContext::currentContext();
++                    if (context) {
++                        auto *gl = context->extraFunctions();
++                        const auto errorBefore = gl->glGetError();
++                        GLint drawFbo = -1, readFbo = -1, readBuffer = -1, drawBuffer = -1;
++                        GLboolean doubleBuffered = false, colorMask[4] = {};
++                        gl->glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFbo);
++                        gl->glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFbo);
++                        gl->glGetIntegerv(GL_READ_BUFFER, &readBuffer);
++                        gl->glGetIntegerv(GL_DRAW_BUFFER, &drawBuffer);
++                        gl->glGetBooleanv(GL_DOUBLEBUFFER, &doubleBuffered);
++                        gl->glGetBooleanv(GL_COLOR_WRITEMASK, colorMask);
++                        const bool stencil = gl->glIsEnabled(GL_STENCIL_TEST);
++                        const bool blend = gl->glIsEnabled(GL_BLEND);
++                        const bool scissor = gl->glIsEnabled(GL_SCISSOR_TEST);
++                        const int width = qRound(q->width() * q->devicePixelRatio());
++                        const int height = qRound(q->height() * q->devicePixelRatio());
++                        unsigned char center[4] = {}, overlay[4] = {};
++                        gl->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
++                        gl->glReadBuffer(GL_BACK);
++                        gl->glReadPixels(width / 2, height / 2, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, center);
++                        gl->glReadPixels(width / 2 - qRound(100 * q->devicePixelRatio()),
++                            qRound(40 * q->devicePixelRatio()), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, overlay);
++                        const auto errorRead = gl->glGetError();
++                        gl->glBindFramebuffer(GL_READ_FRAMEBUFFER, readFbo);
++                        gl->glReadBuffer(readBuffer);
++                        const auto errorRestore = gl->glGetError();
++                        qInfo() << "TEMP GL_BACK" << diagnosticSamples << "elapsed ms" << elapsed
++                            << "context matches" << (context == q->qt_gl_context)
++                            << "surface matches" << (context->surface() == q) << "exposed" << q->isExposed()
++                            << "double" << doubleBuffered << "size" << width << height
++                            << "FBO draw/read" << drawFbo << readFbo << "buffer draw/read" << drawBuffer << readBuffer
++                            << "RGBA mask" << colorMask[0] << colorMask[1] << colorMask[2] << colorMask[3]
++                            << "stencil/blend/scissor" << stencil << blend << scissor
++                            << "center RGBA" << QByteArray(reinterpret_cast<const char *>(center), 4).toHex()
++                            << "overlay RGBA" << QByteArray(reinterpret_cast<const char *>(overlay), 4).toHex()
++                            << "GL errors before/read/restore" << errorBefore << errorRead << errorRestore;
++                        qInfo() << "TEMP mix" << q->frame_mix.num_frames << "first mapped planes"
++                            << (q->frame_mix.num_frames ? q->frame_mix.frames[0]->num_planes : 0);
++                        if (diagnosticSamples == 1 && q->frame_mix.num_frames) {
++                            const auto *mapped = q->frame_mix.frames[0];
++                            qInfo() << "TEMP mapped crop" << mapped->crop.x0 << mapped->crop.y0 << mapped->crop.x1 << mapped->crop.y1
++                                << "repr system/levels/alpha" << mapped->repr.sys << mapped->repr.levels << mapped->repr.alpha
++                                << "bits sample/color/shift" << mapped->repr.bits.sample_depth << mapped->repr.bits.color_depth << mapped->repr.bits.bit_shift
++                                << "color primaries/transfer" << mapped->color.primaries << mapped->color.transfer
++                                << "mix timestamp" << q->frame_mix.timestamps[0];
++                            for (int i = 0; i < mapped->num_planes; ++i) {
++                                const auto &plane = mapped->planes[i];
++                                qInfo() << "TEMP mapped plane" << i << "size" << plane.texture->params.w << plane.texture->params.h
++                                    << "components" << plane.components << "mapping" << plane.component_mapping[0]
++                                    << plane.component_mapping[1] << plane.component_mapping[2] << plane.component_mapping[3];
++                            }
++                        }
++                        if (elapsed >= 750 && q->frame_mix.num_frames) {
++                            using ReadTexture = void (*)(GLuint, GLint, GLint, GLint, GLint, GLsizei, GLsizei, GLsizei,
++                                GLenum, GLenum, GLsizei, void *);
++                            const auto readTexture = reinterpret_cast<ReadTexture>(context->getProcAddress("glGetTextureSubImage"));
++                            qInfo() << "TEMP texture DSA resolved" << bool(readTexture);
++                            if (readTexture) {
++                                GLint packBuffer = 0, packValues[6] = {};
++                                const GLenum packNames[] = {GL_PACK_ALIGNMENT, GL_PACK_ROW_LENGTH, GL_PACK_IMAGE_HEIGHT,
++                                    GL_PACK_SKIP_PIXELS, GL_PACK_SKIP_ROWS, GL_PACK_SKIP_IMAGES};
++                                gl->glGetIntegerv(GL_PIXEL_PACK_BUFFER_BINDING, &packBuffer);
++                                for (int i = 0; i < 6; ++i) {
++                                    gl->glGetIntegerv(packNames[i], &packValues[i]);
++                                    gl->glPixelStorei(packNames[i], i == 0 ? 1 : 0);
++                                }
++                                gl->glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
++                                const auto sampleTexture = [&](pl_tex texture, int plane) {
++                                    unsigned target = 0;
++                                    int format = 0;
++                                    const auto id = pl_opengl_unwrap(q->placeboGpu(), texture, &target, &format, nullptr);
++                                    unsigned char rgba[4] = {};
++                                    if (id) readTexture(id, 0, texture->params.w / 2, texture->params.h / 2, 0,
++                                        1, 1, 1, plane < 0 ? GL_RGBA : GL_RED, GL_UNSIGNED_BYTE, plane < 0 ? 4 : 1, rgba);
++                                    qInfo() << "TEMP texture sample plane" << plane << "id/target/format" << id << target << format
++                                        << "RGBA" << QByteArray(reinterpret_cast<const char *>(rgba), plane < 0 ? 4 : 1).toHex()
++                                        << "GL error" << gl->glGetError();
++                                };
++                                const auto *mapped = q->frame_mix.frames[0];
++                                for (int i = 0; i < mapped->num_planes; ++i) sampleTexture(mapped->planes[i].texture, i);
++                                sampleTexture(q->quick_tex, -1);
++                                for (int i = 0; i < 6; ++i) gl->glPixelStorei(packNames[i], packValues[i]);
++                                gl->glBindBuffer(GL_PIXEL_PACK_BUFFER, packBuffer);
++                                qInfo() << "TEMP texture pack state restored GL error" << gl->glGetError();
++                            }
++                        }
++                    }
++                }
+                 if (q->qt_gl_context)
+                     q->qt_gl_context->swapBuffers(q);
+             },
+@@ -2853,6 +2961,15 @@ void QmlMainWindow::render()
+         }
+     }
+ 
++    if (qEnvironmentVariableIsSet("CHIAKI_GL_DIAGNOSTIC")) {
++        static bool targetLogged = false;
++        if (!targetLogged) {
++            targetLogged = true;
++            qInfo() << "TEMP target crop" << target_frame.crop.x0 << target_frame.crop.y0 << target_frame.crop.x1 << target_frame.crop.y1
++                << "repr bits/alpha" << target_frame.repr.bits.sample_depth << target_frame.repr.bits.color_depth
++                << target_frame.repr.bits.bit_shift << target_frame.repr.alpha;
++        }
++    }
+     if (!pl_render_image_mix(placebo_renderer, &frame_mix, &target_frame, &params))
+     {
+         qCWarning(chiakiGui) << "Failed to render Placebo frame!";
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 2972f867..8f865f57 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -10,6 +10,7 @@
+ #include <QDir>
+ #include <QScreen>
+ #include <QRegularExpression>
++#include <QQuickItem>
+ #ifdef Q_OS_WIN
+ #ifndef NOMINMAX
+ #define NOMINMAX
+@@ -90,10 +91,13 @@ private slots:
+         QmlNativeServices services(&settings);
+         services.backend()->stopAutoConnect();
+         services.backend()->setDiscoveryEnabled(false);
+-        SetupWindow setup(services.backend());
+-        setup.show();
+-        QTRY_COMPARE(script(setup.view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
++        const bool oldControl = qEnvironmentVariableIsSet("CHIAKI_GL_OLD_CONTROL");
++        std::unique_ptr<SetupWindow> setup;
+         const QDir evidence(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE", "."));
++        if (!oldControl) {
++        setup = std::make_unique<SetupWindow>(services.backend());
++        setup->show();
++        QTRY_COMPARE(script(setup->view(), "document.querySelector('h1')?.textContent").toString(), QStringLiteral("Consoles"));
+         QWebEngineView diagnostics;
+         diagnostics.resize(900, 720);
+         diagnostics.show();
+@@ -108,17 +112,20 @@ private slots:
+         gpuFile.close();
+         QVERIFY2(gpu.contains(QRegularExpression("Compositing\\s*:?\\s*Hardware accelerated")), qPrintable(gpu));
+         diagnostics.close();
++        }
+         auto *backend = services.backend();
+         const auto globalApi = QQuickWindow::graphicsApi();
+         const RenderBackend modes[] = {RenderBackend::OpenGL, RenderBackend::Vulkan, RenderBackend::Vulkan, RenderBackend::Vulkan};
+-        for (int pass = 0; pass < 4; ++pass) {
++        for (int pass = 0; pass < (oldControl ? 1 : 4); ++pass) {
+             const bool fallback = pass == 3;
+             if (fallback) qputenv("CHIAKI_FORCE_VULKAN_FALLBACK", "1");
+             const auto resetFallback = qScopeGuard([] { qunsetenv("CHIAKI_FORCE_VULKAN_FALLBACK"); });
+             backend->nativeSettings()->SetRenderBackend(modes[pass]);
+             backend->nativeSettings()->SetStreamGeometry(QRect(80, 80, 960, 640));
+-            setup.show();
+-            setup.view()->setZoomFactor(1);
++            if (setup) {
++                setup->show();
++                setup->view()->setZoomFactor(1);
++            }
+             {
+                 QmlMainWindow native(backend, services.engine());
+                 QCOMPARE(QQuickWindow::graphicsApi(), globalApi);
+@@ -126,7 +133,7 @@ private slots:
+                     ? QSGRendererInterface::Vulkan : QSGRendererInterface::OpenGL);
+                 native.show();
+                 QTRY_VERIFY(native.isExposed());
+-                setup.hide();
++                if (setup) setup->hide();
+                 native.raise();
+                 native.requestActivate();
+                 QTRY_VERIFY(native.isActive());
+@@ -156,6 +163,27 @@ private slots:
+                     return !protectedWindowVisible();
+                 })());
+ #endif
++                QQuickItem *progress = nullptr;
++                QSignalSpy videoChanged(&native, &QmlMainWindow::hasVideoChanged);
++                if (qEnvironmentVariableIsSet("CHIAKI_GL_DIAGNOSTIC")) {
++                    const auto findProgress = [](auto &&self, QQuickItem *item) -> QQuickItem * {
++                        if (item->objectName() == "streamLoadingView") return item;
++                        for (auto *child : item->childItems())
++                            if (auto *found = self(self, child)) return found;
++                        return nullptr;
++                    };
++                    for (auto *candidate : QGuiApplication::allWindows()) {
++                        if (auto *quick = qobject_cast<QQuickWindow *>(candidate))
++                            if ((progress = findProgress(findProgress, quick->contentItem()))) break;
++                    }
++                    int nativeConnections = 0;
++                    if (progress)
++                        for (auto *object : progress->parentItem()->findChildren<QObject *>())
++                            if (object->property("target").value<QObject *>() == &native
++                                && object->property("enabled").toBool()) ++nativeConnections;
++                    qInfo() << "TEMP before frame loading item exists" << bool(progress)
++                        << "native-target enabled connections" << nativeConnections << "hasVideo" << native.hasVideo();
++                }
+                 AVFrame *frame = av_frame_alloc();
+                 QVERIFY(frame);
+                 frame->format = AV_PIX_FMT_YUV420P;
+@@ -170,6 +198,14 @@ private slots:
+                 native.presentFrame({frame, 0.0, 1.0 / 60.0, false}, 0);
+                 QTRY_VERIFY(native.hasVideo());
+                 emit backend->error("GPU coexistence", "Native overlay rendered");
++                if (qEnvironmentVariableIsSet("CHIAKI_GL_DIAGNOSTIC")) {
++                    QTest::qWait(1250);
++                    if (progress) qInfo() << "TEMP after frame loading visible/opacity" << progress->isVisible() << progress->opacity()
++                        << "sessionLoading/legacyLoading/managedConnection" << progress->parentItem()->property("sessionLoading")
++                        << progress->parentItem()->property("legacySessionLoading") << progress->parentItem()->property("managedConnection")
++                        << "hasVideo signal count" << videoChanged.count();
++                    QFAIL("Temporary GL_BACK diagnostic only; no graphics acceptance result");
++                }
+                 QImage rendered;
+                 int bluePixels = 0, redPixels = 0;
+                 QElapsedTimer captureTimer;
+@@ -199,18 +235,19 @@ private slots:
+                 native.hide();
+             }
+             QVERIFY(!backend->qmlWindow());
+-            setup.show();
+-            setup.raise();
+-            setup.activateWindow();
+-            script(setup.view(), "document.querySelector('input').value='';document.querySelector('input').dispatchEvent(new Event('input',{bubbles:true}))");
++            if (oldControl) return;
++            setup->show();
++            setup->raise();
++            setup->activateWindow();
++            script(setup->view(), "document.querySelector('input').value='';document.querySelector('input').dispatchEvent(new Event('input',{bubbles:true}))");
+             discover(backend, {});
+-            QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
+-            script(setup.view(), "document.querySelector('.discovery').click()");
++            QTRY_COMPARE(script(setup->view(), "document.querySelectorAll('.console-card').length").toInt(), 1);
++            script(setup->view(), "document.querySelector('.discovery').click()");
+             QTRY_VERIFY(backend->discoveryEnabled());
+-            QTRY_VERIFY(!script(setup.view(), "document.querySelector('.discovery').disabled").toBool());
+-            script(setup.view(), "document.querySelector('.discovery').click()");
++            QTRY_VERIFY(!script(setup->view(), "document.querySelector('.discovery').disabled").toBool());
++            script(setup->view(), "document.querySelector('.discovery').click()");
+             QTRY_VERIFY(!backend->discoveryEnabled());
+-            QVERIFY(setup.view()->grab().save(evidence.filePath(QString("setup-restored-%1.png").arg(pass))));
++            QVERIFY(setup->view()->grab().save(evidence.filePath(QString("setup-restored-%1.png").arg(pass))));
+         }
+     }
+ 
+@@ -342,6 +379,8 @@ private slots:
+ int main(int argc, char **argv)
+ {
+     if (chiaki_lib_init() != CHIAKI_ERR_SUCCESS) return 1;
++    if (qEnvironmentVariableIsSet("CHIAKI_GL_OLD_CONTROL"))
++        QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+ #ifdef CHIAKI_HAVE_WEBENGINE
+     QtWebEngineQuick::initialize();

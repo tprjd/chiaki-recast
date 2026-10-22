@@ -1,0 +1,15 @@
+{
+  "productionSourceCommit": "0e2702b7ce333a5cb121c077dee17cde99b0f7e1",
+  "librarySourceTree": "7df3e40c3ec287f8718bb31dd8a04b14c902e825",
+  "graphicsHarnessSourceCommit": "713b5861a297251fa04c0171cd69403193bc447b",
+  "graphicsHarnessSourceTree": "3ba2ec7cfd2fd1843133fa59288c6728bda77763",
+  "applicationSha256": "1590764248AD82A41E003B7302DD2E238B38287C288C01446D0A87BCFF276664",
+  "graphicsHarnessSha256": "CBDAB5817958174A92D8BB2006CB36A58DBDE970CA5BFADFDF23ADF368AEBED5",
+  "passingLibraryHarnessSha256": "29459FCF938A2C1815311D63C3868676160650C3C3D9E2371171E730032840B4",
+  "frontendLockSha256": "337AF3CE297AC50327B7714CEABEB1141AC2CC3B30DF52BF043270CE247A6358",
+  "failedNativeCaptureExternal": "C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket03-native-output-failed.png",
+  "failedNativeCaptureSha256": "26A232B6723D3D60CF560F40A1C95E78D963BDB8E85856F81F39443445E8F543",
+  "latestFastCaptureExternal": "C:/Users/david/AppData/Local/Temp/chiaki-web-ui-migration/ticket03-fast-desktop-capture-failed.png",
+  "latestFastCaptureSha256": "4100BDB04F2C9E01137F73D2CBC6E77689CCAF755E194591CBCB51B30A8993CD",
+  "graphicsResult": "3 passed, 0 failed, 5301 ms; native production Fast preset; GL/Vulkan/recreation/forced fallback"
+}

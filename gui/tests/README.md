@@ -1,5 +1,45 @@
 # Console screen tests
 
+## Embedded setup application
+
+The full application build requires Qt 6.9.3 or later with WebEngineWidgets,
+WebChannel, and matching GuiPrivate headers. The frontend build uses Node
+24.16.0 and npm 11.13.0. Its lock file fixes Svelte 5 and the build tools.
+The compiled page and artwork are Qt resources. The installed application
+does not need Node or a web server.
+
+`chiaki-embedded-setup-tests` uses the production Svelte page, QWebEngineView,
+WebChannel, SetupBridge, and native services. `consoleLibrary` supplies replies
+at the native discovery completion boundary and observes the page and native
+state. It checks discovery commands, console selection, profile changes,
+privacy, navigation, keyboard events, and layout.
+
+Run only the required case:
+
+```text
+ctest --test-dir build -R "^chiaki-embedded-setup$" --output-on-failure
+ctest --test-dir build -R "^chiaki-embedded-graphics$" --output-on-failure
+```
+
+The first case has the `desktop` label. The graphics case has `desktop` and
+`gpu` labels. Tests are enabled by default. Use explicit names or exclude
+these labels in a headless run. A software or generic test pass does not
+establish GPU acceptance.
+
+`graphicsCoexistence` is a separate QtTest case in the same application harness.
+It reads `chrome://gpu`, checks imported native OpenGL and Vulkan devices,
+renders controlled native frames and the production overlay, recreates native
+windows, and checks setup restoration. It requires an unobstructed hardware
+desktop. Set `CHIAKI_EMBEDDED_EVIDENCE` to an existing directory to save its
+GPU report and images. A protected OS dialog invalidates screen and focus
+observations. Controlled frames do not prove live console decode or latency.
+The fixture selects the existing native Fast preset through Settings.
+Production defaults stay unchanged. The Windows HighQuality processing issue
+recorded in ticket 03 evidence remains acceptance work for tickets 04 and 23.
+
+The standalone QML checks below retain coverage for setup flows that have not
+yet moved to the web page and for shared native components.
+
 The `chiaki-console-screen-tests` target loads the complete production
 `ConsoleLibrary.qml` with supplied host records. It uses the production
 controls, Material configuration, console artwork, and C++ SVG image provider.

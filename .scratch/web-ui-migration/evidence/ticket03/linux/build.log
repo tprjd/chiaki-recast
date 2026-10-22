@@ -1,0 +1,737 @@
+[0/2] Re-checking globbed directories...
+[1/319] Building C object third-party/CMakeFiles/gf_complete.dir/gf-complete/src/gf_wgen.c.o
+[2/319] Building C object third-party/CMakeFiles/gf_complete.dir/gf-complete/src/gf.c.o
+[3/319] Building C object third-party/CMakeFiles/gf_complete.dir/gf-complete/src/gf_rand.c.o
+[4/319] Building C object third-party/CMakeFiles/gf_complete.dir/gf-complete/src/gf_w128.c.o
+[5/319] Building C object third-party/CMakeFiles/gf_complete.dir/gf-complete/src/gf_cpu.c.o
+[6/319] Building C object third-party/CMakeFiles/gf_complete.dir/gf-complete/src/gf_general.c.o
+[7/319] Building C object third-party/CMakeFiles/gf_complete.dir/gf-complete/src/gf_w64.c.o
+[8/319] Building C object third-party/CMakeFiles/jerasure.dir/jerasure/src/galois.c.o
+[9/319] Building C object third-party/CMakeFiles/gf_complete.dir/gf-complete/src/gf_w32.c.o
+[10/319] Building C object third-party/CMakeFiles/jerasure.dir/jerasure/src/cauchy.c.o
+[11/319] Building C object third-party/CMakeFiles/jerasure.dir/jerasure/src/liberation.c.o
+[12/319] Building C object third-party/CMakeFiles/jerasure.dir/jerasure/src/reed_sol.c.o
+[13/319] Building C object third-party/CMakeFiles/gf_complete.dir/gf-complete/src/gf_w16.c.o
+[14/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/amigaos.c.o
+[15/319] Building C object third-party/nanopb/CMakeFiles/protobuf-nanopb-static.dir/pb_common.c.o
+[16/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/asyn-ares.c.o
+[17/319] Building C object third-party/CMakeFiles/gf_complete.dir/gf-complete/src/gf_w8.c.o
+[18/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/base64.c.o
+[19/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/asyn-thread.c.o
+[20/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/altsvc.c.o
+[21/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/c-hyper.c.o
+[22/319] Building C object third-party/CMakeFiles/gf_complete.dir/gf-complete/src/gf_w4.c.o
+[23/319] Linking C static library third-party/libgf_complete.a
+[24/319] Building C object third-party/nanopb/CMakeFiles/protobuf-nanopb-static.dir/pb_encode.c.o
+[25/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/bufref.c.o
+[26/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/bufq.c.o
+[27/319] Building C object third-party/nanopb/CMakeFiles/protobuf-nanopb-static.dir/pb_decode.c.o
+[28/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/cf-haproxy.c.o
+[29/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/cf-https-connect.c.o
+[30/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/cf-h1-proxy.c.o
+[31/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/conncache.c.o
+[32/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/content_encoding.c.o
+[33/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/cfilters.c.o
+[34/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/cf-h2-proxy.c.o
+[35/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/cf-socket.c.o
+[36/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_des.c.o
+[37/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_endian.c.o
+[38/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_fnmatch.c.o
+[39/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_addrinfo.c.o
+[40/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_get_line.c.o
+[41/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_gssapi.c.o
+[42/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/connect.c.o
+[43/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_gethostname.c.o
+[44/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_memrchr.c.o
+[45/319] Building C object third-party/CMakeFiles/jerasure.dir/jerasure/src/jerasure.c.o
+[46/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_multibyte.c.o
+[47/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_rtmp.c.o
+[48/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_sasl.c.o
+[49/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_sspi.c.o
+[50/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_range.c.o
+[51/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/dict.c.o
+[52/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_sha512_256.c.o
+[53/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_threads.c.o
+[54/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/cookie.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/cookie.c: In function ‘parse_cookie_header’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/cookie.c:762:20: warning: initialization discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  762 |     char *queryp = strchr(path, '?');
+      |                    ^~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/cookie.c:770:16: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  770 |       endslash = strrchr(path, '/');
+      |                ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/cookie.c: In function ‘parse_netscape’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/cookie.c:829:7: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  829 |   ptr = strchr(lineptr, '\r');
+      |       ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/cookie.c:832:7: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  832 |   ptr = strchr(lineptr, '\n');
+      |       ^
+[55/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/dynbuf.c.o
+[56/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_trc.c.o
+[57/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/curl_ntlm_core.c.o
+[58/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/easygetopt.c.o
+[59/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/cw-out.c.o
+[60/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/easyoptions.c.o
+[61/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/dynhds.c.o
+[62/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/file.c.o
+[63/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/fileinfo.c.o
+[64/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/ftp.c.o
+[65/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/ftplistparser.c.o
+[66/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/escape.c.o
+[67/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/easy.c.o
+[68/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/getenv.c.o
+[69/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/fopen.c.o
+[70/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/gopher.c.o
+[71/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/hostasyn.c.o
+[72/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/hmac.c.o
+[73/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/getinfo.c.o
+[74/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/hostip4.c.o
+[75/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/hash.c.o
+[76/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/hostsyn.c.o
+[77/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/hostip6.c.o
+[78/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/formdata.c.o
+[79/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/doh.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/doh.c: In function ‘doh_req_encode’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/doh.c:145:17: warning: initialization discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  145 |     char *dot = strchr(hostp, '.');
+      |                 ^~~~~~
+[80/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/headers.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/headers.c: In function ‘Curl_headers_push’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/headers.c:291:7: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  291 |   end = strchr(header, '\r');
+      |       ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/headers.c:293:9: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  293 |     end = strchr(header, '\n');
+      |         ^
+[81/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/http_digest.c.o
+[82/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/http1.c.o
+[83/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/http_negotiate.c.o
+[84/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/hostip.c.o
+[85/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/hsts.c.o
+[86/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/http_chunks.c.o
+[87/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/http_ntlm.c.o
+[88/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/imap.c.o
+[89/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/idn.c.o
+[90/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/http_aws_sigv4.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/http_aws_sigv4.c: In function ‘canon_query’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/http_aws_sigv4.c:531:9: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  531 |     amp = strchr(p, '&');
+      |         ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/http_aws_sigv4.c: In function ‘Curl_output_aws_sigv4’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/http_aws_sigv4.c:649:21: warning: initialization discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  649 |     char *hostdot = strchr(hostname, '.');
+      |                     ^~~~~~
+[91/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/inet_ntop.c.o
+[92/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/if2ip.c.o
+[93/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/inet_pton.c.o
+[94/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/krb5.c.o
+[95/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/http_proxy.c.o
+[96/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/ldap.c.o
+[97/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/macos.c.o
+[98/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/memdebug.c.o
+[99/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/md5.c.o
+[100/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/llist.c.o
+[101/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/mqtt.c.o
+[102/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/md4.c.o
+[103/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/nonblock.c.o
+[104/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/openldap.c.o
+[105/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/netrc.c.o
+[106/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/noproxy.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/noproxy.c: In function ‘Curl_check_noproxy’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/noproxy.c:150:14: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  150 |       endptr = strchr(name, ']');
+      |              ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/noproxy.c:231:17: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  231 |           slash = strchr(check, '/');
+      |                 ^
+[107/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/pingpong.c.o
+[108/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/pop3.c.o
+[109/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/psl.c.o
+[110/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/parsedate.c.o
+[111/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/rename.c.o
+[112/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/rand.c.o
+[113/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/progress.c.o
+[114/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/rtsp.c.o
+[115/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/http2.c.o
+[116/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/request.c.o
+[117/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/select.c.o
+[118/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/mime.c.o
+[119/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/sha256.c.o
+[120/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/slist.c.o
+[121/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/smb.c.o
+[122/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/share.c.o
+[123/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/smtp.c.o
+[124/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/http.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/http.c: In function ‘Curl_http_target’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/http.c:1849:22: warning: initialization discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+ 1849 |         char *type = strstr(path, ";type=");
+      |                      ^~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/http.c: In function ‘verify_header’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/http.c:3301:15: warning: initialization discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+ 3301 |   char *ptr = memchr(hd, 0x00, hdlen);
+      |               ^~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/http.c:3314:9: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+ 3314 |     ptr = memchr(hd, ':', hdlen);
+      |         ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/http.c: In function ‘http_parse_headers’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/http.c:3860:13: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+ 3860 |     end_ptr = memchr(buf, '\n', blen);
+      |             ^
+[125/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/socks_gssapi.c.o
+[126/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/socketpair.c.o
+[127/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/socks_sspi.c.o
+[128/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/speedcheck.c.o
+[129/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/splay.c.o
+[130/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/sendf.c.o
+[131/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/strcase.c.o
+[132/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/setopt.c.o
+[133/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/strdup.c.o
+[134/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/strtok.c.o
+[135/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/system_win32.c.o
+[136/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/multi.c.o
+[137/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/mprintf.c.o
+[138/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/telnet.c.o
+[139/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/strerror.c.o
+[140/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/strtoofft.c.o
+[141/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/tftp.c.o
+[142/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/timediff.c.o
+[143/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/timeval.c.o
+[144/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/version_win32.c.o
+[145/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/socks.c.o
+[146/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/cleartext.c.o
+[147/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/warnless.c.o
+[148/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/version.c.o
+[149/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest_sspi.c.o
+[150/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/gsasl.c.o
+[151/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/cram.c.o
+[152/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_gssapi.c.o
+[153/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/krb5_sspi.c.o
+[154/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm_sspi.c.o
+[155/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/oauth2.c.o
+[156/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/transfer.c.o
+[157/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_gssapi.c.o
+[158/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/spnego_sspi.c.o
+[159/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/bearssl.c.o
+[160/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/cipher_suite.c.o
+[161/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/vauth.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/vauth/vauth.c: In function ‘Curl_auth_user_contains_domain’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/vauth/vauth.c:135:15: warning: initialization discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  135 |     char *p = strpbrk(user, "\\/@");
+      |               ^~~~~~~
+[162/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/ntlm.c.o
+[163/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/gtls.c.o
+[164/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vauth/digest.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/vauth/digest.c: In function ‘auth_digest_get_key_value’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/vauth/digest.c:207:12: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  207 |   find_pos = strstr(chlg, key);
+      |            ^
+[165/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/mbedtls.c.o
+[166/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/mbedtls_threadlock.c.o
+[167/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/hostcheck.c.o
+[168/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/keylog.c.o
+[169/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/rustls.c.o
+[170/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/ws.c.o
+[171/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel_verify.c.o
+[172/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/schannel.c.o
+[173/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/sectransp.c.o
+[174/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/wolfssl.c.o
+[175/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/x509asn1.c.o
+[176/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vquic/curl_msh3.c.o
+[177/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vquic/curl_ngtcp2.c.o
+[178/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vquic/curl_osslq.c.o
+[179/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vquic/curl_quiche.c.o
+[180/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/urlapi.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/urlapi.c: In function ‘parse_hostname_login’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/urlapi.c:452:7: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  452 |   ptr = memchr(login, '@', len);
+      |       ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/urlapi.c: In function ‘urldecode_host’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/urlapi.c:766:7: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  766 |   per = strchr(hostname, '%');
+      |       ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/urlapi.c: In function ‘parseurl’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/urlapi.c:1235:12: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+ 1235 |   fragment = strchr(path, '#');
+      |            ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/urlapi.c:1261:9: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+ 1261 |   query = memchr(path, '?', pathlen);
+      |         ^
+[181/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic-tls.c.o
+[182/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vquic/vquic.c.o
+[183/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh.c.o
+[184/319] Linking C static library third-party/libjerasure.a
+[185/319] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vssh/wolfssh.c.o
+[186/319] Automatic MOC and UIC for target cpp-steam-tools
+[187/318] Linking C static library third-party/nanopb/libprotobuf-nanopb.a
+[188/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/common.c.o
+[189/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/sock.c.o
+[190/318] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vssh/curl_path.c.o
+[191/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/base64.c.o
+[192/318] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/url.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/url.c: In function ‘parse_connect_to_string’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/url.c:2954:24: warning: initialization discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+ 2954 |       char *ptr_next = strchr(ptr, ':');
+      |                        ^~~~~~
+[193/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/thread.c.o
+[194/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/http.c.o
+[195/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/log.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/log.c: In function ‘chiaki_log_hexdump’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/log.c:147:46: warning: writing 16 bytes into a region of size 14 [-Wstringop-overflow=]
+  147 |                                 hex_buf[i*3] = ' ';
+      |                                 ~~~~~~~~~~~~~^~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/log.c:123:14: note: at offset [35, 38] into destination object ‘hex_buf’ of size 49
+  123 |         char hex_buf[HEXDUMP_WIDTH * 3 + 1];
+      |              ^~~~~~~
+[196/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/session.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/session.c: In function ‘chiaki_session_fini’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/session.c:288:21: warning: unused variable ‘err’ [-Wunused-variable]
+  288 |     ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
+      |                     ^~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/session.c: In function ‘chiaki_session_stop’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/session.c:316:25: warning: unused variable ‘err’ [-Wunused-variable]
+  316 |         ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
+      |                         ^~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/session.c: In function ‘chiaki_session_set_login_pin’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/session.c:358:25: warning: unused variable ‘err’ [-Wunused-variable]
+  358 |         ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
+      |                         ^~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/session.c: In function ‘chiaki_session_set_stream_connection_switch_received’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/session.c:372:25: warning: unused variable ‘err’ [-Wunused-variable]
+  372 |         ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
+      |                         ^~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/session.c: In function ‘session_thread_request_session’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/session.c:960:33: warning: unused variable ‘mutex_err’ [-Wunused-variable]
+  960 |                 ChiakiErrorCode mutex_err = chiaki_mutex_lock(&session->state_mutex);
+      |                                 ^~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/session.c:987:25: warning: unused variable ‘mutex_err’ [-Wunused-variable]
+  987 |         ChiakiErrorCode mutex_err = chiaki_mutex_lock(&session->state_mutex);
+      |                         ^~~~~~~~~
+[197/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/rpcrypt.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/rpcrypt.c: In function ‘chiaki_rpcrypt_bright_ambassador’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/rpcrypt.c:1553:41: warning: unused variable ‘err’ [-Wunused-variable]
+ 1553 |                         ChiakiErrorCode err = bright_ambassador(target, bright, ambassador, nonce, morning);
+      |                                         ^~~
+[198/318] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/vtls.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/vtls/vtls.c: In function ‘pubkey_pem_to_der’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/vtls/vtls.c:983:13: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  983 |   begin_pos = strstr(pem, "-----BEGIN PUBLIC KEY-----");
+      |             ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/third-party/curl/lib/vtls/vtls.c:996:11: warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  996 |   end_pos = strstr(pem + pem_count, "\n-----END PUBLIC KEY-----");
+      |           ^
+[199/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/ctrl.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c: In function ‘chiaki_ctrl_stop’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c:183:25: warning: unused variable ‘err’ [-Wunused-variable]
+  183 |         ChiakiErrorCode err = chiaki_mutex_lock(&ctrl->notif_mutex);
+      |                         ^~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c: In function ‘chiaki_ctrl_send_message’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c:233:25: warning: unused variable ‘err’ [-Wunused-variable]
+  233 |         ChiakiErrorCode err = chiaki_mutex_lock(&ctrl->notif_mutex);
+      |                         ^~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c: In function ‘chiaki_ctrl_set_login_pin’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c:255:25: warning: unused variable ‘err’ [-Wunused-variable]
+  255 |         ChiakiErrorCode err = chiaki_mutex_lock(&ctrl->notif_mutex);
+      |                         ^~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c: In function ‘ctrl_failed’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c:311:25: warning: unused variable ‘mutex_err’ [-Wunused-variable]
+  311 |         ChiakiErrorCode mutex_err = chiaki_mutex_lock(&ctrl->session->state_mutex);
+      |                         ^~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c: In function ‘ctrl_message_received_login_pin_req’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c:971:25: warning: unused variable ‘err’ [-Wunused-variable]
+  971 |         ChiakiErrorCode err = chiaki_mutex_lock(&ctrl->session->state_mutex);
+      |                         ^~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c: In function ‘ctrl_message_received_login’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ctrl.c:1035:49: warning: unused variable ‘err’ [-Wunused-variable]
+ 1035 |                                 ChiakiErrorCode err = chiaki_mutex_lock(&ctrl->session->state_mutex);
+      |                                                 ^~~
+[200/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/launchspec.c.o
+[201/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/senkusha.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/senkusha.c: In function ‘senkusha_takion_av’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/senkusha.c:725:25: warning: unused variable ‘err’ [-Wunused-variable]
+  725 |         ChiakiErrorCode err = chiaki_mutex_lock(&senkusha->state_mutex);
+      |                         ^~~
+[202/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/ecdh.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c: In function ‘chiaki_ecdh_init’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c:61:9: warning: ‘EC_KEY_new’ is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+   61 |         CHECK(ecdh->key_local = EC_KEY_new());
+      |         ^~~~~
+In file included from /home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c:12:
+/usr/include/openssl/ec.h:979:31: note: declared here
+  979 | OSSL_DEPRECATEDIN_3_0 EC_KEY *EC_KEY_new(void);
+      |                               ^~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c:62:9: warning: ‘EC_KEY_set_group’ is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+   62 |         CHECK(EC_KEY_set_group(ecdh->key_local, ecdh->group));
+      |         ^~~~~
+/usr/include/openssl/ec.h:1053:27: note: declared here
+ 1053 | OSSL_DEPRECATEDIN_3_0 int EC_KEY_set_group(EC_KEY *key, const EC_GROUP *group);
+      |                           ^~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c:63:9: warning: ‘EC_KEY_generate_key’ is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+   63 |         CHECK(EC_KEY_generate_key(ecdh->key_local));
+      |         ^~~~~
+/usr/include/openssl/ec.h:1112:27: note: declared here
+ 1112 | OSSL_DEPRECATEDIN_3_0 int EC_KEY_generate_key(EC_KEY *key);
+      |                           ^~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c: In function ‘chiaki_ecdh_fini’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c:77:9: warning: ‘EC_KEY_free’ is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+   77 |         EC_KEY_free(ecdh->key_local);
+      |         ^~~~~~~~~~~
+/usr/include/openssl/ec.h:1014:28: note: declared here
+ 1014 | OSSL_DEPRECATEDIN_3_0 void EC_KEY_free(EC_KEY *key);
+      |                            ^~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c: In function ‘chiaki_ecdh_set_local_key’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c:126:9: warning: ‘EC_KEY_set_private_key’ is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  126 |         if(!EC_KEY_set_private_key(ecdh->key_local, private_key_bn))
+      |         ^~
+/usr/include/openssl/ec.h:1067:27: note: declared here
+ 1067 | OSSL_DEPRECATEDIN_3_0 int EC_KEY_set_private_key(EC_KEY *key, const BIGNUM *prv);
+      |                           ^~~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c:132:9: warning: ‘EC_KEY_set_public_key’ is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  132 |         if(!EC_KEY_set_public_key(ecdh->key_local, public_key_point))
+      |         ^~
+/usr/include/openssl/ec.h:1081:27: note: declared here
+ 1081 | OSSL_DEPRECATEDIN_3_0 int EC_KEY_set_public_key(EC_KEY *key, const EC_POINT *pub);
+      |                           ^~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c: In function ‘chiaki_ecdh_get_local_pub_key’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c:177:9: warning: ‘EC_KEY_get0_public_key’ is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  177 |         const EC_POINT *point = EC_KEY_get0_public_key(ecdh->key_local);
+      |         ^~~~~
+/usr/include/openssl/ec.h:1073:39: note: declared here
+ 1073 | OSSL_DEPRECATEDIN_3_0 const EC_POINT *EC_KEY_get0_public_key(const EC_KEY *key);
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c: In function ‘chiaki_ecdh_derive_secret’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/ecdh.c:231:9: warning: ‘ECDH_compute_key’ is deprecated: Since OpenSSL 3.0 [-Wdeprecated-declarations]
+  231 |         int r = ECDH_compute_key(secret_out, CHIAKI_ECDH_SECRET_SIZE, remote_public_key, ecdh->key_local, NULL);
+      |         ^~~
+/usr/include/openssl/ec.h:1307:27: note: declared here
+ 1307 | OSSL_DEPRECATEDIN_3_0 int ECDH_compute_key(void *out, size_t outlen,
+      |                           ^~~~~~~~~~~~~~~~
+[203/318] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vssh/libssh2.c.o
+[204/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/random.c.o
+[205/318] Building C object third-party/curl/lib/CMakeFiles/libcurl_static.dir/vtls/openssl.c.o
+[206/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/audio.c.o
+[207/318] Linking C static library third-party/curl/lib/libcurl.a
+[208/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/takion.c.o
+[209/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/audiosender.c.o
+[210/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/streamconnection.c.o
+[211/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/packetstats.c.o
+[212/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/congestioncontrol.c.o
+[213/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/gkcrypt.c.o
+[214/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/videoreceiver.c.o
+[215/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/frameprocessor.c.o
+[216/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/stoppipe.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/stoppipe.c: In function ‘chiaki_stop_pipe_stop’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/stoppipe.c:83:9: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   83 |         write(stop_pipe->fds[1], "\x00", 1);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[217/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/discovery.c.o
+[218/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/controller.c.o
+[219/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/reorderqueue.c.o
+[220/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/feedback.c.o
+[221/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/time.c.o
+[222/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/feedbacksender.c.o
+[223/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/discoveryservice.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/discoveryservice.c: In function ‘discovery_service_host_received’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/discoveryservice.c:309:25: warning: unused variable ‘err’ [-Wunused-variable]
+  309 |         ChiakiErrorCode err = chiaki_mutex_lock(&service->state_mutex);
+      |                         ^~~
+[224/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/opusdecoder.c.o
+[225/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/fec.c.o
+[226/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/takionsendbuffer.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/takionsendbuffer.c: In function ‘chiaki_takion_send_buffer_fini’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/takionsendbuffer.c:72:25: warning: variable ‘err’ set but not used [-Wunused-but-set-variable]
+   72 |         ChiakiErrorCode err = chiaki_cond_signal(&send_buffer->cond);
+      |                         ^~~
+[227/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/opusencoder.c.o
+[228/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/audioreceiver.c.o
+[229/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/orientation.c.o
+[230/318] Building C object lib/CMakeFiles/chiaki-lib.dir/protobuf/takion.pb.c.o
+[231/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/remote/rudpsendbuffer.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/remote/rudpsendbuffer.c: In function ‘chiaki_rudp_send_buffer_fini’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/remote/rudpsendbuffer.c:81:25: warning: variable ‘err’ set but not used [-Wunused-but-set-variable]
+   81 |         ChiakiErrorCode err = chiaki_cond_signal(&send_buffer->cond);
+      |                         ^~~
+[232/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/ffmpegdecoder.c.o
+[233/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/regist.c.o
+[234/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/remote/rudp.c.o
+[235/318] Building C object test/CMakeFiles/munit.dir/munit/munit.c.o
+[236/318] Automatic RCC for ../res/resources.qrc
+[237/318] Building C object gui/CMakeFiles/placebo-libav-impl.dir/src/libav_impl.c.o
+[238/318] Linking CXX static library gui/libplacebo-libav-impl.a
+[239/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/remote/holepunch.c.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/remote/holepunch.c: In function ‘chiaki_holepunch_session_init’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/remote/holepunch.c:775:21: warning: variable ‘err’ set but not used [-Wunused-but-set-variable]
+  775 |     ChiakiErrorCode err;
+      |                     ^~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/remote/holepunch.c: In function ‘websocket_thread_func’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/remote/holepunch.c:2240:29: warning: unused variable ‘mutex_err’ [-Wunused-variable]
+ 2240 |             ChiakiErrorCode mutex_err = chiaki_mutex_lock(&session->notif_mutex);
+      |                             ^~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/remote/holepunch.c: In function ‘session_message_parse’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/remote/holepunch.c:5369:13: warning: ‘__builtin_strncpy’ specified bound 46 equals destination size [-Wstringop-truncation]
+ 5369 |             strncpy(candidate.addr, addr_str, sizeof(candidate.addr));
+      |             ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/remote/holepunch.c:5378:13: warning: ‘__builtin_strncpy’ specified bound 46 equals destination size [-Wstringop-truncation]
+ 5378 |             strncpy(candidate.addr_mapped, mapped_addr_str, sizeof(candidate.addr_mapped));
+      |             ^
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/remote/holepunch.c: In function ‘chiaki_holepunch_list_devices’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/lib/src/remote/holepunch.c:638:9: warning: ‘__builtin_strncpy’ specified bound 32 equals destination size [-Wstringop-truncation]
+  638 |         strncpy(device.device_name, json_object_get_string(device_name), sizeof(device.device_name));
+      |         ^
+[240/318] Building C object lib/CMakeFiles/chiaki-lib.dir/src/bitstream.c.o
+[241/318] Linking C static library lib/libchiaki.a
+[242/318] Building CXX object gui/tests/CMakeFiles/chiaki-stream-input-tests.dir/chiaki-stream-input-tests_autogen/mocs_compilation.cpp.o
+[243/318] Building CXX object gui/tests/CMakeFiles/chiaki-console-screen-tests.dir/chiaki-console-screen-tests_autogen/OFDLDOFOMB/qrc_resources.cpp.o
+[244/318] Linking C static library test/libmunit.a
+[245/318] Building C object test/CMakeFiles/chiaki-unit.dir/main.c.o
+[246/318] Building CXX object gui/tests/CMakeFiles/chiaki-console-screen-tests.dir/chiaki-console-screen-tests_autogen/mocs_compilation.cpp.o
+[247/318] Building C object test/CMakeFiles/chiaki-unit.dir/http.c.o
+[248/318] Building C object test/CMakeFiles/chiaki-unit.dir/rpcrypt.c.o
+[249/318] Building C object test/CMakeFiles/chiaki-unit.dir/gkcrypt.c.o
+[250/318] Building C object test/CMakeFiles/chiaki-unit.dir/seqnum.c.o
+[251/318] Building C object test/CMakeFiles/chiaki-unit.dir/keystate.c.o
+[252/318] Building C object test/CMakeFiles/chiaki-unit.dir/reorderqueue.c.o
+[253/318] Building C object test/CMakeFiles/chiaki-unit.dir/takion.c.o
+[254/318] Building C object test/CMakeFiles/chiaki-unit.dir/test_log.c.o
+[255/318] Building C object test/CMakeFiles/chiaki-unit.dir/fec.c.o
+[256/318] Building C object test/CMakeFiles/chiaki-unit.dir/bitstream.c.o
+[257/318] Building C object test/CMakeFiles/chiaki-unit.dir/regist.c.o
+[258/318] Building C object test/CMakeFiles/chiaki-unit.dir/ffmpegdecoder.c.o
+[259/318] Building CXX object third-party/steam-tools/CMakeFiles/cpp-steam-tools.dir/src/steamtools.cpp.o
+In file included from /home/david/.cache/chiaki-web-ui/build-ticket03/third-party/cpp-steam-tools-patched/src/steamtools.cpp:10:
+/home/david/.cache/chiaki-web-ui/build-ticket03/third-party/cpp-steam-tools-patched/src/../include/vdf_parser.hpp: In function ‘std::string tyti::vdf::detail::string_converter(const std::wstring&)’:
+/home/david/.cache/chiaki-web-ui/build-ticket03/third-party/cpp-steam-tools-patched/src/../include/vdf_parser.hpp:127:10: warning: ‘template<class _Codecvt, class _Elem, class _Wide_alloc, class _Byte_alloc> class std::__cxx11::wstring_convert’ is deprecated [-Wdeprecated-declarations]
+  127 |     std::wstring_convert<
+      |          ^~~~~~~~~~~~~~~
+In file included from /usr/include/c++/15/locale:47,
+                 from /usr/include/c++/15/bits/fs_path.h:36,
+                 from /usr/include/c++/15/filesystem:54,
+                 from /usr/include/x86_64-linux-gnu/qt6/QtCore/qfile.h:14,
+                 from /usr/include/x86_64-linux-gnu/qt6/QtCore/qfileinfo.h:9,
+                 from /home/david/.cache/chiaki-web-ui/build-ticket03/third-party/cpp-steam-tools-patched/src/steamtools.cpp:4:
+/usr/include/c++/15/bits/locale_conv.h:262:33: note: declared here
+  262 |     class _GLIBCXX17_DEPRECATED wstring_convert
+      |                                 ^~~~~~~~~~~~~~~
+[260/318] Linking C executable test/chiaki-unit
+[261/318] Linking CXX shared library third-party/steam-tools/libcpp-steam-tools.so
+[262/318] Building CXX object gui/tests/CMakeFiles/chiaki-console-screen-tests.dir/__/src/qmlsvgprovider.cpp.o
+[263/318] Building CXX object gui/tests/CMakeFiles/chiaki-stream-input-tests.dir/streaminput.cpp.o
+[264/318] Building CXX object gui/tests/CMakeFiles/chiaki-console-screen-tests.dir/main.cpp.o
+[265/318] Building CXX object gui/tests/CMakeFiles/chiaki-stream-input-tests.dir/__/src/streaminputownership.cpp.o
+[266/318] Automatic MOC for target chiaki-gui
+[267/318] Automatic RCC for setup.qrc
+[268/318] Linking CXX executable gui/tests/chiaki-stream-input-tests
+[269/318] Building CXX object gui/tests/CMakeFiles/chiaki-console-screen-tests.dir/__/src/streaminputownership.cpp.o
+[270/318] Automatic RCC for src/qml/qml.qrc
+[271/318] Automatic RCC for res/resources.qrc
+[272/318] Linking CXX executable gui/tests/chiaki-console-screen-tests
+[273/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/keyboardmousebindings.cpp.o
+[274/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/keyboardmousemapper.cpp.o
+[275/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/sessionlog.cpp.o
+[276/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/host.cpp.o
+[277/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/streaminputownership.cpp.o
+[278/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/discoverymanager.cpp.o
+[279/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/psnaccountid.cpp.o
+[280/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/psntoken.cpp.o
+[281/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/controllermanager.cpp.o
+[282/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/jsonrequester.cpp.o
+[283/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/streamsession.cpp.o
+[284/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/chiaki-gui_autogen/mocs_compilation.cpp.o
+[285/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlnativeservices.cpp.o
+[286/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/setupwindow.cpp.o
+[287/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlcontroller.cpp.o
+[288/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/chiaki-gui_autogen/PNK5WDWK6L/qrc_resources.cpp.o
+[289/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/chiaki-gui_autogen/VLDSMZLXNG/qrc_qml.cpp.o
+[290/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/chiaki-gui_autogen/EJRQKI7XPS/qrc_setup.cpp.o
+[291/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlsvgprovider.cpp.o
+[292/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/setupbridge.cpp.o
+[293/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/systemdinhibit.cpp.o
+[294/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlmainwindow.cpp.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp: In member function ‘AVBufferRef* QmlMainWindow::vulkanHwDeviceCtx()’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1472:12: warning: ‘AVVulkanDeviceContext::queue_family_index’ is deprecated [-Wdeprecated-declarations]
+ 1472 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+In file included from /home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/include/qmlmainwindow.h:16,
+                 from /home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1:
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1472:12: warning: ‘AVVulkanDeviceContext::queue_family_index’ is deprecated [-Wdeprecated-declarations]
+ 1472 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1472:12: warning: ‘AVVulkanDeviceContext::queue_family_index’ is deprecated [-Wdeprecated-declarations]
+ 1472 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:124:9: note: declared here
+  124 |     int queue_family_index;
+      |         ^~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1473:12: warning: ‘AVVulkanDeviceContext::nb_graphics_queues’ is deprecated [-Wdeprecated-declarations]
+ 1473 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1473:12: warning: ‘AVVulkanDeviceContext::nb_graphics_queues’ is deprecated [-Wdeprecated-declarations]
+ 1473 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1473:12: warning: ‘AVVulkanDeviceContext::nb_graphics_queues’ is deprecated [-Wdeprecated-declarations]
+ 1473 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:126:9: note: declared here
+  126 |     int nb_graphics_queues;
+      |         ^~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1474:12: warning: ‘AVVulkanDeviceContext::queue_family_tx_index’ is deprecated [-Wdeprecated-declarations]
+ 1474 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1474:12: warning: ‘AVVulkanDeviceContext::queue_family_tx_index’ is deprecated [-Wdeprecated-declarations]
+ 1474 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1474:12: warning: ‘AVVulkanDeviceContext::queue_family_tx_index’ is deprecated [-Wdeprecated-declarations]
+ 1474 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:133:9: note: declared here
+  133 |     int queue_family_tx_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1475:12: warning: ‘AVVulkanDeviceContext::nb_tx_queues’ is deprecated [-Wdeprecated-declarations]
+ 1475 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1475:12: warning: ‘AVVulkanDeviceContext::nb_tx_queues’ is deprecated [-Wdeprecated-declarations]
+ 1475 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1475:12: warning: ‘AVVulkanDeviceContext::nb_tx_queues’ is deprecated [-Wdeprecated-declarations]
+ 1475 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:135:9: note: declared here
+  135 |     int nb_tx_queues;
+      |         ^~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1476:12: warning: ‘AVVulkanDeviceContext::queue_family_comp_index’ is deprecated [-Wdeprecated-declarations]
+ 1476 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1476:12: warning: ‘AVVulkanDeviceContext::queue_family_comp_index’ is deprecated [-Wdeprecated-declarations]
+ 1476 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1476:12: warning: ‘AVVulkanDeviceContext::queue_family_comp_index’ is deprecated [-Wdeprecated-declarations]
+ 1476 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:142:9: note: declared here
+  142 |     int queue_family_comp_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1477:12: warning: ‘AVVulkanDeviceContext::nb_comp_queues’ is deprecated [-Wdeprecated-declarations]
+ 1477 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1477:12: warning: ‘AVVulkanDeviceContext::nb_comp_queues’ is deprecated [-Wdeprecated-declarations]
+ 1477 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1477:12: warning: ‘AVVulkanDeviceContext::nb_comp_queues’ is deprecated [-Wdeprecated-declarations]
+ 1477 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:144:9: note: declared here
+  144 |     int nb_comp_queues;
+      |         ^~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1478:12: warning: ‘AVVulkanDeviceContext::queue_family_decode_index’ is deprecated [-Wdeprecated-declarations]
+ 1478 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1478:12: warning: ‘AVVulkanDeviceContext::queue_family_decode_index’ is deprecated [-Wdeprecated-declarations]
+ 1478 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1478:12: warning: ‘AVVulkanDeviceContext::queue_family_decode_index’ is deprecated [-Wdeprecated-declarations]
+ 1478 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:162:9: note: declared here
+  162 |     int queue_family_decode_index;
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1479:12: warning: ‘AVVulkanDeviceContext::nb_decode_queues’ is deprecated [-Wdeprecated-declarations]
+ 1479 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1479:12: warning: ‘AVVulkanDeviceContext::nb_decode_queues’ is deprecated [-Wdeprecated-declarations]
+ 1479 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/qmlmainwindow.cpp:1479:12: warning: ‘AVVulkanDeviceContext::nb_decode_queues’ is deprecated [-Wdeprecated-declarations]
+ 1479 |     vkctx->nb_decode_queues = 1;
+      |            ^~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/libavutil/hwcontext_vulkan.h:164:9: note: declared here
+  164 |     int nb_decode_queues;
+      |         ^~~~~~~~~~~~~~~~
+[295/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/settings.cpp.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/settings.cpp: In member function ‘void Settings::ExportSettings(QString)’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/settings.cpp:203:18: warning: ignoring return value of ‘virtual bool QFile::open(QIODeviceBase::OpenMode)’, declared with attribute ‘nodiscard’ [-Wunused-result]
+  203 |         file.open(QIODevice::ReadWrite);
+      |         ~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/qt6/QtCore/QFile:1,
+                 from /home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/settings.cpp:5:
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qfile.h:291:32: note: declared here
+  291 |     QFILE_MAYBE_NODISCARD bool open(OpenMode flags) override;
+      |                                ^~~~
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/settings.cpp: In member function ‘void Settings::ExportPlaceboSettings(QString)’:
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/src/settings.cpp:229:18: warning: ignoring return value of ‘virtual bool QFile::open(QIODeviceBase::OpenMode)’, declared with attribute ‘nodiscard’ [-Wunused-result]
+  229 |         file.open(QIODevice::ReadWrite);
+      |         ~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qfile.h:291:32: note: declared here
+  291 |     QFILE_MAYBE_NODISCARD bool open(OpenMode flags) override;
+      |                                ^~~~
+[296/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlsettings.cpp.o
+[297/318] Building CXX object gui/CMakeFiles/chiaki-gui.dir/src/qmlbackend.cpp.o
+[298/318] Automatic MOC for target chiaki
+[299/318] Building CXX object gui/CMakeFiles/chiaki.dir/chiaki_autogen/mocs_compilation.cpp.o
+[300/318] Automatic MOC for target chiaki-mouse-response-tests
+[301/318] Building CXX object gui/tests/CMakeFiles/chiaki-mouse-response-tests.dir/chiaki-mouse-response-tests_autogen/mocs_compilation.cpp.o
+[302/318] Automatic MOC for target chiaki-native-services-tests
+[303/318] Building CXX object gui/tests/CMakeFiles/chiaki-native-services-tests.dir/chiaki-native-services-tests_autogen/mocs_compilation.cpp.o
+[304/318] Automatic MOC for target chiaki-stream-input-native-tests
+[305/318] Building CXX object gui/tests/CMakeFiles/chiaki-stream-input-native-tests.dir/chiaki-stream-input-native-tests_autogen/mocs_compilation.cpp.o
+[306/318] Automatic MOC for target chiaki-embedded-setup-tests
+[307/318] Building CXX object gui/tests/CMakeFiles/chiaki-embedded-setup-tests.dir/chiaki-embedded-setup-tests_autogen/mocs_compilation.cpp.o
+[308/318] Building CXX object gui/tests/CMakeFiles/chiaki-mouse-response-tests.dir/mouseresponse.cpp.o
+[309/318] Building CXX object gui/tests/CMakeFiles/chiaki-native-services-tests.dir/nativeservices.cpp.o
+[310/318] Linking CXX executable gui/tests/chiaki-mouse-response-tests
+[311/318] Building CXX object gui/CMakeFiles/chiaki.dir/src/main.cpp.o
+[312/318] Building CXX object gui/tests/CMakeFiles/chiaki-stream-input-native-tests.dir/streaminputnative.cpp.o
+[313/318] Linking CXX executable gui/tests/chiaki-native-services-tests
+[314/318] Linking CXX executable gui/chiaki
+[315/318] Linking CXX executable gui/tests/chiaki-stream-input-native-tests
+[316/318] Building CXX object gui/tests/CMakeFiles/chiaki-embedded-setup-tests.dir/embeddedsetup.cpp.o
+/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1/gui/tests/embeddedsetup.cpp:71:108: warning: trigraph ‘??'’ ignored, use ‘-trigraphs’ to enable [-Wtrigraphs]
+   71 |             "document.body.innerText + [...document.querySelectorAll('*')].map(e=>e.shadowRoot?.textContent??'').join('\\n')")
+[317/318] Linking CXX executable gui/tests/chiaki-embedded-setup-tests

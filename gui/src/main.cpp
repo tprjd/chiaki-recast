@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) { return real_main(argc, argv); }
 #include <discoverymanager.h>
 #include <qmlmainwindow.h>
 #include <qmlnativeservices.h>
+#include <setupwindow.h>
 #include <QApplication>
 #include <QtTypes>
 
@@ -89,7 +90,6 @@ int real_main(int argc, char *argv[])
 #endif
 		QGuiApplication::setDesktopFileName("chiaki-ng");
 
-	qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-gpu");
 #if defined(Q_OS_WIN)
 	const size_t cSize = strlen(argv[0])+1;
 	wchar_t wc[cSize];
@@ -320,7 +320,7 @@ int real_main(int argc, char *argv[])
 int RunMain(QGuiApplication &app, Settings *settings, bool exit_app_on_stream_exit)
 {
 	QmlNativeServices services(settings);
-	QmlMainWindow main_window(services.backend(), services.engine(), exit_app_on_stream_exit);
+	SetupWindow main_window(services.backend());
 	main_window.show();
 	return app.exec();
 }

@@ -35,6 +35,7 @@ extern "C" {
 #include <QQuickRenderTarget>
 #include <QQuickRenderControl>
 #include <QQuickGraphicsDevice>
+#include <rhi/qrhi_platform.h>
 #include <QTimer>
 #include <QtGlobal>
 #include <cstring>
@@ -428,38 +429,33 @@ QmlMainWindow::~QmlMainWindow()
     disconnect(backend, nullptr, this, nullptr);
     session = nullptr;
     update_timer->stop();
-    if (quick_render->thread() == QThread::currentThread())
+    disconnect(quick_render, nullptr, this, nullptr);
+    const auto invalidateQuick = [this] {
+        Q_ASSERT(QThread::currentThread() == native_rhi->thread());
+        endFrame();
+        if (render_backend == RenderBackend::OpenGL && !makeOpenGLContextCurrent())
+            qCWarning(chiakiGui) << "Failed to make OpenGL context current while invalidating Qt Quick";
+        if (quick_tex) {
+            // Resolve the empty target on the render thread to release its QRhi resources.
+            quick_window->setRenderTarget(QQuickRenderTarget());
+            quick_render->beginFrame();
+            quick_render->sync();
+            quick_render->endFrame();
+        }
+        quick_render->invalidate();
+        native_rhi->finish();
         destroySwapchain();
+    };
+    if (owns_render_thread)
+        QMetaObject::invokeMethod(quick_render, invalidateQuick, Qt::BlockingQueuedConnection);
     else
-        QMetaObject::invokeMethod(quick_render, std::bind(&QmlMainWindow::destroySwapchain, this), Qt::BlockingQueuedConnection);
+        invalidateQuick();
 
     if (render_backend == RenderBackend::Vulkan)
         av_buffer_unref(&vulkan_hw_dev_ctx);
 
     const bool isOpenGlBackend = render_backend == RenderBackend::OpenGL;
     bool hasOpenGlContextCurrent = isOpenGlBackend && makeOpenGLContextCurrent();
-
-    if (isOpenGlBackend && quick_window)
-        quick_window->setRenderTarget(QQuickRenderTarget());
-
-#ifndef Q_OS_MACOS
-    if (owns_render_thread) {
-        QMetaObject::invokeMethod(quick_render, &QQuickRenderControl::invalidate, Qt::BlockingQueuedConnection);
-        render_thread->quit();
-        render_thread->wait();
-    } else {
-        quick_render->invalidate();
-    }
-#else
-    // On macOS, we still need to invalidate to prevent leaks
-    if (owns_render_thread) {
-        QMetaObject::invokeMethod(quick_render, &QQuickRenderControl::invalidate, Qt::BlockingQueuedConnection);
-        render_thread->quit();
-        render_thread->wait();
-    } else {
-        quick_render->invalidate();
-    }
-#endif
 
     delete quick_item;
     backend->detachWindow(this);
@@ -505,12 +501,25 @@ QmlMainWindow::~QmlMainWindow()
     }
     quick_fbo = nullptr;
 
+    delete quick_window;
+    quick_window = nullptr;
+    if (owns_render_thread) {
+        // The render control must release its QRhi pointer before the QRhi is deleted.
+        connect(quick_render, &QObject::destroyed, [rhi = native_rhi] {
+            Q_ASSERT(QThread::currentThread() == rhi->thread());
+            delete rhi;
+        });
+        connect(render_thread, &QThread::finished, quick_render, &QObject::deleteLater);
+        render_thread->quit();
+        render_thread->wait();
+    } else {
+        delete quick_render;
+        delete native_rhi;
+    }
+    quick_render = nullptr;
+    native_rhi = nullptr;
     if (hasOpenGlContextCurrent)
         doneOpenGLContextCurrent();
-
-    delete quick_window;
-    // calls invalidate here if not already called
-    delete quick_render;
     if (owns_render_thread)
         delete render_thread;
 
@@ -1511,6 +1520,24 @@ bool QmlMainWindow::makeOpenGLContextCurrent()
     return ok;
 }
 
+QSGRendererInterface::GraphicsApi QmlMainWindow::nativeGraphicsApi() const
+{
+    QSGRendererInterface::GraphicsApi api = QSGRendererInterface::Unknown;
+    const auto readApi = [this, &api] {
+        if (QRhi *rhi = quick_render->rhi()) {
+            if (rhi->backend() == QRhi::Vulkan)
+                api = QSGRendererInterface::Vulkan;
+            else if (rhi->backend() == QRhi::OpenGLES2)
+                api = QSGRendererInterface::OpenGL;
+        }
+    };
+    if (QThread::currentThread() == render_thread)
+        readApi();
+    else
+        QMetaObject::invokeMethod(quick_render, readApi, Qt::BlockingQueuedConnection);
+    return api;
+}
+
 void QmlMainWindow::doneOpenGLContextCurrent()
 {
     if (!qt_gl_context)
@@ -1796,14 +1823,9 @@ renderer_backend_ready:
     quick_render = new RenderControl(this);
 
     QQuickWindow::setDefaultAlphaBuffer(true);
-    QQuickWindow::setGraphicsApi(render_backend == RenderBackend::Vulkan ? QSGRendererInterface::Vulkan : QSGRendererInterface::OpenGL);
     quick_window = new QQuickWindow(quick_render);
-    if (render_backend == RenderBackend::Vulkan) {
+    if (render_backend == RenderBackend::Vulkan)
         quick_window->setVulkanInstance(qt_vk_inst);
-        quick_window->setGraphicsDevice(QQuickGraphicsDevice::fromDeviceObjects(placebo_vulkan->phys_device, placebo_vulkan->device, placebo_vulkan->queue_graphics.index));
-    } else {
-        quick_window->setGraphicsDevice(QQuickGraphicsDevice::fromOpenGLContext(qt_gl_context));
-    }
     quick_window->setColor(QColor(0, 0, 0, 0));
     connect(quick_window, &QQuickWindow::focusObjectChanged, this, &QmlMainWindow::focusObjectChanged);
 
@@ -1920,13 +1942,52 @@ renderer_backend_ready:
     update_timer->setSingleShot(true);
     connect(update_timer, &QTimer::timeout, this, &QmlMainWindow::update);
 
+    const auto initializeQuick = [this] {
+        if (render_backend == RenderBackend::Vulkan) {
+            QRhiVulkanInitParams params;
+            params.inst = qt_vk_inst;
+            QRhiVulkanNativeHandles handles;
+            handles.physDev = placebo_vulkan->phys_device;
+            handles.dev = placebo_vulkan->device;
+            handles.gfxQueueFamilyIdx = placebo_vulkan->queue_graphics.index;
+            handles.gfxQueueIdx = 0;
+            native_rhi = QRhi::create(QRhi::Vulkan, &params, {}, &handles);
+            if (native_rhi) {
+                const auto *imported = static_cast<const QRhiVulkanNativeHandles *>(native_rhi->nativeHandles());
+                if (imported->dev != handles.dev || imported->physDev != handles.physDev
+                    || imported->gfxQueueFamilyIdx != handles.gfxQueueFamilyIdx || imported->gfxQueueIdx != handles.gfxQueueIdx)
+                    qFatal("Qt Quick did not import the libplacebo Vulkan device");
+            }
+        } else {
+            QRhiGles2InitParams params;
+            params.format = qt_gl_context->format();
+            params.fallbackSurface = qt_gl_offscreen_surface;
+            QRhiGles2NativeHandles handles;
+            handles.context = qt_gl_context;
+            native_rhi = QRhi::create(QRhi::OpenGLES2, &params, {}, &handles);
+            if (native_rhi) {
+                const auto *imported = static_cast<const QRhiGles2NativeHandles *>(native_rhi->nativeHandles());
+                if (imported->context != qt_gl_context)
+                    qFatal("Qt Quick did not import the libplacebo OpenGL context");
+            }
+        }
+        if (!native_rhi)
+            qFatal("Failed to import the libplacebo graphics device into Qt Quick");
+        Q_ASSERT(QThread::currentThread() == native_rhi->thread());
+        quick_window->setGraphicsDevice(QQuickGraphicsDevice::fromRhi(native_rhi));
+        if (!quick_render->initialize())
+            qFatal("Failed to initialize native Qt Quick render control");
+        qCInfo(chiakiGui) << "Native Qt Quick QRhi:" << native_rhi->backendName()
+                         << "device:" << native_rhi->driverInfo().deviceName
+                         << "imported libplacebo device matches";
+    };
     if (render_backend == RenderBackend::OpenGL) {
         if (!makeOpenGLContextCurrent())
             qFatal("Failed to make QOpenGLContext current for render control initialization");
-        quick_render->initialize();
+        initializeQuick();
         doneOpenGLContextCurrent();
     } else {
-        QMetaObject::invokeMethod(quick_render, &QQuickRenderControl::initialize);
+        QMetaObject::invokeMethod(quick_render, initializeQuick, Qt::BlockingQueuedConnection);
     }
 
     QTimer *dropped_frames_timer = new QTimer(this);

@@ -1,0 +1,373 @@
+
+
+
+
+
+
+
+
+
+
+  :host {
+    --green: #080;
+    --yellow: #880;
+    --red: #f00;
+    --gray: #888;
+    --bg-yellow: #ff0;
+
+    display: block;
+    flex: 1;
+    overflow: auto;
+    padding: 10px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :host {
+      --green: #0F0;
+      --yellow: #FF0;
+      --red: #f00;
+      --gray: #888;
+      --bg-yellow: #880;
+    }
+  }
+
+  :host * {
+    user-select: text;
+  }
+
+  :host([selected]) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  h3,
+  ul {
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+
+  #content > div,
+  #download-to-file {
+    margin-bottom: 1em;
+  }
+
+  .feature-green {
+    color: var(--green);
+  }
+
+  .feature-yellow {
+    color: var(--yellow);
+  }
+
+  .feature-red {
+    color: var(--red);
+  }
+
+  .feature-gray {
+    color: var(--gray);
+  }
+
+  .bg-yellow {
+    background-color: var(--bg-yellow);
+  }
+
+  #vulkan-info-value {
+    white-space: pre;
+  }
+
+  #download-to-file {
+    font: inherit;
+    min-height: 2em;
+    user-select: none;
+  }
+
+  h4.dawn-info-header {
+    color: var(--yellow);
+    margin-bottom: 2px;
+    margin-top: 10px;
+  }
+  
+  table.info-table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+  }
+  .info-table td {
+    border: 1px solid #777;
+    vertical-align: top;
+    overflow-x: auto;
+  }
+  .info-table td:nth-child(1) {
+    font-weight: bold;
+    width: 25%;
+  }
+  .info-table td:nth-child(2) {
+    font-weight: bold;
+    width: 75%;
+  }
+
+  /*
+  This class is used to show text that is only available
+  when the user copies text or downloads the report to a file.
+  We insert extra but hidden text to make plain text formatting
+  look better, at copy/download time we make the text visible
+  */
+  .copy {
+    display: none;
+  }
+
+
+
+  Download Report to File
+
+
+  GPU Info
+
+
+Graphics Feature Status
+=======================*   Canvas: Hardware accelerated*   Canvas out-of-process rasterization: Enabled*   Direct Rendering Display Compositor: Disabled*   Compositing: Hardware accelerated*   Multiple Raster Threads: Enabled*   OpenGL: Enabled*   Rasterization: Hardware accelerated*   Raw Draw: Disabled*   Skia Graphite: Disabled*   Video Decode: Hardware accelerated*   Video Encode: Hardware accelerated*   Vulkan: Disabled*   WebGL: Hardware accelerated*   WebGL2: Hardware accelerated*   WebGPU: Hardware accelerated*   WebNN: Disabled
+
+Version Information
+===================Data exported              :2026-10-22T12:49:56.493ZChrome version             :Chiaki embedded setup tests/Operating system           :Windows NT 6.2.9200Software rendering list URL:https://chromium.googlesource.com/chromium/src/+/888dc4b15753efa1218bde8b900f3571b888e441/gpu/config/software_rendering_list.jsonDriver bug list URL        :https://chromium.googlesource.com/chromium/src/+/888dc4b15753efa1218bde8b900f3571b888e441/gpu/config/gpu_driver_bug_list.jsonANGLE commit id            :unknown hash2D graphics backend        :Skia/130 349c1179c43ef46f2804404952b9460dc007d76aCommand Line               :chiaki-embedded-setup-tests.exe --browser-subprocess-path="C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\ticket03-package\QtWebEngineProcess.exe" --application-name=Chiaki%20embedded%20setup%20tests --disable-speech-api --touch-events=auto --disable-blink-features=EyeDropperAPI --disable-blink-features=WebOTP --use-adapter-luid=0,70416 --enable-features=NetworkServiceInProcess2,TracingServiceInProcess --disable-features=EyeDropper,BackgroundFetch,InstalledApp,WebOTP,WebPayments,WebUSB,StandardCompliantNonSpecialSchemeURLParsing --use-gl=angle --in-process-gpu --gpu-preferences=UAAAAAAAAADoAQAEAAAAAAAAAAAAAAAAAABgAAEAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAA
+
+Driver Information
+==================Initialization time             :63In-process GPU                  :truePassthrough Command Decoder     :trueSandboxed                       :falseGPU0                            :VENDOR= 0x10de, DEVICE=0x2b85, SUBSYS=0x53021462, REV=161, LUID={0,70416}, DRIVER_VENDOR=NVIDIA, DRIVER_VERSION=32.0.16.1742 *ACTIVE*GPU1                            :VENDOR= 0x1414, DEVICE=0x008c, LUID={0,83281}, DRIVER_VERSION=10.0.26100.5074Optimus                         :falseAMD switchable                  :falseDesktop compositing             :Aero GlassDirect composition              :trueSupports overlays               :falseYUY2 overlay support            :NONENV12 overlay support            :NONEBGRA8 overlay support           :NONERGB10A2 overlay support         :NONEP010 overlay support            :NONEDirectML feature level          :Not supportedDriver D3D12 feature level      :Not supportedDriver Vulkan API version       :Not supportedPixel shader version            :5.0Vertex shader version           :5.0Max. MSAA samples               :8Machine model name              :Machine model version           :GL implementation parts         :(gl=egl-angle,angle=d3d11)Display type                    :ANGLE_D3D11GL_VENDOR                       :Google Inc. (NVIDIA)GL_RENDERER                     :ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 (0x00002B85) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.16.1742)GL_VERSION                      :OpenGL ES 2.0.0 (ANGLE 2.1 git hash: unknown hash)GL_EXTENSIONS                   :GL_AMD_performance_monitor GL_ANGLE_base_vertex_base_instance_shader_builtin GL_ANGLE_client_arrays GL_ANGLE_depth_texture GL_ANGLE_framebuffer_blit GL_ANGLE_framebuffer_multisample GL_ANGLE_get_serialized_context_string GL_ANGLE_get_tex_level_parameter GL_ANGLE_instanced_arrays GL_ANGLE_lossy_etc_decode GL_ANGLE_memory_size GL_ANGLE_pack_reverse_row_order GL_ANGLE_polygon_mode GL_ANGLE_program_binary_readiness_query GL_ANGLE_program_cache_control GL_ANGLE_provoking_vertex GL_ANGLE_request_extension GL_ANGLE_robust_client_memory GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ANGLE_texture_usage GL_ANGLE_translated_shader_source GL_APPLE_clip_distance GL_CHROMIUM_bind_generates_resource GL_CHROMIUM_bind_uniform_location GL_CHROMIUM_color_buffer_float_rgb GL_CHROMIUM_color_buffer_float_rgba GL_CHROMIUM_copy_compressed_texture GL_CHROMIUM_copy_texture GL_CHROMIUM_lose_context GL_CHROMIUM_sync_query GL_EXT_EGL_image_external_wrap_modes GL_EXT_blend_func_extended GL_EXT_blend_minmax GL_EXT_clip_control GL_EXT_color_buffer_half_float GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_clamp GL_EXT_discard_framebuffer GL_EXT_disjoint_timer_query GL_EXT_draw_buffers GL_EXT_draw_elements_base_vertex GL_EXT_float_blend GL_EXT_frag_depth GL_EXT_instanced_arrays GL_EXT_map_buffer_range GL_EXT_multisampled_render_to_texture GL_EXT_occlusion_query_boolean GL_EXT_polygon_offset_clamp GL_EXT_read_format_bgra GL_EXT_robustness GL_EXT_sRGB GL_EXT_shader_texture_lod GL_EXT_texture_border_clamp GL_EXT_texture_compression_bptc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc_srgb GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_norm16 GL_EXT_texture_rg GL_EXT_texture_storage GL_EXT_texture_type_2_10_10_10_REV GL_EXT_unpack_subimage GL_KHR_debug GL_KHR_parallel_shader_compile GL_KHR_robustness GL_NV_EGL_stream_consumer_external GL_NV_fence GL_NV_framebuffer_blit GL_NV_pack_subimage GL_NV_pixel_buffer_object GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_compressed_EAC_R11_signed_texture GL_OES_compressed_EAC_R11_unsigned_texture GL_OES_compressed_EAC_RG11_signed_texture GL_OES_compressed_EAC_RG11_unsigned_texture GL_OES_compressed_ETC2_RGB8_texture GL_OES_compressed_ETC2_RGBA8_texture GL_OES_compressed_ETC2_punchthroughA_RGBA8_texture GL_OES_compressed_ETC2_punchthroughA_sRGB8_alpha_texture GL_OES_compressed_ETC2_sRGB8_alpha8_texture GL_OES_compressed_ETC2_sRGB8_texture GL_OES_depth24 GL_OES_depth32 GL_OES_draw_elements_base_vertex GL_OES_element_index_uint GL_OES_fbo_render_mipmap GL_OES_get_program_binary GL_OES_mapbuffer GL_OES_packed_depth_stencil GL_OES_rgb8_rgba8 GL_OES_standard_derivatives GL_OES_surfaceless_context GL_OES_texture_border_clamp GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_texture_npot GL_OES_vertex_array_object GL_WEBGL_video_textureDisabled Extensions             :GL_KHR_blend_equation_advanced GL_KHR_blend_equation_advanced_coherent GL_MESA_framebuffer_flip_yDisabled WebGL Extensions       :Window system binding vendor    :Google Inc. (NVIDIA)Window system binding version   :1.5 (ANGLE 2.1 git hash: unknown hash)Window system binding extensions:EGL_EXT_create_context_robustness EGL_ANGLE_d3d_share_handle_client_buffer EGL_ANGLE_d3d_texture_client_buffer EGL_ANGLE_surface_d3d_texture_2d_share_handle EGL_ANGLE_query_surface_pointer EGL_ANGLE_window_fixed_size EGL_ANGLE_keyed_mutex EGL_ANGLE_surface_orientation EGL_ANGLE_direct_composition EGL_NV_post_sub_buffer EGL_KHR_create_context EGL_KHR_image EGL_KHR_image_base EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_gl_renderbuffer_image EGL_KHR_get_all_proc_addresses EGL_KHR_stream EGL_KHR_stream_consumer_gltexture EGL_NV_stream_consumer_gltexture_yuv EGL_ANGLE_stream_producer_d3d_texture EGL_ANGLE_create_context_webgl_compatibility EGL_CHROMIUM_create_context_bind_generates_resource EGL_CHROMIUM_sync_control EGL_EXT_pixel_format_float EGL_KHR_surfaceless_context EGL_ANGLE_display_texture_share_group EGL_ANGLE_display_semaphore_share_group EGL_ANGLE_create_context_client_arrays EGL_ANGLE_program_cache_control EGL_ANGLE_robust_resource_initialization EGL_ANGLE_create_context_extensions_enabled EGL_ANDROID_blob_cache EGL_ANDROID_recordable EGL_ANGLE_image_d3d11_texture EGL_ANGLE_create_context_backwards_compatible EGL_KHR_no_config_context EGL_KHR_create_context_no_error EGL_KHR_reusable_syncDirect rendering version        :unknownReset notification strategy     :0x8252GPU process crash count         :0gfx::BufferFormats supported for allocation and texturing:R_8: not supported,  R_16: not supported,  RG_88: not supported,  RG_1616: not supported,  BGR_565: not supported,  RGBA_4444: not supported,  RGBX_8888: not supported,  RGBA_8888: not supported,  BGRX_8888: not supported,  BGRA_1010102: not supported,  RGBA_1010102: not supported,  BGRA_8888: not supported,  RGBA_F16: not supported,  YVU_420: not supported,  YUV_420_BIPLANAR: not supported,  YUVA_420_TRIPLANAR: not supported,  P010: not supported
+
+Driver Bug Workarounds
+======================*   disable_accelerated_vp8_decode*   disable_accelerated_vp9_decode*   disable_d3d11_vp9_ksvc_decoding*   disable_video_overlay_if_moving*   disable_webnn_for_npu*   enable_webgl_timer_query_extensions*   exit_on_context_lost*   unpack_overlapping_rows_separately_unpack_buffer*   disabled_extension_GL_KHR_blend_equation_advanced*   disabled_extension_GL_KHR_blend_equation_advanced_coherent*   disabled_extension_GL_MESA_framebuffer_flip_y
+
+Problems Detected
+=================*   Some drivers are unable to reset the D3D device in the GPU process sandbox    Applied Workarounds: exit_on_context_lost
+
+*   Unpacking overlapping rows from unpack buffers is unstable on NVIDIA GL driver:
+    596774(http://crbug.com/596774)    Applied Workarounds: unpack_overlapping_rows_separately_unpack_buffer
+
+*   Disable KHR_blend_equation_advanced until cc shaders are updated:
+    661715(http://crbug.com/661715)    Applied Workarounds: disable(GL_KHR_blend_equation_advanced),
+        disable(GL_KHR_blend_equation_advanced_coherent)
+
+*   VPx decoding isn't supported well before Windows 10 creators update.:
+    616318(http://crbug.com/616318), 667532(http://crbug.com/667532)    Applied Workarounds: disable_accelerated_vp8_decode,
+        disable_accelerated_vp9_decode
+
+*   Expose WebGL's disjoint_timer_query extensions on platforms with site isolation:
+    808744(http://crbug.com/808744), 870491(http://crbug.com/870491)    Applied Workarounds: enable_webgl_timer_query_extensions
+
+*   Disable GL_MESA_framebuffer_flip_y for desktop GL:
+    964010(http://crbug.com/964010)    Applied Workarounds: disable(GL_MESA_framebuffer_flip_y)
+
+*   VP8 decoding crashes before Windows 10 Fall Creators Update.:
+    1094840(http://crbug.com/1094840)    Applied Workarounds: disable_accelerated_vp8_decode
+
+*   Disable VP9 k-SVC video decoding on non-Intel GPUs:
+    1508379(http://crbug.com/1508379)    Applied Workarounds: disable_d3d11_vp9_ksvc_decoding
+
+*   Block all NPU drivers until newer versions work with WebNN:
+    341327464(http://crbug.com/341327464)    Applied Workarounds: disable_webnn_for_npu
+
+*   Disable overlay promotion for clear video quads when their MPO quads would move:
+    40677119(http://crbug.com/40677119)    Applied Workarounds: disable_video_overlay_if_moving
+
+
+
+ANGLE Features
+==============*   allowCompressedFormats (Frontend workarounds): Enabled
+    condition: true    Allow compressed formats
+
+*   alwaysEnableEmulatedMultidrawExtensions (Frontend workarounds) anglebug:355645824(http://anglebug.com/355645824): Disabled    Enable multi-draw and base vertex base instance extensions for non-WebGL
+    contexts if they are emulated.
+
+*   alwaysRunLinkSubJobsThreaded (Frontend features) anglebug:42266842(http://anglebug.com/42266842): Disabled    If true, sub tasks of the link job are always threaded, regardless of
+    GL_KHR_parallel_shader_compile
+
+*   cacheCompiledShader (Frontend features) anglebug:42265509(http://anglebug.com/42265509): Disabled    Enable to cache compiled shaders
+
+*   compileJobIsThreadSafe (Frontend features) anglebug:41488637(http://anglebug.com/41488637): Enabled
+    condition: true    If false, parts of the compile job cannot be parallelized
+
+*   disableAnisotropicFiltering (Frontend workarounds): Disabled    Disable support for anisotropic filtering
+
+*   disableDrawBuffersIndexed (Frontend features) anglebug:42266194(http://anglebug.com/42266194): Disabled    Disable support for OES_draw_buffers_indexed and EXT_draw_buffers_indexed
+
+*   disableProgramBinary (Frontend features) anglebug:42263580(http://anglebug.com/42263580): Disabled    Disable support for GL_OES_get_program_binary
+
+*   disableProgramCaching (Frontend features) anglebug:1423136(http://anglebug.com/1423136): Disabled    Disables saving programs to the cache
+
+*   disableProgramCachingForTransformFeedback (Frontend workarounds): Disabled    On some GPUs, program binaries don't contain transform feedback varyings
+
+*   dumpShaderSource (Frontend features) anglebug:42266231(http://anglebug.com/42266231): Disabled    Write shader source to temp directory
+
+*   dumpTranslatedShaders (Frontend features) anglebug:40644912(http://anglebug.com/40644912): Disabled    Write translated shaders to temp directory
+
+*   emulatePixelLocalStorage (Frontend features) anglebug:40096838(http://anglebug.com/40096838): Enabled
+    condition: true    Emulate ANGLE_shader_pixel_local_storage using shader images
+
+*   enableCaptureLimits (Frontend features) anglebug:42264287(http://anglebug.com/42264287): Disabled    Set the context limits like frame capturing was enabled
+
+*   enableProgramBinaryForCapture (Frontend features) anglebug:42264193(http://anglebug.com/42264193): Disabled    Even if FrameCapture is enabled, enable GL_OES_get_program_binary
+
+*   enableShaderSubstitution (Frontend workarounds) anglebug:42266232(http://anglebug.com/42266232): Disabled    Check the filesystem for shaders to use instead of those provided through
+    glShaderSource
+
+*   enableTranslatedShaderSubstitution (Frontend workarounds) anglebug:40644912(http://anglebug.com/40644912): Disabled    Check the filesystem for translated shaders to use instead of the shader
+    translator's
+
+*   forceDepthAttachmentInitOnClear (Frontend workarounds) anglebug:42265720(https://anglebug.com/42265720): Disabled
+    condition: isAMD    Force depth attachment initialization on clear ops
+
+*   forceFlushAfterDrawcallUsingShadowmap (Frontend workarounds) https://issuetracker.google.com/349489248(https://issuetracker.google.com/349489248): Disabled    Force flush after drawcall use shadow map for intel device.
+
+*   forceGlErrorChecking (Frontend features) https://issuetracker.google.com/220069903(https://issuetracker.google.com/220069903): Disabled    Force GL error checking (i.e. prevent applications from disabling error
+    checking
+
+*   forceInitShaderVariables (Frontend features): Disabled    Force-enable shader variable initialization
+
+*   forceMinimumMaxVertexAttributes (Frontend features): Disabled
+    condition: false    Force the minimum GL_MAX_VERTEX_ATTRIBS that the context's client version
+    allows.
+
+*   forceRobustResourceInit (Frontend features) anglebug:42264571(http://anglebug.com/42264571): Disabled    Force-enable robust resource init
+
+*   linkJobIsThreadSafe (Frontend features) anglebug:41488637(http://anglebug.com/41488637): Enabled
+    condition: true    If false, parts of the link job cannot be parallelized
+
+*   loseContextOnOutOfMemory (Frontend workarounds): Enabled
+    condition: true    Some users rely on a lost context notification if a GL_OUT_OF_MEMORY error
+    occurs
+
+*   rejectWebglShadersWithUndefinedBehavior (Frontend workarounds) 350528343(http://crbug.com/350528343): Enabled
+    condition: true    Attempts to detect undefined behavior when in WebGL mode and reject
+    shaders if any detected.
+
+*   singleThreadedTextureDecompression (Frontend workarounds): Disabled    Disables multi-threaded decompression of compressed texture formats
+
+*   uncurrentEglSurfaceUponSurfaceDestroy (Frontend workarounds) https://issuetracker.google.com/292285899(https://issuetracker.google.com/292285899): Disabled    Make egl surface uncurrent when calling eglDestroySurface(), if the
+    surface is still bound by the context of current render thread
+
+*   addMockTextureNoRenderTarget (D3D workarounds) anglebug:40644627(http://anglebug.com/40644627): Disabled
+    condition: isIntel && capsVersion >= IntelDriverVersion(160000) && capsVersion < IntelDriverVersion(164815)    On some drivers when rendering with no render target, two bugs lead to
+    incorrect behavior
+
+*   allowClearForRobustResourceInit (D3D workarounds) 941620(http://crbug.com/941620): Enabled
+    condition: true    Some drivers corrupt texture data when clearing for robust resource
+    initialization.
+
+*   allowES3OnFL100 (D3D workarounds): Disabled
+    condition: false    Allow ES3 on 10.0 devices
+
+*   allowTranslateUniformBlockToStructuredBuffer (D3D workarounds) anglebug:40096608(http://anglebug.com/40096608): Disabled
+    condition: IsWindows10OrLater()    There is a slow fxc compile performance issue with dynamic uniform
+    indexing if translating a uniform block with a large array member to
+    cbuffer.
+
+*   borderColorSrgb (D3D workarounds): Disabled    Some drivers expect sRGB border color for sRGB texture formats
+
+*   callClearTwice (D3D workarounds) 655534(https://crbug.com/655534): Disabled
+    condition: isIntel && isSkylake && capsVersion >= IntelDriverVersion(160000) && capsVersion < IntelDriverVersion(164771)    Using clear() may not take effect
+
+*   depthStencilBlitExtraCopy (D3D workarounds) anglebug:40096371(http://anglebug.com/40096371): Disabled
+    condition: (part1 <= 13u && part2 < 6881) && isNvidia && driverVersionValid    Bug in some drivers triggers a TDR when using CopySubresourceRegion from a
+    staging texture to a depth/stencil
+
+*   disableB5G6R5Support (D3D workarounds): Disabled
+    condition: (isIntel && capsVersion >= IntelDriverVersion(150000) && capsVersion < IntelDriverVersion(154539)) || isAMD    Textures with the format DXGI_FORMAT_B5G6R5_UNORM have incorrect data
+
+*   disableRasterizerOrderViews (D3D workarounds) anglebug:40096838(http://anglebug.com/40096838): Disabled    Disable ROVs for testing
+
+*   emulateIsnanFloat (D3D workarounds) 650547(https://crbug.com/650547): Disabled
+    condition: isIntel && isSkylake && capsVersion >= IntelDriverVersion(160000) && capsVersion < IntelDriverVersion(164542)    Using isnan() on highp float will get wrong answer
+
+*   emulateTinyStencilTextures (D3D workarounds): Disabled
+    condition: isAMD && !(deviceCaps.featureLevel < D3D_FEATURE_LEVEL_10_1)    1x1 and 2x2 mips of depth/stencil textures aren't sampled correctly
+
+*   enableTimestampQueries (D3D workarounds): Disabled    Enable timestamp on GL_EXT_disjoint_timer_query extension
+
+*   expandIntegerPowExpressions (D3D workarounds): Enabled
+    condition: true    The HLSL optimizer has a bug with optimizing 'pow' in certain
+    integer-valued expressions
+
+*   flushAfterEndingTransformFeedback (D3D workarounds): Enabled
+    condition: isNvidia    Some drivers sometimes write out-of-order results to StreamOut buffers
+    when transform feedback is used to repeatedly write to the same buffer
+    positions
+
+*   forceAtomicValueResolution (D3D workarounds) anglebug:42261924(http://anglebug.com/42261924): Enabled
+    condition: isNvidia    On some drivers the return value from RWByteAddressBuffer.InterlockedAdd
+    does not resolve when used in the .yzw components of a
+    RWByteAddressBuffer.Store operation
+
+*   getDimensionsIgnoresBaseLevel (D3D workarounds): Enabled
+    condition: isNvidia    Some drivers do not take into account the base level of the texture in the
+    results of the HLSL GetDimensions builtin
+
+*   mrtPerfWorkaround (D3D workarounds): Enabled
+    condition: true    Some drivers have a bug where they ignore null render targets
+
+*   preAddTexelFetchOffsets (D3D workarounds): Disabled
+    condition: isIntel    HLSL's function texture.Load returns 0 when the parameter Location is
+    negative, even if the sum of Offset and Location is in range
+
+*   rewriteUnaryMinusOperator (D3D workarounds): Disabled
+    condition: isIntel && (isBroadwell || isHaswell) && capsVersion >= IntelDriverVersion(150000) && capsVersion < IntelDriverVersion(154624)    Evaluating unary minus operator on integer may get wrong answer in vertex
+    shaders
+
+*   selectViewInGeometryShader (D3D workarounds): Disabled
+    condition: !deviceCaps.supportsVpRtIndexWriteFromVertexShader    The viewport or render target slice will be selected in the geometry
+    shader stage for the ANGLE_multiview extension
+
+*   setDataFasterThanImageUpload (D3D workarounds): Enabled
+    condition: !(isIvyBridge || isBroadwell || isHaswell)    Set data faster than image upload
+
+*   skipVSConstantRegisterZero (D3D workarounds): Enabled
+    condition: isNvidia    In specific cases the driver doesn't handle constant register zero
+    correctly
+
+*   supportsNonConstantLoopIndexing (D3D workarounds): Enabled
+    condition: !isFeatureLevel9_3    Whether the API supports non-constant loop indexing
+
+*   useSystemMemoryForConstantBuffers (D3D workarounds) 593024(https://crbug.com/593024): Disabled
+    condition: isIntel    Copying from staging storage to constant buffer storage does not work
+
+*   zeroMaxLodWorkaround (D3D workarounds): Disabled
+    condition: isFeatureLevel9_3    Missing an option to disable mipmaps on a mipmapped texture
+
+
+
+Dawn Info
+=========
+
+Compositor Information
+======================Tile Update Mode:One-copyPartial Raster  :Enabled
+
+GpuMemoryBuffers Status
+=======================R_8               :Software onlyR_16              :Software onlyRG_88             :Software onlyRG_1616           :Software onlyBGR_565           :Software onlyRGBA_4444         :Software onlyRGBX_8888         :GPU_READ, SCANOUTRGBA_8888         :GPU_READ, SCANOUTBGRX_8888         :GPU_READ, SCANOUTBGRA_1010102      :Software onlyRGBA_1010102      :Software onlyBGRA_8888         :GPU_READ, SCANOUTRGBA_F16          :Software onlyYVU_420           :Software onlyYUV_420_BIPLANAR  :Software onlyYUVA_420_TRIPLANAR:Software onlyP010              :Software only
+
+Display(s) Information
+======================Info                          :Display[1174743572] bounds=[0,0 3072x1728], workarea=[0,0 3072x1728], scale=1.25, rotation=0, panel_rotation=0 external detectedColor space (all)             :{primaries:BT709, transfer:SRGB, matrix:RGB, range:FULL}Buffer format (all)           :BGRA_8888Color volume                  :{name:'srgb', r:[0.6400, 0.3300], g:[0.3000, 0.6000], b:[0.1500, 0.3300], w:[0.3127, 0.3290]}SDR white level in nits       :203HDR relative maximum luminance:1Bits per color component      :8Bits per pixel                :24Refresh Rate in Hz            :240Info                          :Display[3137087320] bounds=[-2048,0 2048x1152], workarea=[-2048,0 2048x1152], scale=1.25, rotation=0, panel_rotation=0 external detectedColor space (all)             :{primaries:BT709, transfer:SRGB, matrix:RGB, range:FULL}Buffer format (all)           :BGRA_8888Color volume                  :{name:'srgb', r:[0.6400, 0.3300], g:[0.3000, 0.6000], b:[0.1500, 0.3300], w:[0.3127, 0.3290]}SDR white level in nits       :203HDR relative maximum luminance:1Bits per color component      :8Bits per pixel                :24Refresh Rate in Hz            :59
+
+Video Acceleration Information
+==============================Decoding               :Decode h264 baseline   :64x64 to 4096x4096 pixelsDecode h264 main       :64x64 to 4096x4096 pixelsDecode h264 high       :64x64 to 4096x4096 pixelsDecode av1 profile main:64x64 to 8192x8192 pixelsEncoding               :
+
+Vulkan Information
+==================
+
+Device Performance Information
+==============================Total Physical Memory (Gb):63Total Disk Space (Gb)     :0Hardware Concurrency      :32System Commit Limit (Gb)  :70D3D11 Feature Level       :UnknownHas Discrete GPU          :unknownSoftware Rendering        :No
+
+Diagnostics
+===========
+
+Driver Information for Hardware GPU
+===================================
+
+Graphics Feature Status for Hardware GPU
+========================================
+
+Driver Bug Workarounds for Hardware GPU
+=======================================
+
+Problems Detected for Hardware GPU
+==================================
+
+Log Messages
+============

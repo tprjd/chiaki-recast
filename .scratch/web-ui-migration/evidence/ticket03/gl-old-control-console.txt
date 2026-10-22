@@ -1,0 +1,33 @@
+A crash occurred in C:\Users\david\AppData\Local\Temp\chiaki-web-ui-migration\ticket03-package\chiaki-embedded-setup-tests.exe.
+While testing graphicsCoexistence
+Function time: 1825ms Total time: 1825ms
+
+Exception address: 0x00007FFFCAE02D90
+Exception code   : 0xc0000005
+Nearby symbol    : QRhi::finish
+
+Stack:
+#  1: QTest::CrashHandler::WindowsFaultHandler::windowsFaultHandler() - 0x00007FF8B02BEC50
+#  2: UnhandledExceptionFilter() - 0x00007FF905CD9D90
+#  3: strncpy() - 0x00007FF9088495D0
+#  4: _C_specific_handler() - 0x00007FF908803180
+#  5: _chkstk() - 0x00007FF9088478D0
+#  6: RtlWow64GetCurrentCpuArea() - 0x00007FF908755780
+#  7: KiUserExceptionDispatcher() - 0x00007FF908847280
+#  8: QRhi::finish() - 0x00007FFFCAE02D90
+#  9: Unable to obtain symbol
+# 10: Unable to obtain symbol
+# 11: Unable to obtain symbol
+# 12: QMetaMethodInvoker::invokeImpl() - 0x00007FFFC9F62DC0
+# 13: QMetaMethod::invokeImpl() - 0x00007FFFC9F62BA0
+# 14: QTest::ignoreMessage() - 0x00007FF8B02B6050
+# 15: QTest::ignoreMessage() - 0x00007FF8B02B6050
+# 16: QTest::ignoreMessage() - 0x00007FF8B02B6050
+# 17: QTest::ignoreMessage() - 0x00007FF8B02B6050
+# 18: QTest::qRun() - 0x00007FF8B02BB3A0
+# 19: QTest::qExec() - 0x00007FF8B02B8970
+# 20: Unable to obtain symbol
+# 21: Unable to obtain symbol
+# 22: BaseThreadInitThunk() - 0x00007FF90704E8C0
+# 23: RtlUserThreadStart() - 0x00007FF9086E8D70
+

@@ -23,8 +23,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 
 - [01: Application-owned native services](issues/01-application-owned-native-services.md): resolved for the native ownership milestone. Required graphics, live playback, cleanup, and performance acceptance remains assigned to tickets 03, 04, and 23.
 - [02: Native stream-only interface](issues/02-native-stream-only-interface.md): resolved for the native stream-root milestone. OpenGL and Vulkan production root/input checks pass. Live media and combined graphics acceptance remains with tickets 03, 04, and 23.
-- [03: Accelerated web console library](issues/03-accelerated-web-console-library.md): claimed. The required combined graphics check from ticket 01 remains pending.
-- [04: Local native stream handoff](issues/04-local-native-stream-handoff.md): waiting for ticket 03. Ticket 02 is resolved.
+- [03: Accelerated web console library](issues/03-accelerated-web-console-library.md): resolved for the library and graphics foundation milestone. Real bridge/package checks and Windows hardware Chromium plus native Fast-preset GL/Vulkan/recreation/fallback pass. HighQuality/default processing and full hardware acceptance remain in 04 and 23.
+- [04: Local native stream handoff](issues/04-local-native-stream-handoff.md): ready after ticket 03 is integrated. Ticket 02 is resolved.
 - Tickets 05 through 23: waiting for their declared blockers.
 
 ## Integration history
@@ -40,3 +40,5 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [Ticket 01](issues/01-application-owned-native-services.md) completes application-owned native services and QML engine lifetime. The pre-edit check established installed module limits and native graphics behavior. It did not prove accelerated WebEngine coexistence or real-console performance. Tickets 03 and 04 retain the required combined graphics acceptance. Ticket 23 retains matched live baseline conditions, predeclared tolerances, live-frame cleanup, and hardware acceptance.
 
 - [Ticket 02](issues/02-native-stream-only-interface.md) extracts `StreamRoot.qml` and removes setup navigation from the native host. `streamViewDismissed` is a presentation request; ticket 04 owns cleanup before setup restoration. [Native verification](evidence/ticket02/verification.md) records actual root, PIN, settings, and input checks.
+
+- [Ticket 03](issues/03-accelerated-web-console-library.md) completes the restricted production bridge and static Svelte library. Its passing Windows hardware GPU fixture selects the existing native Fast preset; production defaults stay unchanged. HighQuality produces black native video in the recorded fixture, including a bounded old-import/no-WebEngine control. This is not a full pre-migration baseline. [04](issues/04-local-native-stream-handoff.md) and [23](issues/23-complete-web-only-acceptance.md) retain default/preset processing acceptance, real handoff focus, live media, hardware, and platform limits. See [verification](evidence/ticket03/verification.md).
