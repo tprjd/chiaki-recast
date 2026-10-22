@@ -2,8 +2,9 @@
   import { tick, onMount } from 'svelte';
   import KeyboardMouse from './KeyboardMouse.svelte';
   import Controllers from './Controllers.svelte';
+  import Profiles from './Profiles.svelte';
   import { moveFocus } from './navigation';
-  import { generalSettings, mediaSettings, rendererSettings, colorMappingSettings, settingConditionMet, keyboardMouseSettings, controllerSettings } from './settings';
+  import { generalSettings, mediaSettings, rendererSettings, colorMappingSettings, profileSettings, settingConditionMet, keyboardMouseSettings, controllerSettings } from './settings';
   import SettingField from './SettingField.svelte';
   import type { State, connectSetup } from './bridge';
   let { current, connection, close, t }: {
@@ -18,15 +19,18 @@
   let controllerTarget = $state('');
   let search: HTMLInputElement;
   const values = $derived({ ...current.generalSettings, ...current.mediaSettings, ...current.rendererSettings, ...current.keyboardMouse.values, ...current.controllerSetup.values });
-  const fields = $derived([...generalSettings, ...mediaSettings, ...rendererSettings, ...colorMappingSettings, ...controllerSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
+  const fields = $derived([...profileSettings, ...generalSettings, ...mediaSettings, ...rendererSettings, ...colorMappingSettings, ...controllerSettings, ...keyboardMouseSettings.filter(field => current.keyboardMouse.supported || ['keyboardEnabled', 'mouseTouchEnabled'].includes(field.key))].filter(field => field.action || Object.hasOwn(values, field.key)).map(field => {
     const choices = current.mediaChoices[field.key];
     if (field.key.startsWith('bitrate')) return { ...field, automatic: [0, 2, 6, 10, 15][Number(values[`resolution${field.key.slice(7)}`])] };
     return choices ? { ...field, options: choices.map(choice => choice.label), optionValues: choices.map(choice => choice.value) } : field;
   }));
-  const categories = ['General', 'Video', 'Stream', 'Audio/Wifi', 'Display', 'Renderer', 'Color mapping', 'Keyboard and mouse', 'Controllers'];
+  const categories = ['General', 'Video', 'Stream', 'Audio/Wifi', 'Display', 'Renderer', 'Color mapping', 'Keyboard and mouse', 'Controllers', 'Profiles'];
   const visibleFields = $derived(fields.filter(field => (field.category ?? 'General') === category));
   const groups = $derived([...new Set(visibleFields.map(field => field.group))]);
   const searchFields = $derived([...fields,
+    { key: 'profileSelection', label: 'Create or switch profile', category: 'Profiles', group: 'Profiles', description: 'Select a profile, then use the explicit action.' },
+    { key: 'newProfileName', label: 'New profile name', category: 'Profiles', group: 'Profiles', description: 'Create a named profile.' },
+    { key: 'deleteProfile', label: 'Delete selected profile', category: 'Profiles', group: 'Profiles', description: 'The default and current profiles cannot be deleted.' },
     ...['controllerMappingChange', 'controllerMappingReset'].map((key, index) => ({ key, label: index ? 'Reset controller mapping' : 'Change controller mapping', category: 'Controllers', group: 'Controller mapping', description: 'Select a controller by pressing a button.' })),
     ...['enableAnalogStickMapping', 'controllerMappingApply', 'controllerMappingCancel'].map((key, index) => ({ key, label: ['Analog stick and L2/R2 mapping', 'Apply controller mapping', 'Cancel controller mapping'][index], category: 'Controllers', group: 'Controller mapping', description: 'Select a controller before editing its mappings.' })),
     ...current.controllerSetup.targets.flatMap(mapping => [0, 1].map(slot => ({ key: `controllerMap${mapping.buttonValue}Slot${slot}`, label: `${mapping.buttonName} ${t(slot ? 'alternate input' : 'primary input')}`, category: 'Controllers', group: 'Controller mapping', description: 'Assign a controller input.' }))),
@@ -50,8 +54,9 @@
     if (category === 'Audio/Wifi') connection.refreshAudioDevices();
     await tick();
     const target = document.getElementById(unmet ? unmet.key : requires && !values[requires] ? requires : field?.requiresValue && values[field.requiresValue.key] !== field.requiresValue.value ? field.requiresValue.key : key);
-    target?.focus();
-    target?.scrollIntoView({ block: 'nearest' });
+    const available = target ?? (category === 'Profiles' ? document.getElementById('profileSelection') : null);
+    available?.focus();
+    available?.scrollIntoView({ block: 'nearest' });
   }
   async function change(key: string, value: boolean | number | string, generation = current.profileGeneration) {
     if (key === 'openPlaceboColorMapping') { await reveal('placeboGamutMappingFunction'); return; }
@@ -59,8 +64,8 @@
     pending = true;
     try {
       const action = key === 'restartRenderer' || rendererSettings.find(field => field.key === key)?.action;
-      const reply = await (action ? connection.rendererAction(key, generation) : Object.hasOwn(current.controllerSetup.values, key) ? connection.controllerSetting(key, value, generation) : Object.hasOwn(current.rendererSettings, key) ? connection.rendererSetting(key, value, generation) : Object.hasOwn(current.generalSettings, key) ? connection.generalSetting(key, value as boolean | number, generation) : connection.mediaSetting(key, value, generation));
-      if (generation !== current.profileGeneration) return;
+      const reply = await (profileSettings.some(field => field.key === key && field.action) ? connection.settingsFileAction(key, generation) : action ? connection.rendererAction(key, generation) : Object.hasOwn(current.controllerSetup.values, key) ? connection.controllerSetting(key, value, generation) : Object.hasOwn(current.rendererSettings, key) ? connection.rendererSetting(key, value, generation) : Object.hasOwn(current.generalSettings, key) ? connection.generalSetting(key, value as boolean | number, generation) : connection.mediaSetting(key, value, generation));
+      if (generation !== current.profileGeneration && !(key === 'importSettings' && reply.accepted && reply.profileGeneration === current.profileGeneration)) return;
       message = reply.message ?? (reply.accepted ? t('Saved') : t('The setting could not be saved.'));
     } catch {
       message = t('The setting could not be saved.');
@@ -128,6 +133,8 @@
         {/if}
       {/if}
       {#if category === 'Audio/Wifi'}<button disabled={pending} onclick={() => connection.refreshAudioDevices()}>{t('Refresh audio devices')}</button>{/if}
+      {#if category === 'Profiles'}<Profiles {current} {connection} {t} />{/if}
+      {#if category === 'General'}<p data-log-directory>{current.profiles.logDirectory}</p>{/if}
       {#key current.profileGeneration}
       {#if category === 'Keyboard and mouse'}
         <KeyboardMouse {current} {connection} {t} target={keyboardMouseTarget} />

@@ -12,6 +12,7 @@
 #include <cmath>
 #include <QHostAddress>
 #include <QRegularExpression>
+#include <QDesktopServices>
 
 SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     : QObject(parent), backend(backend)
@@ -41,6 +42,7 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     accountExpiry.setSingleShot(true);
     connect(&accountExpiry, &QTimer::timeout, this, &SetupBridge::refresh);
     auto *settings = backend->qmlSettings();
+    connect(settings, &QmlSettings::profilesChanged, this, &SetupBridge::refresh);
     connect(settings, &QmlSettings::currentProfileChanged, this, [this] {
         invalidateControllerMapping(tr("The profile changed. Select the controller again."));
     });
@@ -95,6 +97,8 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     connect(settings, &QmlSettings::mouseTouchEnabledChanged, this, &SetupBridge::refresh);
     connect(settings, &QmlSettings::controllerMappingChanged, this, &SetupBridge::refresh);
     decoders = settings->availableDecoders();
+    connect(settings, &QmlSettings::logSanitizeChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::logVerboseChanged, this, &SetupBridge::refresh);
     connect(settings, &QmlSettings::disconnectActionChanged, this, &SetupBridge::refresh);
     connect(settings, &QmlSettings::suspendActionChanged, this, &SetupBridge::refresh);
     connect(settings, &QmlSettings::audioVideoDisabledChanged, this, &SetupBridge::refresh);
@@ -184,6 +188,7 @@ void SetupBridge::refresh()
     if (generation != backend->profileGeneration()) {
         generation = backend->profileGeneration();
         keys.clear();
+        profileKeys.clear();
         selectedKey.clear();
         credentialsRejected = false;
     }
@@ -513,6 +518,7 @@ void SetupBridge::refresh()
     auto *settings = backend->qmlSettings();
     QVariantMap general{{"disconnectAction", settings->disconnectAction()}, {"suspendAction", settings->suspendAction()},
         {"audioVideoDisabled", settings->audioVideoDisabled()}, {"streamerMode", privateMode},
+        {"logSanitize", settings->logSanitize()}, {"logVerbose", settings->logVerbose()},
         {"streamMenuEnabled", settings->streamMenuEnabled()}, {"streamMenuShortcut1", settings->streamMenuShortcut1()},
         {"streamMenuShortcut2", settings->streamMenuShortcut2()}, {"streamMenuShortcut3", settings->streamMenuShortcut3()},
         {"streamMenuShortcut4", settings->streamMenuShortcut4()}};
@@ -712,8 +718,24 @@ void SetupBridge::refresh()
     const auto phase = nativeAttempt.value("phase").toString();
     const bool pending = nativeAttempt.value("presented").toBool() && !phase.isEmpty()
         && phase != "failure" && phase != "cancelled" && phase != "registered" && phase != "woken";
+    QVariantList profiles;
+    QHash<QString, QString> updatedProfileKeys;
+    auto names = backend->nativeSettings()->GetProfiles();
+    names.prepend(QString());
+    int profileIndex = 0;
+    for(const auto &name : names) {
+        auto key = profileKeys.value(name);
+        if(key.isEmpty()) key = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        updatedProfileKeys.insert(name, key);
+        const bool active = name == backend->qmlSettings()->currentProfile();
+        profiles.append(QVariantMap{{"key", key}, {"label", name.isEmpty() ? tr("default") : privateMode ? tr("Profile %1").arg(++profileIndex) : name},
+            {"active", active}, {"deletable", !name.isEmpty() && !active}});
+    }
+    profileKeys = updatedProfileKeys;
+    const QVariantMap profileState{{"items", profiles}, {"current", privateMode ? tr("Hidden") : backend->qmlSettings()->currentProfile().isEmpty() ? tr("default") : backend->qmlSettings()->currentProfile()},
+        {"logDirectory", privateMode ? tr("Log directory hidden") : backend->qmlSettings()->logDirectory()}};
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
-        {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"autoConnectKey", autoConnectKey}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
+        {"profiles", profileState}, {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"autoConnectKey", autoConnectKey}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
         {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->registrationBusy() || backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
             || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
     if (!suspended) emit stateChanged(state);
@@ -794,7 +816,7 @@ QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &
     if (profileGeneration != QString::number(backend->profileGeneration()))
         return reject(QT_TR_NOOP("The profile changed. Try again in the current profile."));
     auto *settings = backend->qmlSettings();
-    const bool boolean = name == "streamerMode" || name == "streamMenuEnabled"
+    const bool boolean = name == "streamerMode" || name == "streamMenuEnabled" || name == "logSanitize" || name == "logVerbose"
 #ifdef CHIAKI_GUI_ENABLE_STEAMDECK_NATIVE
         || name == "steamDeckHaptics" || name == "verticalDeck"
 #endif
@@ -818,6 +840,8 @@ QVariantMap SetupBridge::setGeneralSetting(const QString &name, const QVariant &
     if (name == "disconnectAction") settings->setDisconnectAction(value.toInt());
     else if (name == "suspendAction") settings->setSuspendAction(value.toInt());
     else if (name == "audioVideoDisabled") settings->setAudioVideoDisabled(value.toInt());
+    else if (name == "logSanitize") settings->setLogSanitize(value.toBool());
+    else if (name == "logVerbose") settings->setLogVerbose(value.toBool());
     else if (name == "streamerMode") settings->setStreamerMode(value.toBool());
     else if (name == "streamMenuEnabled") settings->setStreamMenuEnabled(value.toBool());
     else if (name == "streamMenuShortcut1") settings->setStreamMenuShortcut1(value.toUInt());
@@ -2009,5 +2033,49 @@ QVariantMap SetupBridge::rendererAction(const QString &action, const QString &pr
         return {{"accepted", true}, {"message", tr("Renderer documentation link copied.")}};
     }
     if(action == "restartRenderer") return settings->restartApplication();
+    return {{"accepted", false}};
+}
+
+QVariantMap SetupBridge::profileAction(const QString &action, const QString &key, const QString &name, bool confirmed, const QString &profile)
+{
+    if(!currentProfile(profile)) return {{"accepted", false}, {"message", tr("The profile changed. Select the profile again.")}};
+    if(suspended || state.value("connectionBusy").toBool()) return {{"accepted", false}, {"message", tr("Finish the current connection before changing profiles.")}};
+    QString target;
+    if(action == "create") {
+        target = name.trimmed();
+        if(target.isEmpty()) return {{"accepted", false}, {"message", tr("Enter a profile name.")}};
+    } else {
+        const auto it = std::find_if(profileKeys.cbegin(), profileKeys.cend(), [&](const QString &value) { return value == key; });
+        if(it == profileKeys.cend()) return {{"accepted", false}, {"message", tr("Select an available profile.")}};
+        target = it.key();
+    }
+    if(action == "delete") {
+        if(!confirmed || target.isEmpty() || target == backend->qmlSettings()->currentProfile())
+            return {{"accepted", false}, {"message", tr("The default and current profiles cannot be deleted. Confirm deletion of another profile.")}};
+        const bool deleted = backend->nativeSettings()->DeleteProfile(target);
+        refresh();
+        return {{"accepted", deleted}, {"message", deleted ? tr("Profile deleted.") : tr("The profile could not be deleted.")}};
+    }
+    if(action != "create" && action != "switch") return {{"accepted", false}};
+    const bool saved = backend->nativeSettings()->SetCurrentProfile(target);
+    refresh();
+    return {{"accepted", saved}, {"profileGeneration", QString::number(backend->profileGeneration())}, {"message", saved ? tr("Profile selected.") : tr("The profile could not be selected.")}};
+}
+
+QVariantMap SetupBridge::settingsFileAction(const QString &action, const QString &profile)
+{
+    if(!currentProfile(profile)) return {{"accepted", false}, {"message", tr("The profile changed. Try again in the current profile.")}};
+    if(action == "exportSettings") return backend->qmlSettings()->exportSettings();
+    if(action == "importSettings") {
+        if(suspended || state.value("connectionBusy").toBool()) return {{"accepted", false}, {"message", tr("Finish the current connection before importing settings.")}};
+        auto reply = backend->qmlSettings()->importSettings();
+        reply.insert("profileGeneration", QString::number(backend->profileGeneration()));
+        refresh();
+        return reply;
+    }
+    if(action == "openLogDirectory") {
+        const bool opened = QDesktopServices::openUrl(QUrl::fromLocalFile(backend->qmlSettings()->logDirectory()));
+        return {{"accepted", opened}, {"message", opened ? tr("Log directory opened.") : tr("The log directory could not be opened.")}};
+    }
     return {{"accepted", false}};
 }

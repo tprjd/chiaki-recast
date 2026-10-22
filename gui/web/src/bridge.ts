@@ -16,6 +16,7 @@ export interface State {
   mediaSettings: Record<string, boolean | number | string>;
   mediaChoices: Record<string, { label: string; value: string }[]>;
   generalSettings: Record<string, boolean | number>;
+  profiles: { items: { key: string; label: string; active: boolean; deletable: boolean }[]; current: string; logDirectory: string };
   controllerSetup: {
     values: Record<string, boolean | number>; devices: { name: string; type: string; playStation: boolean; steamVirtual: boolean }[];
     operation: string; phase: string; message: string; type: string; altered: boolean; analog: boolean; button: number; slot: number;
@@ -34,8 +35,10 @@ export interface State {
     refresh: { phase?: string; message?: string } };
 }
 export interface Registration { busy: boolean; savedAccount: boolean; context?: string; id?: string; phase?: string; message?: string; diagnostics?: string; profileValid?: boolean; connectKey?: string }
-interface Reply { accepted: boolean; message?: string; context?: string; address?: string; ps5?: boolean; id?: string; route?: string; accountId?: string; form?: string }
+interface Reply { accepted: boolean; profileGeneration?: string; message?: string; context?: string; address?: string; ps5?: boolean; id?: string; route?: string; accountId?: string; form?: string }
 interface NativeBridge {
+  profileAction(action: string, key: string, name: string, confirmed: boolean, profile: string, callback: (reply: Reply) => void): void;
+  settingsFileAction(action: string, profile: string, callback: (reply: Reply) => void): void;
   setControllerSetting(name: string, value: boolean | number | string, profile: string, callback: (reply: Reply) => void): void;
   beginControllerMapping(reset: boolean, profile: string, callback: (reply: Reply) => void): void;
   controllerMappingAction(action: string, operation: string, profile: string, callback: (reply: Reply) => void): void;
@@ -127,6 +130,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
   resetKeyboardKeys(form: string, profile: string): Promise<Reply>;
   rendererSetting(name: string, value: boolean | number | string, profileGeneration: string): Promise<Reply>;
   rendererAction(action: string, profileGeneration: string): Promise<Reply>;
+  profileAction(action: string, key: string, name: string, confirmed: boolean, profile: string): Promise<Reply>;
+  settingsFileAction(action: string, profile: string): Promise<Reply>;
   dispose(): void;
 }> {
   return new Promise((resolve, reject) => {
@@ -200,6 +205,8 @@ export function connectSetup(receive: (state: State) => void): Promise<{
         resetKeyboardKeys: (form, profile) => new Promise(done => setup.resetKeyboardKeys(form, profile, done)),
         rendererSetting: (name, value, generation) => new Promise(done => setup.setRendererSetting(name, value, generation, done)),
         rendererAction: (action, generation) => new Promise(done => setup.rendererAction(action, generation, done)),
+        profileAction: (action, key, name, confirmed, profile) => new Promise(done => setup.profileAction(action, key, name, confirmed, profile, done)),
+        settingsFileAction: (action, profile) => new Promise(done => setup.settingsFileAction(action, profile, done)),
         dispose() {
           setup.stateChanged.disconnect(update);
           window.removeEventListener('pageshow', refresh);
