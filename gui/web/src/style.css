@@ -43,7 +43,8 @@ input { width: 280px; max-width: 100%; border: 1px solid var(--line); border-rad
 .settings-search { margin: 24px 0 30px; }
 .settings-layout { display: grid; grid-template-columns: 185px minmax(0, 1fr); gap: 34px; }
 .category-nav { align-self: start; position: sticky; top: 24px; display: grid; gap: 4px; }
-.category-nav button { min-height: 44px; text-align: left; padding: 11px 13px; border: 0; border-radius: 7px; background: #1c344c; color: var(--accent); }
+.category-nav button { min-height: 44px; text-align: left; padding: 11px 13px; border: 0; border-radius: 7px; background: var(--panel); color: var(--muted); }
+.category-nav button[aria-current=page] { background: #1c344c; color: var(--accent); }
 .settings-content, .setting-copy { min-width: 0; }
 .settings-content h2 { font-size: 23px; }
 .settings-note, .setting-copy p, .setting-control small { color: var(--muted); }

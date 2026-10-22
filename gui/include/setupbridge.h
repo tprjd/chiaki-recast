@@ -24,6 +24,8 @@ public:
     Q_INVOKABLE QVariantMap copyPsnSignInLink(const QString &profile);
     Q_INVOKABLE QVariantMap submitPsnRedirect(const QString &profile, const QString &url);
     Q_INVOKABLE QVariantMap setGeneralSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
+    Q_INVOKABLE QVariantMap setMediaSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
+    Q_INVOKABLE QVariantMap refreshAudioDevices();
     // Native callers resolve immediately before dispatch; no row index crosses WebChannel.
     bool resolveConsole(const QString &key, int &index, QString &nickname) const;
 
@@ -43,6 +45,7 @@ private:
     bool suspended = false;
     QVariantMap streamError;
     quint64 streamErrorGeneration = 0;
+    QStringList decoders;
     QTimer accountExpiry;
     bool credentialsRejected = false;
     bool currentProfile(const QString &profile) const;
