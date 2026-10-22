@@ -1,0 +1,26 @@
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 53c7b230..2cb28f54 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -2105,6 +2105,7 @@ private slots:
+         script(setup.view(), "document.querySelector('[data-save-pin]').click()");
+         QTRY_COMPARE(settings.GetRegisteredHost(HostMAC(registered.server_mac)).GetConsolePin(), QStringLiteral("0012"));
+         QTRY_VERIFY(!script(setup.view(), "!!document.querySelector('[data-saved-pin]')").toBool());
++        QTRY_VERIFY(script(setup.view(), "document.activeElement.hasAttribute('data-close-management')").toBool());
+         const auto json = QJsonDocument::fromVariant(consoleRequest(setup.view(), "snapshot", {})).toJson();
+         QVERIFY(!json.contains("\"0012\""));
+         QVERIFY(!json.contains("\"0091\""));
+diff --git a/gui/web/src/ConsoleManagement.svelte b/gui/web/src/ConsoleManagement.svelte
+index be258713..207830e5 100644
+--- a/gui/web/src/ConsoleManagement.svelte
++++ b/gui/web/src/ConsoleManagement.svelte
+@@ -85,6 +85,9 @@
+         if (action === 'pin') { saved = true; message = t('Console login PIN saved'); }
+         else { close(); return; }
+       } else message = reply.message ?? t('The change could not be saved. Try again.');
++      await tick();
++      document.querySelector<HTMLElement>(!reply.accepted && mode === 'pin' && validTarget
++        ? '[data-saved-pin]' : '[data-close-management]')?.focus();
+     } finally { busy = false; }
+   }
+ </script>

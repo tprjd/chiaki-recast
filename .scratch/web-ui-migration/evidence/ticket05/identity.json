@@ -1,0 +1,508 @@
+{
+  "sourceCommit": "823cf551b72002b9f0b39cc7ae5dd0705e101ed4",
+  "source": [
+    {
+      "path": "gui/include/setupbridge.h",
+      "sha256": "c2c0e20720dd3c517a72cc43f78cba4a038fad3d15d3541193217414627dcdd8",
+      "gitBlobSha256": "3015f874a650042e61d2f70a0e7190fcb60056d2de53e2dd7e88202bf0b8f4a3"
+    },
+    {
+      "path": "gui/src/setupbridge.cpp",
+      "sha256": "295afda8e8ee0a9c13d2e427648fc168699ce0e3d9df83b614ae9e23f9aee1ac",
+      "gitBlobSha256": "88ed0909ebc207c5cfb87f443c4b9d154dbd4e0223e3330b635c89f375b629c7"
+    },
+    {
+      "path": "gui/src/qmlbackend.cpp",
+      "sha256": "490f92b0d6394dab664a952e7bc8159b75911f497044b930effc63c5e5ead4e7",
+      "gitBlobSha256": "a2c748efe440642ce9d2929925c5d3a7556ec0525f0997f4b77c004a24a1751a"
+    },
+    {
+      "path": "gui/web/src/App.svelte",
+      "sha256": "698f3dcc3c74e4d4bc42b96717897233aaf4db9f8b9cf1fa0e7a0d633f34e585",
+      "gitBlobSha256": "e726daa483024c65ed137de5c0508c202cdb4425b04a4a4346077aa9a0ffa491"
+    },
+    {
+      "path": "gui/web/src/ConsoleManagement.svelte",
+      "sha256": "cd62813c1b37d1a9ae0c285e387ebd1790272059a56174b154551a4bc31db726",
+      "gitBlobSha256": "87573ebdafbe85c8e12a18ce021606a6363058e7aa725f38fd74116241714851"
+    },
+    {
+      "path": "gui/web/src/Dialog.svelte",
+      "sha256": "349e73f81a7f0d7f0914d46d039898824f2eba8d1826978f2665994e6f445e4d",
+      "gitBlobSha256": "3c40057ef075f95fffeaf976ea8d27f954f7c3fbe91a99f9454ac8ee6b7443fc"
+    },
+    {
+      "path": "gui/web/src/ConnectAction.svelte",
+      "sha256": "7ee0d2eb7457fe9771701ea8786e84f128e55f3bcd36766eb088a043da216e06",
+      "gitBlobSha256": "3ab4d931caa2a785e21c0cb0d42833686277aa5a9c126f616bb488e452c776db"
+    },
+    {
+      "path": "gui/web/src/bridge.ts",
+      "sha256": "e97b382fc16998f73aa2ec28f57edf37a8d96be94926f7e70bfdb4c0ba1e6100",
+      "gitBlobSha256": "f9db8810c9f38232ef550db3bbbbf558fc46ee95f3ab18c9586ef4b25c07b204"
+    },
+    {
+      "path": "gui/web/src/style.css",
+      "sha256": "ee5e7fd76ea4dd96101350177acad280fa9991ad0f2aee4ac23e9535b02d9ee8",
+      "gitBlobSha256": "9d327d9e8d66ffb417a1b75d2c7c37f7e6d318e23bd8b0d212b1cfb031d5f403"
+    },
+    {
+      "path": "gui/web/package-lock.json",
+      "sha256": "59e9bbe871ea16981ea1fd5beb0913760e66d684de0e3de8c15f2fed0a6b31e6",
+      "gitBlobSha256": "337af3ce297ac50327b7714ceabeb1141ac2cc3b30df52bf043270ce247a6358"
+    },
+    {
+      "path": "gui/tests/embeddedsetup.cpp",
+      "sha256": "acc0a3b9c9614abd75b789dacb415ddfa706420fa50561a2070a5ee2e0ca7b24",
+      "gitBlobSha256": "86b5bd0f221e9bacb5f39584ed51ec1021a2b10c2511ce8b51b904595de46575"
+    },
+    {
+      "path": "gui/tests/CMakeLists.txt",
+      "sha256": "c8bf2739ddd28cb9682dcfd78d880b86b2cfe85519db778f03d42b0dade5e096",
+      "gitBlobSha256": "c3417fc9e6e44e876c18a427a1bc0658b1aadeb1ddaf98ed8a91f2a7d4049707"
+    },
+    {
+      "path": "gui/src/qml/qml.qrc",
+      "sha256": "37d352f6f309ca88b2a15534ef55df5afdd9129006d3229f733ca1113a1aa548",
+      "gitBlobSha256": "b666099f2082bd98622dcacd32c4250028eb6598b19056c5b13719e95f50fad2"
+    },
+    {
+      "path": "gui/src/qml/MainView.qml",
+      "sha256": "c2e9be6cec57b37b00458596f65ac6c33d649c67a9f6f6519b55255af07a088a",
+      "gitBlobSha256": "86f0dc8a9a2e21bd00e1795689863305cf37bfa5460f6e285242647cf34f8acc"
+    },
+    {
+      "path": "gui/src/qml/ConsolePinContent.qml",
+      "sha256": "6a804117d45af41f1e2ee654db3b0aba6f124c6836347b8a59c99a934b078d95",
+      "gitBlobSha256": "9efd0e0561becfa70a36123ddcb2f1e1024381298f092f782985c80323bc54db"
+    },
+    {
+      "path": "gui/src/qml/LiveConsolePinHost.qml",
+      "sha256": "0a8ddb1899b4bab502ccffa3bb0b50be62888f27abd63f65f9487457def5acac",
+      "gitBlobSha256": "4b8f486d59953984c54f89a12adadfff4fbd0d4eecce32e16066735d54eb59ff"
+    },
+    {
+      "path": "gui/src/qml/LiveConsolePinContent.qml",
+      "sha256": "27d538e9ece89c75b569baa4af4bc26c556905c6eb8d928788d46216fd4b87bc",
+      "gitBlobSha256": "5283815a8904058dee1a98795e400cd97310c1634c3a8333b34491df2636b44e"
+    },
+    {
+      "path": "gui/src/qml/StreamRoot.qml",
+      "sha256": "bfe553d36afaa6512af579cdea713765b22f16ceeeb7731e249222cc32930eec",
+      "gitBlobSha256": "0230636dda942df8a61bf47c31db10af5fbcaa5eb49428db442f4d6df2678f03"
+    },
+    {
+      "path": "gui/src/applicationcontroller.cpp",
+      "sha256": "c077de8a002cddf021d90c26040b590b3c8b38da2eace2a730d3d554ebdda9c9",
+      "gitBlobSha256": "c9e5aa6a29ff0ec1eca5021e1f8fb75aec95a9d2dcbfa0c0f60bdca1a630002e"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket05-build\\gui\\chiaki.exe",
+      "sha256": "d40d043927d2c1a5c06bcc8963ac1abb34091e2c39964f8ffcb07e14f634f37f"
+    },
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket05-build\\gui\\tests\\chiaki-embedded-setup-tests.exe",
+      "sha256": "7806650d85d5f32e28d55610a3848a8c26031258df42114b593790f84615130d"
+    },
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket05-build\\gui\\web\\app.js",
+      "sha256": "38462ff87f1dbe95d5f05c55edb20ebefcb5632d76c3a13dfe843f3808f10a66"
+    },
+    {
+      "path": "C:\\Users\\david\\.cache\\chiaki-msvc-native\\ticket05-build\\gui\\web\\app.css",
+      "sha256": "99574dea4e30e382b8215cd404236c3999c4451591c82a24692403f96d98f85f"
+    }
+  ],
+  "evidence": [
+    {
+      "path": ".gitattributes",
+      "sha256": "8b9c3028d6467ff3be7c793141927841d70f47f52d0590677438f488ca154992"
+    },
+    {
+      "path": "embedded-details.png",
+      "sha256": "20ecb9fb5fb30c1e9827098cc7d680399306fe7dba09852b62ec8987b5eb7463"
+    },
+    {
+      "path": "embedded-library.png",
+      "sha256": "0f287df570d0cf730c9ef01c6fd7189258cdb96ee15f516176ec3f1d71df4dca"
+    },
+    {
+      "path": "embedded-manual.png",
+      "sha256": "53c83a385dde2a9dc4f01db1d1c0cb344a5be00472a0741995192e5aea87c592"
+    },
+    {
+      "path": "frontend-check.txt",
+      "sha256": "41530075d4b7082d37005de2e4fd4c63bab8070e9de922080b7d6dd2a10d81cc"
+    },
+    {
+      "path": "record-identity.py",
+      "sha256": "5904426c8add5d46d2ce8fe3f3f3cf92240bafe48cf912e6a246a7233e02c50b"
+    },
+    {
+      "path": "ticket05-build.cmd",
+      "sha256": "fc7c3d9571664a3228968d04ef088732506367d677cd3cc04efdcd0c02660488"
+    },
+    {
+      "path": "ticket05-configure.cmd",
+      "sha256": "86c819554f350eadbe207c346957128b492799bdc660ea2e938c4880d95120e4"
+    },
+    {
+      "path": "ticket05-configure.log",
+      "sha256": "a468ea6136144b3be43acd4f524b1e7a3b594c96f126b49b8aeeb7da9878b2fd"
+    },
+    {
+      "path": "ticket05-final-build.log",
+      "sha256": "30e9926227a116bc307842915c8e5ad13e847f866f45699e7e03846850559b6f"
+    },
+    {
+      "path": "ticket05-final-merged-build.log",
+      "sha256": "6635056b9bec8bb36fbad0f1bd6a4384b7abed5287cb54e01899b997eec9fa6a"
+    },
+    {
+      "path": "ticket05-focus-green.cmd",
+      "sha256": "b4477f67a9b44f0669b77f8dbeef587ae78dfffa786b343609ae51c3758a3f67"
+    },
+    {
+      "path": "ticket05-focus-green.txt",
+      "sha256": "17645d8048e8ffb8ec2044d969dd8cd2c9993da770a6789df561f6e0e9483056"
+    },
+    {
+      "path": "ticket05-focus-identity.txt",
+      "sha256": "c0e305f611fea54e7d52ba079af44a20eed565f7b44cf53b801ee02e987fb135"
+    },
+    {
+      "path": "ticket05-focus-source.patch",
+      "sha256": "afa49a823c617b35faca02a23e0d339948a76b88b6add51c89050cb4346d6d37"
+    },
+    {
+      "path": "ticket05-handoff-identity.txt",
+      "sha256": "6385ad438c2e0e5efb4073528ad237f50b67cee29824403d472ceb42d2989a69"
+    },
+    {
+      "path": "ticket05-handoff.cmd",
+      "sha256": "7aa6ccb312cb70b43a0f63b71e411ce824c635b1a09db3d8b94c76584d3e8e32"
+    },
+    {
+      "path": "ticket05-handoff.txt",
+      "sha256": "1c3705eb5900d4937439da865cc46fdc6790ad2f4c15d29de90d22f3deef337e"
+    },
+    {
+      "path": "ticket05-management-green.cmd",
+      "sha256": "3e0697c219ee432b73325217f69d58aa4da6364cfa9235edea9178f993ee58bf"
+    },
+    {
+      "path": "ticket05-management-green.txt",
+      "sha256": "a424e1fed3cdae6709cdeb471a1aa7c0d5f589707ba48be5d36db60dda9fc5ca"
+    },
+    {
+      "path": "ticket05-management-identity.txt",
+      "sha256": "9279c90638405d72a86396d207eaf32eeb0dcb768919bd2a8c5523dd38b762e4"
+    },
+    {
+      "path": "ticket05-management-source.patch",
+      "sha256": "6c17edd6e867084f2d04acd6c98e8e2b94f7c32d461950de3a74285df6f5be7e"
+    },
+    {
+      "path": "ticket05-manual-green.cmd",
+      "sha256": "8525bc283a015e22070b4ce3d43947d8020521fc627425f0c73b411b0fbf842c"
+    },
+    {
+      "path": "ticket05-manual-green.txt",
+      "sha256": "9b933c961cf7ea22e38f219d224b0ba84338f1ec7597c60b29eaf90f6b5c1bae"
+    },
+    {
+      "path": "ticket05-manual-identity.txt",
+      "sha256": "0df2e0906f744b7f49f82ef86e64567015981af8cfc8f44319b4808a2c331762"
+    },
+    {
+      "path": "ticket05-manual-source.patch",
+      "sha256": "57984caff9ff507e5480959fbf1c43edfd56cd76a764c974fbd95ca319e72ab3"
+    },
+    {
+      "path": "ticket05-merged-build.log",
+      "sha256": "1a2cf5eed4620f4b8cca7d027a3dd581b58150fbd688dad52b93df99168f3e38"
+    },
+    {
+      "path": "ticket05-privacy-green-console.txt",
+      "sha256": "a682cb40a3e57d2650957e73d0ca318e3da990f125af99b77e35df269027f05c"
+    },
+    {
+      "path": "ticket05-privacy-green-identity.txt",
+      "sha256": "10ea19f66d68d048dd5632877f7af5856024e55c8c2c8e79766b9cde09347b2e"
+    },
+    {
+      "path": "ticket05-privacy-green.cmd",
+      "sha256": "1588c18c460f5583a98e4f6991ee3420a8bdb9029e5b28fabc7430820b9303d0"
+    },
+    {
+      "path": "ticket05-privacy-green.txt",
+      "sha256": "1b165e0d9997ba7cca008b25e25e2d5d8c4660b83d4ebcfdb2f0a5c121a62408"
+    },
+    {
+      "path": "ticket05-privacy-red-identity.txt",
+      "sha256": "d058d86b50e0b2aa34f1da4fc1907cf6cac8f676e8d8311366063feb5d98bb6e"
+    },
+    {
+      "path": "ticket05-privacy-red-source.patch",
+      "sha256": "d477df1c52d3a14ecc3b1fd47553d862424906036c43ad85d243ddca4b650c64"
+    },
+    {
+      "path": "ticket05-privacy-red.cmd",
+      "sha256": "e17932499863cc8dd67487600dbc31fcc9f96fe7a33c085c33425c5dfcc5a3f5"
+    },
+    {
+      "path": "ticket05-privacy-red.txt",
+      "sha256": "17b415ae761a7c320c1c62455358ae36176e5e73df29974683a7e429bc9c2d06"
+    },
+    {
+      "path": "ticket05-red-identity.txt",
+      "sha256": "ba46796d66d8ea671da8963eb6bb50c647be8d851b4fac5fa5b83e7be1cd03d5"
+    },
+    {
+      "path": "ticket05-red-source.patch",
+      "sha256": "fad4f558af3f9cf754ddc22e7c9d6f8e8c309ca4bc64c1f5c107daa665b4a271"
+    },
+    {
+      "path": "ticket05-red.cmd",
+      "sha256": "2e2d9b8a370fa4b539eda3d88cfacab3254178e3f1cba59496e983d0fd1bcf78"
+    },
+    {
+      "path": "ticket05-red.txt",
+      "sha256": "8be1ea23dff83a5937b3843e4bddd8730cd5551de6e56dff64e2f743480f4d29"
+    },
+    {
+      "path": "ticket05-result-focus-green-identity.txt",
+      "sha256": "8a6039fc194d99002049920699d5a225b503997f25635fc0005494f550cdcd4f"
+    },
+    {
+      "path": "ticket05-result-focus-green-source.patch",
+      "sha256": "22bc8cc9025185e38457c4ecf4f334f73d4b523ea0bf101145aed86a559c454c"
+    },
+    {
+      "path": "ticket05-result-focus-green.cmd",
+      "sha256": "e571fa07f79d275026be763b6c7c9a6f919756a484fce78304138bf5db70dcdb"
+    },
+    {
+      "path": "ticket05-result-focus-green.txt",
+      "sha256": "a01f82f79ff8b891d49652993b4f97a9da502d2f9f4c479c20365407259d3705"
+    },
+    {
+      "path": "ticket05-result-focus-red-identity.txt",
+      "sha256": "ea5088be879024e60e1b1f1220fda885cdc55a3d0b04c6dff4614228a1a44252"
+    },
+    {
+      "path": "ticket05-result-focus-red-source.patch",
+      "sha256": "c8c488a790e4958172eb8abeda00322c7f8d6f5591920b55f0984eccec9eee79"
+    },
+    {
+      "path": "ticket05-result-focus-red.cmd",
+      "sha256": "b9531b5e9417e4d05c4a990592f3767d2dcbb7fb5c9b9f59a0a0490c504b4792"
+    },
+    {
+      "path": "ticket05-result-focus-red.txt",
+      "sha256": "14d5b28b17bc38711d471fa05651196f5225f6cdd0a9110f0221f70d3a97ddd0"
+    },
+    {
+      "path": "ticket05-validation-red-identity.txt",
+      "sha256": "8ded5323f8d134f145e250c7ea8818d19cd91bdf1107628d997a9eba752d0c7a"
+    },
+    {
+      "path": "ticket05-validation-red-source.patch",
+      "sha256": "3fe9b0db946dc66a4343de5f44d50a96c84b660ee7fd688dcbbe0e293194357e"
+    },
+    {
+      "path": "ticket05-validation-red.cmd",
+      "sha256": "e3ea424a3b4fffe2f087f1d2eafc5f5c5ce70f57aea08e66e62b365e5a0eb63e"
+    },
+    {
+      "path": "ticket05-validation-red.txt",
+      "sha256": "19c94d63f8571682eabc1246863e4a73c2aaf94b1d6e83027347ba9b454af4e6"
+    }
+  ],
+  "reusedSourceComparisons": [
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/setupbridge.cpp",
+      "method": "saveManualAddress",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/setupbridge.cpp",
+      "method": "manageConsole",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/setupbridge.cpp",
+      "method": "connectConsole",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/setupbridge.cpp",
+      "method": "identity",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/setupbridge.cpp",
+      "method": "resolveConsole",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "hosts",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "connectToHost",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "connectionTargetKey",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "resolveConnectionTarget",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "connectionTargetValid",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "createSession",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qmlbackend.cpp",
+      "method": "releaseSession",
+      "matches": true
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/web/src/App.svelte",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/web/src/ConsoleManagement.svelte",
+      "matches": true,
+      "note": "Excludes the tested saved-PIN result focus addition."
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/web/src/Dialog.svelte",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/web/src/ConnectAction.svelte",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/applicationcontroller.cpp",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qml/StreamRoot.qml",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qml/ConsolePinContent.qml",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qml/LiveConsolePinContent.qml",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/src/qml/LiveConsolePinHost.qml",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "manualAddress",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "manualAddressValidation",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "consoleManagement",
+      "matches": true,
+      "note": "Excludes the added saved-PIN result focus assertion."
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "consoleTargetGuards",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "manualHandoff",
+      "matches": true,
+      "note": null
+    },
+    {
+      "base": "5bf0b24d",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "test": "consoleLibrary",
+      "matches": true,
+      "note": null
+    }
+  ],
+  "desktopSubmodules": [
+    "160000 commit 439de4a9b136bc3b5163e73d4caf37c590bef875\ttest/munit",
+    "160000 commit d36565f8eaca113efd454efe714126cd77a01512\tthird-party/cpp-steam-tools",
+    "160000 commit b1ef0e1a01c0bb6ee5367bd9c186a603bde3615a\tthird-party/curl",
+    "160000 commit fa54a4670a5705c84abf6c24b92b0cd479625478\tthird-party/gf-complete",
+    "160000 commit 505ccb4bc69eee8d7ea40a6089a056b99671134f\tthird-party/jerasure",
+    "160000 commit cad3c18ef15a663e30e3e43e3a752b66378adec1\tthird-party/nanopb"
+  ],
+  "buildCacheSha256": "77234c7b142d36b4267047d3d9109e35835887c7da09ab3955a5b9c8798883c7",
+  "vendorPatch": {
+    "path": "third-party/gf-complete/src/gf_cpu.c",
+    "sha256": "0911fd3b219f0f53d29eaf71ce157657c2375b9131e997e8c8ff64de2de53904",
+    "committed": false
+  }
+}
