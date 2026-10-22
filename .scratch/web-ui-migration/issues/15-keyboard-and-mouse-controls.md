@@ -51,3 +51,17 @@ identities, commands, exact outcomes, source comparisons, images, historical
 native evidence, and remaining limits. No physical calibration, live console,
 Raw Input, GPU, or new platform desktop acceptance is claimed. Native defaults
 remain provisional. Shared QML resources still have live stream callers.
+
+Integration merge `7f202b35` contains worker commit `48427a70` without conflicts.
+The merged tree matches the worker tree. GUI source matches tested settings
+merge `280989cf`. All 26 recorded normalized source, lock, application, harness,
+asset, image, and vendor-patch hashes match. The merger independently confirmed
+all 45 preserved-source comparisons and their hashes. All six layout captures
+were inspected and their merged hashes match.
+
+The saved shared settings 5/0, capture/presentation 4/0, and current GNU numeric
+response 10/0 results were reused with the other valid focused checks. No build
+or test was repeated. Renderer restart/file actions, native stream lifetime,
+media settings, and native input algorithms remain unchanged. Source-only
+whitespace checks pass. Physical calibration, Raw Input, actual focus, live
+console, GPU, package, and platform desktop acceptance remain open.
