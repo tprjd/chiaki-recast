@@ -44,6 +44,15 @@ if(TARGET chiaki-gui)
     target_compile_definitions(chiaki-embedded-setup-tests PRIVATE CHIAKI_TEST_PYTHON="${PYTHON_EXECUTABLE}")
     add_test(NAME chiaki-embedded-setup COMMAND chiaki-embedded-setup-tests consoleLibrary)
     set_tests_properties(chiaki-embedded-setup PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-wake-auto-connect COMMAND chiaki-embedded-setup-tests
+        autoConnectTarget autoConnectCancellation wakeConsole wakeFailures
+        -o ${CMAKE_CURRENT_BINARY_DIR}/wake-auto-connect.txt,txt)
+    set_tests_properties(chiaki-embedded-wake-auto-connect PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-startup-native-connection COMMAND chiaki-embedded-setup-tests
+        startupNativeConnection -o ${CMAKE_CURRENT_BINARY_DIR}/startup-native-connection.txt,txt)
+    set_tests_properties(chiaki-startup-native-connection PROPERTIES LABELS desktop
+        ENVIRONMENT "QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
     add_test(NAME chiaki-embedded-pairing COMMAND chiaki-embedded-setup-tests registrationForm registrationProgress
         registrationLookup registrationLookupTimeout registrationAccountSources registrationNativeValidation registrationStaleTargets registrationAddressCorrection)
     set_tests_properties(chiaki-embedded-pairing PROPERTIES

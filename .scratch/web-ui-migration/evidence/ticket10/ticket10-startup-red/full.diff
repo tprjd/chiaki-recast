@@ -1,0 +1,21 @@
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 815c67a2..def6be37 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -492,9 +492,9 @@ private slots:
+         auto discovery = controlledDiscovery();
+         discovery.wakeup = [&](ChiakiLog *, ChiakiDiscovery *, const char *, uint64_t, bool) { ++wakes; return CHIAKI_ERR_SUCCESS; };
+         QmlNativeServices services(&settings, transport, {}, {}, discovery);
+-        const auto releaseOnExit = qScopeGuard([&] { release.release(); });
+         auto *backend = services.backend();
+         ApplicationController controller(&services);
++        const auto releaseOnExit = qScopeGuard([&] { release.release(); });
+         auto &setup = *controller.setupWindow();
+         setup.view()->settings()->setAttribute(QWebEngineSettings::JavascriptEnabled, false);
+         setup.resize(1280, 720);
+diff --git a/third-party/gf-complete b/third-party/gf-complete
+--- a/third-party/gf-complete
++++ b/third-party/gf-complete
+@@ -1 +1 @@
+-Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478
++Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478-dirty

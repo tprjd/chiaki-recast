@@ -301,20 +301,23 @@ native acceptance. Real transport checks need a console.
 
 ## Auto-connect and console wake-up tests
 
-`ConnectionWake` loads production `AutoConnectView.qml` through
-`ConnectionHarness.qml`. This view uses `ConnectionView.qml` for the selected
-console, actual wait state, persistent timeout, safe retry, and cancellation.
-`context` distinguishes startup auto-connect from a manual wake request.
-`waitingForWake` retains wait-screen ownership until the connection starts.
-The same attempt ID continues through local or PSN handoff.
+`chiaki-embedded-wake-auto-connect` uses compiled Svelte, WebEngine,
+WebChannel, and native services. It checks saved target persistence, wake
+progress, reload without replay, transport failure, timeout, retry, cancellation,
+and current target and profile guards. The native wake transport is controlled.
+Unexpected wake, PSN, and raw session requests fail closed.
 
-These tests check repeated input, cleanup before retry, closed views, invalid
-targets, streamer mode, and action focus at 900 by 600 and 1280 by 720.
-The real `StackView` check verifies that an old view cannot dismiss a new
-attempt or take focus during its exit transition.
-The fake backend supplies native results. It does not simulate discovery,
-wake packets, or a session. Isolated native checks cover those handlers with
-transport disabled. Real console wake-up still needs a console.
+`chiaki-startup-native-connection` disables page JavaScript before startup work.
+Native discovery and PSN completions must prepare the native window and start
+the selected session without the page. Its raw session producer uses a real
+compatible native thread. Native Stop and cleanup join that thread. The checks
+cover local priority, wake wait, PS4 and PS5 remote targets, a late console list,
+cancellation, removed registrations, replacement, and profile changes.
+
+The unused setup wrapper `AutoConnectView.qml` and its fake wake tests are
+removed. Native stream `ConnectionView.qml` and its tests remain. These checks
+do not prove real wake packets, live PSN, foreground focus, graphics output,
+physical input, or media performance.
 
 ## PSN setup tests
 

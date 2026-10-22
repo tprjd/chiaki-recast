@@ -16,6 +16,7 @@ struct DiscoveryRequests
 {
 	std::function<ChiakiErrorCode(ChiakiDiscoveryService *, ChiakiDiscoveryServiceOptions *, ChiakiLog *)> init = chiaki_discovery_service_init;
 	std::function<void(ChiakiDiscoveryService *)> fini = chiaki_discovery_service_fini;
+	std::function<ChiakiErrorCode(ChiakiLog *, ChiakiDiscovery *, const char *, uint64_t, bool)> wakeup = chiaki_discovery_wakeup;
 };
 
 struct DiscoveryHost

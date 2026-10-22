@@ -1,0 +1,6 @@
+ M gui/include/setupbridge.h
+ M gui/src/setupbridge.cpp
+ M gui/tests/embeddedsetup.cpp
+ M gui/web/src/ConnectAction.svelte
+ M gui/web/src/bridge.ts
+ m third-party/gf-complete

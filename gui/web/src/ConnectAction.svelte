@@ -13,11 +13,27 @@
       message = reply.accepted ? '' : reply.message ?? t('Console unavailable');
     } finally { pending = false; }
   }
+  async function autoConnectTarget(key: string) {
+    if (!connection || !current || pending) return;
+    pending = true;
+    try {
+      const reply = await connection.autoConnectTarget(key, current.profileGeneration);
+      message = reply.accepted ? '' : reply.message ?? t('Console unavailable');
+    } finally { pending = false; }
+  }
   async function register() {
     if (!connection || !selected || pending || !current || current.connectionBusy) return;
     pending = true;
     try {
       const reply = await connection.autoRegister(selected.key, current.profileGeneration);
+      message = reply.accepted ? '' : reply.message ?? t('Console unavailable');
+    } finally { pending = false; }
+  }
+  async function wake() {
+    if (!connection || !selected || pending || current?.connectionBusy) return;
+    pending = true;
+    try {
+      const reply = await connection.wake(selected.key);
       message = reply.accepted ? '' : reply.message ?? t('Console unavailable');
     } finally { pending = false; }
   }
@@ -33,8 +49,11 @@
 {#if current?.connection.id}
   <section class="stream-error" data-psn-connection aria-live="polite">
     <h2>{current.connection.phase === 'failure' ? current.connection.errorTitle : current.connection.phase === 'cancelled'
-      ? t('Connection cancelled') : current.connection.phase === 'registered' ? t('Console registered')
-      : current.connection.registrationOnly ? t('Registering through PSN') : t('Connecting through PSN')}</h2>
+      ? t('Connection cancelled') : current.connection.phase === 'registered' ? t('Console registered') : current.connection.registrationOnly ? t('Registering through PSN')
+      : current.connection.context === 'startup' ? t('Auto-connect') : current.connection.context === 'wakeOnly' ? t('Wake console')
+      : current.connection.route === 'psn' ? t('Connecting through PSN') : t('Connecting to console')}</h2>
+    <p data-connection-phase>{current.connection.phase === 'waking' ? t('Waiting for the console to wake')
+      : current.connection.phase === 'woken' ? t('Console is awake') : current.connection.phase === 'waiting' ? t('Waiting for the selected console') : ''}</p>
     {#if current.connection.registrationOnly && !['failure', 'cancelled', 'registered'].includes(current.connection.phase ?? '')}
       <p data-registration-phase>{t(current.connection.phase === 'internet' ? 'Waiting for internet'
         : current.connection.phase === 'initiating' ? 'Starting PSN connection'
@@ -45,19 +64,37 @@
     {#if current.connection.phase === 'failure'}
       <button data-connection-retry disabled={current.connection.cleanupPending || !current.connection.targetValid}
         onclick={() => connection?.retryConnection(current!.connection.id!)}>{t('Retry')}</button>
-    {:else if !['cancelled', 'registered'].includes(current.connection.phase ?? '')}
-      <button data-connection-cancel disabled={!current.connection.cancelable || current.connection.phase === 'cancelling'}
-        onclick={() => connection?.cancelConnection(current!.connection.id!)}>{t('Cancel')}</button>
+    {:else if !['cancelled', 'registered', 'woken'].includes(current.connection.phase ?? '')}
+      {#if current.connection.context === 'startup'}
+        <button data-stop-auto-connect disabled={!current.connection.cancelable || current.connection.phase === 'cancelling'}
+          onclick={() => connection?.stopAutoConnect(current!.connection.id!)}>{t('Stop auto-connect')}</button>
+      {:else}
+        <button data-connection-cancel disabled={!current.connection.cancelable || current.connection.phase === 'cancelling'}
+          onclick={() => connection?.cancelConnection(current!.connection.id!)}>{t('Cancel')}</button>
+      {/if}
     {/if}
-    {#if ['failure', 'cancelled', 'registered'].includes(current.connection.phase ?? '')}
+    {#if ['failure', 'cancelled', 'registered', 'woken'].includes(current.connection.phase ?? '')}
       <button data-connection-back disabled={current.connection.cleanupPending}
         onclick={() => connection?.dismissConnection(current!.connection.id!)}>{t('Back to consoles')}</button>
     {/if}
   </section>
 {/if}
 <div class="connect-action">
+  {#if current}
+    <label class="setting-control">{t('Auto-connect at startup')}
+      <select data-auto-connect-target value={current.autoConnectKey} disabled={!connection || pending || current.connectionBusy}
+        onchange={event => autoConnectTarget(event.currentTarget.value)}>
+        <option value="">{t('Off')}</option>
+        {#each current.registrations as console (console.key)}<option value={console.key}>{console.name}</option>{/each}
+      </select>
+    </label>
+  {/if}
   <button class="connect-console" disabled={!connection || pending || current?.connectionBusy || !selected?.available
-    || !selected.registered || (selected.route === 'local' && selected.state !== 'ready')} onclick={connect}>{t('Connect')}</button>
+    || !selected.registered || (selected.route === 'local' && !['ready', 'standby'].includes(selected.state))} onclick={connect}>
+    {t(selected?.route === 'local' && selected.state === 'standby' ? 'Wake and connect' : 'Connect')}</button>
+  {#if selected?.registered && selected.route !== 'psn'}
+    <button data-wake-console disabled={!connection || pending || current?.connectionBusy || !selected.available} onclick={wake}>{t('Wake console')}</button>
+  {/if}
   {#if selected?.actions.includes('autoRegister')}
     <button data-automatic-register disabled={!connection || pending || current?.connectionBusy || !selected.available} onclick={register}>{t('Automatic registration')}</button>
     {#if selected.ps5 === false}<span>{t('Automatic registration requires your main PS4 console registered to your PSN account.')}</span>{/if}

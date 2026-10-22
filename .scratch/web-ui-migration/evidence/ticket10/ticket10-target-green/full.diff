@@ -1,0 +1,216 @@
+diff --git a/gui/include/setupbridge.h b/gui/include/setupbridge.h
+index cf239f1c..d9737ca6 100644
+--- a/gui/include/setupbridge.h
++++ b/gui/include/setupbridge.h
+@@ -16,6 +16,7 @@ public:
+     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
+     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
+     Q_INVOKABLE QVariantMap connectConsole(const QString &key);
++    Q_INVOKABLE QVariantMap setAutoConnectTarget(const QString &key, const QString &profile);
+     Q_INVOKABLE QVariantMap openRegistration(const QString &key, const QString &profile);
+     Q_INVOKABLE QVariantMap submitRegistration(const QString &context, const QVariantMap &fields);
+     Q_INVOKABLE QVariantMap connectRegistration(const QString &attempt);
+diff --git a/gui/src/setupbridge.cpp b/gui/src/setupbridge.cpp
+index 9201288e..80520bfa 100644
+--- a/gui/src/setupbridge.cpp
++++ b/gui/src/setupbridge.cpp
+@@ -20,6 +20,7 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
+     connect(backend->qmlSettings(), &QmlSettings::registeredHostsChanged, this, &SetupBridge::refresh);
+     connect(backend, &QmlBackend::discoveryEnabledChanged, this, &SetupBridge::refresh);
+     connect(backend, &QmlBackend::connectionAttemptChanged, this, &SetupBridge::refresh);
++    connect(backend->qmlSettings(), &QmlSettings::autoConnectMacChanged, this, &SetupBridge::refresh);
+     connect(backend, &QmlBackend::windowChanged, this, &SetupBridge::refresh);
+     connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, &SetupBridge::refresh);
+     connect(backend->qmlSettings(), &QmlSettings::currentProfileChanged, this, &SetupBridge::refresh);
+@@ -136,6 +137,7 @@ void SetupBridge::refresh()
+     }
+     QHash<QString, QString> currentKeys;
+     QVariantList consoles, registrations, hiddenConsoles;
++    QString autoConnectKey;
+     const auto opaqueKey = [&](const QString &id) {
+         auto key = keys.value(id);
+         if (key.isEmpty()) key = QUuid::createUuid().toString(QUuid::WithoutBraces);
+@@ -157,7 +159,9 @@ void SetupBridge::refresh()
+     for (const auto &registration : backend->qmlSettings()->registeredHosts()) {
+         const auto host = registration.toMap();
+         const auto mac = host.value("mac").toString();
+-        registrations.append(QVariantMap{{"key", opaqueKey("registration:" + mac)},
++        const auto key = opaqueKey("registration:" + mac);
++        if (mac == backend->qmlSettings()->autoConnectMac()) autoConnectKey = key;
++        registrations.append(QVariantMap{{"key", key},
+             {"name", safeName(host.value("name").toString(), {}, mac)},
+             {"ps5", host.value("ps5")}, {"identifier", privateMode ? tr("hidden") : mac}});
+     }
+@@ -623,7 +627,7 @@ void SetupBridge::refresh()
+     const bool pending = nativeAttempt.value("presented").toBool() && !phase.isEmpty()
+         && phase != "failure" && phase != "cancelled" && phase != "registered";
+     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
+-        {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
++        {"registrations", registrations}, {"autoConnectKey", autoConnectKey}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
+         {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
+             || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
+     if (!suspended) emit stateChanged(state);
+@@ -779,6 +783,25 @@ QVariantMap SetupBridge::connectConsole(const QString &key)
+     return {{"accepted", true}};
+ }
+ 
++QVariantMap SetupBridge::setAutoConnectTarget(const QString &key, const QString &profile)
++{
++    if (!currentProfile(profile) || state.value("connectionBusy").toBool()) return {{"accepted", false}};
++    QString mac;
++    if (!key.isEmpty()) {
++        const auto id = keys.key(key);
++        int matches = 0;
++        for (const auto &host : backend->nativeSettings()->GetRegisteredHosts())
++            if (id == "registration:" + host.GetServerMAC().ToString()
++                    && !backend->nativeSettings()->GetHiddenHostHidden(host.GetServerMAC())) {
++                mac = host.GetServerMAC().ToString();
++                ++matches;
++            }
++        if (matches != 1) return {{"accepted", false}, {"message", tr("Console unavailable")}};
++    }
++    backend->qmlSettings()->setAutoConnectMac(mac);
++    return {{"accepted", true}};
++}
++
+ QVariantMap SetupBridge::openRegistration(const QString &key, const QString &profile)
+ {
+     if (!currentProfile(profile)) return {{"accepted", false}, {"message", tr("The profile changed. Open registration again.")}};
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index f3e0585b..039fe6a5 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -383,6 +383,55 @@ class EmbeddedSetupTest : public QObject
+     }
+ 
+ private slots:
++    void autoConnectTarget()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto removeSettings = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        settings.SetRemotePlayAsk(false);
++        settings.SetAddSteamShortcutAsk(false);
++        ChiakiRegisteredHost registered = {};
++        registered.target = CHIAKI_TARGET_PS5_1;
++        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
++        strcpy(registered.server_nickname, "Startup console");
++        settings.AddRegisteredHost(RegisteredHost(registered));
++        QList<QPointer<PsnReply>> requests;
++        PsnRequests transport;
++        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
++        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **, size_t *, ChiakiLog *) {
++            QTest::qFail("Unexpected PSN list in auto-connect settings", __FILE__, __LINE__);
++            return CHIAKI_ERR_CANCELED;
++        };
++        transport.connect = [](StreamSession *, const QString &, bool) {
++            QTest::qFail("Unexpected PSN connection in auto-connect settings", __FILE__, __LINE__);
++            return CHIAKI_ERR_CANCELED;
++        };
++        transport.startSession = [](ChiakiSession *) {
++            QTest::qFail("Unexpected native start in auto-connect settings", __FILE__, __LINE__);
++            return CHIAKI_ERR_CANCELED;
++        };
++        QmlNativeServices services(&settings, transport, {}, {}, controlledDiscovery());
++        SetupWindow setup(services.backend());
++        setup.resize(1280, 720);
++        setup.show();
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-auto-connect-target]') !== null").toBool());
++        const auto key = setup.bridge()->snapshot().value("registrations").toList().first().toMap().value("key").toString();
++        QVERIFY(fill(setup.view(), "[data-auto-connect-target]", key));
++        QTRY_COMPARE(settings.GetAutoConnectHost().GetServerMAC().ToString(), QStringLiteral("001122334455"));
++        QVERIFY(services.backend()->connectionAttempt().isEmpty());
++        Settings restarted(profile);
++        QCOMPARE(restarted.GetAutoConnectHost().GetServerMAC().ToString(), QStringLiteral("001122334455"));
++        setup.view()->reload();
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-auto-connect-target]')?.value").toString(), key);
++        QVERIFY(fill(setup.view(), "[data-auto-connect-target]", ""));
++        QTRY_VERIFY(!settings.GetAutoConnectHost().GetServerMAC().GetValue());
++        QVERIFY(requests.isEmpty());
++    }
++
+     void remoteNativeConnection()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+diff --git a/gui/web/src/ConnectAction.svelte b/gui/web/src/ConnectAction.svelte
+index 97457aee..3ed4de11 100644
+--- a/gui/web/src/ConnectAction.svelte
++++ b/gui/web/src/ConnectAction.svelte
+@@ -13,6 +13,14 @@
+       message = reply.accepted ? '' : reply.message ?? t('Console unavailable');
+     } finally { pending = false; }
+   }
++  async function autoConnectTarget(key: string) {
++    if (!connection || !current || pending) return;
++    pending = true;
++    try {
++      const reply = await connection.autoConnectTarget(key, current.profileGeneration);
++      message = reply.accepted ? '' : reply.message ?? t('Console unavailable');
++    } finally { pending = false; }
++  }
+ </script>
+ 
+ {#if current?.streamError?.id}
+@@ -42,6 +50,15 @@
+   </section>
+ {/if}
+ <div class="connect-action">
++  {#if current}
++    <label>{t('Auto-connect at startup')}
++      <select data-auto-connect-target value={current.autoConnectKey} disabled={!connection || pending || current.connectionBusy}
++        onchange={event => autoConnectTarget(event.currentTarget.value)}>
++        <option value="">{t('Off')}</option>
++        {#each current.registrations as console (console.key)}<option value={console.key}>{console.name}</option>{/each}
++      </select>
++    </label>
++  {/if}
+   <button class="connect-console" disabled={!connection || pending || current?.connectionBusy || !selected?.available
+     || !selected.registered || (selected.route === 'local' && selected.state !== 'ready')} onclick={connect}>{t('Connect')}</button>
+   <span role="status">{message}</span>
+diff --git a/gui/web/src/bridge.ts b/gui/web/src/bridge.ts
+index 99af940d..299ff633 100644
+--- a/gui/web/src/bridge.ts
++++ b/gui/web/src/bridge.ts
+@@ -7,7 +7,7 @@ export interface State {
+   revision: string; profileGeneration: string; consoles: Console[];
+   registrations: { key: string; name: string; ps5: boolean; identifier: string }[];
+   hiddenConsoles: { key: string; name: string; identifier: string }[];
+-  selectedKey: string; discoveryEnabled: boolean; streamerMode: boolean;
++  selectedKey: string; autoConnectKey: string; discoveryEnabled: boolean; streamerMode: boolean;
+   connectionBusy: boolean;
+   registration: Registration;
+   accountLookup: { route?: string; id?: string; phase?: string; message?: string };
+@@ -43,6 +43,7 @@ interface NativeBridge {
+   setDiscoveryEnabled(value: boolean, callback: (reply: Reply) => void): void;
+   selectConsole(key: string, callback: (reply: Reply) => void): void;
+   connectConsole(key: string, callback: (reply: Reply) => void): void;
++  setAutoConnectTarget(key: string, profile: string, callback: (reply: Reply) => void): void;
+   refreshPsnConsoles(profile: string, callback: (reply: Reply) => void): void;
+   cancelConnection(attempt: string, callback: (reply: Reply) => void): void;
+   retryConnection(attempt: string, callback: (reply: Reply) => void): void;
+@@ -83,6 +84,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
+   discovery(enabled: boolean): Promise<Reply>;
+   select(key: string): Promise<Reply>;
+   connect(key: string): Promise<Reply>;
++  autoConnectTarget(key: string, profile: string): Promise<Reply>;
+   refreshPsnConsoles(profile: string): Promise<Reply>;
+   cancelConnection(attempt: string): Promise<Reply>;
+   retryConnection(attempt: string): Promise<Reply>;
+@@ -148,6 +150,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
+         discovery: value => new Promise(done => setup.setDiscoveryEnabled(value, done)),
+         select: key => new Promise(done => setup.selectConsole(key, done)),
+         connect: key => new Promise(done => setup.connectConsole(key, done)),
++        autoConnectTarget: (key, profile) => new Promise(done => setup.setAutoConnectTarget(key, profile, done)),
+         refreshPsnConsoles: profile => new Promise(done => setup.refreshPsnConsoles(profile, done)),
+         cancelConnection: attempt => new Promise(done => setup.cancelConnection(attempt, done)),
+         retryConnection: attempt => new Promise(done => setup.retryConnection(attempt, done)),
+diff --git a/third-party/gf-complete b/third-party/gf-complete
+--- a/third-party/gf-complete
++++ b/third-party/gf-complete
+@@ -1 +1 @@
+-Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478
++Subproject commit fa54a4670a5705c84abf6c24b92b0cd479625478-dirty
