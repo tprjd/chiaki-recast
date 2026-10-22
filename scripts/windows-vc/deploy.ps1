@@ -76,7 +76,7 @@ foreach ($relative in @(
     'chiaki.exe', 'Qt6Core.dll', 'Qt6Gui.dll', 'Qt6Widgets.dll', 'Qt6Quick.dll',
     'Qt6WebEngineWidgets.dll', 'Qt6WebEngineCore.dll', 'Qt6WebChannel.dll',
     'QtWebEngineProcess.exe', 'platforms/qwindows.dll', 'qml/QtQuick/qmldir',
-    'qml/QtQuick/Controls/qmldir', 'qt.conf', 'vcruntime140.dll', 'msvcp140.dll',
+    'qml/QtQuick/Controls/qmldir', 'qt.conf', 'vcruntime140.dll', 'msvcp140.dll', 'd3dcompiler_47.dll',
     'resources/qtwebengine_resources.pak', 'resources/qtwebengine_resources_100p.pak',
     'resources/qtwebengine_resources_200p.pak', 'resources/qtwebengine_devtools_resources.pak',
     'resources/icudtl.dat', 'resources/v8_context_snapshot.bin',
@@ -98,9 +98,16 @@ foreach ($locale in Get-ChildItem "$QtDirectory/translations/qtwebengine_locales
         throw "Wrong WebEngine locale: $relative"
     }
 }
-foreach ($relative in @('QtWebEngineProcess.exe', 'Qt6WebEngineCore.dll', 'Qt6WebEngineWidgets.dll', 'Qt6WebChannel.dll')) {
+$matchingFiles = @('QtWebEngineProcess.exe') + @(Get-ChildItem "$Package/Qt6*.dll" -File |
+    Where-Object Name -ne 'Qt6Core.dll' | ForEach-Object Name)
+foreach ($relative in $matchingFiles) {
     if ((Get-FileHash "$Package/$relative").Hash -ne (Get-FileHash "$QtDirectory/bin/$relative").Hash) {
-        throw "WebEngine files must come from the selected SDK: $relative"
+        throw "Qt files must come from the selected SDK: $relative"
+    }
+}
+foreach ($asset in Get-ChildItem "$Package/resources" -File) {
+    if ((Get-FileHash $asset.FullName).Hash -ne (Get-FileHash "$QtDirectory/resources/$($asset.Name)").Hash) {
+        throw "Wrong WebEngine resource: $($asset.Name)"
     }
 }
 if ((Get-Item "$Package/Qt6Core.dll").VersionInfo.FileVersion -ne $qtVersion) { throw 'QtCore version does not match the selected SDK.' }
