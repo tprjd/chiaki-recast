@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Setting } from './settings';
   let { field, value, disabled, change, t }: {
-    field: Setting; value: boolean | number; disabled: boolean;
-    change: (value: boolean | number) => void; t: (text: string) => string;
+    field: Setting; value: boolean | number | string; disabled: boolean;
+    change: (value: boolean | number | string) => void; t: (text: string) => string;
   } = $props();
 </script>
 
@@ -14,9 +14,14 @@
   <div class="setting-control">
     {#if field.options}
       <select id={field.key} {value} {disabled} aria-describedby={`${field.key}-description ${field.key}-default`}
-        onchange={event => { const next = Number(event.currentTarget.value); event.currentTarget.value = String(value); change(next); }}>
-        {#each field.options as option, index}<option value={index}>{t(option)}</option>{/each}
+        onchange={event => { const next = field.optionValues ? field.optionValues[event.currentTarget.selectedIndex] : Number(event.currentTarget.value); event.currentTarget.value = String(value); change(next); }}>
+        {#each field.options as option, index}<option value={field.optionValues?.[index] ?? index}>{t(option)}</option>{/each}
       </select>
+    {:else if field.min !== undefined}
+      <input id={field.key} type="number" value={Number(value) / (field.factor ?? 1)} min={field.min} max={field.max} step={field.step ?? 1} {disabled}
+        aria-describedby={`${field.key}-description ${field.key}-default`}
+        onchange={event => { const next = event.currentTarget.valueAsNumber * (field.factor ?? 1); event.currentTarget.value = String(Number(value) / (field.factor ?? 1)); change(next); }} />
+      {#if field.unit}<span>{t(field.unit)}</span>{/if}
     {:else}
       <input id={field.key} type="checkbox" checked={value === true} {disabled}
         aria-describedby={`${field.key}-description ${field.key}-default`}

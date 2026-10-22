@@ -45,6 +45,8 @@ if(TARGET chiaki-gui)
     set_tests_properties(chiaki-embedded-setup PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-settings COMMAND chiaki-embedded-setup-tests generalSettings settingsValidation settingsRestart)
     set_tests_properties(chiaki-embedded-settings PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-video-audio COMMAND chiaki-embedded-setup-tests videoAudioSettings)
+    set_tests_properties(chiaki-embedded-video-audio PROPERTIES LABELS desktop)
     add_test(NAME chiaki-embedded-graphics COMMAND chiaki-embedded-setup-tests graphicsCoexistence)
     set_tests_properties(chiaki-embedded-graphics PROPERTIES LABELS "desktop;gpu")
 
