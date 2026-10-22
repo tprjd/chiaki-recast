@@ -28,6 +28,8 @@ public:
     Q_INVOKABLE QVariantMap setGeneralSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
     Q_INVOKABLE QVariantMap setMediaSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
     Q_INVOKABLE QVariantMap refreshAudioDevices();
+    Q_INVOKABLE QVariantMap setRendererSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
+    Q_INVOKABLE QVariantMap rendererAction(const QString &action, const QString &profileGeneration);
     // Native callers resolve immediately before dispatch; no row index crosses WebChannel.
     bool resolveConsole(const QString &key, int &index, QString &nickname) const;
 
@@ -50,5 +52,7 @@ private:
     QStringList decoders;
     QTimer accountExpiry;
     bool credentialsRejected = false;
+    int startupRendererBackend = 0;
+    bool startupVSync = true;
     bool currentProfile(const QString &profile) const;
 };

@@ -4,7 +4,7 @@
 
 **Blocked by:** 04: Connect locally from web setup to native playback; 06: Sign in to PSN independently from web setup.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 44, 45, 46.
 

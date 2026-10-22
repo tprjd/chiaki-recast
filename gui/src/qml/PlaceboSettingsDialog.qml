@@ -41,6 +41,7 @@ DialogView {
         }
     })
     property string options_url: ""
+    property string fileMessage: ""
     property int currentSection: 0
     title: qsTr("Renderer settings")
     header: ""
@@ -130,6 +131,7 @@ DialogView {
                         Layout.fillWidth: true
                         spacing: 12
                         Label { text: qsTr("Config"); font.pixelSize: 16; font.bold: true }
+                        Label { text: dialog.fileMessage; visible: text.length > 0; wrapMode: Text.Wrap; Layout.fillWidth: true; Accessible.role: Accessible.AlertMessage }
                         Frame {
                             Layout.fillWidth: true
                             background: Rectangle { color: "#1a202b"; radius: 8; border.color: "#303a48" }
@@ -202,7 +204,8 @@ DialogView {
                                     objectName: "exportPlaceboSettings"
                                     text: qsTr("Export")
                                     onClicked: {
-                                        dialog.backend.settings.exportPlaceboSettings();
+                                        const result = dialog.backend.settings.exportPlaceboSettings();
+                                        if (result) dialog.fileMessage = result.message;
                                     }
                                     Material.roundedScale: Material.SmallScale
                                     KeyNavigation.down: importButton
@@ -224,7 +227,8 @@ DialogView {
                                     lastInFocusChain: true
                                     text: qsTr("Import")
                                     onClicked: {
-                                        dialog.backend.settings.importPlaceboSettings();
+                                        const result = dialog.backend.settings.importPlaceboSettings();
+                                        if (result) dialog.fileMessage = result.message;
                                     }
                                     Material.roundedScale: Material.SmallScale
                                     KeyNavigation.up: exportButton

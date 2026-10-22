@@ -81,6 +81,18 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     connect(settings, &QmlSettings::noiseSuppressLevelChanged, this, &SetupBridge::refresh);
     connect(settings, &QmlSettings::echoSuppressLevelChanged, this, &SetupBridge::refresh);
 #endif
+    startupRendererBackend = settings->rendererBackend();
+    startupVSync = settings->vSyncEnabled();
+    connect(settings, &QmlSettings::vSyncEnabledChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::videoPresetChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::queueDepthLimitChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::rendererBackendChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::displayTargetPrimChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::displayTargetTrcChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::displayTargetPeakChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::displayTargetContrastChanged, this, &SetupBridge::refresh);
+    connect(settings, &QmlSettings::placeboChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::windowChanged, this, &SetupBridge::refresh);
     refresh();
 }
 
@@ -313,10 +325,56 @@ void SetupBridge::refresh()
     addChoices("decoder", decoders, settings->decoder(), false);
     addChoices("audioInDevice", settings->availableAudioInDevices(), settings->audioInDevice(), true);
     addChoices("audioOutDevice", settings->availableAudioOutDevices(), settings->audioOutDevice(), true);
+    QVariantMap renderer{{"vSyncEnabled", settings->vSyncEnabled()},
+        {"videoPreset", settings->videoPreset()},
+        {"queueDepthLimit", settings->queueDepthLimit()},
+        {"rendererBackend", settings->rendererBackend()},
+        {"displayTargetPrim", settings->displayTargetPrim()},
+        {"displayTargetTrc", settings->displayTargetTrc()},
+        {"displayTargetPeak", settings->displayTargetPeak()},
+        {"displayTargetContrast", settings->displayTargetContrast()},
+        {"placeboUpscaler", settings->placeboUpscaler()},
+        {"placeboPlaneUpscaler", settings->placeboPlaneUpscaler()},
+        {"placeboDownscaler", settings->placeboDownscaler()},
+        {"placeboPlaneDownscaler", settings->placeboPlaneDownscaler()},
+        {"placeboFrameMixer", settings->placeboFrameMixer()},
+        {"placeboAntiringingStrength", settings->placeboAntiringingStrength()},
+        {"placeboDebandEnabled", settings->placeboDebandEnabled()},
+        {"placeboDebandPreset", settings->placeboDebandPreset()},
+        {"placeboDebandIterations", settings->placeboDebandIterations()},
+        {"placeboDebandThreshold", settings->placeboDebandThreshold()},
+        {"placeboDebandRadius", settings->placeboDebandRadius()},
+        {"placeboDebandGrain", settings->placeboDebandGrain()},
+        {"placeboSigmoidEnabled", settings->placeboSigmoidEnabled()},
+        {"placeboSigmoidPreset", settings->placeboSigmoidPreset()},
+        {"placeboSigmoidCenter", settings->placeboSigmoidCenter()},
+        {"placeboSigmoidSlope", settings->placeboSigmoidSlope()},
+        {"placeboColorAdjustmentEnabled", settings->placeboColorAdjustmentEnabled()},
+        {"placeboColorAdjustmentPreset", settings->placeboColorAdjustmentPreset()},
+        {"placeboColorAdjustmentBrightness", settings->placeboColorAdjustmentBrightness()},
+        {"placeboColorAdjustmentContrast", settings->placeboColorAdjustmentContrast()},
+        {"placeboColorAdjustmentSaturation", settings->placeboColorAdjustmentSaturation()},
+        {"placeboColorAdjustmentHue", settings->placeboColorAdjustmentHue()},
+        {"placeboColorAdjustmentGamma", settings->placeboColorAdjustmentGamma()},
+        {"placeboColorAdjustmentTemperature", settings->placeboColorAdjustmentTemperature()},
+        {"placeboPeakDetectionEnabled", settings->placeboPeakDetectionEnabled()},
+        {"placeboPeakDetectionPreset", settings->placeboPeakDetectionPreset()},
+        {"placeboPeakDetectionPeakSmoothingPeriod", settings->placeboPeakDetectionPeakSmoothingPeriod()},
+        {"placeboPeakDetectionSceneThresholdLow", settings->placeboPeakDetectionSceneThresholdLow()},
+        {"placeboPeakDetectionSceneThresholdHigh", settings->placeboPeakDetectionSceneThresholdHigh()},
+        {"placeboPeakDetectionPeakPercentile", settings->placeboPeakDetectionPeakPercentile()},
+        {"placeboPeakDetectionBlackCutoff", settings->placeboPeakDetectionBlackCutoff()},
+        {"placeboPeakDetectionAllowDelayedPeak", settings->placeboPeakDetectionAllowDelayedPeak()}};
+    renderer.insert("targetPeakChoice", settings->displayTargetPeak() == 0 ? 0 : 1);
+    renderer.insert("targetContrastChoice", settings->displayTargetContrast() == 0 ? 0 : settings->displayTargetContrast() == -1 ? 1 : 2);
+    const auto *window = backend->qmlWindow();
+    QVariantMap rendererStatus{{"restartRequired", settings->rendererBackend() != startupRendererBackend
+        || (startupRendererBackend == 1 && settings->vSyncEnabled() != startupVSync)}};
+    if(window) rendererStatus.insert("runtimeBackend", window->runtimeRendererBackend());
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
         {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
         {"streamerMode", privateMode}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
-            || backend->connectionAttempt().value("cleanupPending").toBool()}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
+            || backend->connectionAttempt().value("cleanupPending").toBool()}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
     if (!suspended) emit stateChanged(state);
 }
 
@@ -721,4 +779,306 @@ QVariantMap SetupBridge::manageConsole(const QString &action, const QString &key
         return {{"accepted", true}};
     }
     return unavailable();
+}
+
+QVariantMap SetupBridge::setRendererSetting(const QString &name, const QVariant &value, const QString &profileGeneration)
+{
+    const auto reject = [this] { return QVariantMap{{"accepted", false}, {"message", tr("Choose a valid renderer setting value.")}}; };
+    if(!currentProfile(profileGeneration)) return {{"accepted", false}, {"message", tr("The profile changed. Try again in the current profile.")}};
+    auto *settings = backend->qmlSettings();
+    const auto type = value.metaType().id();
+    const bool numeric = type == QMetaType::Double || type == QMetaType::Int || type == QMetaType::UInt || type == QMetaType::LongLong;
+    const auto number = value.toDouble();
+    if(name == "targetPeakChoice") {
+        if(!numeric || (number != 0 && number != 1)) return reject();
+        settings->setDisplayTargetPeak(number == 0 ? 0 : 1000);
+        return {{"accepted", true}};
+    }
+    if(name == "targetContrastChoice") {
+        if(!numeric || (number != 0 && number != 1 && number != 2)) return reject();
+        settings->setDisplayTargetContrast(number == 0 ? 0 : number == 1 ? -1 : 1000);
+        return {{"accepted", true}};
+    }
+    if(name == "vSyncEnabled") {
+        if(type != QMetaType::Bool) return reject();
+        const bool changed = settings->vSyncEnabled() != value.toBool();
+        const auto *window = backend->qmlWindow();
+        const int runtimeBackend = window ? window->runtimeRendererBackend() : startupRendererBackend;
+        settings->setVSyncEnabled(value.toBool());
+        if(changed && runtimeBackend == static_cast<int>(RenderBackend::OpenGL)) return settings->restartApplication();
+        return {{"accepted", true}};
+    }
+    if(name == "videoPreset") {
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 5 || std::floor(number) != number) return reject();
+        settings->setVideoPreset(int(number));
+        if(auto *window = backend->qmlWindow()) window->setVideoPreset(static_cast<QmlMainWindow::VideoPreset>(int(number)));
+        return {{"accepted", true}};
+    }
+    if(name == "queueDepthLimit") {
+        if(!numeric || !std::isfinite(number) || number < 2 || number > 5 || std::floor(number) != number) return reject();
+        settings->setQueueDepthLimit(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "rendererBackend") {
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 1 || std::floor(number) != number) return reject();
+        const bool changed = settings->rendererBackend() != int(number);
+        settings->setRendererBackend(int(number));
+        if(changed) return settings->restartApplication();
+        return {{"accepted", true}};
+    }
+    if(name == "displayTargetPrim") {
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 17 || std::floor(number) != number) return reject();
+        settings->setDisplayTargetPrim(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "displayTargetTrc") {
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 16 || std::floor(number) != number) return reject();
+        settings->setDisplayTargetTrc(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "displayTargetPeak") {
+        if(!(settings->displayTargetPeak() != 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 10 || number > 10000 || std::floor(number) != number) return reject();
+        settings->setDisplayTargetPeak(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "displayTargetContrast") {
+        if(!(settings->displayTargetContrast() > 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 10 || number > 1000000 || std::floor(number) != number) return reject();
+        settings->setDisplayTargetContrast(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboUpscaler") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 13 || std::floor(number) != number) return reject();
+        settings->setPlaceboUpscaler(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboPlaneUpscaler") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 10 || std::floor(number) != number) return reject();
+        settings->setPlaceboPlaneUpscaler(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboDownscaler") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 8 || std::floor(number) != number) return reject();
+        settings->setPlaceboDownscaler(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboPlaneDownscaler") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 8 || std::floor(number) != number) return reject();
+        settings->setPlaceboPlaneDownscaler(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboFrameMixer") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 4 || std::floor(number) != number) return reject();
+        settings->setPlaceboFrameMixer(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboAntiringingStrength") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 1) return reject();
+        settings->setPlaceboAntiringingStrength(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboDebandEnabled") {
+        if(settings->videoPreset() != 5) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboDebandEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboDebandPreset") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboDebandEnabled())) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 1 || std::floor(number) != number) return reject();
+        settings->setPlaceboDebandPreset(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboDebandIterations") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboDebandEnabled() && settings->placeboDebandPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 16 || std::floor(number) != number) return reject();
+        settings->setPlaceboDebandIterations(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboDebandThreshold") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboDebandEnabled() && settings->placeboDebandPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 1000) return reject();
+        settings->setPlaceboDebandThreshold(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboDebandRadius") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboDebandEnabled() && settings->placeboDebandPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 1000) return reject();
+        settings->setPlaceboDebandRadius(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboDebandGrain") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboDebandEnabled() && settings->placeboDebandPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 1000) return reject();
+        settings->setPlaceboDebandGrain(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboSigmoidEnabled") {
+        if(settings->videoPreset() != 5) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboSigmoidEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboSigmoidPreset") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboSigmoidEnabled())) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 1 || std::floor(number) != number) return reject();
+        settings->setPlaceboSigmoidPreset(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboSigmoidCenter") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboSigmoidEnabled() && settings->placeboSigmoidPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 1) return reject();
+        settings->setPlaceboSigmoidCenter(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboSigmoidSlope") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboSigmoidEnabled() && settings->placeboSigmoidPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 1 || number > 20) return reject();
+        settings->setPlaceboSigmoidSlope(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboColorAdjustmentEnabled") {
+        if(settings->videoPreset() != 5) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboColorAdjustmentEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboColorAdjustmentPreset") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboColorAdjustmentEnabled())) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 1 || std::floor(number) != number) return reject();
+        settings->setPlaceboColorAdjustmentPreset(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboColorAdjustmentBrightness") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboColorAdjustmentEnabled() && settings->placeboColorAdjustmentPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < -1 || number > 1) return reject();
+        settings->setPlaceboColorAdjustmentBrightness(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboColorAdjustmentContrast") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboColorAdjustmentEnabled() && settings->placeboColorAdjustmentPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 100) return reject();
+        settings->setPlaceboColorAdjustmentContrast(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboColorAdjustmentSaturation") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboColorAdjustmentEnabled() && settings->placeboColorAdjustmentPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 100) return reject();
+        settings->setPlaceboColorAdjustmentSaturation(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboColorAdjustmentHue") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboColorAdjustmentEnabled() && settings->placeboColorAdjustmentPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 6.28) return reject();
+        settings->setPlaceboColorAdjustmentHue(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboColorAdjustmentGamma") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboColorAdjustmentEnabled() && settings->placeboColorAdjustmentPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 100) return reject();
+        settings->setPlaceboColorAdjustmentGamma(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboColorAdjustmentTemperature") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboColorAdjustmentEnabled() && settings->placeboColorAdjustmentPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < -1.143 || number > 5.286) return reject();
+        settings->setPlaceboColorAdjustmentTemperature(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboPeakDetectionEnabled") {
+        if(settings->videoPreset() != 5) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboPeakDetectionEnabled(value.toBool());
+        return {{"accepted", true}};
+    }
+    if(name == "placeboPeakDetectionPreset") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboPeakDetectionEnabled())) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 2 || std::floor(number) != number) return reject();
+        settings->setPlaceboPeakDetectionPreset(int(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboPeakDetectionPeakSmoothingPeriod") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboPeakDetectionEnabled() && settings->placeboPeakDetectionPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 1000) return reject();
+        settings->setPlaceboPeakDetectionPeakSmoothingPeriod(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboPeakDetectionSceneThresholdLow") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboPeakDetectionEnabled() && settings->placeboPeakDetectionPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 100) return reject();
+        settings->setPlaceboPeakDetectionSceneThresholdLow(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboPeakDetectionSceneThresholdHigh") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboPeakDetectionEnabled() && settings->placeboPeakDetectionPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 100) return reject();
+        settings->setPlaceboPeakDetectionSceneThresholdHigh(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboPeakDetectionPeakPercentile") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboPeakDetectionEnabled() && settings->placeboPeakDetectionPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 100) return reject();
+        settings->setPlaceboPeakDetectionPeakPercentile(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboPeakDetectionBlackCutoff") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboPeakDetectionEnabled() && settings->placeboPeakDetectionPreset() == 0)) return reject();
+        if(!numeric || !std::isfinite(number) || number < 0 || number > 100) return reject();
+        settings->setPlaceboPeakDetectionBlackCutoff(float(number));
+        return {{"accepted", true}};
+    }
+    if(name == "placeboPeakDetectionAllowDelayedPeak") {
+        if(settings->videoPreset() != 5) return reject();
+        if(!(settings->placeboPeakDetectionEnabled() && settings->placeboPeakDetectionPreset() == 0)) return reject();
+        if(type != QMetaType::Bool) return reject();
+        settings->setPlaceboPeakDetectionAllowDelayedPeak(value.toBool());
+        return {{"accepted", true}};
+    }
+    return reject();
+}
+
+QVariantMap SetupBridge::rendererAction(const QString &action, const QString &profileGeneration)
+{
+    if(!currentProfile(profileGeneration)) return {{"accepted", false}, {"message", tr("The profile changed. Try again in the current profile.")}};
+    auto *settings = backend->qmlSettings();
+    if(action == "importPlaceboSettings") return settings->importPlaceboSettings();
+    if(action == "exportPlaceboSettings") return settings->exportPlaceboSettings();
+    if(action == "openRendererDocumentation") {
+        backend->openPlaceboOptionsLink();
+        return {{"accepted", true}, {"message", tr("Renderer documentation opened.")}};
+    }
+    if(action == "copyRendererDocumentationUrl") {
+        QGuiApplication::clipboard()->setText(QStringLiteral("https://libplacebo.org/options/"));
+        return {{"accepted", true}, {"message", tr("Renderer documentation link copied.")}};
+    }
+    if(action == "restartRenderer") return settings->restartApplication();
+    return {{"accepted", false}};
 }

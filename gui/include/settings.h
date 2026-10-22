@@ -224,8 +224,8 @@ class Settings : public QObject
 		void ExportSettings(QString filepath);
 		void ImportSettings(QString filepath);
 
-		void ExportPlaceboSettings(QString filepath);
-		void ImportPlaceboSettings(QString filepath);
+		bool ExportPlaceboSettings(QString filepath);
+		bool ImportPlaceboSettings(QString filepath);
 
 		QMap<QString, QString> GetPlaceboValues();
 
