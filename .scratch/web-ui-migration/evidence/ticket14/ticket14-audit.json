@@ -1,0 +1,176 @@
+{
+  "baseline": "a57660940c4d3d22403c834eb638a947e01e24f2",
+  "source": "98823c2027e561abdd7c9f74478ec71c50dcb4be",
+  "controlCount": 28,
+  "independentMetadataMatch": true,
+  "comparisons": [
+    {
+      "name": "existing renderer setters/actions suffix",
+      "base": "00cc9d82385ba4091cffae10dc0f6ed890ce1495e0b0472c9c948ef53a4cb191",
+      "current": "00cc9d82385ba4091cffae10dc0f6ed890ce1495e0b0472c9c948ef53a4cb191",
+      "same": true
+    },
+    {
+      "name": "SetupBridge constructor and stable target methods",
+      "base": "8df538c6881af37df7e9b1e18619a06fef12f1cc61860ae110fb769de88b40d7",
+      "current": "8df538c6881af37df7e9b1e18619a06fef12f1cc61860ae110fb769de88b40d7",
+      "same": true
+    },
+    {
+      "name": "gui/src/qmlsettings.cpp",
+      "base": "fc6c4eb5365cf07d715d93d1d571590516e911b8e5924191b8fbda2cef7cc820",
+      "current": "fc6c4eb5365cf07d715d93d1d571590516e911b8e5924191b8fbda2cef7cc820",
+      "same": true
+    },
+    {
+      "name": "gui/src/settings.cpp",
+      "base": "b2723cbd5740c4fedf6ce73a9cb887a8c226aaf3eac30452a5ae751b7c16e26c",
+      "current": "b2723cbd5740c4fedf6ce73a9cb887a8c226aaf3eac30452a5ae751b7c16e26c",
+      "same": true
+    },
+    {
+      "name": "gui/src/qml/PlaceboColorMappingDialog.qml",
+      "base": "01c8a29134143e30b136e32e987d48c404918debf61e5df1fad988dff1bd90e1",
+      "current": "01c8a29134143e30b136e32e987d48c404918debf61e5df1fad988dff1bd90e1",
+      "same": true
+    },
+    {
+      "name": "gui/src/qml/PlaceboSettingsDialog.qml",
+      "base": "ee274d7d34182a3b521358e68d53a1eb97bc7803cf453dcef5bd401130dad376",
+      "current": "ee274d7d34182a3b521358e68d53a1eb97bc7803cf453dcef5bd401130dad376",
+      "same": true
+    },
+    {
+      "name": "gui/src/qml/StreamRoot.qml",
+      "base": "0230636dda942df8a61bf47c31db10af5fbcaa5eb49428db442f4d6df2678f03",
+      "current": "0230636dda942df8a61bf47c31db10af5fbcaa5eb49428db442f4d6df2678f03",
+      "same": true
+    },
+    {
+      "name": "gui/web/src/KeyboardMouse.svelte",
+      "base": "42f9b7236208d69da49ae914b6c26e4a55572735670c9489e13b3255058ca42a",
+      "current": "42f9b7236208d69da49ae914b6c26e4a55572735670c9489e13b3255058ca42a",
+      "same": true
+    },
+    {
+      "name": "gui/web/src/bridge.ts",
+      "base": "fb14fa4934d6d852ed53787f973e07ba553ba4251c47fe6f46fafcc4c20eae61",
+      "current": "fb14fa4934d6d852ed53787f973e07ba553ba4251c47fe6f46fafcc4c20eae61",
+      "same": true
+    },
+    {
+      "name": "gui/src/setupwindow.cpp",
+      "base": "1e9fea20bf7e25540caf6ad03db12d69d184544a57bc1aaa2be3f0a13eb84fe5",
+      "current": "1e9fea20bf7e25540caf6ad03db12d69d184544a57bc1aaa2be3f0a13eb84fe5",
+      "same": true
+    },
+    {
+      "name": "gui/src/qmlbackend.cpp",
+      "base": "94328e0d6f6b801fc1fce3bc52ad66490e1cdd7b024e0aa7798ccf7a04681585",
+      "current": "94328e0d6f6b801fc1fce3bc52ad66490e1cdd7b024e0aa7798ccf7a04681585",
+      "same": true
+    },
+    {
+      "name": "gui/src/qmlnativeservices.cpp",
+      "base": "5a1d17b1bdb46891d9bd63cf413a39aec1ad0d0512ee4053d6502e8614d094b2",
+      "current": "5a1d17b1bdb46891d9bd63cf413a39aec1ad0d0512ee4053d6502e8614d094b2",
+      "same": true
+    },
+    {
+      "name": "gui/include/qmlnativeservices.h",
+      "base": "1ac0ef0f2d0df0af6d92cca693b197c46c9d68cd5d06b9e4c954340b99947085",
+      "current": "1ac0ef0f2d0df0af6d92cca693b197c46c9d68cd5d06b9e4c954340b99947085",
+      "same": true
+    },
+    {
+      "name": "gui/include/qmlbackend.h",
+      "base": "d7070acfde020e389a660816756e174def9deb9fa9367343d011ecea8e623f3d",
+      "current": "d7070acfde020e389a660816756e174def9deb9fa9367343d011ecea8e623f3d",
+      "same": true
+    },
+    {
+      "name": "gui/src/discoverymanager.cpp",
+      "base": "30c4e7b003d4674ce1d847b2e8d41c2c9e7cbb40baef1c0d53d7d1196e48be5b",
+      "current": "30c4e7b003d4674ce1d847b2e8d41c2c9e7cbb40baef1c0d53d7d1196e48be5b",
+      "same": true
+    },
+    {
+      "name": "gui/include/discoverymanager.h",
+      "base": "09f01d790c372a5a350ed93baeabc219953694d5c41ceec358e3647a81d86caa",
+      "current": "09f01d790c372a5a350ed93baeabc219953694d5c41ceec358e3647a81d86caa",
+      "same": true
+    },
+    {
+      "name": "tested color and renderer setter method",
+      "base": "ccc11c8683a9cec39ee405d83169bbdc98b92b73a06dc38d882ed1db24bd6530",
+      "current": "ccc11c8683a9cec39ee405d83169bbdc98b92b73a06dc38d882ed1db24bd6530",
+      "same": true
+    },
+    {
+      "name": "tested gui/web/src/SettingField.svelte",
+      "base": "df0374f81b885daeea1a8bed02971033199b7c4f300539974c5721ce6622f1d5",
+      "current": "df0374f81b885daeea1a8bed02971033199b7c4f300539974c5721ce6622f1d5",
+      "same": true
+    },
+    {
+      "name": "tested gui/web/src/settings.ts",
+      "base": "9990d1d8d82c462a0fe73443b324586f521e3016e53e1d4aa0b30acf248b6fcb",
+      "current": "9990d1d8d82c462a0fe73443b324586f521e3016e53e1d4aa0b30acf248b6fcb",
+      "same": true
+    },
+    {
+      "name": "tested Settings.svelte apart from button class",
+      "base": "933f8e88a663197310e7132cba72d7012418c9166a5568321bcba38383e56f4b",
+      "current": "933f8e88a663197310e7132cba72d7012418c9166a5568321bcba38383e56f4b",
+      "same": true
+    },
+    {
+      "name": "tested shared stylesheet apart from PSN refresh selector",
+      "base": "9d327d9e8d66ffb417a1b75d2c7c37f7e6d318e23bd8b0d212b1cfb031d5f403",
+      "current": "9d327d9e8d66ffb417a1b75d2c7c37f7e6d318e23bd8b0d212b1cfb031d5f403",
+      "same": true
+    },
+    {
+      "name": "tested rendererSettings",
+      "base": "2ce8d5ab05745631b6b6ec9a10bfc7955a75928a19389d9287b750408090f5c6",
+      "current": "2ce8d5ab05745631b6b6ec9a10bfc7955a75928a19389d9287b750408090f5c6",
+      "same": true
+    },
+    {
+      "name": "tested rendererLayout",
+      "base": "bfc4a7e288ed7415651b18f941dddda86bfb54b36f3c16dd0da7c8791ed277b4",
+      "current": "bfc4a7e288ed7415651b18f941dddda86bfb54b36f3c16dd0da7c8791ed277b4",
+      "same": true
+    },
+    {
+      "name": "tested settingsValidation",
+      "base": "f9549b1afcb9a76099e723e870e36c832aff2f4539eb6ce58a4d34c4a16d57e8",
+      "current": "f9549b1afcb9a76099e723e870e36c832aff2f4539eb6ce58a4d34c4a16d57e8",
+      "same": true
+    },
+    {
+      "name": "tested videoAudioSettings",
+      "base": "85543b6b18e87e3a8834d5151ad6f762e2127038cbce8cea29e68bfd220ea3e4",
+      "current": "85543b6b18e87e3a8834d5151ad6f762e2127038cbce8cea29e68bfd220ea3e4",
+      "same": true
+    },
+    {
+      "name": "tested keyboardMouseSettings",
+      "base": "6f95ec8a2a7f5049ba3c7c798cc69af67154318e789e09c0c46cd285cc10c433",
+      "current": "6f95ec8a2a7f5049ba3c7c798cc69af67154318e789e09c0c46cd285cc10c433",
+      "same": true
+    },
+    {
+      "name": "tested colorMappingRestartRead",
+      "base": "6c2cf3b04c3b85196e444d4a0cb9a0b584d3cb3bd6672f75a67167d914021f4b",
+      "current": "6c2cf3b04c3b85196e444d4a0cb9a0b584d3cb3bd6672f75a67167d914021f4b",
+      "same": true
+    },
+    {
+      "name": "tested color behavior apart from moved capture",
+      "base": "a2d44e2760d66c714ba5a058fc43394d4d5d2968bd40abd2f43571ba8cbebeb0",
+      "current": "a2d44e2760d66c714ba5a058fc43394d4d5d2968bd40abd2f43571ba8cbebeb0",
+      "same": true
+    }
+  ]
+}

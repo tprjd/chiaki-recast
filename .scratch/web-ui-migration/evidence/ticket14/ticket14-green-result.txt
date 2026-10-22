@@ -1,0 +1,16 @@
+********* Start testing of EmbeddedSetupTest *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : EmbeddedSetupTest::initTestCase()
+QWARN  : EmbeddedSetupTest::colorMappingSettings() QFontDatabase: Cannot find font directory C:/Users/david/.cache/chiaki-native-qt/6.9.3/msvc2022_64/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+FAIL!  : EmbeddedSetupTest::colorMappingSettings() Compared values are not the same
+   Actual   (script(setup.view(), "document.querySelector('#placeboToneMappingContrastRecovery')?.value").toString()): "0.5699999928474426"
+   Expected ((QString(QtPrivate::qMakeStringPrivate(u"" "0.57"))))                                                   : "0.57"
+C:\Users\david\.codex\worktrees\web-ui-ticket-14\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(2045) : failure location
+QWARN  : EmbeddedSetupTest::rendererSettings() Failed to relaunch application for renderer settings
+PASS   : EmbeddedSetupTest::rendererSettings()
+PASS   : EmbeddedSetupTest::rendererLayout()
+PASS   : EmbeddedSetupTest::settingsValidation()
+PASS   : EmbeddedSetupTest::cleanupTestCase()
+Totals: 5 passed, 1 failed, 0 skipped, 0 blacklisted, 35877ms
+********* Finished testing of EmbeddedSetupTest *********
