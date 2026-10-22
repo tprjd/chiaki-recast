@@ -43,7 +43,7 @@
 </script>
 
 <svelte:window onkeydown={event => {
-  if (open && event.key === 'Escape' && (event.target as Element).closest('.psn-account')) {
+  if (!event.defaultPrevented && open && event.key === 'Escape' && (event.target as Element).closest('.psn-account')) {
     event.preventDefault(); toggle();
   }
 }} />

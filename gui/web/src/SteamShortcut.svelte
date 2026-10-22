@@ -62,6 +62,7 @@
   function close() { if (!busy) connection.endSteamShortcut(form, profile); }
 </script>
 <svelte:window onkeydown={event => {
+  if (event.defaultPrevented) return;
   const panel = document.querySelector<HTMLElement>('[data-steam-form]');
   if (!panel) return;
   if (event.key === 'ContextMenu') {

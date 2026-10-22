@@ -17,10 +17,10 @@
 #include "steamtools.h"
 #endif
 
-#ifdef CHIAKI_HAVE_WEBENGINE
 #if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
 #include <QWebEngineClientHints>
 #endif
+#ifdef CHIAKI_HAVE_WEBENGINE
 #include <QWebEngineCookieStore>
 #endif
 #include <QUrlQuery>
@@ -2026,6 +2026,7 @@ void QmlBackend::clearCookies(QQuickWebEngineProfile *profile)
     auto cookieStore = profile->cookieStore();
     cookieStore->deleteAllCookies();
 }
+#endif
 
 template<class Profile>
 static void applyWebEngineHints(Profile *profile)
@@ -2060,9 +2061,10 @@ static void applyWebEngineHints(Profile *profile)
     profile->setUrlRequestInterceptor(new SecUaRequestInterceptor(chrome_version, profile));
 }
 
+#ifdef CHIAKI_HAVE_WEBENGINE
 void QmlBackend::setWebEngineHints(QQuickWebEngineProfile *profile) { applyWebEngineHints(profile); }
-void QmlBackend::setWebEngineHints(QWebEngineProfile *profile) { applyWebEngineHints(profile); }
 #endif
+void QmlBackend::setWebEngineHints(QWebEngineProfile *profile) { applyWebEngineHints(profile); }
 
 void QmlBackend::connectToHost(int index, QString nickname)
 {

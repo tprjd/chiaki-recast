@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick } from 'svelte';
+  import { moveFocus } from './navigation';
   import SettingField from './SettingField.svelte';
   import type { State, connectSetup } from './bridge';
   import { keyboardMouseSettings } from './settings';
@@ -145,7 +146,7 @@
   </section>
   <p class="keyboard-note" role="status">{message}</p>
 </div>
-<dialog bind:this={confirmation} aria-labelledby="reset-keyboard-title" oncancel={event => { event.preventDefault(); cancelReset(); }}>
+<dialog bind:this={confirmation} aria-labelledby="reset-keyboard-title" onkeydown={event => moveFocus(event, confirmation)} oncancel={event => { event.preventDefault(); cancelReset(); }}>
   <h2 id="reset-keyboard-title">{t('Reset keyboard and mouse defaults?')}</h2>
   <p>{t('This restores mouse response and bindings and turns mouse camera mode off. Other settings stay unchanged.')}</p>
   <button data-keyboard-reset-confirm onclick={reset}>{t('Reset defaults')}</button>
