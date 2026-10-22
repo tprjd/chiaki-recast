@@ -499,6 +499,11 @@ dialog. It tracks decoded AVBuffer lifetimes through normal OpenGL disconnect
 and Vulkan controller destruction with queued GUI delivery. The same native
 backend and QML engine serve both connections.
 
+`suspendClosesSignIn` checks the account and handoff merge boundary. It closes
+the native sign-in page during a pending exchange, freezes setup, completes
+the exchange through the controlled native HTTP boundary, and resumes with
+fresh account status. Closing the page does not cancel the native operation.
+
 The fixture explicitly clears the saved console login PIN. A zeroed
 `ChiakiRegisteredHost` otherwise creates the saved string `0`, which selects
 the existing automatic PIN submission route. The frame fixture is generated

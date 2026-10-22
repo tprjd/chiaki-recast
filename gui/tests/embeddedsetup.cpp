@@ -544,7 +544,8 @@ private slots:
         QTRY_VERIFY(!native);
         QTRY_VERIFY(setup.isVisible());
         QCOMPARE(setup.view()->page()->lifecycleState(), QWebEnginePage::LifecycleState::Active);
-        QTRY_VERIFY(!script(setup.view(), "document.querySelector('.connect-console').disabled").toBool());
+        QVERIFY(backend->discoveryEnabled());
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.discovery').getAttribute('aria-pressed')").toString(), QStringLiteral("true"));
     }
 
     void init()
