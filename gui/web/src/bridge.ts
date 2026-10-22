@@ -9,6 +9,7 @@ export interface State {
   hiddenConsoles: { key: string; name: string; identifier: string }[];
   selectedKey: string; discoveryEnabled: boolean; streamerMode: boolean;
   connectionBusy: boolean;
+  connection: { id?: string; phase?: string; cancelable?: boolean; cleanupPending?: boolean; targetValid?: boolean; errorTitle?: string; errorText?: string };
   streamError?: { id: string; title: string; text: string };
   mediaSettings: Record<string, boolean | number | string>;
   mediaChoices: Record<string, { label: string; value: string }[]>;
@@ -21,7 +22,8 @@ export interface State {
   rendererSettings: Record<string, boolean | number>;
   rendererStatus: { restartRequired: boolean; runtimeBackend?: number };
   capabilities: { discovery: boolean }; strings: Record<string, string>;
-  psn: { status: 'signedOut' | 'ready' | 'expired'; id?: string; phase?: string; message?: string; profileValid?: boolean };
+  psn: { status: 'signedOut' | 'ready' | 'expired'; id?: string; phase?: string; message?: string; profileValid?: boolean;
+    refresh: { phase?: string; message?: string } };
 }
 interface Reply { accepted: boolean; message?: string; form?: string }
 interface NativeBridge {
@@ -31,6 +33,10 @@ interface NativeBridge {
   setDiscoveryEnabled(value: boolean, callback: (reply: Reply) => void): void;
   selectConsole(key: string, callback: (reply: Reply) => void): void;
   connectConsole(key: string, callback: (reply: Reply) => void): void;
+  refreshPsnConsoles(profile: string, callback: (reply: Reply) => void): void;
+  cancelConnection(attempt: string, callback: (reply: Reply) => void): void;
+  retryConnection(attempt: string, callback: (reply: Reply) => void): void;
+  dismissConnection(attempt: string, callback: (reply: Reply) => void): void;
   saveManualAddress(address: string, registrationKey: string, profile: string, callback: (reply: Reply) => void): void;
   manageConsole(action: string, key: string, pin: string, callback: (reply: Reply) => void): void;
   dismissStreamError(id: string, callback: (reply: Reply) => void): void;
@@ -60,6 +66,10 @@ export function connectSetup(receive: (state: State) => void): Promise<{
   discovery(enabled: boolean): Promise<Reply>;
   select(key: string): Promise<Reply>;
   connect(key: string): Promise<Reply>;
+  refreshPsnConsoles(profile: string): Promise<Reply>;
+  cancelConnection(attempt: string): Promise<Reply>;
+  retryConnection(attempt: string): Promise<Reply>;
+  dismissConnection(attempt: string): Promise<Reply>;
   saveManual(address: string, registrationKey: string, profile: string): Promise<Reply>;
   manage(action: string, key: string, pin?: string): Promise<Reply>;
   dismissStreamError(id: string): Promise<Reply>;
@@ -114,6 +124,10 @@ export function connectSetup(receive: (state: State) => void): Promise<{
         discovery: value => new Promise(done => setup.setDiscoveryEnabled(value, done)),
         select: key => new Promise(done => setup.selectConsole(key, done)),
         connect: key => new Promise(done => setup.connectConsole(key, done)),
+        refreshPsnConsoles: profile => new Promise(done => setup.refreshPsnConsoles(profile, done)),
+        cancelConnection: attempt => new Promise(done => setup.cancelConnection(attempt, done)),
+        retryConnection: attempt => new Promise(done => setup.retryConnection(attempt, done)),
+        dismissConnection: attempt => new Promise(done => setup.dismissConnection(attempt, done)),
         saveManual: (address, registrationKey, profile) => new Promise(done => setup.saveManualAddress(address, registrationKey, profile, done)),
         manage: (action, key, pin = '') => new Promise(done => setup.manageConsole(action, key, pin, done)),
         dismissStreamError: id => new Promise(done => setup.dismissStreamError(id, done)),

@@ -81,6 +81,7 @@ static bool inputDesktopAvailable()
 #include "applicationcontroller.h"
 #include <QTcpServer>
 #include <atomic>
+#include <QSemaphore>
 #ifdef Q_OS_WIN
 #include <stdlib.h>
 #endif
@@ -227,6 +228,12 @@ class EmbeddedSetupTest : public QObject
             Qt::QueuedConnection, Q_ARG(QList<DiscoveryHost>, hosts)));
     }
 
+    DiscoveryRequests controlledDiscovery()
+    {
+        return {[](ChiakiDiscoveryService *, ChiakiDiscoveryServiceOptions *, ChiakiLog *) { return CHIAKI_ERR_SUCCESS; },
+            [](ChiakiDiscoveryService *) {}};
+    }
+
     QVariantMap settingRequest(QWebEngineView *view, const QString &name, const QVariant &value, const QString &generation, const QString &method = "setGeneralSetting")
     {
         return setupRequest(view, method, QJsonArray{name, QJsonValue::fromVariant(value), generation});
@@ -320,6 +327,375 @@ class EmbeddedSetupTest : public QObject
     }
 
 private slots:
+    void remoteNativeConnection()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetHardwareDecoder({});
+        settings.SetCodecRemotePS5(CHIAKI_CODEC_H264);
+        settings.SetRenderBackend(RenderBackend::OpenGL);
+        settings.SetPlaceboPreset(PlaceboPreset::Fast);
+        settings.SetWindowType(WindowType::AdjustableResolution);
+        settings.SetStreamGeometry(QRect(80, 80, 960, 640));
+        settings.SetPsnAuthToken("worker-access-secret");
+        settings.SetPsnRefreshToken("worker-refresh-secret");
+        settings.SetPsnAccountId("AQAAAAAAAAA=");
+        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(3600).toString(settings.GetTimeFormat()));
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Remote office");
+        RegisteredHost paired(registered);
+        paired.SetConsolePin(paired, {});
+        settings.AddRegisteredHost(paired);
+        QSemaphore release;
+        std::atomic<int> calls = 0;
+        std::atomic<ChiakiErrorCode> result = CHIAKI_ERR_HOST_UNREACH;
+        std::atomic<int> starts = 0;
+        QString connectedDuid;
+        bool connectedPs5 = false;
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
+            *count = 1;
+            strcpy((*devices)[0].device_name, "Remote office");
+            memset((*devices)[0].device_uid, 0x12, sizeof((*devices)[0].device_uid));
+            (*devices)[0].remoteplay_enabled = true;
+            return CHIAKI_ERR_SUCCESS;
+        };
+        transport.connect = [&](StreamSession *, const QString &duid, bool ps5) {
+            connectedDuid = duid;
+            connectedPs5 = ps5;
+            ++calls;
+            release.acquire();
+            return result.load();
+        };
+        transport.startSession = [&](ChiakiSession *) { ++starts; return CHIAKI_ERR_CANCELED; };
+        QmlNativeServices services(&settings, transport, {}, controlledDiscovery());
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        ApplicationController controller(&services);
+        const auto unblock = qScopeGuard([&] { release.release(100); });
+        auto *setup = controller.setupWindow();
+        setup->show();
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
+        const auto key = setup->bridge()->snapshot().value("selectedKey").toString();
+        script(setup->view(), "document.querySelector('.connect-console').click();document.querySelector('.connect-console').click()");
+        QTRY_COMPARE(calls.load(), 1);
+        QCOMPARE(connectedDuid, QStringLiteral("1212121212121212121212121212121212121212121212121212121212121212"));
+        QVERIFY(connectedPs5);
+        QPointer<StreamSession> firstSession = backend->qmlSession();
+        QPointer<QmlMainWindow> native = backend->qmlWindow();
+        QVERIFY(firstSession && native);
+        QTRY_VERIFY(!setup->isVisible());
+        QTRY_VERIFY(nativeObject("connectionCancel"));
+        QCOMPARE(nativeObject("connectionRoute")->property("text").toString(), QStringLiteral("Remote connection"));
+        release.release();
+        QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("failure"));
+        QTRY_VERIFY(!firstSession);
+        QVERIFY(!backend->connectionAttempt().value("cleanupPending").toBool());
+        QCOMPARE(nativeObject("connectionTitle")->property("text").toString(), QStringLiteral("Console is unreachable"));
+        auto *retry = nativeObject("connectionRetry");
+        QVERIFY(retry && retry->property("enabled").toBool());
+        const auto firstAttempt = backend->connectionAttempt().value("id").toString();
+        result = CHIAKI_ERR_SUCCESS;
+        QVERIFY(QMetaObject::invokeMethod(retry, "clicked"));
+        QTRY_COMPARE(calls.load(), 2);
+        QPointer<StreamSession> secondSession = backend->qmlSession();
+        QVERIFY(secondSession);
+        QVERIFY(backend->connectionAttempt().value("id").toString() != firstAttempt);
+        QVERIFY(!setup->bridge()->cancelConnection(firstAttempt).value("accepted").toBool());
+        auto *cancel = nativeObject("connectionCancel");
+        QVERIFY(cancel && cancel->property("enabled").toBool());
+        QVERIFY(QMetaObject::invokeMethod(cancel, "clicked"));
+        QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("cancelling"));
+        QVERIFY(backend->connectionAttempt().value("cleanupPending").toBool());
+        QVERIFY(!setup->bridge()->connectConsole(key).value("accepted").toBool());
+        release.release();
+        QTRY_VERIFY(!secondSession);
+        QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("cancelled"));
+        QCOMPARE(starts.load(), 0);
+        auto *back = nativeObject("connectionBack");
+        QVERIFY(back && back->property("enabled").toBool());
+        QVERIFY(QMetaObject::invokeMethod(back, "clicked"));
+        QTRY_VERIFY(!native);
+        QTRY_VERIFY(setup->isVisible());
+        QTRY_VERIFY(script(setup->view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
+        QCOMPARE(calls.load(), 2);
+        script(setup->view(), "document.querySelector('.connect-console').click()");
+        QTRY_COMPARE(calls.load(), 3);
+        QPointer<StreamSession> staleSession = backend->qmlSession();
+        native = backend->qmlWindow();
+        QVERIFY(staleSession && native);
+        QTRY_VERIFY(!setup->isVisible());
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        backend->setDiscoveryEnabled(false);
+        release.release();
+        QTRY_VERIFY(!staleSession);
+        QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("failure"));
+        QVERIFY(!nativeObject("connectionRetry")->property("enabled").toBool());
+        QVERIFY(!backend->connectionAttempt().value("cleanupPending").toBool());
+        back = nativeObject("connectionBack");
+        QVERIFY(back && back->property("enabled").toBool());
+        QVERIFY(QMetaObject::invokeMethod(back, "clicked"));
+        QTRY_VERIFY(!native);
+        QTRY_VERIFY(setup->isVisible());
+        QTRY_COMPARE(script(setup->view(), "document.querySelectorAll('.console-card').length").toInt(), 0);
+        QCOMPARE(calls.load(), 3);
+        QCOMPARE(requests.size(), 0);
+        QVERIFY(!backend->qmlSession());
+        QVERIFY(!backend->qmlWindow());
+        QCOMPARE(starts.load(), 0);
+    }
+
+    void psnRemoteRefreshOwnership()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetPsnAuthToken("list-access-secret");
+        settings.SetPsnRefreshToken("list-refresh-secret");
+        settings.SetPsnAccountId("AQAAAAAAAAA=");
+        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(3600).toString(settings.GetTimeFormat()));
+        for (int i = 0; i < 2; ++i) {
+            ChiakiRegisteredHost registered = {};
+            registered.target = CHIAKI_TARGET_PS5_1;
+            memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+            registered.server_mac[5] += i;
+            strcpy(registered.server_nickname, i ? "Remote lounge" : "Remote office");
+            settings.AddRegisteredHost(RegisteredHost(registered));
+        }
+        QSemaphore release;
+        std::atomic<int> calls = 0;
+        std::atomic<bool> fail = false;
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [&](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            ++calls;
+            release.acquire();
+            *devices = nullptr;
+            *count = 0;
+            if (fail) return CHIAKI_ERR_NETWORK;
+            *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(4, sizeof(ChiakiHolepunchDeviceInfo)));
+            *count = 4;
+            for (int i = 0; i < 4; ++i) {
+                strcpy((*devices)[i].device_name, i == 0 ? "Remote office" : i == 1 ? "Remote lounge" : "Unregistered");
+                memset((*devices)[i].device_uid, i + 1, sizeof((*devices)[i].device_uid));
+                (*devices)[i].remoteplay_enabled = i != 3;
+            }
+            return CHIAKI_ERR_SUCCESS;
+        };
+        QmlNativeServices services(&settings, transport, {}, controlledDiscovery());
+        const auto unblock = qScopeGuard([&] { release.release(100); });
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_COMPARE(calls.load(), 1);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]')?.textContent").toString(), QStringLiteral("Finding remote consoles"));
+        QVERIFY(script(setup.view(), "document.querySelector('[data-psn-refresh]').disabled").toBool());
+        release.release();
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 2);
+        script(setup.view(), "[...document.querySelectorAll('.console-card')].find(e=>e.textContent.includes('Remote lounge')).click()");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-card.selected .console-name').textContent").toString(), QStringLiteral("Remote lounge"));
+        const auto selected = setup.bridge()->snapshot().value("selectedKey");
+        script(setup.view(), "document.querySelector('[data-psn-refresh]').click();document.querySelector('[data-psn-refresh]').click()");
+        QTRY_COMPARE(calls.load(), 2);
+        QCOMPARE(setup.bridge()->snapshot().value("selectedKey"), selected);
+        release.release();
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]').textContent").toString(), QStringLiteral("Remote consoles updated"));
+        QCOMPARE(setup.bridge()->snapshot().value("selectedKey"), selected);
+        DiscoveryHost local = {};
+        local.ps5 = true;
+        local.host_name = "Remote office";
+        local.host_id = "001122334455";
+        local.host_addr = "192.0.2.1";
+        local.state = CHIAKI_DISCOVERY_HOST_STATE_READY;
+        discover(backend, {local});
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 2);
+        QTRY_COMPARE(script(setup.view(), "[...document.querySelectorAll('.console-card')].filter(e=>e.textContent.includes('Remote office')).length").toInt(), 1);
+        QCOMPARE(setup.bridge()->snapshot().value("selectedKey"), selected);
+        fail = true;
+        script(setup.view(), "document.querySelector('[data-psn-refresh]').click()");
+        QTRY_COMPARE(calls.load(), 3);
+        release.release(2);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]').textContent").toString(), QStringLiteral("Could not refresh remote consoles. Check your connection and try again."));
+        QCOMPARE(calls.load(), 4);
+        QCOMPARE(setup.bridge()->snapshot().value("selectedKey"), selected);
+        QCOMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 2);
+        const auto oldProfile = setup.bridge()->snapshot().value("profileGeneration").toString();
+        fail = false;
+        script(setup.view(), "document.querySelector('[data-psn-refresh]').click()");
+        QTRY_COMPARE(calls.load(), 5);
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        backend->setDiscoveryEnabled(false);
+        discover(backend, {});
+        release.release();
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.console-card').length").toInt(), 0);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]').textContent").toString(), QStringLiteral("Sign in to PSN before refreshing remote consoles."));
+        QVERIFY(!setup.bridge()->selectConsole(selected.toString()).value("accepted").toBool());
+        QVERIFY(!setup.bridge()->refreshPsnConsoles(oldProfile).value("accepted").toBool());
+        QCOMPARE(requests.size(), 0);
+    }
+
+    void psnRemoteTokenConnection()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetPsnAuthToken("connection-access-secret");
+        settings.SetPsnRefreshToken("connection-refresh-secret");
+        settings.SetPsnAccountId("AQAAAAAAAAA=");
+        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(3600).toString(settings.GetTimeFormat()));
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Remote office");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
+            *count = 1;
+            strcpy((*devices)[0].device_name, "Remote office");
+            memset((*devices)[0].device_uid, 0x12, sizeof((*devices)[0].device_uid));
+            (*devices)[0].remoteplay_enabled = true;
+            return CHIAKI_ERR_SUCCESS;
+        };
+        QmlNativeServices services(&settings, transport, {}, controlledDiscovery());
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.connect-console')?.disabled === false").toBool());
+        const auto key = setup.bridge()->snapshot().value("selectedKey").toString();
+        backend->qmlSettings()->setPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(-60).toString(settings.GetTimeFormat()));
+        script(setup.view(), "document.querySelector('.connect-console').click();document.querySelector('.connect-console').click()");
+        QTRY_COMPARE(requests.size(), 1);
+        const auto first = backend->connectionAttempt().value("id").toString();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-connection-cancel]')?.disabled === false").toBool());
+        QVERIFY(!setup.bridge()->connectConsole(key).value("accepted").toBool());
+        requests[0]->finish({}, QNetworkReply::AuthenticationRequiredError);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-connection-retry]')?.disabled === false").toBool());
+        QCOMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("failure"));
+        QVERIFY(script(setup.view(), "document.querySelector('[data-psn-connection]').textContent.includes('PSN credentials expired. Sign in again.')").toBool());
+        setup.resize(390, 720);
+        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+        if (qEnvironmentVariableIsSet("CHIAKI_EMBEDDED_EVIDENCE"))
+            QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("remote-connection-error-390.png")));
+        script(setup.view(), "document.querySelector('[data-connection-retry]').click()");
+        QTRY_COMPARE(requests.size(), 2);
+        QVERIFY(backend->connectionAttempt().value("id").toString() != first);
+        QVERIFY(!setup.bridge()->cancelConnection(first).value("accepted").toBool());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-connection-cancel]') !== null").toBool());
+        script(setup.view(), "document.querySelector('[data-connection-cancel]').click()");
+        QTRY_COMPARE(backend->connectionAttempt().value("phase").toString(), QStringLiteral("cancelled"));
+        QVERIFY(!requests[1]);
+        QVERIFY(!backend->connectionAttempt().value("cleanupPending").toBool());
+        QVERIFY(!backend->qmlSession());
+        script(setup.view(), "document.querySelector('[data-connection-back]').click()");
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('[data-psn-connection]')").toBool());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.connect-console').disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.connect-console').click()");
+        QTRY_COMPARE(requests.size(), 3);
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        backend->setDiscoveryEnabled(false);
+        QVERIFY(!requests[2]);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-connection-retry]')?.disabled === true").toBool());
+        QVERIFY(!setup.bridge()->connectConsole(key).value("accepted").toBool());
+        QVERIFY(!backend->qmlSession());
+        const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
+        QVERIFY(!snapshot.contains("connection-access-secret"));
+        QVERIFY(!snapshot.contains("connection-refresh-secret"));
+        QVERIFY(!snapshot.contains("credential-bearing-network-error"));
+    }
+
+    void psnRemoteRefresh()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetPsnAuthToken("refresh-access-secret");
+        settings.SetPsnRefreshToken("refresh-secret");
+        settings.SetPsnAccountId("AQAAAAAAAAA=");
+        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(-60).toString(settings.GetTimeFormat()));
+        ChiakiRegisteredHost registered = {};
+        registered.target = CHIAKI_TARGET_PS5_1;
+        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
+        strcpy(registered.server_nickname, "Remote office");
+        settings.AddRegisteredHost(RegisteredHost(registered));
+        QList<QPointer<PsnReply>> requests;
+        PsnRequests transport;
+        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
+            *count = 1;
+            strcpy((*devices)[0].device_name, "Remote office");
+            memset((*devices)[0].device_uid, 0x12, sizeof((*devices)[0].device_uid));
+            (*devices)[0].remoteplay_enabled = true;
+            return CHIAKI_ERR_SUCCESS;
+        };
+        QmlNativeServices services(&settings, transport, {}, controlledDiscovery());
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_COMPARE(requests.size(), 1);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-refresh]') !== null").toBool());
+        QVERIFY(script(setup.view(), "document.querySelector('[data-psn-refresh]').disabled").toBool());
+        requests[0]->finish({}, QNetworkReply::AuthenticationRequiredError);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]').textContent").toString(), QStringLiteral("PSN credentials expired. Sign in again."));
+        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-psn-refresh]').disabled").toBool());
+        script(setup.view(), "document.querySelector('[data-psn-refresh]').click();document.querySelector('[data-psn-refresh]').click()");
+        QTRY_COMPARE(requests.size(), 2);
+        requests[1]->finish(R"({"access_token":"renewed-access-secret","refresh_token":"renewed-refresh-secret","expires_in":3600})");
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-card .console-name')?.textContent").toString(), QStringLiteral("Remote office"));
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]').textContent").toString(), QStringLiteral("Remote consoles updated"));
+        QTRY_VERIFY(!script(setup.view(), "document.querySelector('.connect-console').disabled").toBool());
+        backend->qmlSettings()->setStreamerMode(true);
+        const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
+        QVERIFY(!snapshot.contains("access-secret"));
+        QVERIFY(!snapshot.contains("refresh-secret"));
+        QVERIFY(!snapshot.contains("12121212"));
+        setup.resize(800, 600);
+        setup.view()->setZoomFactor(2);
+        QTRY_VERIFY(script(setup.view(), "document.documentElement.scrollWidth <= innerWidth").toBool());
+        if (qEnvironmentVariableIsSet("CHIAKI_EMBEDDED_EVIDENCE"))
+            QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("remote-refresh-200-percent.png")));
+    }
+
     void keyboardMouseSettings()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -2472,7 +2848,7 @@ private slots:
         settings.AddRegisteredHost(RegisteredHost(registered));
         settings.SetManualHost(ManualHost(-1, "private.example", true, HostMAC(registered.server_mac)));
         settings.AddHiddenHost(HiddenHost(HostMAC(registered.server_mac), "192.0.2.77"));
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
         setup.show();
@@ -2530,7 +2906,7 @@ private slots:
         paired.SetConsolePin(paired, "0091");
         settings.AddRegisteredHost(paired);
         const auto manualId = settings.SetManualHost(ManualHost(-1, "console.example", true, HostMAC(registered.server_mac)));
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
         SetupWindow setup(backend);
@@ -2599,7 +2975,7 @@ private slots:
         });
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
         SetupWindow setup(backend);
@@ -2705,7 +3081,7 @@ private slots:
         memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
         strcpy(registered.server_nickname, "Office console");
         settings.AddRegisteredHost(RegisteredHost(registered));
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
         setup.show();
@@ -2771,7 +3147,7 @@ private slots:
         });
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         services.backend()->stopAutoConnect();
         SetupWindow setup(services.backend());
         setup.show();
@@ -2802,7 +3178,7 @@ private slots:
         });
         Settings settings(profile);
         settings.SetDiscoveryEnabled(false);
-        QmlNativeServices services(&settings);
+        QmlNativeServices services(&settings, {}, {}, controlledDiscovery());
         auto *backend = services.backend();
         backend->stopAutoConnect();
         backend->setDiscoveryEnabled(false);

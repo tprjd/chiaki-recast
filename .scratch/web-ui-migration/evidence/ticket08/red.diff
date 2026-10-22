@@ -1,0 +1,73 @@
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 4c649ac5..96e022a7 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -81,6 +81,7 @@ static bool inputDesktopAvailable()
+ #include "applicationcontroller.h"
+ #include <QTcpServer>
+ #include <atomic>
++#include <QSemaphore>
+ #ifdef Q_OS_WIN
+ #include <stdlib.h>
+ #endif
+@@ -271,6 +272,60 @@ class EmbeddedSetupTest : public QObject
+     }
+ 
+ private slots:
++    void psnRemoteRefresh()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto removeSettings = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        settings.SetRemotePlayAsk(false);
++        settings.SetAddSteamShortcutAsk(false);
++        settings.SetPsnAuthToken("refresh-access-secret");
++        settings.SetPsnRefreshToken("refresh-secret");
++        settings.SetPsnAccountId("AQAAAAAAAAA=");
++        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(-60).toString(settings.GetTimeFormat()));
++        ChiakiRegisteredHost registered = {};
++        registered.target = CHIAKI_TARGET_PS5_1;
++        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
++        strcpy(registered.server_nickname, "Remote office");
++        settings.AddRegisteredHost(RegisteredHost(registered));
++        QList<QPointer<PsnReply>> requests;
++        PsnRequests transport;
++        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
++        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
++            *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
++            *count = 1;
++            strcpy((*devices)[0].device_name, "Remote office");
++            memset((*devices)[0].device_uid, 0x12, sizeof((*devices)[0].device_uid));
++            (*devices)[0].remoteplay_enabled = true;
++            return CHIAKI_ERR_SUCCESS;
++        };
++        QmlNativeServices services(&settings, transport);
++        auto *backend = services.backend();
++        backend->stopAutoConnect();
++        SetupWindow setup(backend);
++        setup.show();
++        QTRY_COMPARE(requests.size(), 1);
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-refresh]') !== null").toBool());
++        QVERIFY(script(setup.view(), "document.querySelector('[data-psn-refresh]').disabled").toBool());
++        requests[0]->finish({}, QNetworkReply::AuthenticationRequiredError);
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]').textContent").toString(), QStringLiteral("PSN credentials expired. Sign in again."));
++        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-psn-refresh]').disabled").toBool());
++        script(setup.view(), "document.querySelector('[data-psn-refresh]').click();document.querySelector('[data-psn-refresh]').click()");
++        QTRY_COMPARE(requests.size(), 2);
++        requests[1]->finish(R"({"access_token":"renewed-access-secret","refresh_token":"renewed-refresh-secret","expires_in":3600})");
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-card .console-name')?.textContent").toString(), QStringLiteral("Remote office"));
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]').textContent").toString(), QStringLiteral("Remote consoles updated"));
++        QTRY_VERIFY(!script(setup.view(), "document.querySelector('.connect-console').disabled").toBool());
++        const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
++        QVERIFY(!snapshot.contains("access-secret"));
++        QVERIFY(!snapshot.contains("refresh-secret"));
++        QVERIFY(!snapshot.contains("12121212"));
++    }
++
+     void keyboardMouseSettings()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
