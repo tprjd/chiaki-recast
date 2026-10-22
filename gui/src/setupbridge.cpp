@@ -20,6 +20,7 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, &SetupBridge::refresh);
     connect(backend->qmlSettings(), &QmlSettings::currentProfileChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::psnAuthAttemptChanged, this, &SetupBridge::refresh);
+    connect(backend, &QmlBackend::psnRefreshChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::psnTokenChanged, this, [this] { credentialsRejected = false; refresh(); });
     connect(backend, &QmlBackend::psnCredsExpired, this, [this] { credentialsRejected = true; refresh(); });
     connect(backend->qmlSettings(), &QmlSettings::psnAuthTokenChanged, this, &SetupBridge::refresh);
@@ -170,7 +171,10 @@ void SetupBridge::refresh()
         QT_TR_NOOP("Open embedded sign-in"), QT_TR_NOOP("Use external browser"), QT_TR_NOOP("Copy sign-in link"),
         QT_TR_NOOP("After sign-in in an external browser, copy the complete final URL from its address bar. Paste the full URL, including its authorization code, below."),
         QT_TR_NOOP("Sign-in redirect URL"), QT_TR_NOOP("Retry"), QT_TR_NOOP("Complete sign-in"), QT_TR_NOOP("Close"),
-        QT_TR_NOOP("Use the same PlayStation account as your console. The Sony sign-in page and your external browser can show account details.")};
+        QT_TR_NOOP("Use the same PlayStation account as your console. The Sony sign-in page and your external browser can show account details."),
+        QT_TR_NOOP("Refresh remote consoles"), QT_TR_NOOP("Refreshing PSN credentials"), QT_TR_NOOP("Finding remote consoles"),
+        QT_TR_NOOP("Connecting through PSN"), QT_TR_NOOP("Connection cancelled"), QT_TR_NOOP("Waiting for connection cleanup"),
+        QT_TR_NOOP("Could not start Remote Play"), QT_TR_NOOP("Cancel"), QT_TR_NOOP("Back to consoles")};
     for (const auto *text : texts) strings.insert(QString::fromUtf8(text), tr(text));
     const auto *native = backend->nativeSettings();
     const bool configured = !native->GetPsnAuthToken().isEmpty() && !native->GetPsnRefreshToken().isEmpty()
@@ -181,6 +185,7 @@ void SetupBridge::refresh()
     accountExpiry.stop();
     if (configured && !expired) accountExpiry.start(int(qMin<qint64>(remaining, std::numeric_limits<int>::max())));
     QVariantMap psn{{"status", configured ? (expired ? "expired" : "ready") : "signedOut"}};
+    psn.insert("refresh", backend->psnRefresh());
     const auto attempt = backend->psnAuthAttempt();
     // Keep the bridge allowlist explicit: the native attempt also contains an Account ID.
     for (const auto &field : {"id", "phase", "message", "profileValid"})
@@ -300,10 +305,21 @@ void SetupBridge::refresh()
     QVariantMap rendererStatus{{"restartRequired", settings->rendererBackend() != startupRendererBackend
         || (startupRendererBackend == 1 && settings->vSyncEnabled() != startupVSync)}};
     if(window) rendererStatus.insert("runtimeBackend", window->runtimeRendererBackend());
+    const auto nativeAttempt = backend->connectionAttempt();
+    QVariantMap connection;
+    if (nativeAttempt.value("route") == "psn" && !backend->qmlWindow() && nativeAttempt.value("presented").toBool()) {
+        for (const auto &field : {"id", "phase", "cancelable", "cleanupPending", "targetValid"})
+            connection.insert(field, nativeAttempt.value(field));
+        connection.insert("errorTitle", privateMode ? tr("Could not start Remote Play") : nativeAttempt.value("errorTitle"));
+        connection.insert("errorText", privateMode ? QString() : nativeAttempt.value("errorText"));
+    }
+    const auto phase = nativeAttempt.value("phase").toString();
+    const bool pending = nativeAttempt.value("presented").toBool() && !phase.isEmpty()
+        && phase != "failure" && phase != "cancelled" && phase != "registered";
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
         {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
         {"streamerMode", privateMode}, {"connectionBusy", backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
-            || backend->connectionAttempt().value("cleanupPending").toBool()}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
+            || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
     if (!suspended) emit stateChanged(state);
 }
 
@@ -449,11 +465,35 @@ QVariantMap SetupBridge::connectConsole(const QString &key)
     if (!resolveConsole(key, index, nickname))
         return {{"accepted", false}, {"message", tr("Console unavailable")}};
     const auto host = backend->hosts().at(index).toMap();
-    if (!host.value("registered").toBool() || !host.value("discovered").toBool() || host.value("state") != "ready")
-        return {{"accepted", false}, {"message", tr("Select an online registered local console")}};
+    if (!host.value("registered").toBool() || (host.value("duid").toString().isEmpty()
+            && (!host.value("discovered").toBool() || host.value("state") != "ready")))
+        return {{"accepted", false}, {"message", tr("Select an online registered local console or a remote console")}};
     selectedKey = key;
     backend->connectToHost(index, nickname);
     return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::refreshPsnConsoles(const QString &profile)
+{
+    const auto phase = backend->psnRefresh().value("phase").toString();
+    if (!currentProfile(profile) || phase == "refreshing" || phase == "listing") return {{"accepted", false}};
+    backend->refreshPsnToken();
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::cancelConnection(const QString &attempt)
+{
+    return {{"accepted", backend->cancelConnection(attempt)}};
+}
+
+QVariantMap SetupBridge::retryConnection(const QString &attempt)
+{
+    return {{"accepted", backend->retryConnection(attempt)}};
+}
+
+QVariantMap SetupBridge::dismissConnection(const QString &attempt)
+{
+    return {{"accepted", backend->dismissConnection(attempt)}};
 }
 
 QVariantMap SetupBridge::refreshAudioDevices()

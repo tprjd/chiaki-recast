@@ -16,6 +16,10 @@ public:
     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
     Q_INVOKABLE QVariantMap connectConsole(const QString &key);
+    Q_INVOKABLE QVariantMap refreshPsnConsoles(const QString &profile);
+    Q_INVOKABLE QVariantMap cancelConnection(const QString &attempt);
+    Q_INVOKABLE QVariantMap retryConnection(const QString &attempt);
+    Q_INVOKABLE QVariantMap dismissConnection(const QString &attempt);
     void setSuspended(bool suspended);
     void reportStreamError(const QString &title, const QString &text);
     Q_INVOKABLE QVariantMap dismissStreamError(const QString &id);
