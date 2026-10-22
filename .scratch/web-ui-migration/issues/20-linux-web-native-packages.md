@@ -4,7 +4,7 @@
 
 **Blocked by:** 04: Connect locally from web setup to native playback.
 
-**Status:** ready-for-agent
+**Status:** claimed
 
 **Source:** [Web setup UI specification](../spec.md). Stories 89, 90, 91, 94.
 
@@ -16,3 +16,7 @@
 - [ ] Native OpenGL and Vulkan playback, supported HDR behavior, input, audio, microphone operation, and direct streaming pass package smoke checks.
 - [ ] Architecture and runtime combinations are reported with tested module availability. Unsupported combinations do not gain a second setup UI.
 - [ ] Automated package checks detect missing assets and helper files. Rerun an affected check when a later change can alter package behavior.
+
+## Comments
+
+- Claimed after ticket 04. Prepare current compatible AppImage and Flatpak build inputs and verify package completeness in the available WSL environment. WSL has software graphics; Linux hardware, focus, and GPU acceptance remains unverified because only a Windows PC is available.
