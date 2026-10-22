@@ -41,6 +41,24 @@ static bool protectedWindowVisible()
     }, reinterpret_cast<LPARAM>(&found));
     return found;
 }
+
+static bool inputDesktopAvailable()
+{
+    const auto desktopName = [](HDESK desktop) {
+        wchar_t name[256];
+        DWORD needed = 0;
+        return GetUserObjectInformationW(desktop, UOI_NAME, name, sizeof(name), &needed)
+            ? QString::fromWCharArray(name) : QString();
+    };
+    HDESK input = OpenInputDesktop(0, FALSE, DESKTOP_READOBJECTS);
+    if (!input) return false;
+    const auto inputName = desktopName(input);
+    const auto threadName = desktopName(GetThreadDesktop(GetCurrentThreadId()));
+    CloseDesktop(input);
+    qInfo() << "Graphics desktop requirement input/thread" << inputName << threadName
+        << "foreground HWND" << quintptr(GetForegroundWindow());
+    return !inputName.isEmpty() && inputName == threadName && GetForegroundWindow();
+}
 #endif
 #ifdef CHIAKI_HAVE_WEBENGINE
 #include <QtWebEngineQuick>
@@ -77,6 +95,9 @@ class EmbeddedSetupTest : public QObject
 private slots:
     void graphicsCoexistence()
     {
+#ifdef Q_OS_WIN
+        QVERIFY2(inputDesktopAvailable(), "Graphics check requires the active unlocked input desktop and an available foreground window");
+#endif
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
         const auto removeSettings = qScopeGuard([&] {
             QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
@@ -117,11 +138,13 @@ private slots:
             if (fallback) qputenv("CHIAKI_FORCE_VULKAN_FALLBACK", "1");
             const auto resetFallback = qScopeGuard([] { qunsetenv("CHIAKI_FORCE_VULKAN_FALLBACK"); });
             backend->nativeSettings()->SetRenderBackend(modes[pass]);
+            backend->nativeSettings()->SetPlaceboPreset(PlaceboPreset::Fast);
             backend->nativeSettings()->SetStreamGeometry(QRect(80, 80, 960, 640));
             setup.show();
             setup.view()->setZoomFactor(1);
             {
                 QmlMainWindow native(backend, services.engine());
+                QCOMPARE(native.videoPreset(), QmlMainWindow::VideoPreset::Fast);
                 QCOMPARE(QQuickWindow::graphicsApi(), globalApi);
                 QCOMPARE(native.nativeGraphicsApi(), modes[pass] == RenderBackend::Vulkan && !fallback
                     ? QSGRendererInterface::Vulkan : QSGRendererInterface::OpenGL);
@@ -136,6 +159,7 @@ private slots:
                 qInfo() << "Graphics observation native HWND" << quintptr(nativeWindow)
                     << "foreground HWND" << quintptr(GetForegroundWindow())
                     << "foreground process" << windowProcess(GetForegroundWindow());
+                QVERIFY2(inputDesktopAvailable(), "The active input desktop changed during the graphics check");
                 QVERIFY2(!protectedWindowVisible(), "Windows Security owns a visible protected window");
                 QVERIFY(SetWindowPos(nativeWindow, HWND_TOPMOST, 0, 0, 0, 0,
                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE));
