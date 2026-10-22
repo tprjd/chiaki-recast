@@ -469,6 +469,176 @@ private slots:
         QVERIFY(backend->nativeSettings()->GetKeyboardMouseBindings() == DefaultKeyboardMouseBindings());
     }
 
+    void keyboardMouseGuards()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetMouseCameraEnabled(true);
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#keyboardEnabled') !== null").toBool());
+        const QString generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+        const auto begun = setupRequest(setup.view(), "beginKeyboardMouse", {generation});
+        QVERIFY(begun.value("accepted").toBool());
+        const auto form = begun.value("form").toString();
+        QVERIFY(!form.isEmpty());
+        for (const auto &input : QList<QPair<QString, QVariant>>{{"mouseHorizontalSensitivity", -0.05}, {"mouseHorizontalSensitivity", 8.01},
+                {"mouseVerticalSensitivity", 0}, {"mouseDeadZoneCompensation", -0.01}, {"mouseDeadZoneCompensation", 0.51},
+                {"mouseResponseExponent", 0.09}, {"mouseResponseExponent", 3.01}, {"mouseCameraEnabled", 1}, {"mouseInvertVertical", "true"},
+                {"mouseHorizontalSensitivity", "2"}, {"psnAuthToken", "forbidden"}, {"keyboardEnabled", 1}, {"mouseTouchEnabled", 1}}) {
+            const auto reply = setupRequest(setup.view(), "setKeyboardMouseSetting", {input.first, QJsonValue::fromVariant(input.second), form, generation});
+            QVERIFY(reply.contains("accepted"));
+            QVERIFY(!reply.value("accepted").toBool());
+        }
+        for (const auto &args : QList<QJsonArray>{{-1, 0, false, form, generation}, {0.5, 0, false, form, generation},
+                 {22, 0, false, form, generation}, {0, 2, false, form, generation}, {0, 0.5, false, form, generation},
+                 {0, 0, true, form, generation}, {0, 0, false, "obsolete", generation}}) {
+            const auto reply = setupRequest(setup.view(), "captureKeyboardMouse", args);
+            QVERIFY(reply.contains("accepted"));
+            QVERIFY(!reply.value("accepted").toBool());
+        }
+#ifdef Q_OS_WIN
+        for (const auto &input : QList<QPair<QString, double>>{{"mouseHorizontalSensitivity", 0.05}, {"mouseHorizontalSensitivity", 8},
+                {"mouseVerticalSensitivity", 0.05}, {"mouseVerticalSensitivity", 8}, {"mouseDeadZoneCompensation", 0},
+                {"mouseDeadZoneCompensation", 0.5}, {"mouseResponseExponent", 0.1}, {"mouseResponseExponent", 3}}) {
+            const auto reply = setupRequest(setup.view(), "setKeyboardMouseSetting", {input.first, input.second, form, generation});
+            QVERIFY(reply.value("accepted").toBool());
+        }
+        QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 8.0);
+        QCOMPARE(settings.GetMouseResponse().verticalSensitivity, 8.0);
+        QCOMPARE(settings.GetMouseResponse().deadZoneCompensation, 0.5);
+        QCOMPARE(settings.GetMouseResponse().responseExponent, 3.0);
+#endif
+        const auto nextForm = setupRequest(setup.view(), "beginKeyboardMouse", {generation}).value("form").toString();
+        QVERIFY(!nextForm.isEmpty() && nextForm != form);
+        QVERIFY(setupRequest(setup.view(), "endKeyboardMouse", {form}).value("accepted").toBool());
+        QVERIFY(!setupRequest(setup.view(), "resetKeyboardMouse", {form, generation}).value("accepted").toBool());
+#ifdef Q_OS_WIN
+        QVERIFY(setupRequest(setup.view(), "setKeyboardMouseSetting", {"mouseHorizontalSensitivity", 2, nextForm, generation}).value("accepted").toBool());
+        QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 2.0);
+#endif
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        QVERIFY(!setupRequest(setup.view(), "resetKeyboardMouse", {nextForm, generation}).value("accepted").toBool());
+        QVERIFY(!setupRequest(setup.view(), "setKeyboardMouseSetting", {"mouseCameraEnabled", true, nextForm, generation}).value("accepted").toBool());
+        QVERIFY(!setupRequest(setup.view(), "captureKeyboardMouse", {0, 0, false, nextForm, generation}).value("accepted").toBool());
+        QVERIFY(!backend->nativeSettings()->GetMouseCameraEnabled());
+        QVERIFY(backend->nativeSettings()->GetKeyboardMouseBindings() == DefaultKeyboardMouseBindings());
+        QCOMPARE(backend->nativeSettings()->GetMouseResponse().horizontalSensitivity, 1.0);
+    }
+
+    void keyboardMouseLegacyAndLifetime()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile + "-next").clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        Settings next(profile + "-next");
+        next.SetDiscoveryEnabled(false);
+        next.SetMouseCameraEnabled(true);
+        MouseResponse nextResponse;
+        nextResponse.horizontalSensitivity = 2.25;
+        QVERIFY(next.SetMouseResponse(nextResponse));
+        QmlNativeServices services(&settings);
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SetupWindow setup(backend);
+        setup.show();
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#keyboardEnabled')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('#keyboardEnabled').click()");
+        QTRY_VERIFY(!settings.GetKeyboardEnabled());
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#mouseTouchEnabled')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('#mouseTouchEnabled').click()");
+        QTRY_VERIFY(!settings.GetMouseTouchEnabled());
+        const int button = settings.GetControllerMapping().firstKey();
+        script(setup.view(), QString("document.getElementById('keyMapping%1').click()").arg(button));
+        QPointer<QDialog> capture;
+        QTRY_VERIFY(capture = setup.findChild<QDialog *>("setupBindingCapture"));
+        QSignalSpy mappingChanged(backend->qmlSettings(), &QmlSettings::controllerMappingChanged);
+        QTest::keyClick(capture->findChild<QLabel *>("setupBindingPrompt"), Qt::Key_B);
+        QTRY_VERIFY(capture.isNull());
+        QCOMPARE(settings.GetControllerMapping().value(button), Qt::Key_B);
+        QCOMPARE(mappingChanged.count(), 1);
+        QTRY_COMPARE(script(setup.view(), QString("document.getElementById('keyMapping%1').textContent").arg(button)).toString(), QStringLiteral("B"));
+        Settings reopened(profile);
+        QCOMPARE(reopened.GetControllerMapping().value(button), Qt::Key_B);
+        script(setup.view(), "document.querySelector('#resetAllKeys').click()");
+        QTRY_VERIFY(settings.GetControllerMapping().value(button) != Qt::Key_B);
+        script(setup.view(), QString("document.getElementById('keyMapping%1').click()").arg(button));
+        QTRY_VERIFY(capture = setup.findChild<QDialog *>("setupBindingCapture"));
+        QEvent deactivate(QEvent::WindowDeactivate);
+        QApplication::sendEvent(capture, &deactivate);
+        QTRY_VERIFY(capture.isNull());
+        script(setup.view(), QString("document.getElementById('keyMapping%1').click()").arg(button));
+        QTRY_VERIFY(capture = setup.findChild<QDialog *>("setupBindingCapture"));
+        script(setup.view(), "document.querySelector('.back-consoles').click()");
+        QTRY_VERIFY(capture.isNull());
+        QVERIFY(!backend->qmlSession());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#keyboardEnabled')?.disabled === false").toBool());
+        script(setup.view(), QString("document.getElementById('keyMapping%1').click()").arg(button));
+        QTRY_VERIFY(capture = setup.findChild<QDialog *>("setupBindingCapture"));
+        setup.view()->reload();
+        QTRY_VERIFY(capture.isNull());
+#ifdef Q_OS_WIN
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.open-settings')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('.open-settings').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.category-nav') !== null").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Keyboard and mouse').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('#mouseCameraEnabled')?.disabled === false").toBool());
+        script(setup.view(), "document.querySelector('#mouseCameraEnabled').click()");
+        QTRY_VERIFY(settings.GetMouseCameraEnabled());
+        backend->qmlSettings()->setMouseHorizontalSensitivity(3.5);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('#mouseHorizontalSensitivity').value").toString(), QStringLiteral("3.5"));
+        script(setup.view(), "document.querySelector('#keyboardMouseReset').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog').open && document.activeElement.hasAttribute('data-keyboard-reset-cancel')").toBool());
+        setup.suspend();
+        setup.resume();
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('dialog').open && document.querySelector('#keyboardMouseReset')?.disabled === false").toBool());
+        QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 3.5);
+        script(setup.view(), "document.querySelector('#keyboardMouseReset').click();document.querySelector('[data-keyboard-reset-confirm]').click()");
+        QTRY_VERIFY(!settings.GetMouseCameraEnabled());
+        QCOMPARE(settings.GetMouseResponse().horizontalSensitivity, 1.0);
+        QVERIFY(!settings.GetKeyboardEnabled());
+        QVERIFY(!settings.GetMouseTouchEnabled());
+        script(setup.view(), "document.querySelector('#mouseCameraEnabled').click()");
+        QTRY_VERIFY(settings.GetMouseCameraEnabled());
+        script(setup.view(), "{const e=document.querySelector('#mouseHorizontalSensitivity');window.oldMouseDraft=e;e.value='7.25';e.dispatchEvent(new Event('input',{bubbles:true}));}document.querySelector('#keyboardMouseReset').click();window.oldMouseReset=document.querySelector('[data-keyboard-reset-confirm]');");
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('dialog').open").toBool());
+        script(setup.view(), "window.oldMouseDraft.dispatchEvent(new Event('change',{bubbles:true}));window.oldMouseReset.click()");
+        QTest::qWait(50);
+        QVERIFY(backend->nativeSettings()->GetMouseCameraEnabled());
+        QCOMPARE(backend->nativeSettings()->GetMouseResponse().horizontalSensitivity, 2.25);
+#endif
+    }
+
     void suspendClosesSignIn()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
