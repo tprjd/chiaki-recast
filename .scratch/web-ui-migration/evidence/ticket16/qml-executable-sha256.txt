@@ -1,0 +1,5 @@
+
+Algorithm : SHA256
+Hash      : 4CB35676642607BE05F3DEFEACA8C069A68EC6874EEBD2ACA78AF8D1FF93EC04
+Path      : C:\Users\david\.cache\chiaki-msvc-native\ticket16-build\gui\tests\chiaki-console-screen-tests.exe
+

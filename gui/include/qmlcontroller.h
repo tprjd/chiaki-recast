@@ -25,8 +25,11 @@ public:
     bool isPS() const;
     void setEscapeShortcut(uint32_t shortcut) { escape_shortcut = shortcut; };
     void setTarget(QObject *target);
+    void setNavigationEnabled(bool enabled);
     QString GetGUID() const;
     QString GetVIDPID() const;
+    QString name() const { return controller->GetName(); }
+    QString type() const { return controller->GetType(); }
 
 private:
     void sendKey(Qt::Key key, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
@@ -34,6 +37,8 @@ private:
     QPointer<QObject> target;
     uint32_t escape_shortcut = 0;
     uint32_t old_buttons = 0;
+    bool navigation_enabled = true;
+    bool wait_for_release = false;
     Controller *controller = {};
     QTimer *repeat_timer = {};
     int repeat_running = 0;

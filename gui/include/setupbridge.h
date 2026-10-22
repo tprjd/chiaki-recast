@@ -12,6 +12,7 @@ class SetupBridge : public QObject
     Q_OBJECT
 public:
     explicit SetupBridge(QmlBackend *backend, QObject *parent = nullptr);
+    ~SetupBridge() override;
     Q_INVOKABLE QVariantMap snapshot() const { return state; }
     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
@@ -39,6 +40,11 @@ public:
     Q_INVOKABLE QVariantMap setGeneralSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
     Q_INVOKABLE QVariantMap setMediaSetting(const QString &name, const QVariant &value, const QString &profileGeneration);
     Q_INVOKABLE QVariantMap refreshAudioDevices();
+    Q_INVOKABLE QVariantMap setControllerSetting(const QString &name, const QVariant &value, const QString &profile);
+    Q_INVOKABLE QVariantMap beginControllerMapping(bool reset, const QString &profile);
+    Q_INVOKABLE QVariantMap controllerMappingAction(const QString &action, const QString &operation, const QString &profile);
+    Q_INVOKABLE QVariantMap captureControllerMapping(const QVariant &button, const QVariant &slot, const QString &operation, const QString &profile);
+    void invalidateControllerMapping(const QString &message = {});
     Q_INVOKABLE QVariantMap beginKeyboardMouse(const QString &profile);
     Q_INVOKABLE QVariantMap endKeyboardMouse(const QString &form);
     Q_INVOKABLE QVariantMap setKeyboardMouseSetting(const QString &name, const QVariant &value, const QString &form, const QString &profile);
@@ -77,6 +83,15 @@ private:
     bool keyboardMouseAvailable = false;
     quint64 keyboardMouseWindowGeneration = 0;
     QString keyboardMouseForm;
+    QString controllerOperation;
+    QString controllerPhase;
+    QString controllerMessage;
+    bool controllerReset = false;
+    int controllerButton = 0;
+    int controllerSlot = 0;
+    quint64 controllerNavigationGeneration = 0;
+    bool controllerOperationValid(const QString &operation, const QString &profile) const;
+    void controllerNavigation(bool enabled);
     int startupRendererBackend = 0;
     bool startupVSync = true;
     bool currentProfile(const QString &profile) const;

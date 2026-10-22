@@ -1,0 +1,11 @@
+********* Start testing of console_screen *********
+Config: Using QtTest library 6.9.3, Qt 6.9.3 (x86_64-little_endian-llp64 shared (dynamic) release build; by MSVC 2022), windows 11
+PASS   : console_screen::SettingsSearch::initTestCase()
+PASS   : console_screen::SettingsSearch::test_captureModeSearch()
+PASS   : console_screen::SettingsSearch::test_conditionChangeKeepsUsableSearchFocus()
+PASS   : console_screen::SettingsSearch::test_consoleActionUsesFirstCurrentEligibleNativeControl()
+PASS   : console_screen::SettingsSearch::test_escapeDuringKeyCaptureOpeningKeepsSettings()
+QWARN  : console_screen::SettingsSearch::test_everyCategoryAndStreamRoute() file:///C:/Users/david/.codex/worktrees/web-ui-ticket-16/chiaki-ng-ui/gui/src/qml/SettingsDialog.qml:243: ReferenceError: controllerMappingChange is not defined
+PASS   : console_screen::SettingsSearch::test_everyCategoryAndStreamRoute()
+PASS   : console_screen::SettingsSearch::test_freshPrerequisiteAfterCaptureAndWindowResize()
+PASS   : console_screen::SettingsSearch::test_fullLinkedInventory(desktop)

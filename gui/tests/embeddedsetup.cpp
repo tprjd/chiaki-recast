@@ -383,6 +383,226 @@ class EmbeddedSetupTest : public QObject
     }
 
 private slots:
+    void controllerSettings()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        PsnRequests transport;
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS;
+        };
+        QmlNativeServices services(&settings, transport, {}, {}, controlledDiscovery());
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 900);
+        setup.show();
+        QVERIFY(click(setup.view(), ".open-settings"));
+        QTRY_VERIFY(script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).some(e => e.textContent === 'Controllers')").toBool());
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Controllers').click()");
+        QVERIFY(click(setup.view(), "#allowJoystickBackgroundEvents"));
+        QTRY_VERIFY(!settings.GetAllowJoystickBackgroundEvents());
+        QVERIFY(fill(setup.view(), "#dpadTouchIncrement", "0.75"));
+        script(setup.view(), "document.querySelector('#dpadTouchIncrement').dispatchEvent(new Event('change',{bubbles:true}))");
+        QTRY_COMPARE(settings.GetDpadTouchIncrement(), uint16_t(75));
+        Settings reopened(profile);
+        QCOMPARE(reopened.GetDpadTouchIncrement(), uint16_t(75));
+        QVERIFY(click(setup.view(), "#buttonsByPosition"));
+        QTRY_VERIFY(settings.GetButtonsByPosition());
+        for (int index = 1; index <= 4; ++index) {
+            QVERIFY(fill(setup.view(), QString("#dpadTouchShortcut%1").arg(index), QString::number(index)));
+        }
+        QTRY_COMPARE(services.backend()->qmlSettings()->dpadTouchShortcut4(), uint(4));
+        QVERIFY(fill(setup.view(), "#rumbleHapticsIntensity", "5"));
+        QTRY_COMPARE(services.backend()->qmlSettings()->rumbleHapticsIntensity(), 5);
+        QVERIFY(fill(setup.view(), "#hapticOverride", "1.7"));
+        script(setup.view(), "document.querySelector('#hapticOverride').dispatchEvent(new Event('change',{bubbles:true}))");
+        QTRY_VERIFY(qAbs(services.backend()->qmlSettings()->hapticOverride() - 1.7f) < 0.001f);
+        const auto generation = QString::number(services.backend()->profileGeneration());
+        for (const auto &request : QList<QJsonArray>{{"dpadTouchIncrement", 0, generation}, {"dpadTouchShortcut1", 17, generation},
+                {"rumbleHapticsIntensity", 6, generation}, {"hapticOverride", 2.1, generation}, {"buttonsByPosition", 1, generation},
+                {"allowJoystickBackgroundEvents", "true", generation}, {"unknown", true, generation}})
+            QVERIFY(!setupRequest(setup.view(), "setControllerSetting", request).value("accepted").toBool());
+        QVERIFY(click(setup.view(), "#dpadTouchEnabled"));
+        QTRY_VERIFY(!services.backend()->qmlSettings()->dpadTouchEnabled());
+        QVERIFY(!setupRequest(setup.view(), "setControllerSetting", {"dpadTouchIncrement", 80, generation}).value("accepted").toBool());
+        Settings persisted(profile);
+        QVERIFY(persisted.GetButtonsByPosition());
+        QCOMPARE(persisted.GetDpadTouchIncrement(), uint16_t(75));
+    }
+
+    void controllerMapping()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            for (const auto &name : {profile, profile + "-next"})
+                QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + name).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        PsnRequests transport;
+        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
+            *devices = nullptr; *count = 0; return CHIAKI_ERR_SUCCESS;
+        };
+        QmlNativeServices services(&settings, transport, {}, {}, controlledDiscovery());
+        auto *backend = services.backend();
+        backend->stopAutoConnect();
+        SDL_VirtualJoystickDesc description = {};
+        description.version = SDL_VIRTUAL_JOYSTICK_DESC_VERSION;
+        description.type = SDL_JOYSTICK_TYPE_GAMECONTROLLER;
+        description.naxes = 6;
+        description.nbuttons = 16;
+        description.nhats = 1;
+        description.vendor_id = 0xfafa;
+        description.product_id = 0x0016;
+        description.name = "Recast setup test controller";
+        const int index = SDL_JoystickAttachVirtualEx(&description);
+        QVERIFY2(index >= 0, SDL_GetError());
+        auto *joystick = SDL_JoystickOpen(index);
+        QVERIFY(joystick);
+        const auto instance = SDL_JoystickInstanceID(joystick);
+        const auto detach = [&] {
+            for (int i = 0; i < SDL_NumJoysticks(); ++i)
+                if (SDL_JoystickGetDeviceInstanceID(i) == instance) { SDL_JoystickDetachVirtual(i); break; }
+        };
+        const auto removeController = qScopeGuard([&] { detach(); SDL_JoystickClose(joystick); });
+        SetupWindow setup(backend);
+        setup.resize(1280, 900);
+        setup.show();
+        QTRY_VERIFY(!backend->qmlControllers().isEmpty());
+        const auto button = [&](int number, bool pressed) { QCOMPARE(SDL_JoystickSetVirtualButton(joystick, number, pressed), 0); SDL_JoystickUpdate(); };
+        const auto tap = [&](int number) { button(number, true); QTest::qWait(80); button(number, false); QTest::qWait(80); };
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('.open-settings')").toBool());
+        setup.view()->setFocus();
+        tap(6);
+        QTRY_COMPARE(script(setup.view(), "document.querySelector('h1').textContent").toString(), QStringLiteral("Settings"));
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Controllers').click()");
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-controller-devices]').textContent.includes('Recast setup test controller')").toBool());
+        setup.view()->setFocus();
+        script(setup.view(), "document.querySelector('#controllerMappingChange').focus()");
+        tap(0);
+        QTRY_COMPARE(setup.bridge()->snapshot().value("controllerSetup").toMap().value("phase").toString(), QStringLiteral("select"));
+        tap(0);
+        QTRY_VERIFY(backend->controllerMappingInProgress());
+        QTRY_COMPARE(script(setup.view(), "document.querySelectorAll('.controller-mappings > div').length").toInt(), 23);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('dialog[open]') && !document.querySelector('[data-controller-capture]')").toBool());
+        if (qEnvironmentVariableIsSet("CHIAKI_EMBEDDED_EVIDENCE")) {
+            QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("controller-mapping.png")));
+            setup.resize(2560, 1800);
+            setup.view()->setZoomFactor(2);
+            QTRY_VERIFY(script(setup.view(), "devicePixelRatio === 2 && innerWidth === 1280 && document.documentElement.scrollWidth <= innerWidth").toBool());
+            QTest::qWait(250);
+            QVERIFY(setup.view()->grab().save(QDir(qEnvironmentVariable("CHIAKI_EMBEDDED_EVIDENCE")).filePath("controller-mapping-200-percent.png")));
+            setup.view()->setZoomFactor(1);
+            setup.resize(1280, 900);
+        }
+        tap(12);
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("controllerMap1Slot0"));
+        tap(14);
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("controllerMap1Slot1"));
+        const auto original = backend->currentControllerMapping();
+        description.product_id = 0x0017;
+        const int unrelated = SDL_JoystickAttachVirtualEx(&description);
+        QVERIFY2(unrelated >= 0, SDL_GetError());
+        const auto devices = backend->qmlControllers().size();
+        QTRY_COMPARE(backend->qmlControllers().size(), devices + 1);
+        QCOMPARE(SDL_JoystickDetachVirtual(unrelated), 0);
+        QTRY_COMPARE(backend->qmlControllers().size(), devices);
+        QVERIFY(backend->controllerMappingInProgress());
+        const auto mappingInput = [&](int action, int slot) {
+            for (const auto &row : backend->currentControllerMapping()) {
+                const auto entry = row.toMap();
+                if (entry.value("buttonValue").toInt() == action) return entry.value("physicalButton").toStringList().value(slot);
+            }
+            return QString();
+        };
+        QVERIFY(click(setup.view(), "#controllerMap1Slot1"));
+        QTRY_VERIFY(script(setup.view(), "!!document.querySelector('[data-controller-capture]')").toBool());
+        QVERIFY(click(setup.view(), "#controllerCaptureCancel"));
+        QTRY_VERIFY(!script(setup.view(), "!!document.querySelector('[data-controller-capture]')").toBool());
+        QCOMPARE(backend->currentControllerMapping(), original);
+        QVERIFY(click(setup.view(), "#enableAnalogStickMapping"));
+        QTRY_VERIFY(backend->enableAnalogStickMapping());
+        QVERIFY(click(setup.view(), "#controllerMap1Slot1"));
+        tap(1);
+        QTRY_COMPARE(mappingInput(1, 1), QStringLiteral("b1"));
+        QVERIFY(mappingInput(2, 0).isEmpty());
+        QVERIFY(backend->controllerMappingAltered());
+        QTRY_VERIFY(!script(setup.view(), "!!document.querySelector('[data-controller-capture]')").toBool());
+        QCOMPARE(script(setup.view(), "document.querySelectorAll('dialog[open]').length").toInt(), 1);
+        QVERIFY(click(setup.view(), "#controllerMappingCancel"));
+        QTRY_VERIFY(!backend->controllerMappingInProgress());
+        QVERIFY(settings.GetControllerMappings().isEmpty());
+        QVERIFY(click(setup.view(), "#controllerMappingChange"));
+        tap(0);
+        QTRY_VERIFY(backend->controllerMappingInProgress());
+        QCOMPARE(backend->currentControllerMapping(), original);
+        QVERIFY(click(setup.view(), "#controllerMap1Slot1"));
+        tap(1);
+        QTRY_COMPARE(mappingInput(1, 1), QStringLiteral("b1"));
+        QVERIFY(click(setup.view(), "#controllerMappingApply"));
+        QTRY_VERIFY(!backend->controllerMappingInProgress());
+        QTRY_COMPARE(settings.GetControllerMappings().size(), 1);
+        const auto saved = settings.GetControllerMappings();
+        QVERIFY(saved.first().contains("a:b1"));
+        Settings reopened(profile);
+        QCOMPARE(reopened.GetControllerMappings(), saved);
+        script(setup.view(), "document.querySelector('#controllerMappingReset').focus()");
+        tap(0);
+        QTRY_COMPARE(setup.bridge()->snapshot().value("controllerSetup").toMap().value("phase").toString(), QStringLiteral("select"));
+        tap(0);
+        QTRY_VERIFY(settings.GetControllerMappings().isEmpty());
+        QTRY_VERIFY(!backend->controllerMappingInProgress());
+        QVERIFY(fill(setup.view(), ".settings-search input", "MIC alternate input"));
+        QTRY_VERIFY(script(setup.view(), "document.querySelectorAll('.settings-results button').length === 1").toBool());
+        QVERIFY(click(setup.view(), ".settings-results button"));
+        tap(0);
+        QTRY_COMPARE(script(setup.view(), "document.activeElement.id").toString(), QStringLiteral("controllerMap1073741824Slot1"));
+        QVERIFY(!script(setup.view(), "!!document.querySelector('[data-controller-capture]')").toBool());
+        QVERIFY(click(setup.view(), "#controllerMap1073741824Slot1"));
+        setup.view()->reload();
+        QTRY_VERIFY(!backend->controllerMappingInProgress());
+        QTRY_VERIFY(setup.bridge()->snapshot().value("controllerSetup").toMap().value("operation").toString().isEmpty());
+        QVERIFY(click(setup.view(), ".open-settings"));
+        script(setup.view(), "Array.from(document.querySelectorAll('.category-nav button')).find(e => e.textContent === 'Controllers').click()");
+        QVERIFY(click(setup.view(), "#controllerMappingChange"));
+        tap(0);
+        QTRY_VERIFY(backend->controllerMappingInProgress());
+        QVERIFY(click(setup.view(), "#controllerMap1Slot1"));
+        const auto previousOperation = setup.bridge()->snapshot().value("controllerSetup").toMap().value("operation").toString();
+        const auto previousGeneration = QString::number(backend->profileGeneration());
+        backend->qmlSettings()->setCurrentProfile(profile + "-next");
+        backend->setDiscoveryEnabled(false);
+        QTRY_VERIFY(!backend->controllerMappingInProgress());
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('dialog[open]') && document.querySelector('[data-controller-status]').textContent.includes('profile changed')").toBool());
+        QVERIFY(!setupRequest(setup.view(), "captureControllerMapping", {1, 1, previousOperation, previousGeneration}).value("accepted").toBool());
+        QVERIFY(!setupRequest(setup.view(), "controllerMappingAction", {"apply", previousOperation, previousGeneration}).value("accepted").toBool());
+        QVERIFY(click(setup.view(), "#controllerMappingChange"));
+        tap(0);
+        QTRY_VERIFY(backend->controllerMappingInProgress());
+        setup.hide();
+        QTRY_VERIFY(!backend->controllerMappingInProgress());
+        setup.show();
+        QVERIFY(click(setup.view(), "#controllerMappingChange"));
+        tap(0);
+        QTRY_VERIFY(backend->controllerMappingInProgress());
+        const auto oldOperation = setup.bridge()->snapshot().value("controllerSetup").toMap().value("operation").toString();
+        const auto generation = QString::number(backend->profileGeneration());
+        QVERIFY(click(setup.view(), "#controllerMap1Slot1"));
+        detach();
+        QTRY_VERIFY(!backend->controllerMappingInProgress());
+        QTRY_VERIFY(script(setup.view(), "!document.querySelector('dialog[open]') && document.querySelector('[data-controller-status]').textContent.includes('disconnected')").toBool());
+        QVERIFY(!setupRequest(setup.view(), "controllerMappingAction", {"apply", oldOperation, generation}).value("accepted").toBool());
+        QVERIFY(settings.GetControllerMappings().isEmpty());
+    }
+
     void remoteNativeConnection()
     {
         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
