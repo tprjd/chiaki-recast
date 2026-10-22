@@ -2,6 +2,15 @@
 #include "setupbridge.h"
 #include "qmlbackend.h"
 #include "psnsigninwindow.h"
+#include "keyboardmousebindings.h"
+#include <QDialog>
+#include <QLabel>
+#include <QPushButton>
+#include <QDialogButtonBox>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QPointer>
+#include <functional>
 #include <QCloseEvent>
 #include <QVBoxLayout>
 #include <QWebChannel>
@@ -14,6 +23,124 @@
 
 namespace {
 const QUrl setupUrl(QStringLiteral("qrc:/setup/index.html"));
+
+class BindingCapture : public QDialog
+{
+    QmlSettings *settings;
+    QLabel *prompt;
+    QLabel *status;
+    QPushButton *move;
+    int action, slot, pending = 0;
+    qint64 pressed = 0;
+    Qt::MouseButton mousePressed = Qt::NoButton;
+    bool legacy;
+    std::function<bool()> current;
+
+    void offer(int input, bool replace = false)
+    {
+        if (!current()) { reject(); return; }
+        if (legacy) {
+            settings->changeControllerKey(action, input);
+            emit settings->controllerMappingChanged();
+            accept();
+            return;
+        }
+        const auto result = settings->changeKeyboardMouseBinding(action, slot, input, replace);
+        status->setText(result.value("error").toString());
+        if (!status->text().isEmpty()) return;
+        if (result.value("conflict").toInt() >= 0) {
+            pending = input;
+            status->setText(tr("This input is assigned to %1. Move binding or cancel.").arg(result.value("name").toString()));
+            prompt->setEnabled(false);
+            findChild<QPushButton *>("setupBindingTab")->hide();
+            findChild<QPushButton *>("setupBindingClear")->hide();
+            move->show();
+            move->setFocus(Qt::TabFocusReason);
+            return;
+        }
+        accept();
+    }
+
+    bool eventFilter(QObject *object, QEvent *event) override
+    {
+        if (object != prompt || !prompt->isEnabled()) return QDialog::eventFilter(object, event);
+        if (event->type() == QEvent::FocusOut) { pressed = 0; mousePressed = Qt::NoButton; }
+        if (event->type() == QEvent::ShortcutOverride) {
+            event->accept();
+            return true;
+        }
+        if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
+            auto *key = static_cast<QKeyEvent *>(event);
+            if (!legacy && (key->key() == Qt::Key_Tab || key->key() == Qt::Key_Backtab)) return false;
+            const auto identity = KeyboardMousePhysicalKey(key->key(), key->nativeScanCode());
+            if (!key->isAutoRepeat()) {
+                if (event->type() == QEvent::KeyPress) pressed = identity;
+                else if (pressed && pressed == identity) {
+                    pressed = 0;
+                    if (key->key() == Qt::Key_Escape) reject();
+                    else offer(key->key());
+                }
+            }
+            return true;
+        }
+        if (!legacy && (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonRelease)) {
+            auto *mouse = static_cast<QMouseEvent *>(event);
+            if (event->type() == QEvent::MouseButtonPress) { mousePressed = mouse->button(); prompt->setFocus(); }
+            else if (mousePressed == mouse->button()) { mousePressed = Qt::NoButton; offer(-int(mouse->button())); }
+            return true;
+        }
+        return QDialog::eventFilter(object, event);
+    }
+
+    bool event(QEvent *event) override
+    {
+        if (event->type() == QEvent::WindowDeactivate) reject();
+        return QDialog::event(event);
+    }
+
+public:
+    BindingCapture(QmlSettings *settings, int action, int slot, bool legacy, std::function<bool()> current, QWidget *parent)
+        : QDialog(parent), settings(settings), action(action), slot(slot), legacy(legacy), current(std::move(current))
+    {
+        setObjectName("setupBindingCapture");
+        setWindowTitle(tr("Assign binding"));
+        setAttribute(Qt::WA_DeleteOnClose);
+        setWindowModality(Qt::WindowModal);
+        auto *layout = new QVBoxLayout(this);
+        prompt = new QLabel(legacy ? tr("Press a key to assign it. Press Escape or Cancel to cancel.")
+            : tr("Press a key, or click this box with a mouse button. Escape cancels. Tab moves focus. Use Assign Tab to bind Tab."), this);
+        prompt->setObjectName("setupBindingPrompt");
+        prompt->setWordWrap(true);
+        prompt->setMargin(16);
+        prompt->setFocusPolicy(Qt::StrongFocus);
+        prompt->setAccessibleName(prompt->text());
+        prompt->installEventFilter(this);
+        layout->addWidget(prompt);
+        status = new QLabel(this);
+        status->setObjectName("setupBindingStatus");
+        status->setWordWrap(true);
+        layout->addWidget(status);
+        auto *buttons = new QDialogButtonBox(QDialogButtonBox::Cancel, this);
+        buttons->setOrientation(Qt::Vertical);
+        connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
+        if (!legacy) {
+            auto *tab = buttons->addButton(tr("Assign Tab"), QDialogButtonBox::ActionRole);
+            tab->setObjectName("setupBindingTab");
+            connect(tab, &QPushButton::clicked, this, [this] { offer(Qt::Key_Tab); });
+            auto *clear = buttons->addButton(tr("Clear binding"), QDialogButtonBox::ActionRole);
+            clear->setObjectName("setupBindingClear");
+            connect(clear, &QPushButton::clicked, this, [this] { offer(0); });
+            move = buttons->addButton(tr("Move binding"), QDialogButtonBox::ActionRole);
+            move->setObjectName("setupBindingMove");
+            move->hide();
+            connect(move, &QPushButton::clicked, this, [this] { offer(pending, true); });
+        }
+        for (auto *button : buttons->findChildren<QPushButton *>()) button->setAutoDefault(false);
+        layout->addWidget(buttons);
+        resize(qMin(500, parent->width() - 32), sizeHint().height());
+        prompt->setFocus(Qt::TabFocusReason);
+    }
+};
 
 class SetupRequests : public QWebEngineUrlRequestInterceptor
 {
@@ -54,6 +181,23 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
     connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, updateTitle);
     connect(backend->qmlSettings(), &QmlSettings::currentProfileChanged, this, updateTitle);
     updateTitle();
+    connect(setupBridge, &SetupBridge::keyboardMouseCaptureRequested, this,
+        [this](int action, int slot, bool legacy, const QString &form, const QString &profile) {
+            if (!isVisible() || !setupBridge->keyboardMouseFormValid(form, profile)) return;
+            // A second activation replaces capture, but never replaces the settings presentation.
+            emit setupBridge->keyboardMouseClosed();
+            auto *capture = new BindingCapture(this->backend->qmlSettings(), action, slot, legacy,
+                [this, form, profile, legacy] {
+                    const bool cameraEnabled = this->backend->qmlSettings()->mouseCameraEnabled();
+                    return setupBridge->keyboardMouseFormValid(form, profile)
+                        && (legacy ? !cameraEnabled : cameraEnabled);
+                }, this);
+            connect(setupBridge, &SetupBridge::keyboardMouseClosed, capture, &QDialog::reject);
+            connect(capture, &QDialog::finished, this, [this, form, profile] {
+                if (isVisible() && setupBridge->keyboardMouseFormValid(form, profile)) webView->setFocus(Qt::TabFocusReason);
+            });
+            capture->open();
+        });
     connect(setupBridge, &SetupBridge::psnSignInRequested, this, [this] {
         if (!signInWindow) {
             signInWindow = new PsnSignInWindow(this->backend, this);
@@ -77,6 +221,8 @@ SetupWindow::SetupWindow(QmlBackend *backend, QWidget *parent)
     profile->setUrlRequestInterceptor(new SetupRequests(profile));
     auto *page = new SetupPage(profile, webView);
     webView->setPage(page);
+    connect(page, &QWebEnginePage::loadStarted, setupBridge, &SetupBridge::invalidateKeyboardMouse);
+    connect(page, &QWebEnginePage::renderProcessTerminated, setupBridge, &SetupBridge::invalidateKeyboardMouse);
     connect(page, &QWebEnginePage::recommendedStateChanged, this, [this, page](QWebEnginePage::LifecycleState state) {
         if (!isVisible() && state != QWebEnginePage::LifecycleState::Active)
             page->setLifecycleState(QWebEnginePage::LifecycleState::Frozen);
@@ -116,8 +262,21 @@ void SetupWindow::resume()
 
 void SetupWindow::closeEvent(QCloseEvent *event)
 {
+    setupBridge->invalidateKeyboardMouse();
     if (signInWindow) signInWindow->close();
     backend->nativeSettings()->SetGeometry(geometry());
     QWidget::closeEvent(event);
     if (event->isAccepted()) emit closed();
+}
+
+void SetupWindow::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    setupBridge->setKeyboardMouseAvailable(true);
+}
+
+void SetupWindow::hideEvent(QHideEvent *event)
+{
+    setupBridge->setKeyboardMouseAvailable(false);
+    QWidget::hideEvent(event);
 }

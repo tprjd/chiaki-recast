@@ -1,0 +1,10 @@
+Built source: 0e2702b7ce333a5cb121c077dee17cde99b0f7e1
+Binary: /home/david/.cache/chiaki-web-ui/build-ticket03/gui/tests/chiaki-mouse-response-tests
+Pre-run SHA256: 6d65b95aaf0dbb4124e475816375d0c99a4e2eb8e2eab622207ba803c89aff27
+Toolchain: WSL Ubuntu26.04 GCC15.2.0 Qt6.10.2
+Current migration source: 0916ee6486b57df98006a1d8ae0e12a5795ce4cc
+CRLF-normalized source hashes match HEAD:
+6157e77bbad96ae829c1d29b39872ab4843cbf68aeb1bc52fcc65d9640469fa6 gui/src/keyboardmousemapper.cpp
+54f1f3d9e2c580b571192bced530376312f7c2cb8c3c6091ec9274e19998c70f gui/include/keyboardmousemapper.h
+5b7590ffedf67d6a592199df1ebc0d70ab020e5d5cb7e6079a78e45727a479bd gui/tests/mouseresponse.cpp
+QCoreApplication-only test; root approved parallel execution with GUI check.

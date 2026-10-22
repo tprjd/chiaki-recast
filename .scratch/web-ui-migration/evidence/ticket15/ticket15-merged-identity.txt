@@ -1,0 +1,5 @@
+source=280989cf124919d74f0bb0dde8406d20e6acb376
+executable_sha256=331E01D4D5F3381B755A74632E13A56C8B5ED3629F3F2DF9E5A8B5193C024F88
+Qt=6.9.3 MSVC clang-cl19.1.7 QPA=offscreen Chromium=--disable-gpu
+QT_QPA_FONTDIR=C:/Windows/Fonts
+rendererSettings retains the controlled external process launcher
