@@ -1,0 +1,15 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[I] Logging to file C:/Users/david/AppData/Roaming/Chiaki embedded setup tests/Chiaki embedded setup tests/log/chiaki_session_2026-10-22_15-43-50-147147.log
+[I] Chiaki Version 1.10.0
+[I] ChiakiOpusEncoder initialized
+[I] Starting session request for PS5
+[I] Trying to request session from <redacted-ipv4>:9295
+[I] Connected to <redacted-ipv4>:9295
+[I] Sending session request
+[I] Queue reset in presentFrame due to pts rollback frame_pts= 0 queue_pts_origin= -1
+[I] [libplacebo] Spent 18.277 ms compiling shader
+[I] [libplacebo] Estimated source FPS: 59.999, display FPS: 69.490
+[I] Session has quit
