@@ -110,7 +110,7 @@ focus, and the guided workspace. The live PIN route can use this same content.
 save outcome. `ConsolePin` tests both the form and its guarded library callbacks,
 including target changes and return focus. Test assertions do not print PINs.
 
-`Main.qml` owns one `LiveConsolePinHost` for both PSN and stream routes.
+`StreamRoot.qml` owns the native `LiveConsolePinHost` during playback and connection progress.
 The backend retains `sessionPinRequest` across the route handoff. Its opaque
 `id` owns `enterPin(id, pin)`, `cancelSessionPin(id)`, and
 `dismissSessionPin(id)`. The request contains no PIN value. Native connection
@@ -433,3 +433,13 @@ The screen runner supplies the application name Chiaki and synthetic version
 The tests do not exercise native input capture, the Main non-Library focus fallback,
 display scaling, a real renderer failure, or a physical controller. Ticket 08 covers
 native acceptance.
+
+The maintained `chiaki-native-services-tests` check loads the production
+`StreamRoot.qml` through `QmlMainWindow`. It checks stream-only progress,
+saved stream geometry, PIN cancellation and acknowledgement, the return request,
+window recreation, and direct-stream exit. `sessionAndFeedback` and
+`keyboardMouseSettingsRoute` retain production root settings and input checks.
+The former also checks renderer-fallback input ownership while live settings close.
+Use a direct process launch for normal saved-size window checks. On Windows,
+`Start-Process -WindowStyle Hidden` can suppress the native first normal show,
+although Qt reports the window as visible.

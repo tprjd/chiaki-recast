@@ -22,7 +22,7 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 ## Frontier
 
 - [01: Application-owned native services](issues/01-application-owned-native-services.md): resolved for the native ownership milestone. Required graphics, live playback, cleanup, and performance acceptance remains assigned to tickets 03, 04, and 23.
-- [02: Native stream-only interface](issues/02-native-stream-only-interface.md): claimed.
+- [02: Native stream-only interface](issues/02-native-stream-only-interface.md): resolved for the native stream-root milestone. OpenGL and Vulkan production root/input checks pass. Live media and combined graphics acceptance remains with tickets 03, 04, and 23.
 - [03: Accelerated web console library](issues/03-accelerated-web-console-library.md): claimed. The required combined graphics check from ticket 01 remains pending.
 - Tickets 04 through 23: waiting for their declared blockers.
 
@@ -35,3 +35,5 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 ## Decisions
 
 - [Ticket 01](issues/01-application-owned-native-services.md) completes application-owned native services and QML engine lifetime. The pre-edit check established installed module limits and native graphics behavior. It did not prove accelerated WebEngine coexistence or real-console performance. Tickets 03 and 04 retain the required combined graphics acceptance. Ticket 23 retains matched live baseline conditions, predeclared tolerances, live-frame cleanup, and hardware acceptance.
+
+- [Ticket 02](issues/02-native-stream-only-interface.md) extracts `StreamRoot.qml` and removes setup navigation from the native host. `streamViewDismissed` is a presentation request; ticket 04 owns cleanup before setup restoration. [Native verification](evidence/ticket02/verification.md) records actual root, PIN, settings, and input checks.

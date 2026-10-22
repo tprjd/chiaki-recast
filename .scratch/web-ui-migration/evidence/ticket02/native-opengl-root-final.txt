@@ -1,0 +1,98 @@
+********* Start testing of NativeServicesTest *********
+Config: Using QtTest library 6.11.2, Qt 6.11.2 (x86_64-little_endian-llp64 shared (dynamic) release build; by GCC 16.2.0), windows 11
+PASS   : NativeServicesTest::initTestCase()
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Initialized libplacebo v7.360.1 (API v360)
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: Using amd graphics card
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Detected OpenGL version strings:
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]     GL_VERSION:  4.6.0 NVIDIA 617.42
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]     GL_VENDOR:   NVIDIA Corporation
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]     GL_RENDERER: NVIDIA GeForce RTX 5090/PCIe/SSE2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]     GL_SHADING_LANGUAGE_VERSION: 4.60 NVIDIA
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] GPU information:
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]     GLSL version: 460
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_shmem_size:            49152
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_group_threads:         1024
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_group_size[0]:         1024
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_group_size[1]:         1024
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_group_size[2]:         64
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       subgroup_size:             0
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       min_gather_offset:         -32
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_gather_offset:         31
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]     Limits:
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       thread_safe:               1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       callbacks:                 1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_buf_size:              18446744073709551615
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_ubo_size:              65536
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_ssbo_size:             2147483647
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_vbo_size:              18446744073709551615
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_mapped_size:           18446744073709551615
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_buffer_texels:         0
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       align_host_ptr:            0
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       host_cached:               1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_tex_1d_dim:            32768
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_tex_2d_dim:            32768
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_tex_3d_dim:            16384
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       blittable_1d_3d:           0
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       buf_transfer:              1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       align_tex_xfer_pitch:      4
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       align_tex_xfer_offset:     32
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_variable_comps:        4096
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_constants:             0
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_pushc_size:            0
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       align_vertex_stride:       1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_dispatch[0]:           2147483647
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_dispatch[1]:           65535
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       max_dispatch[2]:           65535
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       fragment_queues:           1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo]       compute_queues:            1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (EASU)
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: FidelityFX Super Resolution v1.0.2 (RCAS)
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: feature map 1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: feature map 2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: feature map 3
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: feature map 4
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_3
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 1_4
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_3
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 2_4
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_3
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 3_4
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_3
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: mapping 4_4
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 2
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 3
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: sub-band residuals 4
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: sub-pixel convolution 1
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: [libplacebo] Registering hook pass: aggregation
+QCRITICAL: NativeServicesTest::streamOnlyRoot() chiaki.gui: Current Profile:  ""
+QWARN  : NativeServicesTest::streamOnlyRoot() qrc:/StreamRoot.qml:401:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+QWARN  : NativeServicesTest::streamOnlyRoot() qrc:/StreamRoot.qml:371:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+QWARN  : NativeServicesTest::streamOnlyRoot() qrc:/StreamRoot.qml:341:9: QML Shortcut: Shortcut: Only binding to one of multiple key bindings associated with 70. Use 'sequences: [ <key> ]' to bind to all of them.
+QINFO  : NativeServicesTest::streamOnlyRoot() chiaki.gui: Checking sleep state: 
+PASS   : NativeServicesTest::streamOnlyRoot()
+PASS   : NativeServicesTest::cleanupTestCase()
+Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 887ms
+********* Finished testing of NativeServicesTest *********

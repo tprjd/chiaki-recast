@@ -138,6 +138,7 @@ public slots:
     void updatePlacebo();
     void updateVSync();
     void show();
+    void dismissStreamView() { emit streamViewDismissed(); }
     void presentFrame(ChiakiFfmpegFrame frame, int32_t frames_lost);
 
     AVBufferRef *vulkanHwDeviceCtx();
@@ -151,6 +152,7 @@ signals:
     void zoomFactorChanged();
     void videoPresetChanged();
     void menuRequested();
+    void streamViewDismissed();
     void directStreamChanged();
     void queueDepthAverageChanged();
     void pendingFrameAgeChanged();

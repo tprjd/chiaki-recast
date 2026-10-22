@@ -173,6 +173,7 @@ Item {
 
     Rectangle {
         id: loadingView
+        objectName: "streamLoadingView"
         anchors.fill: parent
         color: "black"
         opacity: !view.managedConnection && (sessionError || sessionLoading) || (!sessionLoading && !sessionError && (view.settings.audioVideoDisabled & 0x02)) ? 1.0 : 0.0

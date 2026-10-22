@@ -673,16 +673,6 @@ void QmlBackend::setConnectState(PsnConnectState connect_state)
         if (!phase.isEmpty()) connection_attempt["phase"] = phase;
         emit connectionAttemptChanged();
     }
-    if(window && connect_state == PsnConnectState::ConnectFailed)
-    {
-        if(!this->settings->GetGeometry().isEmpty())
-        {
-            window->setGeometry(this->settings->GetGeometry());
-            window->normalTime();
-        }
-        else
-            window->showMaximized();
-    }
     emit connectStateChanged();
 }
 

@@ -4,6 +4,7 @@
 #include <QQmlEngine>
 #include <QUuid>
 #include <QScopeGuard>
+#include <QQuickItem>
 #include "qmlnativeservices.h"
 #include "qmlmainwindow.h"
 #include "qmlbackend.h"
@@ -12,6 +13,76 @@ class NativeServicesTest : public QObject
 {
     Q_OBJECT
 private slots:
+    void streamOnlyRoot()
+    {
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto removeSettings = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        settings.SetWindowType(WindowType::AdjustableResolution);
+        settings.SetGeometry(QRect(40, 40, 720, 480));
+        settings.SetStreamGeometry(QRect(80, 80, 1024, 640));
+        settings.SetRenderBackend(qEnvironmentVariable("CHIAKI_INPUT_TEST_RENDERER") == "vulkan"
+            ? RenderBackend::Vulkan : RenderBackend::OpenGL);
+        QmlNativeServices services(&settings);
+        services.backend()->stopAutoConnect();
+        QmlMainWindow window(services.backend(), services.engine());
+        window.show();
+        QCOMPARE(window.size(), QSize(1024, 640));
+        QCOMPARE(settings.GetGeometry(), QRect(40, 40, 720, 480));
+        window.requestActivate();
+        QTRY_VERIFY(window.isExposed());
+        const auto findProgress = [](auto &&self, QQuickItem *item) -> QQuickItem * {
+            if (item->objectName() == "streamLoadingView") return item;
+            for (auto *child : item->childItems())
+                if (auto *found = self(self, child)) return found;
+            return nullptr;
+        };
+        QQuickItem *progress = nullptr;
+        for (auto *candidate : QGuiApplication::allWindows()) {
+            auto *quick = qobject_cast<QQuickWindow *>(candidate);
+            if (!quick) continue;
+            progress = findProgress(findProgress, quick->contentItem());
+            if (progress) break;
+        }
+        QVERIFY2(progress && progress->isVisible(), "A native stream window must show connection progress without a setup root");
+        QQuickItem *root = progress;
+        while (root && !root->property("streamSettingsOpen").isValid()) root = root->parentItem();
+        QVERIFY(root);
+        QSignalSpy dismissed(&window, &QmlMainWindow::streamViewDismissed);
+        QVERIFY(QMetaObject::invokeMethod(root, "showMainView"));
+        QCOMPARE(dismissed.count(), 1);
+        QVERIFY(window.isVisible());
+        settings.SetHardwareDecoder({});
+        StreamSessionConnectInfo info(&settings, CHIAKI_TARGET_PS5_1, "127.0.0.1", "Test console",
+            QByteArray(CHIAKI_SESSION_AUTH_SIZE, '\0'), QByteArray(16, '\0'), {}, {}, false, false, false, false);
+        auto *backend = services.backend();
+        backend->createSession(info);
+        QPointer<StreamSession> session = backend->qmlSession();
+        QVERIFY(session);
+        session->LoginPINRequested(false);
+        const QString request = backend->sessionPinRequest().value("id").toString();
+        QVERIFY(!request.isEmpty());
+        auto *pinHost = root->findChild<QObject *>("liveConsolePinHost");
+        QVERIFY(pinHost && pinHost->property("blocking").toBool());
+        QVERIFY(window.streamInput()->blocked());
+        QVERIFY(QMetaObject::invokeMethod(root, "openDisplaySettings"));
+        QVERIFY(!root->property("streamSettingsOpen").toBool());
+        QVERIFY(backend->cancelSessionPin(request));
+        session->SessionQuit(CHIAKI_QUIT_REASON_STOPPED, {});
+        QVERIFY(!session);
+        QCOMPARE(window.size(), QSize(1024, 640));
+        QCOMPARE(settings.GetGeometry(), QRect(40, 40, 720, 480));
+        QCOMPARE(backend->sessionPinRequest().value("phase").toString(), QStringLiteral("cancelled"));
+        QVERIFY(backend->dismissSessionPin(request));
+        QVERIFY(QMetaObject::invokeMethod(root, "showMainView"));
+        QCOMPARE(dismissed.count(), 2);
+        QVERIFY(!pinHost->property("blocking").toBool());
+    }
     void windowRecreation()
     {
         QQuickWindow setup;
