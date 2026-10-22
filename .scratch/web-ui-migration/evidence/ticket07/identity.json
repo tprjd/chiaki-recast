@@ -1,0 +1,547 @@
+{
+  "source": "3d07a8b22187ffdfab239ed954f3cb5c0b1cefe3",
+  "gui_tree": "c3e47fc49ca8c566079614c2eb3d7b773c9b5823",
+  "comparisons": [
+    {
+      "label": "QmlRegist::QmlRegist(",
+      "path": "gui/src/qmlbackend.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "aaf640c64c114e443e9bd5c415904bced56c4733170d86e61c966bbb981f7fbf",
+      "expected_sha256": "aaf640c64c114e443e9bd5c415904bced56c4733170d86e61c966bbb981f7fbf",
+      "equal": true
+    },
+    {
+      "label": "QmlRegist::~QmlRegist()",
+      "path": "gui/src/qmlbackend.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "ee74d277aad8aa763ea4c12228d8225ba76fd38921f887d9e9eeb5fa1823a363",
+      "expected_sha256": "ee74d277aad8aa763ea4c12228d8225ba76fd38921f887d9e9eeb5fa1823a363",
+      "equal": true
+    },
+    {
+      "label": "ChiakiErrorCode QmlRegist::start(",
+      "path": "gui/src/qmlbackend.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "23b496fe5e3d9004285374cb457646c9bcae1de302ff4f304abc3c4657d58ee1",
+      "expected_sha256": "23b496fe5e3d9004285374cb457646c9bcae1de302ff4f304abc3c4657d58ee1",
+      "equal": true
+    },
+    {
+      "label": "void QmlRegist::log_cb(",
+      "path": "gui/src/qmlbackend.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "be414c5ba12654c540faf0d4ea2add7c83e9ccd2e7aa049976db0e79169ea488",
+      "expected_sha256": "be414c5ba12654c540faf0d4ea2add7c83e9ccd2e7aa049976db0e79169ea488",
+      "equal": true
+    },
+    {
+      "label": "void QmlRegist::regist_cb(",
+      "path": "gui/src/qmlbackend.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "971f3b0df0c6d125f1a08a882d48b5e0021737740f6522f19df20f399037aa37",
+      "expected_sha256": "971f3b0df0c6d125f1a08a882d48b5e0021737740f6522f19df20f399037aa37",
+      "equal": true
+    },
+    {
+      "label": "QVariantMap QmlBackend::createRegistrationContext(",
+      "path": "gui/src/qmlbackend.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "7a36682dedbebef3832f7d7f00c1a0f7f6d871a5f7a9d4ff80e22958c9d04350",
+      "expected_sha256": "7a36682dedbebef3832f7d7f00c1a0f7f6d871a5f7a9d4ff80e22958c9d04350",
+      "equal": true
+    },
+    {
+      "label": "bool QmlBackend::registrationContextCurrent(",
+      "path": "gui/src/qmlbackend.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "01d2896ae65c517cfe076eb3ec61197a00c3cbbf8bdf6ec4c12af4f2d9fa1c75",
+      "expected_sha256": "01d2896ae65c517cfe076eb3ec61197a00c3cbbf8bdf6ec4c12af4f2d9fa1c75",
+      "equal": true
+    },
+    {
+      "label": "bool QmlBackend::registerHost(",
+      "path": "gui/src/qmlbackend.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "b350d3ece435957466350785fe7bc0150c0ebf3b77561f583e8e9d060a717a1f",
+      "expected_sha256": "b350d3ece435957466350785fe7bc0150c0ebf3b77561f583e8e9d060a717a1f",
+      "equal": true
+    },
+    {
+      "label": "QString QmlBackend::startAccountLookup(",
+      "path": "gui/src/qmlbackend.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "7de292054358245fa36c805a30801c676744b4b825fd799bf8d44c69eee75aaf",
+      "expected_sha256": "7de292054358245fa36c805a30801c676744b4b825fd799bf8d44c69eee75aaf",
+      "equal": true
+    },
+    {
+      "label": "bool QmlBackend::cancelAccountLookup(",
+      "path": "gui/src/qmlbackend.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "dbc9e81ace48166a71515fad777ad9156aaef92bb38e1048b1fccc2cb35bcbae",
+      "expected_sha256": "dbc9e81ace48166a71515fad777ad9156aaef92bb38e1048b1fccc2cb35bcbae",
+      "equal": true
+    },
+    {
+      "label": "QVariantMap SetupBridge::openRegistration(",
+      "path": "gui/src/setupbridge.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "cce32e5b8d1c573e43f114b4605ef6c072b4b82ad7582f35a9fbef85b91630ef",
+      "expected_sha256": "cce32e5b8d1c573e43f114b4605ef6c072b4b82ad7582f35a9fbef85b91630ef",
+      "equal": true
+    },
+    {
+      "label": "bool SetupBridge::registrationAccountCurrent(",
+      "path": "gui/src/setupbridge.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "e7d2d4fece1efebb061a20f02f6cf8377e61cbe44123722231ef9b4094f967d8",
+      "expected_sha256": "e7d2d4fece1efebb061a20f02f6cf8377e61cbe44123722231ef9b4094f967d8",
+      "equal": true
+    },
+    {
+      "label": "QVariantMap SetupBridge::beginRegistrationAccount(",
+      "path": "gui/src/setupbridge.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "c939227653d24cf0622b1a3775bbed35ee4b579fefac4778944254616741dbf8",
+      "expected_sha256": "c939227653d24cf0622b1a3775bbed35ee4b579fefac4778944254616741dbf8",
+      "equal": true
+    },
+    {
+      "label": "QVariantMap SetupBridge::lookupRegistrationAccount(",
+      "path": "gui/src/setupbridge.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "7761745fb37cd5400d24c61e36a417d9d1ecc178eb698adffd0513b0f4d55907",
+      "expected_sha256": "7761745fb37cd5400d24c61e36a417d9d1ecc178eb698adffd0513b0f4d55907",
+      "equal": true
+    },
+    {
+      "label": "QVariantMap SetupBridge::readRegistrationAccount(",
+      "path": "gui/src/setupbridge.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "f45be6b099be04165523e769a01cdbf1fadbe35a115aa2dbcb534415af81bbc2",
+      "expected_sha256": "f45be6b099be04165523e769a01cdbf1fadbe35a115aa2dbcb534415af81bbc2",
+      "equal": true
+    },
+    {
+      "label": "QVariantMap SetupBridge::endRegistrationAccount(",
+      "path": "gui/src/setupbridge.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "49292e17180e3f8f6ef49a994a9eddf251a60560947cfacfcf76cc68915fcc25",
+      "expected_sha256": "49292e17180e3f8f6ef49a994a9eddf251a60560947cfacfcf76cc68915fcc25",
+      "equal": true
+    },
+    {
+      "label": "QVariantMap SetupBridge::connectRegistration(",
+      "path": "gui/src/setupbridge.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "0c7a4f10d3356be1ee10a970463d7ea5112afa30a954ec8107182f23195023b6",
+      "expected_sha256": "0c7a4f10d3356be1ee10a970463d7ea5112afa30a954ec8107182f23195023b6",
+      "equal": true
+    },
+    {
+      "label": "corrected registration context",
+      "path": "gui/src/setupbridge.cpp",
+      "tested_source": "c7a5c7d1",
+      "actual_sha256": "8b73dc84d3d36a0caa20c9963e79db65cae5bf47e9bdad3f8403172894fc5e23",
+      "expected_sha256": "8b73dc84d3d36a0caa20c9963e79db65cae5bf47e9bdad3f8403172894fc5e23",
+      "equal": true
+    },
+    {
+      "label": "registration and lookup snapshot allowlists",
+      "path": "gui/src/setupbridge.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "73dbca289dc1dc64827e77732b85e096497702e2f082f7efd275609ed6ddd54b",
+      "expected_sha256": "73dbca289dc1dc64827e77732b85e096497702e2f082f7efd275609ed6ddd54b",
+      "equal": true
+    },
+    {
+      "label": "registration and account profile invalidation",
+      "path": "gui/src/qmlbackend.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "177742d365a9f70f9d00a5a877c5d0e1a4656a9bf25f298647037faf47f3f29a",
+      "expected_sha256": "177742d365a9f70f9d00a5a877c5d0e1a4656a9bf25f298647037faf47f3f29a",
+      "equal": true
+    },
+    {
+      "label": "registration transport defaults",
+      "path": "gui/include/registrationrequests.h",
+      "tested_source": "c152f87b",
+      "actual_sha256": "845aed376e7ec455b5a5168d9c3ec2710692de888b150f531e6c86fe2e91ffae",
+      "expected_sha256": "845aed376e7ec455b5a5168d9c3ec2710692de888b150f531e6c86fe2e91ffae",
+      "equal": true
+    },
+    {
+      "label": "native sign-in UI",
+      "path": "gui/web/src/PsnAccount.svelte",
+      "tested_source": "c152f87b",
+      "actual_sha256": "44642c837035576769a1e02f72ca1be552bf8b65f113f151f09beff93f60966a",
+      "expected_sha256": "44642c837035576769a1e02f72ca1be552bf8b65f113f151f09beff93f60966a",
+      "equal": true
+    },
+    {
+      "label": "final pairing UI",
+      "path": "gui/web/src/Pairing.svelte",
+      "tested_source": "add8c676",
+      "actual_sha256": "92715107574806ff1f2a469f1e4c894e5b1cd1d2d5d567fac553792e819772e7",
+      "expected_sha256": "92715107574806ff1f2a469f1e4c894e5b1cd1d2d5d567fac553792e819772e7",
+      "equal": true
+    },
+    {
+      "label": "pairing UI before focus fallback",
+      "path": "gui/web/src/Pairing.svelte",
+      "tested_source": "c7a5c7d1",
+      "actual_sha256": "b7418fbe163214d7251a8a50f0e63844f54b191a5ee2dc174289eb3ae6498a64",
+      "expected_sha256": "b7418fbe163214d7251a8a50f0e63844f54b191a5ee2dc174289eb3ae6498a64",
+      "equal": true
+    },
+    {
+      "label": "scenario registrationLookup",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "07b4fa8349699f8a373fa81a14b1d06a7ff237846e15277a5c5240d13b2ae7ee",
+      "expected_sha256": "07b4fa8349699f8a373fa81a14b1d06a7ff237846e15277a5c5240d13b2ae7ee",
+      "equal": true
+    },
+    {
+      "label": "scenario registrationLookupTimeout",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "ed2821529b622b3499fcb9013c55830af8b08a6162f02baae4d16a928a3c4982",
+      "expected_sha256": "ed2821529b622b3499fcb9013c55830af8b08a6162f02baae4d16a928a3c4982",
+      "equal": true
+    },
+    {
+      "label": "scenario registrationAccountSources",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "38e9cd8073fa84159ea2e438d0e7f8c45746f865f9f8c96e6454d80f93a69cec",
+      "expected_sha256": "38e9cd8073fa84159ea2e438d0e7f8c45746f865f9f8c96e6454d80f93a69cec",
+      "equal": true
+    },
+    {
+      "label": "scenario registrationNativeValidation",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "a213ca1ca79abe9ab79fb469f217edd67716c36bba9ba0c4de35d39be7d1fcd5",
+      "expected_sha256": "a213ca1ca79abe9ab79fb469f217edd67716c36bba9ba0c4de35d39be7d1fcd5",
+      "equal": true
+    },
+    {
+      "label": "scenario registrationStaleTargets_data",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "43731072d5505f4a51d2187002be0120764fb63c317064a602de4c5874a0b0ef",
+      "expected_sha256": "43731072d5505f4a51d2187002be0120764fb63c317064a602de4c5874a0b0ef",
+      "equal": true
+    },
+    {
+      "label": "scenario registrationStaleTargets",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "c840a13a99fd5da9367781ea27e6873e47a894fa725ce460e5a1f7e25ec62f51",
+      "expected_sha256": "c840a13a99fd5da9367781ea27e6873e47a894fa725ce460e5a1f7e25ec62f51",
+      "equal": true
+    },
+    {
+      "label": "scenario psnSignIn",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "8312c499da73e0e96fb2f7ab4c30cd80be6f9ef345e3f9e8d0c5cba0bb8180c7",
+      "expected_sha256": "8312c499da73e0e96fb2f7ab4c30cd80be6f9ef345e3f9e8d0c5cba0bb8180c7",
+      "equal": true
+    },
+    {
+      "label": "scenario consoleTargetGuards",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "c152f87b",
+      "actual_sha256": "2b8e3cee27b6d83da6d2472d7e4e2a15e1a23c00664b19f9f727ae44efe6bf6e",
+      "expected_sha256": "2b8e3cee27b6d83da6d2472d7e4e2a15e1a23c00664b19f9f727ae44efe6bf6e",
+      "equal": true
+    },
+    {
+      "label": "scenario registrationAddressCorrection",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "c7a5c7d1",
+      "actual_sha256": "46d86eaf060ae4801856b2a176a2723da22e1c69a67532914317f3c5a85a87e7",
+      "expected_sha256": "46d86eaf060ae4801856b2a176a2723da22e1c69a67532914317f3c5a85a87e7",
+      "equal": true
+    },
+    {
+      "label": "scenario registrationForm",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "c7a5c7d1",
+      "actual_sha256": "e6b741b6d41941261da4ff7ad5656bc8feb2331a5b001840324dd5a3220ec53a",
+      "expected_sha256": "e6b741b6d41941261da4ff7ad5656bc8feb2331a5b001840324dd5a3220ec53a",
+      "equal": true
+    },
+    {
+      "label": "scenario registrationProgress",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "c7a5c7d1",
+      "actual_sha256": "aa3d53950a4ccc40510c9743736f8d8ec332b259467cb4591b4e90b80fb32cb3",
+      "expected_sha256": "aa3d53950a4ccc40510c9743736f8d8ec332b259467cb4591b4e90b80fb32cb3",
+      "equal": true
+    },
+    {
+      "label": "scenario registrationHandoff",
+      "path": "gui/tests/embeddedsetup.cpp",
+      "tested_source": "add8c676",
+      "actual_sha256": "f9b870588d31f61eb87dd7b283718454d63b6aea5134de24cbcaf14edb201fb3",
+      "expected_sha256": "f9b870588d31f61eb87dd7b283718454d63b6aea5134de24cbcaf14edb201fb3",
+      "equal": true
+    },
+    {
+      "label": "pairing WebChannel request adapters",
+      "path": "gui/web/src/bridge.ts",
+      "tested_source": "add8c676",
+      "actual_sha256": "0283bbaed5174e5eac3b7099e53f6bb60c9061e295b1b6a48ab546519b8fc787",
+      "expected_sha256": "0283bbaed5174e5eac3b7099e53f6bb60c9061e295b1b6a48ab546519b8fc787",
+      "equal": true
+    }
+  ],
+  "constructor_and_default_checks": {
+    "gui/include/qmlbackend.h": true,
+    "gui/include/qmlnativeservices.h": true,
+    "gui/src/qmlbackend.cpp": true,
+    "gui/src/qmlnativeservices.cpp": true,
+    "native service forwards both requests": true,
+    "backend binds discovery before construction": true,
+    "backend retains native registration requests": true,
+    "backend retains launcher": true,
+    "raw session default remains production": true
+  },
+  "source_files": {
+    "gui/include/registrationrequests.h": {
+      "worktree_sha256": "71fe594be72b94e9bf55aba9fa4535243faf3227f3d7cd250ffc5a5a1abc2a19",
+      "normalized_sha256": "845aed376e7ec455b5a5168d9c3ec2710692de888b150f531e6c86fe2e91ffae",
+      "git_blob_sha256": "845aed376e7ec455b5a5168d9c3ec2710692de888b150f531e6c86fe2e91ffae"
+    },
+    "gui/include/qmlbackend.h": {
+      "worktree_sha256": "d04730c4c668e99769cc6d076d8b11d0341c820e7cda9c9f60d9cc78fa53fa8e",
+      "normalized_sha256": "24c7553c6671b8428f12a353e6ed1f6db36c7ba38eb1cc97ba5b454915dbd7be",
+      "git_blob_sha256": "24c7553c6671b8428f12a353e6ed1f6db36c7ba38eb1cc97ba5b454915dbd7be"
+    },
+    "gui/include/qmlnativeservices.h": {
+      "worktree_sha256": "8c621d9d3b3fd2a971d0c687e453f9aa3b506de4da5b6cb5ea4395a0e1e4b686",
+      "normalized_sha256": "5cac25a33c4d53feca724f49215cfea1effc64700e246897b142d359bd9e44c9",
+      "git_blob_sha256": "5cac25a33c4d53feca724f49215cfea1effc64700e246897b142d359bd9e44c9"
+    },
+    "gui/include/setupbridge.h": {
+      "worktree_sha256": "a212b914580ce141bd841c88199d2604ac1ac4940888826eb73c3e3388703fc4",
+      "normalized_sha256": "c2b98dfb1de5a8ae3791d861834d868f741ce447c9e94208438470c34149f17b",
+      "git_blob_sha256": "c2b98dfb1de5a8ae3791d861834d868f741ce447c9e94208438470c34149f17b"
+    },
+    "gui/src/qmlbackend.cpp": {
+      "worktree_sha256": "ff75e9e49562cb8bcf12723ec3402547af2a31b79cc4733e172150e0cb805d97",
+      "normalized_sha256": "1576420f928a699128f5b40ae3a2fef7ab4e9c982fe374ab5d424b9a1e66798d",
+      "git_blob_sha256": "1576420f928a699128f5b40ae3a2fef7ab4e9c982fe374ab5d424b9a1e66798d"
+    },
+    "gui/src/qmlnativeservices.cpp": {
+      "worktree_sha256": "17fa438748072bea165523666d9d66f5506046caba8ef5b4caf92416026e29a4",
+      "normalized_sha256": "bd69c4ba074dfcfa3811a16caf77ccc00e9ddc805c707aaae04ebcc530ecd089",
+      "git_blob_sha256": "bd69c4ba074dfcfa3811a16caf77ccc00e9ddc805c707aaae04ebcc530ecd089"
+    },
+    "gui/src/setupbridge.cpp": {
+      "worktree_sha256": "abdd245629964780a2303a7c4afcea1916654faf6cb5f6cc36765d1af69a9a57",
+      "normalized_sha256": "ecf6d12f959accf318e90b3d16ea481681de0d7e041033e73c3d335fec17b06b",
+      "git_blob_sha256": "ecf6d12f959accf318e90b3d16ea481681de0d7e041033e73c3d335fec17b06b"
+    },
+    "gui/include/psnrequests.h": {
+      "worktree_sha256": "603ab42e42f7b74527d95e627935637884ed782c77941611e315ae057b2f1916",
+      "normalized_sha256": "239a8a106c759a1cf3d29e17f633f6b080ce4eb5325214e205d014acddc2e135",
+      "git_blob_sha256": "239a8a106c759a1cf3d29e17f633f6b080ce4eb5325214e205d014acddc2e135"
+    },
+    "gui/include/discoverymanager.h": {
+      "worktree_sha256": "c83c5d557e719ec31db30352dc9279ab56304efe1d72da0a39f48f6a896f7c96",
+      "normalized_sha256": "09f01d790c372a5a350ed93baeabc219953694d5c41ceec358e3647a81d86caa",
+      "git_blob_sha256": "09f01d790c372a5a350ed93baeabc219953694d5c41ceec358e3647a81d86caa"
+    },
+    "gui/src/discoverymanager.cpp": {
+      "worktree_sha256": "1e25b18de52da4d1d40b56c3271ca13a049d06e22a919b22b99f35ebf4809307",
+      "normalized_sha256": "30c4e7b003d4674ce1d847b2e8d41c2c9e7cbb40baef1c0d53d7d1196e48be5b",
+      "git_blob_sha256": "30c4e7b003d4674ce1d847b2e8d41c2c9e7cbb40baef1c0d53d7d1196e48be5b"
+    },
+    "gui/include/streamsession.h": {
+      "worktree_sha256": "40d9123cd7b5437174b3f4f638383f7eb4f3b03183ff25cd440bd4e16eae81f7",
+      "normalized_sha256": "853487e349df45c7eed9b7cc41a2e5d92e716aacfc02aaeb59e0bfb1e8127cb0",
+      "git_blob_sha256": "853487e349df45c7eed9b7cc41a2e5d92e716aacfc02aaeb59e0bfb1e8127cb0"
+    },
+    "gui/src/streamsession.cpp": {
+      "worktree_sha256": "cad35c7bb6feef5beda935b53c9bc79bd550cd3da881aa9491895265ec200a6d",
+      "normalized_sha256": "56f9ae77a54ba88b83b37d050a675454a8f0960129edcecf8a5bb4d27e53c074",
+      "git_blob_sha256": "56f9ae77a54ba88b83b37d050a675454a8f0960129edcecf8a5bb4d27e53c074"
+    },
+    "gui/web/src/Pairing.svelte": {
+      "worktree_sha256": "501a33241e1c731c34dee1fc3a63e345e4a55dba5ee9695eb5f6e506fab73821",
+      "normalized_sha256": "92715107574806ff1f2a469f1e4c894e5b1cd1d2d5d567fac553792e819772e7",
+      "git_blob_sha256": "92715107574806ff1f2a469f1e4c894e5b1cd1d2d5d567fac553792e819772e7"
+    },
+    "gui/web/src/PsnAccount.svelte": {
+      "worktree_sha256": "387d3e5b69fced2202e388eb1d514719b813c6d9e4e1f2ed6674a1c715e34552",
+      "normalized_sha256": "44642c837035576769a1e02f72ca1be552bf8b65f113f151f09beff93f60966a",
+      "git_blob_sha256": "44642c837035576769a1e02f72ca1be552bf8b65f113f151f09beff93f60966a"
+    },
+    "gui/web/src/App.svelte": {
+      "worktree_sha256": "6a411f6f86c8996b70c21c527087f61e7b5360613701dae2d5f4eda3be676ca3",
+      "normalized_sha256": "d25f51c29d21b1227ba9771fd8e132b9bb8e829c3693782282fb244b17a0717e",
+      "git_blob_sha256": "d25f51c29d21b1227ba9771fd8e132b9bb8e829c3693782282fb244b17a0717e"
+    },
+    "gui/web/src/bridge.ts": {
+      "worktree_sha256": "4feaae71c724ce7a58bdbb023ee3031d3ce9af2fa48bc8cd4107c87b8002361b",
+      "normalized_sha256": "7fdaec66c5959bc932a7a6ad4a02a717bc4213de903c28caa5c07a72b7fdbbd2",
+      "git_blob_sha256": "7fdaec66c5959bc932a7a6ad4a02a717bc4213de903c28caa5c07a72b7fdbbd2"
+    },
+    "gui/web/src/ConnectAction.svelte": {
+      "worktree_sha256": "dce62d5eeef74ca6217bfde9093e895d889d6e3e5b18e78f126f89492b26643b",
+      "normalized_sha256": "acb9819884d784f2416c11f2a420c3d8ae3ebe35962e419f67d0e8a0b2b440f5",
+      "git_blob_sha256": "acb9819884d784f2416c11f2a420c3d8ae3ebe35962e419f67d0e8a0b2b440f5"
+    },
+    "gui/tests/embeddedsetup.cpp": {
+      "worktree_sha256": "b72338b04a170a61894821bc6488af2dfb1c465af307a7105b3f2b79612a24de",
+      "normalized_sha256": "e254745cc23a7067ba5333ff7277acf88105839ec183357e308bdb7822bb1dee",
+      "git_blob_sha256": "e254745cc23a7067ba5333ff7277acf88105839ec183357e308bdb7822bb1dee"
+    },
+    "gui/tests/CMakeLists.txt": {
+      "worktree_sha256": "7358466edc6a948c59039df76bc9499bc33a0b946f5f9a9e2679e130b3b10cdd",
+      "normalized_sha256": "37ee75b24da8e471b7e9f5d2ad5c7a83ff49eb70755686df54e5dd370d10548b",
+      "git_blob_sha256": "37ee75b24da8e471b7e9f5d2ad5c7a83ff49eb70755686df54e5dd370d10548b"
+    },
+    "gui/tests/README.md": {
+      "worktree_sha256": "d3b439a19bc4b55fe7006f6d843e1891b797a8212d62b19bb58ec8e9ec67d4c9",
+      "normalized_sha256": "a193faebb3517bb10068c03d55c919ec241183ab4d55dbff5a76790e4a44132b",
+      "git_blob_sha256": "a193faebb3517bb10068c03d55c919ec241183ab4d55dbff5a76790e4a44132b"
+    },
+    "gui/web/package-lock.json": {
+      "worktree_sha256": "59e9bbe871ea16981ea1fd5beb0913760e66d684de0e3de8c15f2fed0a6b31e6",
+      "normalized_sha256": "337af3ce297ac50327b7714ceabeb1141ac2cc3b30df52bf043270ce247a6358",
+      "git_blob_sha256": "337af3ce297ac50327b7714ceabeb1141ac2cc3b30df52bf043270ce247a6358"
+    }
+  },
+  "artifacts": {
+    "application": {
+      "path": "C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/chiaki.exe",
+      "sha256": "51605cae6025d803bae0e111402475c228404ee02ac49b874914a53192cd8c0c"
+    },
+    "embedded_tests": {
+      "path": "C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/tests/chiaki-embedded-setup-tests.exe",
+      "sha256": "78950cd12f9d7aab8109b477f817fca064bdc6a19cce0621483387d46cde6cdf"
+    },
+    "javascript": {
+      "path": "C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/web/app.js",
+      "sha256": "d517fcdc1913a4e21edf6efea7001f9e7d4a2a1c37f172996ee947e31205cfa0"
+    },
+    "css": {
+      "path": "C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/web/app.css",
+      "sha256": "1e0388c582acc0da81d3688816197fcd7a3eb097af48961f255dbc2132b8ac51"
+    }
+  },
+  "retired_routes_absent": true,
+  "reports": {
+    "correction-result.txt": {
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "failures": []
+    },
+    "focused-result.txt": {
+      "passed": 14,
+      "failed": 2,
+      "skipped": 0,
+      "failures": [
+        "registrationForm",
+        "registrationAddressCorrection"
+      ]
+    },
+    "handoff-correction-result.txt": {
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "failures": []
+    },
+    "handoff-result.txt": {
+      "passed": 2,
+      "failed": 1,
+      "skipped": 0,
+      "failures": [
+        "registrationHandoff"
+      ]
+    },
+    "ticket07-form-result.txt": {
+      "passed": 3,
+      "failed": 1,
+      "skipped": 0,
+      "failures": [
+        "registrationProgress"
+      ]
+    },
+    "ticket07-red-result.txt": {
+      "passed": 2,
+      "failed": 1,
+      "skipped": 0,
+      "failures": [
+        "registrationForm"
+      ]
+    },
+    "ticket07-registration-result.txt": {
+      "passed": 4,
+      "failed": 1,
+      "skipped": 0,
+      "failures": [
+        "registrationLookup"
+      ]
+    }
+  },
+  "all_source_checks_pass": true,
+  "evidence_sha256": {
+    ".gitattributes": "ffe82f3c5b968ed009c2577fa38f32c83be167799ee565d40a18e3440c57b342",
+    "correction-console.txt": "f7298779fef7c104af1f4eeddb7bc277c86724700cf47ab0132185fb31710097",
+    "correction-identity.txt": "d6cfb0c3fd3f517e6d372d23bd07d9ad207325e9b211864971d44417e8335812",
+    "correction-result.txt": "8f9de82e618707f2f47a3a06aa2799db2321ff77ad460aaeeb691edcb9c7efc7",
+    "correction.cmd": "ed04c4beb4efe64fbe8dca2214025262e66a46652c7b6e6d7f57ea513080598e",
+    "final-app-build.txt": "f1879c617399cf1240d692e415a564f489defb508f7966aa05d5483b00b92c42",
+    "final-build.txt": "5a09271834d335baaaca9a68cb8888ed653745a1e0b585e2cab3be84b503bffc",
+    "final-frontend-check.txt": "b9104a3ac55ac52a6292d8306643d3d75ba7def8e2b6a470b18a70c1395441b8",
+    "focused-console.txt": "72a344319079861b26171ff2ea812d16289bdab661dd001d215457504dfb9e73",
+    "focused-identity.txt": "bf07a13e4225a2f608042bec62ca04595ffe1e1967436ab92d220fe28c846493",
+    "focused-result.txt": "dd43fa14cbdb0559d8a58c4153ed8f4432ddc9c789f8cfd371328a5634325f15",
+    "focused.cmd": "332398574fffc138e3471b63b8907b102e1a3bd542b5a8398554da6ac2ef520f",
+    "handoff-console.txt": "cfef02f27367b3290fe3ef822ee6d22cbfa7ca29071c7999236ea54bae97f529",
+    "handoff-correction-console.txt": "fd48e6d03d53d003264d59a79cf1920ade15b55254d0f0e0df743dff76e9f250",
+    "handoff-correction-identity.txt": "2ece81386afaa697c8a36a95735fe9e16fdcc684b68110e9ab18a5f1698b2edd",
+    "handoff-correction-result.txt": "916b3fc848d78f596c0c427df4ce5dfa8d8fdb14bd24ab1e6dac1743966a92e5",
+    "handoff-correction.cmd": "15d89202d27ad1089d3eef11f58e6178dde04d0ce011e3ffbec393f1dab590ec",
+    "handoff-identity.txt": "590fb26348cea4dd3393085b0086443b3c6a965316ce583af34ec005cbfdd918",
+    "handoff-result.txt": "d2b536c819e9910d1e0f31ecc7ba1b3bce58313e205fa094bc0877f714088a16",
+    "handoff.cmd": "c7230eb7fd62b92ee0abea19dc9188bcd0b5727c605905b86f4c3201248f78d0",
+    "native-seams.md": "af1f361432211ff26d0390eb00597a4db8fd80983a7a252968486ee73b379a58",
+    "red-identity.md": "6b839ff09ecaed9009813a2991a2b70ef9b11ac93b05c6a3709ba87522567064",
+    "registration-1280.png": "91384ad628ede0e8dce7f39816ca6018b5789a72109b84926f3b0a3b1d54b847",
+    "registration-200-percent.png": "d93e90753d93738cf1948fec80f4667c6a86e2083953970cb49354aa4f61008a",
+    "registration-390.png": "a1f5126b4df058e25919d1cd0278918fdf0581ea9279c0a972e44310ae6a916f",
+    "registration-900.png": "2715af8d14f6546708f322b126cf079f402012d64bbc85a7189f72ef95d0f456",
+    "ticket07-app-build.cmd": "1f4ac11685bcab47b4b066a8925ff87613e4a153a3bb0986aa06bc7f8574458d",
+    "ticket07-app-build.txt": "65d7cbeb5c6ba5aa5d234ebaeebf268da4e3e1d53f510930f917b92d4d9bf65f",
+    "ticket07-build-red.txt": "f65e51303155bdd569f46f714a5fed806f4bd4e4d21c6399d850a02420b0303b",
+    "ticket07-build.cmd": "bd675c120afe42777d3d6eada69426bd9a545af79244b8a52859459987a57230",
+    "ticket07-configure.cmd": "9339faaff323db781554cb606b5d862d12596bf0a2bad9b9c034e3a2614945e9",
+    "ticket07-configure.txt": "196c669c2f2988f8eee60835cf51dec6fd3da48d4012a54a01ca627f0dc50745",
+    "ticket07-correction-green-build.txt": "724c8c057f85f6825340376b45943c31d8a8475c7b5f6ca083d0b781b601ec86",
+    "ticket07-final-app-build.txt": "6c22e609cccfe00d37a37aac80a9464a7ffbcb10749ddab8d1825880dbfa843f",
+    "ticket07-final-build.txt": "1edd037e96f1a907df7ebce9ccde5ca6d7e9751f61b9102a3a006fd68183577e",
+    "ticket07-final-scope-build.txt": "300cbb4c8e5ff906628cdb014aafbf3c88b20de5c5f4e7c4feb524c1936bea0f",
+    "ticket07-form-console.txt": "6be3ff948fca4405204a34b06f63fd7eec3fc6cd8e110ace3a5aa29e21cb2e59",
+    "ticket07-form-identity.txt": "5489e2632e1708bd307b6cd20abe198934c2f98acbc2f646e4ab5c5dc498033c",
+    "ticket07-form-result.txt": "a76a99d8f26b884702f1bc495cd7d56cf43d7d7748392ccd8ae30e17be1be6e4",
+    "ticket07-form.cmd": "de7a6b04954e7d2c66ba071705d1a4a42cd74c4ccae791989d250742b8d15f81",
+    "ticket07-handoff-correction-build.txt": "9e75e30a76cda0b6848c93c9826edd33531fd145071daa305b63d96085680a02",
+    "ticket07-red-result.txt": "94afd493c5ec77e8150b9bdd23e916465e2cb97731789aac781845bdf27b12a8",
+    "ticket07-red.cmd": "0d69a50cff4b9b31ea597f603d1e8f42faddd006916f15d8acc66d071f8f22ea",
+    "ticket07-red.txt": "ea067fbb1700ac0e176cde6eb2f792931caa064470061ca5c20c64ff2d65af4f",
+    "ticket07-registration-console.txt": "047ccd2c16999b6d31e26ce18b116f5fb3afa0ccbe87d5b5964221e1dd2289fb",
+    "ticket07-registration-identity.txt": "6b0a59b9a06c97ed5afa8aab50e5c3a4840ef8fdb81a8e5196c8eb98c48ce0ac",
+    "ticket07-registration-result.txt": "ed15f1d2b37ad03d368eaf7c82dcd2f5626cec798459add8f55faceaaaeb2319",
+    "ticket07-registration.cmd": "1e73a0aa85a02383ba3fd3698a79878673fce35bf219e119dec03eed9966e72f",
+    "verification.md": "017a105fa43a1accd3d31c98b692f297909d878227634e057595bcddc4125889",
+    "verify.py": "c0b6bdd59e37fb719c8d003017150f84defe379836c99cc1f5a47a2517812c7b"
+  }
+}

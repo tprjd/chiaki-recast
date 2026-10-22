@@ -6,7 +6,7 @@
 class QmlNativeServices
 {
 public:
-    explicit QmlNativeServices(Settings *settings, PsnRequests requests = {}, QmlSettings::ProcessLauncher launcher = {}, DiscoveryRequests discovery = {});
+    explicit QmlNativeServices(Settings *settings, PsnRequests requests = {}, QmlSettings::ProcessLauncher launcher = {}, RegistrationRequests registration = {}, DiscoveryRequests discovery = {});
     QmlBackend *backend() { return &backend_; }
     QQmlEngine *engine() { return &engine_; }
 

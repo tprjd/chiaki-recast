@@ -1,0 +1,21 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[0/2] Re-checking globbed directories...
+[1/2] Linking CXX executable gui\chiaki.exe
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/chiaki.exe: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\SDL2.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\SDL2.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\SDL2.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libspeexdsp.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\libspeexdsp.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\libspeexdsp.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\json-c.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\json-c.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\json-c.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\miniupnpc.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\miniupnpc.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\miniupnpc.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\event_core.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\event_core.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\event_core.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\opus.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\opus.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\opus.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libcrypto-3-x64.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\libcrypto-3-x64.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui\libcrypto-3-x64.dll: message: deploying dependencies

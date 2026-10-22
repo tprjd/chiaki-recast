@@ -1,8 +1,9 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import type { State, connectSetup } from './bridge';
-  let { current, connection }: { current: State; connection: Awaited<ReturnType<typeof connectSetup>> } = $props();
+  let { current, connection, route = false, close }: { current: State; connection: Awaited<ReturnType<typeof connectSetup>>; route?: boolean; close?: () => void } = $props();
   let open = $state(false);
+  $effect(() => { if (route) open = true; });
   let redirect = $state('');
   let submitting = $state(false);
   let profile = $state('');
@@ -20,6 +21,7 @@
   });
   async function toggle() {
     redirect = '';
+    if (route) { close?.(); return; }
     open = !open;
     await tick();
     if (open) heading?.focus(); else opener?.focus();
@@ -46,9 +48,9 @@
   }
 }} />
 <section class="psn-account" data-setup-panel aria-label={t('PSN account')}>
-  <button bind:this={opener} data-psn-account aria-expanded={open} aria-controls="psn-account-panel" onclick={toggle}>{t('PSN account')}</button>
+  {#if !route}<button bind:this={opener} data-psn-account aria-expanded={open} aria-controls="psn-account-panel" onclick={toggle}>{t('PSN account')}</button>{/if}
   {#if open}
-    <div class="account-panel" id="psn-account-panel">
+    <div class="account-panel" id={route ? "registration-psn-account-panel" : "psn-account-panel"}>
       <h2 bind:this={heading} tabindex="-1">{t('PSN remote access')}</h2>
       <p data-psn-status role="status">{t(current.psn.phase === 'account' ? 'Retrieving your Account ID'
         : current.psn.phase === 'exchanging' ? 'Completing PSN sign-in' : current.psn.status === 'ready' ? 'PSN remote access is ready'

@@ -1,0 +1,207 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[0/2] Re-checking globbed directories...
+[1/8] Generating web/index.html, web/app.js, web/app.css
+
+added 46 packages in 1s
+
+> chiaki-recast-setup@1.0.0 build
+> vite build --outDir C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/web
+
+17:29:02 [vite-plugin-svelte] no Svelte config found at C:/Users/david/.codex/worktrees/web-ui-ticket-07/chiaki-ng-ui/gui/web - using default configuration.
+vite v8.3.5 building client environment for production...
+transforming...
+<script src="qrc:/qtwebchannel/qwebchannel.js"> in "/index.html" can't be bundled without type="module" attribute
+✓ 125 modules transformed.
+
+(!) outDir C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\web is not inside project root and will not be emptied.
+Use --emptyOutDir to override.
+
+rendering chunks...
+computing gzip size...
+../../../../../../.cache/chiaki-msvc-native/ticket07-build/gui/web/index.html    0.64 kB │ gzip:  0.35 kB
+../../../../../../.cache/chiaki-msvc-native/ticket07-build/gui/web/app.css       9.71 kB │ gzip:  2.54 kB
+../../../../../../.cache/chiaki-msvc-native/ticket07-build/gui/web/app.js      123.56 kB │ gzip: 38.28 kB
+
+✓ built in 175ms
+[2/8] Automatic RCC for setup.qrc
+[3/8] Building CXX object gui\CMakeFiles\chiaki-gui.dir\chiaki-gui_autogen\EJRQKI7XPS\qrc_setup.cpp.obj
+[4/8] Automatic MOC for target chiaki-embedded-setup-tests
+[5/7] Building CXX object gui\tests\CMakeFiles\chiaki-embedded-setup-tests.dir\embeddedsetup.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(2068,108): warning: trigraph ignored [-Wtrigraphs]
+ 2068 |             "document.body.innerText + [...document.querySelectorAll('*')].map(e=>e.shadowRoot?.textContent??'').join('\\n')")
+      |                                                                                                            ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(876,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  876 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(1011,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 1011 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(1058,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 1058 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(1116,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 1116 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(3081,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 3081 |         strcpy(registered.server_nickname, "PRIVATE.EXAMPLE");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(3137,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 3137 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(3316,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 3316 |         strcpy(registered.server_nickname, "Office console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(3339,9): warning: 'strcpy' is deprecated: This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 3339 |         strcpy(other.server_nickname, "Other console");
+      |         ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\string.h(130,1): note: 'strcpy' has been explicitly marked deprecated here
+  130 | __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1(
+      | ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(874,5): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1'
+  874 |     __DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX(_ReturnType, _ReturnPolicy, _DeclSpec, _FuncName, _FuncName##_s, _DstType, _SalAttributeDst, _DstType, _Dst, _TType1, _TArg1)
+      |     ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\corecrt.h(1933,17): note: expanded from macro '__DEFINE_CPP_OVERLOAD_STANDARD_FUNC_0_1_EX'
+ 1933 |                 _CRT_INSECURE_DEPRECATE(_SecureFuncName) _DeclSpec _ReturnType __cdecl _FuncName(_SalAttributeDst _DstType *_Dst, _TType1 _TArg1);
+      |                 ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\tests\embeddedsetup.cpp:79:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\include\qmlnativeservices.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-07\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+11 warnings generated.
+[6/7] Linking CXX executable gui\tests\chiaki-embedded-setup-tests.exe
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/tests/chiaki-embedded-setup-tests.exe: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\SDL2.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\SDL2.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/tests\SDL2.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libspeexdsp.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\libspeexdsp.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/tests\libspeexdsp.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\json-c.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\json-c.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/tests\json-c.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\miniupnpc.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\miniupnpc.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/tests\miniupnpc.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\event_core.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\event_core.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/tests\event_core.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\opus.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\opus.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/tests\opus.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libcrypto-3-x64.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket07-build\gui\tests\libcrypto-3-x64.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket07-build/gui/tests\libcrypto-3-x64.dll: message: deploying dependencies

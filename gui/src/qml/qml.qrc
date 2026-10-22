@@ -22,7 +22,6 @@
     <file>RegistrationMethodDialog.qml</file>
     <file>RemindDialog.qml</file>
     <file>DialogView.qml</file>
-    <file>RegistDialog.qml</file>
     <file>SteamShortcutDialog.qml</file>
     <file>SettingsDialog.qml</file>
     <file>KeyboardMousePage.qml</file>
@@ -37,7 +36,6 @@
     <file>ConsolePinContent.qml</file>
     <file>LiveConsolePinContent.qml</file>
     <file>LiveConsolePinHost.qml</file>
-    <file>PSNLoginDialog.qml</file>
     <file>PSNTokenDialog.qml</file>
     <file>ControllerMappingDialog.qml</file>
     <file>AutoConnectView.qml</file>
