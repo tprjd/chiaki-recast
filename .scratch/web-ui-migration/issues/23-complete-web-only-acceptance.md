@@ -16,6 +16,7 @@
 - [ ] Access checks cover keyboard, controller, touch, screen-reader labels, focus return, reduced motion, privacy, long text, required sizes, display scaling, and 200 percent zoom.
 - [ ] The production embedded application checks use the real bridge and native services. Run checks affected by the final changes and reuse applicable passing feature evidence. Existing native input ownership and output checks retain coverage on their supported toolchains; an MSVC run must not claim coverage from GNU-only targets.
 - [ ] Check each final Windows, Linux, and macOS package once with actual Chromium GPU acceleration enabled. Exercise the core native handoff and affected migrated features. Reuse deeper hardware evidence unless relevant native code, Qt, WebEngine, package contents, drivers, or configuration changed.
+- [ ] Resolve the HighQuality native processing failure recorded in ticket 03, using a matched native baseline and actual loaded dependency identities. Verify the unchanged default and required presets; Fast-preset coexistence alone cannot pass this criterion.
 - [ ] Compare matched native baseline and migrated measurements against tolerances fixed before evaluation. Reuse valid baseline variation data. Collect additional independent runs when variation is unknown, results approach a limit, or a regression appears. Inconclusive data cannot establish a pass.
 - [ ] Complete the live baseline acceptance carried from [01](01-application-owned-native-services.md). Pin the build, machine, console, network, decoder, renderer, profile, display mode, and measurement conditions before evaluation. Use the [predeclared comparison conditions and tolerances](../evidence/ticket01/baseline.md). The loopback native baseline does not prove live performance. Retain the required combined accelerated WebEngine and native graphics evidence from [03](03-accelerated-web-console-library.md) and [04](04-local-native-stream-handoff.md).
 - [ ] Record frame timing, queue depth, pending frame age, dropped frames, audio underruns, CPU, GPU, memory including Chromium, and time to first frame. Require no repeatable streaming regression beyond measured baseline variation.
@@ -39,3 +40,23 @@ matched performance acceptance. The combined accelerated WebEngine and native
 renderer checks remain required in [03](03-accelerated-web-console-library.md)
 and [04](04-local-native-stream-handoff.md). Reuse valid focused native evidence
 without treating these unverified combinations as passed.
+
+### Ticket 03 preset and desktop acceptance limits
+
+[03](03-accelerated-web-console-library.md) uses the production native Fast
+preset in its controlled GPU fixture. Production defaults remain unchanged.
+Its [native diagnosis](../evidence/ticket03/verification.md) records correct
+uploaded Y/U/V data and a transparent Quick center, but black video with
+HighQuality in the Windows MSVC/Qt 6.9.3 environment. An old-import/no-page
+control also fails; this is not a complete pre-migration baseline or proof
+that every native configuration is affected. No permanent preset fallback
+is authorized. Resolve the default processing issue before release acceptance.
+
+The source/dependency audit found no header, import-library, staged-DLL,
+FFmpeg, or packing mismatch. Loaded module paths were not observed during
+the read-only audit. Retain that distinction in follow-up evidence.
+Desktop screen results made while Windows Security or another input desktop
+is active are inconclusive. Actual native handoff focus, physical controller,
+touch, screen reader, translated locales, display scaling, Linux/macOS GPUs,
+live console decode, HDR, audio/microphone, cleanup, and matched performance
+remain required acceptance work.

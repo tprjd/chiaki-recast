@@ -1,0 +1,88 @@
+
+Name                                       Length
+----                                       ------
+generic                                    
+iconengines                                
+imageformats                               
+networkinformation                         
+platforms                                  
+position                                   
+qml                                        
+qmltooling                                 
+resources                                  
+styles                                     
+tls                                        
+translations                               
+avcodec-61.dll                             88414720
+avdevice-61.dll                            5277184
+avfilter-10.dll                            28976128
+avformat-61.dll                            19857920
+avutil-59.dll                              2822656
+chiaki-embedded-setup-tests.exe            5096448
+chiaki.exe                                 5206528
+cpp-steam-tools.dll                        278528
+D3Dcompiler_47.dll                         4669440
+dxcompiler.dll                             21728696
+event_core.dll                             183296
+json-c.dll                                 54272
+lcms2.dll                                  361472
+libcrypto-3-x64.dll                        4671488
+libplacebo-360.dll                         1310208
+libspeexdsp.dll                            109568
+miniupnpc.dll                              49664
+opus.dll                                   425984
+postproc-58.dll                            88576
+qt.conf                                    96
+Qt6Core.dll                                10023136
+Qt6Gui.dll                                 9497312
+Qt6LabsFolderListModel.dll                 117984
+Qt6LabsQmlModels.dll                       162528
+Qt6Network.dll                             1735392
+Qt6OpenGL.dll                              1972960
+Qt6Positioning.dll                         514784
+Qt6PrintSupport.dll                        404704
+Qt6Qml.dll                                 5308128
+Qt6QmlCore.dll                             133856
+Qt6QmlMeta.dll                             152288
+Qt6QmlModels.dll                           765664
+Qt6QmlWorkerScript.dll                     77536
+Qt6Quick.dll                               6428384
+Qt6QuickControls2.dll                      100064
+Qt6QuickControls2Basic.dll                 1716448
+Qt6QuickControls2BasicStyleImpl.dll        63200
+Qt6QuickControls2FluentWinUI3StyleImpl.dll 192224
+Qt6QuickControls2Fusion.dll                1458400
+Qt6QuickControls2FusionStyleImpl.dll       177888
+Qt6QuickControls2Imagine.dll               2667744
+Qt6QuickControls2ImagineStyleImpl.dll      51424
+Qt6QuickControls2Impl.dll                  291552
+Qt6QuickControls2Material.dll              1752288
+Qt6QuickControls2MaterialStyleImpl.dll     297184
+Qt6QuickControls2Universal.dll             1416416
+Qt6QuickControls2UniversalStyleImpl.dll    111328
+Qt6QuickControls2WindowsStyleImpl.dll      52448
+Qt6QuickDialogs2.dll                       155360
+Qt6QuickDialogs2QuickImpl.dll              2830048
+Qt6QuickDialogs2Utils.dll                  47840
+Qt6QuickEffects.dll                        420064
+Qt6QuickLayouts.dll                        209120
+Qt6QuickShapes.dll                         332000
+Qt6QuickTemplates2.dll                     1947872
+Qt6QuickWidgets.dll                        132320
+Qt6SerialPort.dll                          135392
+Qt6Svg.dll                                 607968
+Qt6Test.dll                                383200
+Qt6WebChannel.dll                          242400
+Qt6WebChannelQuick.dll                     63200
+Qt6WebEngineCore.dll                       199584992
+Qt6WebEngineQuick.dll                      634080
+Qt6WebEngineWidgets.dll                    187104
+Qt6Widgets.dll                             6540512
+QtWebEngineProcess.exe                     724704
+SDL2.dll                                   1665024
+shaderc_shared.dll                         5182904
+spirv-cross-c-shared.dll                   2183096
+swresample-5.dll                           658944
+swscale-8.dll                              703488
+
+

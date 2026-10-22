@@ -1,0 +1,38 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[0/2] Re-checking globbed directories...
+[1/5] Automatic MOC for target chiaki-embedded-setup-tests
+[2/4] Building CXX object gui\tests\CMakeFiles\chiaki-embedded-setup-tests.dir\embeddedsetup.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(125,108): warning: trigraph ignored [-Wtrigraphs]
+  125 |             "document.body.innerText + [...document.querySelectorAll('*')].map(e=>e.shadowRoot?.textContent??'').join('\\n')")
+      |                                                                                                            ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\tests\embeddedsetup.cpp:67:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\qmlnativeservices.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+3 warnings generated.
+[3/4] Linking CXX executable gui\tests\chiaki-embedded-setup-tests.exe
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests/chiaki-embedded-setup-tests.exe: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\SDL2.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\SDL2.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\SDL2.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libspeexdsp.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\libspeexdsp.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\libspeexdsp.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\json-c.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\json-c.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\json-c.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\miniupnpc.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\miniupnpc.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\miniupnpc.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\event_core.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\event_core.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\event_core.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\opus.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\opus.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\opus.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libcrypto-3-x64.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\libcrypto-3-x64.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\libcrypto-3-x64.dll: message: deploying dependencies

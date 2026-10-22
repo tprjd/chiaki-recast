@@ -1,0 +1,18 @@
+source_commit=0e2702b7ce333a5cb121c077dee17cde99b0f7e1
+source_dir=/home/david/.cache/chiaki-web-ui/source-ticket03-0e2702b7ce333a5cb121c077dee17cde99b0f7e1
+build_dir=/home/david/.cache/chiaki-web-ui/build-ticket03
+node_path=/home/david/.cache/chiaki-web-ui/package-tools/node-v24.16.0-linux-x64/bin/node
+v24.16.0
+11.13.0
+cmake version 4.2.3
+c++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+6.10.2
+7.360.0
+62.11.100
+2.32.10
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdd       1007G  300G  657G  32% /
+corrected_PATH=/home/david/.cache/chiaki-web-ui/package-tools/node-v24.16.0-linux-x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+4.21.12
+corrected_PATH=/home/david/.cache/chiaki-web-ui/package-tools/node-v24.16.0-linux-x64/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+4.21.12

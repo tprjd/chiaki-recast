@@ -1,0 +1,159 @@
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.14.39
+** Copyright (c) 2025 Microsoft Corporation
+**********************************************************************
+[0/2] Re-checking globbed directories...
+[1/8] Automatic MOC for target chiaki-gui
+[2/7] Building CXX object gui\CMakeFiles\chiaki-gui.dir\src\qmlmainwindow.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(159,20): warning: unused variable 'chiaki_level' [-Wunused-variable]
+  159 |     ChiakiLogLevel chiaki_level;
+      |                    ^~~~~~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(526,18): warning: 'fopen' is deprecated: This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+  526 |     FILE *file = fopen(qPrintable(shader_cache_path()), "wb");
+      |                  ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdio.h(212,20): note: 'fopen' has been explicitly marked deprecated here
+  212 |     _Check_return_ _CRT_INSECURE_DEPRECATE(fopen_s)
+      |                    ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1132,10): warning: variable 'stored' set but not used [-Wunused-but-set-variable]
+ 1132 |     bool stored = false;
+      |          ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1133,17): warning: variable 'reason' set but not used [-Wunused-but-set-variable]
+ 1133 |     const char *reason = "unknown";
+      |                 ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1472,12): warning: 'queue_family_index' is deprecated [-Wdeprecated-declarations]
+ 1472 |     vkctx->queue_family_index = placebo_vulkan->queue_graphics.index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(123,5): note: 'queue_family_index' has been explicitly marked deprecated here
+  123 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1473,12): warning: 'nb_graphics_queues' is deprecated [-Wdeprecated-declarations]
+ 1473 |     vkctx->nb_graphics_queues = placebo_vulkan->queue_graphics.count;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(125,5): note: 'nb_graphics_queues' has been explicitly marked deprecated here
+  125 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1474,12): warning: 'queue_family_tx_index' is deprecated [-Wdeprecated-declarations]
+ 1474 |     vkctx->queue_family_tx_index = placebo_vulkan->queue_transfer.index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(132,5): note: 'queue_family_tx_index' has been explicitly marked deprecated here
+  132 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1475,12): warning: 'nb_tx_queues' is deprecated [-Wdeprecated-declarations]
+ 1475 |     vkctx->nb_tx_queues = placebo_vulkan->queue_transfer.count;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(134,5): note: 'nb_tx_queues' has been explicitly marked deprecated here
+  134 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1476,12): warning: 'queue_family_comp_index' is deprecated [-Wdeprecated-declarations]
+ 1476 |     vkctx->queue_family_comp_index = placebo_vulkan->queue_compute.index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(141,5): note: 'queue_family_comp_index' has been explicitly marked deprecated here
+  141 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1477,12): warning: 'nb_comp_queues' is deprecated [-Wdeprecated-declarations]
+ 1477 |     vkctx->nb_comp_queues = placebo_vulkan->queue_compute.count;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(143,5): note: 'nb_comp_queues' has been explicitly marked deprecated here
+  143 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1478,12): warning: 'queue_family_decode_index' is deprecated [-Wdeprecated-declarations]
+ 1478 |     vkctx->queue_family_decode_index = vk_decode_queue_index;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(161,5): note: 'queue_family_decode_index' has been explicitly marked deprecated here
+  161 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1479,12): warning: 'nb_decode_queues' is deprecated [-Wdeprecated-declarations]
+ 1479 |     vkctx->nb_decode_queues = 1;
+      |            ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/hwcontext_vulkan.h(163,5): note: 'nb_decode_queues' has been explicitly marked deprecated here
+  163 |     attribute_deprecated
+      |     ^
+C:\Users\david\.cache\chiaki-ui-native\ffmpeg\ffmpeg-n7.1-latest-win64-gpl-shared-7.1\include\libavutil/attributes.h(102,45): note: expanded from macro 'attribute_deprecated'
+  102 | #    define attribute_deprecated __declspec(deprecated)
+      |                                             ^
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(1803,18): warning: 'fopen' is deprecated: This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [-Wdeprecated-declarations]
+ 1803 |     FILE *file = fopen(qPrintable(shader_cache_path()), "rb");
+      |                  ^
+C:\Program Files (x86)\Windows Kits\10\include\10.0.26100.0\ucrt\stdio.h(212,20): note: 'fopen' has been explicitly marked deprecated here
+  212 |     _Check_return_ _CRT_INSECURE_DEPRECATE(fopen_s)
+      |                    ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(368,55): note: expanded from macro '_CRT_INSECURE_DEPRECATE'
+  368 |         #define _CRT_INSECURE_DEPRECATE(_Replacement) _CRT_DEPRECATE_TEXT(    \
+      |                                                       ^
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\vcruntime.h(358,47): note: expanded from macro '_CRT_DEPRECATE_TEXT'
+  358 | #define _CRT_DEPRECATE_TEXT(_Text) __declspec(deprecated(_Text))
+      |                                               ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp:1:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\qmlmainwindow.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\src\qmlmainwindow.cpp(290,20): warning: unused function 'render_params_path' [-Wunused-function]
+  290 | static const char *render_params_path()
+      |                    ^~~~~~~~~~~~~~~~~~
+16 warnings generated.
+[3/7] Automatic MOC for target chiaki-embedded-setup-tests
+[4/6] Building CXX object gui\tests\CMakeFiles\chiaki-embedded-setup-tests.dir\embeddedsetup.cpp.obj
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\tests\embeddedsetup.cpp(103,108): warning: trigraph ignored [-Wtrigraphs]
+  103 |             "document.body.innerText + [...document.querySelectorAll('*')].map(e=>e.shadowRoot?.textContent??'').join('\\n')")
+      |                                                                                                            ^
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\tests\embeddedsetup.cpp:49:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\qmlnativeservices.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\qmlbackend.h:3:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\streamsession.h:33:
+In file included from C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\settings.h:8:
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\host.h(36,13): warning: unused function 'operator!=' [-Wunused-function]
+   36 | static bool operator!=(const HostMAC &a, const HostMAC &b)      { return !(a == b); }
+      |             ^~~~~~~~
+C:\Users\david\.codex\worktrees\web-ui-ticket-03\chiaki-ng-ui\gui\include\host.h(55,13): warning: unused function 'operator==' [-Wunused-function]
+   55 | static bool operator==(const HiddenHost &a, const HiddenHost &b)        { return (a.GetMAC() == b.GetMAC() && a.GetNickname() == b.GetNickname()); }
+      |             ^~~~~~~~
+3 warnings generated.
+[5/6] Linking CXX executable gui\tests\chiaki-embedded-setup-tests.exe
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests/chiaki-embedded-setup-tests.exe: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\SDL2.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\SDL2.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\SDL2.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libspeexdsp.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\libspeexdsp.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\libspeexdsp.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\json-c.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\json-c.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\json-c.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\miniupnpc.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\miniupnpc.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\miniupnpc.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\event_core.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\event_core.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\event_core.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\opus.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\opus.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\opus.dll: message: deploying dependencies
+C:\Users\david\.cache\chiaki-msvc-native\installed\x64-windows\bin\libcrypto-3-x64.dll -> C:\Users\david\.cache\chiaki-msvc-native\ticket03-build\gui\tests\libcrypto-3-x64.dll skipped, up to date
+C:/Users/david/.cache/chiaki-msvc-native/ticket03-build/gui/tests\libcrypto-3-x64.dll: message: deploying dependencies

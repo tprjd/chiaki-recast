@@ -1,0 +1,66 @@
+diff --git a/gui/src/qmlmainwindow.cpp b/gui/src/qmlmainwindow.cpp
+index 43c05688..09a064a4 100644
+--- a/gui/src/qmlmainwindow.cpp
++++ b/gui/src/qmlmainwindow.cpp
+@@ -2142,6 +2142,46 @@ void QmlMainWindow::createSwapchain()
+         struct pl_opengl_swapchain_params sw_params = {
+             .swap_buffers = [](void *priv) {
+                 auto q = static_cast<QmlMainWindow *>(priv);
++                static int diagnosticSamples = 0;
++                if (qEnvironmentVariableIsSet("CHIAKI_GL_DIAGNOSTIC") && q->has_video && diagnosticSamples++ < 24) {
++                    auto *context = QOpenGLContext::currentContext();
++                    if (context) {
++                        auto *gl = context->extraFunctions();
++                        const auto errorBefore = gl->glGetError();
++                        GLint drawFbo = -1, readFbo = -1, readBuffer = -1, drawBuffer = -1;
++                        GLboolean doubleBuffered = false, colorMask[4] = {};
++                        gl->glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFbo);
++                        gl->glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFbo);
++                        gl->glGetIntegerv(GL_READ_BUFFER, &readBuffer);
++                        gl->glGetIntegerv(GL_DRAW_BUFFER, &drawBuffer);
++                        gl->glGetBooleanv(GL_DOUBLEBUFFER, &doubleBuffered);
++                        gl->glGetBooleanv(GL_COLOR_WRITEMASK, colorMask);
++                        const bool stencil = gl->glIsEnabled(GL_STENCIL_TEST);
++                        const bool blend = gl->glIsEnabled(GL_BLEND);
++                        const bool scissor = gl->glIsEnabled(GL_SCISSOR_TEST);
++                        const int width = qRound(q->width() * q->devicePixelRatio());
++                        const int height = qRound(q->height() * q->devicePixelRatio());
++                        unsigned char center[4] = {}, overlay[4] = {};
++                        gl->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
++                        gl->glReadBuffer(GL_BACK);
++                        gl->glReadPixels(width / 2, height / 2, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, center);
++                        gl->glReadPixels(width / 2 - qRound(100 * q->devicePixelRatio()),
++                            qRound(40 * q->devicePixelRatio()), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, overlay);
++                        const auto errorRead = gl->glGetError();
++                        gl->glBindFramebuffer(GL_READ_FRAMEBUFFER, readFbo);
++                        gl->glReadBuffer(readBuffer);
++                        const auto errorRestore = gl->glGetError();
++                        qInfo() << "TEMP GL_BACK" << diagnosticSamples << "context matches" << (context == q->qt_gl_context)
++                            << "surface matches" << (context->surface() == q) << "exposed" << q->isExposed()
++                            << "double" << doubleBuffered << "size" << width << height
++                            << "FBO draw/read" << drawFbo << readFbo << "buffer draw/read" << drawBuffer << readBuffer
++                            << "RGBA mask" << colorMask[0] << colorMask[1] << colorMask[2] << colorMask[3]
++                            << "stencil/blend/scissor" << stencil << blend << scissor
++                            << "center RGBA" << QByteArray(reinterpret_cast<const char *>(center), 4).toHex()
++                            << "overlay RGBA" << QByteArray(reinterpret_cast<const char *>(overlay), 4).toHex()
++                            << "GL errors before/read/restore" << errorBefore << errorRead << errorRestore;
++                    }
++                }
+                 if (q->qt_gl_context)
+                     q->qt_gl_context->swapBuffers(q);
+             },
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 2972f867..686bad13 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -170,6 +170,10 @@ private slots:
+                 native.presentFrame({frame, 0.0, 1.0 / 60.0, false}, 0);
+                 QTRY_VERIFY(native.hasVideo());
+                 emit backend->error("GPU coexistence", "Native overlay rendered");
++                if (qEnvironmentVariableIsSet("CHIAKI_GL_DIAGNOSTIC")) {
++                    QTest::qWait(1000);
++                    QFAIL("Temporary GL_BACK diagnostic only; no graphics acceptance result");
++                }
+                 QImage rendered;
+                 int bluePixels = 0, redPixels = 0;
+                 QElapsedTimer captureTimer;
