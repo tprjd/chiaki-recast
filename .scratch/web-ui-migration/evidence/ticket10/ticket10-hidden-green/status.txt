@@ -1,0 +1,3 @@
+ M gui/src/qmlbackend.cpp
+ M gui/tests/embeddedsetup.cpp
+ m third-party/gf-complete

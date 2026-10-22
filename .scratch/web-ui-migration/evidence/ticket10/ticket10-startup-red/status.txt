@@ -1,0 +1,2 @@
+ M gui/tests/embeddedsetup.cpp
+ m third-party/gf-complete

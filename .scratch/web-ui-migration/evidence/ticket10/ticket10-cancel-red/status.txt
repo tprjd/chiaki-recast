@@ -1,0 +1,10 @@
+ M gui/include/discoverymanager.h
+ M gui/include/qmlbackend.h
+ M gui/include/setupbridge.h
+ M gui/src/discoverymanager.cpp
+ M gui/src/qmlbackend.cpp
+ M gui/src/setupbridge.cpp
+ M gui/tests/embeddedsetup.cpp
+ M gui/web/src/ConnectAction.svelte
+ M gui/web/src/bridge.ts
+ m third-party/gf-complete
