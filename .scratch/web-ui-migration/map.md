@@ -27,7 +27,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [04: Local native stream handoff](issues/04-local-native-stream-handoff.md): claimed. Tickets 02 and 03 are integrated.
 - [06: PSN sign-in](issues/06-psn-sign-in.md): claimed after ticket 03.
 - [11: General and stream settings](issues/11-general-and-stream-settings.md): resolved for the settings shell and general session controls. Real-bridge writes, rejection, search/focus, privacy, reload, and separate-process persistence pass. Physical and platform acceptance remains in the later acceptance tickets.
-- Tickets [12](issues/12-video-and-audio-settings.md), [13](issues/13-display-and-renderer-settings.md), [15](issues/15-keyboard-and-mouse-controls.md), [16](issues/16-controller-setup-and-mapping.md), and [17](issues/17-profiles-files-and-logs.md): ready after ticket 11.
+- [12: Video and audio settings](issues/12-video-and-audio-settings.md): claimed after ticket 11.
+- Tickets [13](issues/13-display-and-renderer-settings.md), [15](issues/15-keyboard-and-mouse-controls.md), [16](issues/16-controller-setup-and-mapping.md), and [17](issues/17-profiles-files-and-logs.md): ready after ticket 11.
 - Other tickets 05 through 23: waiting for their declared blockers.
 
 ## Integration history
