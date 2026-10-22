@@ -1,0 +1,58 @@
+Window: "Chiaki Recast: package-check-7aaeefd2537f4ede9c2b58572a6e26c0 - Chiaki Recast:package-check-7aaeefd2537f4ede9c2b58572a6e26c0", App: chiaki.exe.
+	0 window (settable, string) Chiaki Recast: package-check-7aaeefd2537f4ede9c2b58572a6e26c0 - Chiaki Recast:package-check-7aaeefd2537f4ede9c2b58572a6e26c0 Secondary Actions: Raise ID: QApplication.SetupWindow
+		1 title bar (settable, string) Value: Chiaki Recast: package-check-7aaeefd2537f4ede9c2b58572a6e26c0 - Chiaki Recast:package-check-7aaeefd2537f4ede9c2b58572a6e26c0
+			2 menu bar System ID: MenuBar
+				3 menu item System
+			4 button Minimise
+			5 button Maximise
+			6 button Close
+		7 group (settable, string) ID: QApplication.SetupWindow.QWebEngineView
+			8 document (settable, string) Chiaki Recast ID: QApplication.SetupWindow.QWebEngineView.QObject
+				9 custom (settable, string) ID: QApplication.SetupWindow.QWebEngineView.QObject.app
+					10 custom (settable, string) ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject
+						11 image (settable, string) Chiaki Recast ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+					12 group (settable, string) ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject
+						13 heading (settable, string) Consoles ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+							14 text Consoles ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject
+						15 text ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+							16 text Search consoles ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject
+							17 edit (settable, string) Search consoles ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject
+						18 button (settable, string) Settings ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+						19 button (settable, string) DiscoveryDiscovery is on ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+						20 button (settable, string) Refresh remote consoles ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+						21 custom (settable, string) ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+							22 text Sign in to PSN before refreshing remote consoles. ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject
+						23 button (settable, string) Steam shortcut ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+						24 custom (settable, string) ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+						25 text ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+							26 text Auto-connect at startup ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject
+							27 menu (settable, string) Auto-connect at startup Value: Off ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject
+						28 button (disabled, settable, string) Connect ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+						29 custom (settable, string) ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+						30 custom (settable, string) ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+							31 button (settable, string) Register console ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject
+						32 button (settable, string) Add console ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+						33 button (settable, string) Manage consoles ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+						34 custom (settable, string) ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+							35 heading (settable, string) No consoles found ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject
+								36 text No consoles found ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject.QObject
+							37 group (settable, string) ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject
+								38 text Turn on discovery to find consoles on your local network. ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject.QObject
+						39 custom (settable, string) PSN account ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject
+							40 button (settable, string) PSN account ID: QApplication.SetupWindow.QWebEngineView.QObject.app.QObject.QObject.QObject
+
+Document text: ```
+Consoles
+Search consoles
+Sign in to PSN before refreshing remote consoles.
+Auto-connect at startup
+No consoles found
+Turn on discovery to find consoles on your local network.
+```
+
+Consoles
+Search consoles
+Sign in to PSN before refreshing remote consoles.
+Auto-connect at startup
+No consoles found
+Turn on discovery to find consoles on your local network.

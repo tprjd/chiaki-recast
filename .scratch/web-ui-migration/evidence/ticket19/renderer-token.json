@@ -1,0 +1,31 @@
+{
+  "parentPid": 37856,
+  "query": "Read-only process/token queries. No elevation or launch flag changes.",
+  "rendererProcess": {
+    "ProcessId": 44736,
+    "ParentProcessId": 37856,
+    "ExecutablePath": "C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final\\QtWebEngineProcess.exe",
+    "CommandLine": "\"C:\\Users\\david\\AppData\\Local\\Temp\\chiaki-web-ui-migration\\ticket19-package-final\\QtWebEngineProcess.exe\" --type=renderer --webengine-schemes=qrc:sV --disable-speech-api --touch-events=auto --disable-databases --disable-blink-features=EyeDropperAPI,WebOTP --video-capture-use-gpu-memory-buffer --lang=en-GB --device-scale-factor=1.25 --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=3 --time-ticks-at-unix-epoch=-1792654688154879 --launch-time-ticks=37669401058 --field-trial-handle=5280,i,7297629141372799256,10253735187388545819,262144 --enable-features=NetworkServiceInProcess2,TracingServiceInProcess --disable-features=BackgroundFetch,EyeDropper,InstalledApp,StandardCompliantNonSpecialSchemeURLParsing,WebOTP,WebPayments,WebUSB --variations-seed-version --mojo-platform-channel-handle=5260 /prefetch:1"
+  },
+  "parent": {
+    "pid": 37856,
+    "integritySid": "S-1-16-8192",
+    "integrityRid": 8192,
+    "isTokenRestricted": false,
+    "restrictedSidCount": 0,
+    "restrictedSids": [],
+    "isAppContainer": false
+  },
+  "renderer": {
+    "pid": 44736,
+    "integritySid": "S-1-16-0",
+    "integrityRid": 0,
+    "isTokenRestricted": true,
+    "restrictedSidCount": 1,
+    "restrictedSids": [
+      "S-1-0-0"
+    ],
+    "isAppContainer": false
+  },
+  "restrictedRendererObserved": true
+}

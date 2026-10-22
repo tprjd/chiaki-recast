@@ -4,6 +4,7 @@ export interface Console {
   state: string; route: 'local' | 'manual' | 'psn'; ps5?: boolean;
 }
 export interface State {
+  viewState: { route: string; search: string; category: string; settingsSearch: string };
   reminder: { id: string; kind: string; eligible: boolean };
   steam: { supported: boolean; form: string; phase: string; name?: string; options?: string; path?: string; diagnostics?: string };
   revision: string; profileGeneration: string; consoles: Console[];
@@ -39,6 +40,7 @@ export interface State {
 export interface Registration { busy: boolean; savedAccount: boolean; context?: string; id?: string; phase?: string; message?: string; diagnostics?: string; profileValid?: boolean; connectKey?: string }
 interface Reply { accepted: boolean; profileGeneration?: string; message?: string; context?: string; address?: string; ps5?: boolean; id?: string; route?: string; accountId?: string; form?: string }
 interface NativeBridge {
+  saveViewState(route: string, search: string, category: string, settingsSearch: string, profile: string): void;
   beginSteamShortcut(profile: string, callback: (reply: Reply) => void): void;
   chooseSteamFolder(form: string, profile: string, callback: (reply: Reply) => void): void;
   submitSteamShortcut(form: string, fields: Record<string, string>, profile: string, callback: (reply: Reply) => void): void;
@@ -99,6 +101,7 @@ declare global {
 }
 
 export function connectSetup(receive: (state: State) => void): Promise<{
+  saveViewState(route: string, search: string, category: string, settingsSearch: string, profile: string): void;
   beginSteamShortcut(profile: string): Promise<Reply>;
   chooseSteamFolder(form: string, profile: string): Promise<Reply>;
   submitSteamShortcut(form: string, fields: Record<string, string>, profile: string): Promise<Reply>;
@@ -181,6 +184,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
       window.addEventListener('pageshow', refresh);
       document.addEventListener('visibilitychange', resume);
       resolve({
+        saveViewState: (route, search, category, settingsSearch, profile) => setup.saveViewState(route, search, category, settingsSearch, profile),
         beginSteamShortcut: profile => new Promise(done => setup.beginSteamShortcut(profile, done)),
         chooseSteamFolder: (form, profile) => new Promise(done => setup.chooseSteamFolder(form, profile, done)),
         submitSteamShortcut: (form, fields, profile) => new Promise(done => setup.submitSteamShortcut(form, fields, profile, done)),

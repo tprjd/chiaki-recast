@@ -44,6 +44,13 @@ if(TARGET chiaki-gui)
     target_compile_definitions(chiaki-embedded-setup-tests PRIVATE CHIAKI_TEST_PYTHON="${PYTHON_EXECUTABLE}")
     add_test(NAME chiaki-embedded-setup COMMAND chiaki-embedded-setup-tests consoleLibrary)
     set_tests_properties(chiaki-embedded-setup PROPERTIES LABELS desktop)
+    add_test(NAME chiaki-embedded-setup-recovery COMMAND chiaki-embedded-setup-tests setupReload setupFileLifetime
+        -o ${CMAKE_CURRENT_BINARY_DIR}/setup-recovery.txt,txt)
+    set_tests_properties(chiaki-embedded-setup-recovery PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QTWEBENGINE_CHROMIUM_FLAGS=--disable-gpu")
+    add_test(NAME chiaki-native-session-recovery COMMAND chiaki-embedded-setup-tests nativeSessionRecovery
+        -o ${CMAKE_CURRENT_BINARY_DIR}/native-session-recovery.txt,txt)
+    set_tests_properties(chiaki-native-session-recovery PROPERTIES LABELS "desktop;gpu")
     add_test(NAME chiaki-embedded-wake-auto-connect COMMAND chiaki-embedded-setup-tests
         autoConnectTarget autoConnectCancellation wakeConsole wakeFailures
         -o ${CMAKE_CURRENT_BINARY_DIR}/wake-auto-connect.txt,txt)

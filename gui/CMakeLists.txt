@@ -3,16 +3,20 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+if(WIN32 AND (NOT MSVC OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8 OR CMAKE_SYSTEM_PROCESSOR MATCHES "^(ARM64|arm64|aarch64)$" OR CMAKE_CXX_COMPILER_ARCHITECTURE_ID STREQUAL "ARM64"))
+    message(FATAL_ERROR "Web setup requires the Qt 6.9.3 Windows MSVC x64 WebEngine SDK. MinGW and Windows ARM64 packages are unsupported. There is no QML setup fallback.")
+endif()
+
 find_program(NPM_EXECUTABLE NAMES npm.cmd npm REQUIRED)
 file(GLOB_RECURSE SETUP_FRONTEND_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/web/src/*")
 add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/web/app.js" "${CMAKE_CURRENT_BINARY_DIR}/web/app.css"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/web/app.js" "${CMAKE_CURRENT_BINARY_DIR}/web/app.css" "${CMAKE_CURRENT_BINARY_DIR}/web/THIRD-PARTY-NOTICES.txt"
     COMMAND "${NPM_EXECUTABLE}" ci --ignore-scripts --no-audit --no-fund
     COMMAND "${NPM_EXECUTABLE}" run build -- --outDir "${CMAKE_CURRENT_BINARY_DIR}/web"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/web"
     DEPENDS ${SETUP_FRONTEND_SOURCES} web/package.json web/package-lock.json web/.npmrc web/index.html web/vite.config.ts web/tsconfig.json
     VERBATIM)
-add_custom_target(chiaki-setup-assets DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/web/app.js" "${CMAKE_CURRENT_BINARY_DIR}/web/app.css")
+add_custom_target(chiaki-setup-assets DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/web/index.html" "${CMAKE_CURRENT_BINARY_DIR}/web/app.js" "${CMAKE_CURRENT_BINARY_DIR}/web/app.css" "${CMAKE_CURRENT_BINARY_DIR}/web/THIRD-PARTY-NOTICES.txt")
 configure_file(web/resources.qrc.in "${CMAKE_CURRENT_BINARY_DIR}/setup.qrc" @ONLY)
 
 if(APPLE)
@@ -189,6 +193,7 @@ endif()
 install(FILES chiaking.desktop DESTINATION share/applications)
 install(FILES chiaking.png DESTINATION share/icons/hicolor/512x512/apps)
 install(FILES io.github.streetpea.Chiaki4deck.appdata.xml DESTINATION share/metainfo)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/web/THIRD-PARTY-NOTICES.txt" DESTINATION share/licenses/chiaki-ng/frontend)
 
 if(CHIAKI_ENABLE_TESTS)
 	add_subdirectory(tests)

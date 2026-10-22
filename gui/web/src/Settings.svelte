@@ -7,12 +7,11 @@
   import { generalSettings, mediaSettings, rendererSettings, colorMappingSettings, profileSettings, settingConditionMet, keyboardMouseSettings, controllerSettings } from './settings';
   import SettingField from './SettingField.svelte';
   import type { State, connectSetup } from './bridge';
-  let { current, connection, close, t }: {
+  let { current, connection, close, t, query = $bindable(''), category = $bindable('General') }: {
     current: State; connection: Awaited<ReturnType<typeof connectSetup>>;
     close: () => void; t: (text: string) => string;
+    query?: string; category?: string;
   } = $props();
-  let query = $state('');
-  let category = $state('General');
   let message = $state('');
   let pending = $state(false);
   let keyboardMouseTarget = $state('');
@@ -40,7 +39,9 @@
     ...current.keyboardMouse.keys.map(mapping => ({ key: `keyMapping${mapping.buttonValue}`, label: `${t('Key for')} ${mapping.buttonName}`, category: 'Keyboard and mouse', group: 'Key assignments', description: 'Assign a keyboard key.' }))]);
   const results = $derived(searchFields.filter(field => query.trim().toLocaleLowerCase().split(/\s+/)
     .every(term => `${t(field.category ?? 'General')} ${t(field.group)} ${t(field.label)} ${t(field.description)}`.toLocaleLowerCase().includes(term))));
-  onMount(() => { document.getElementById('disconnectAction')?.focus(); });
+  onMount(() => {
+    (query ? search : document.querySelector<HTMLElement>('.settings-content button:enabled, .settings-content input:enabled, .settings-content select:enabled'))?.focus();
+  });
 
   async function reveal(key: string, requires?: string) {
     query = '';
@@ -97,7 +98,7 @@
   <button class="back-consoles" onclick={close}>{t('Back to consoles')}</button>
 </div>
 <label class="search settings-search">{t('Find a setting')}
-  <input bind:this={search} type="search" bind:value={query} aria-label={t('Find a setting')} />
+  <input bind:this={search} type="search" maxlength="256" bind:value={query} aria-label={t('Find a setting')} />
 </label>
 <div class="settings-layout">
   <nav class="category-nav" aria-label={t('Settings categories')}>
