@@ -28,7 +28,8 @@ changes, failures, or unresolved concerns. Record hardware limitations.
 - [06: PSN sign-in](issues/06-psn-sign-in.md): resolved for standalone web account status and native embedded/external sign-in. Native transport, persistence, cookie rules and responsive checks pass. Live PSN and visible desktop acceptance remain outside this evidence.
 - [11: General and stream settings](issues/11-general-and-stream-settings.md): resolved for the settings shell and general session controls. Real-bridge writes, rejection, search/focus, privacy, reload, and separate-process persistence pass. Physical and platform acceptance remains in the later acceptance tickets.
 - [12: Video and audio settings](issues/12-video-and-audio-settings.md): claimed after ticket 11.
-- Tickets [13](issues/13-display-and-renderer-settings.md), [15](issues/15-keyboard-and-mouse-controls.md), [16](issues/16-controller-setup-and-mapping.md), and [17](issues/17-profiles-files-and-logs.md): ready after ticket 11.
+- [13: Display and native renderer settings](issues/13-display-and-renderer-settings.md): claimed after ticket 11.
+- Tickets [15](issues/15-keyboard-and-mouse-controls.md), [16](issues/16-controller-setup-and-mapping.md), and [17](issues/17-profiles-files-and-logs.md): ready after ticket 11.
 - [18: Setup reminders and Steam shortcuts](issues/18-reminders-and-steam-shortcuts.md): ready after ticket 06. Tickets 07 and 08 still require ticket 04.
 - Other tickets 05 through 23: waiting for their declared blockers.
 
