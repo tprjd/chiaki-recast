@@ -1,0 +1,339 @@
+diff --git a/gui/include/qmlbackend.h b/gui/include/qmlbackend.h
+index c8db3933..c1f7bc0e 100644
+--- a/gui/include/qmlbackend.h
++++ b/gui/include/qmlbackend.h
+@@ -90,6 +90,7 @@ class QmlBackend : public QObject
+     Q_PROPERTY(QVariantMap connectionAttempt READ connectionAttempt NOTIFY connectionAttemptChanged)
+     Q_PROPERTY(QVariantMap sessionPinRequest READ sessionPinRequest NOTIFY sessionPinRequestChanged)
+     Q_PROPERTY(QVariantMap psnAuthAttempt READ psnAuthAttempt NOTIFY psnAuthAttemptChanged)
++    Q_PROPERTY(QVariantMap psnRefresh READ psnRefresh NOTIFY psnRefreshChanged)
+     Q_PROPERTY(QList<QmlController*> controllers READ qmlControllers NOTIFY controllersChanged)
+     Q_PROPERTY(bool discoveryEnabled READ discoveryEnabled WRITE setDiscoveryEnabled NOTIFY discoveryEnabledChanged)
+     Q_PROPERTY(QVariantList hosts READ hosts NOTIFY hostsChanged)
+@@ -213,6 +214,7 @@ public:
+     Q_INVOKABLE QUrl psnLoginUrl() const;
+     Q_INVOKABLE bool checkPsnRedirectURL(const QUrl &url) const;
+     QVariantMap psnAuthAttempt() const { return psn_auth_attempt; }
++    QVariantMap psnRefresh() const { return psn_refresh; }
+     Q_INVOKABLE QString startPsnAuth(const QUrl &url);
+     Q_INVOKABLE void stopAutoConnect();
+     Q_INVOKABLE bool setConsolePin(int index, QString console_pin);
+@@ -260,6 +262,7 @@ signals:
+     void hostsChanged();
+     void hiddenHostsChanged();
+     void psnTokenChanged();
++    void psnRefreshChanged();
+     void psnAuthAttemptChanged();
+     void psnCredsExpired();
+     void autoConnectChanged();
+@@ -370,6 +373,8 @@ private:
+     bool controller_mapping_altered = false;
+     bool updating_psn_hosts = false;
+     bool psn_hosts_refresh_pending = false;
++    QVariantMap psn_refresh;
++    QPointer<PSNToken> refresh_token;
+     PsnRequests psn_requests;
+     QFutureWatcher<void> psn_hosts_watcher;
+     QFuture<void> psn_hosts_future;
+diff --git a/gui/include/setupbridge.h b/gui/include/setupbridge.h
+index e07b8b93..1bd37b25 100644
+--- a/gui/include/setupbridge.h
++++ b/gui/include/setupbridge.h
+@@ -16,6 +16,7 @@ public:
+     Q_INVOKABLE QVariantMap setDiscoveryEnabled(bool enabled);
+     Q_INVOKABLE QVariantMap selectConsole(const QString &key);
+     Q_INVOKABLE QVariantMap connectConsole(const QString &key);
++    Q_INVOKABLE QVariantMap refreshPsnConsoles(const QString &profile);
+     void setSuspended(bool suspended);
+     void reportStreamError(const QString &title, const QString &text);
+     Q_INVOKABLE QVariantMap dismissStreamError(const QString &id);
+diff --git a/gui/src/qmlbackend.cpp b/gui/src/qmlbackend.cpp
+index 90a44de5..3700cd9b 100644
+--- a/gui/src/qmlbackend.cpp
++++ b/gui/src/qmlbackend.cpp
+@@ -539,6 +539,8 @@ void QmlBackend::profileChanged()
+     // Stop replies before the old profile's Settings object can be removed.
+     for (auto *token : findChildren<PSNToken *>())
+         delete token;
++    psn_refresh.clear();
++    emit psnRefreshChanged();
+     psn_hosts.clear();
+     psn_nickname_hosts.clear();
+     waking_sleeping_nicknames.clear();
+@@ -3039,10 +3041,17 @@ QString QmlBackend::startPsnAuth(const QUrl &url)
+ 
+ void QmlBackend::refreshAuth()
+ {
++    if (refresh_token) return;
+     const auto generation = profile_generation;
+     PSNToken *psnToken = new PSNToken(settings, this, psn_requests.networkManager);
+-    connect(psnToken, &PSNToken::PSNTokenError, this, [this](const QString &error) {
++    refresh_token = psnToken;
++    psn_refresh = {{"phase", "refreshing"}};
++    emit psnRefreshChanged();
++    connect(psnToken, &PSNToken::PSNTokenError, this, [this, generation](const QString &error) {
++        if (generation != profile_generation) return;
+         qCWarning(chiakiGui) << "Could not refresh token. Automatic PSN Connection Unavailable!" << error;
++        psn_refresh = {{"phase", "failure"}, {"message", error}};
++        emit psnRefreshChanged();
+     });
+     connect(psnToken, &PSNToken::UnauthorizedError, this, [this, generation] { if (generation == profile_generation) emit psnCredsExpired(); });
+     connect(psnToken, &PSNToken::PSNTokenSuccess, this, []() {
+@@ -3054,12 +3063,15 @@ void QmlBackend::refreshAuth()
+         if (generation == profile_generation) updatePsnHosts();
+     });
+     connect(psnToken, &PSNToken::Finished, psnToken, &QObject::deleteLater);
++    connect(psnToken, &PSNToken::Finished, this, [this, psnToken] { if (refresh_token == psnToken) refresh_token.clear(); });
+     QString refresh_token = settings->GetPsnRefreshToken();
+     psnToken->RefreshPsnToken(std::move(refresh_token));
+ }
+ 
+ void QmlBackend::updatePsnHosts()
+ {
++    psn_refresh = {{"phase", "listing"}};
++    emit psnRefreshChanged();
+     if(updating_psn_hosts)
+     {
+         psn_hosts_refresh_pending = true;
+@@ -3085,9 +3097,11 @@ void QmlBackend::updatePsnHostsThread(QString psn_token, uint32_t log_mask, QStr
+     size_t num_devices_ps5 = 0;
+     ChiakiLog backend_log;
+     chiaki_log_init(&backend_log, log_mask, chiaki_log_cb_print, nullptr);
++    ChiakiErrorCode result = CHIAKI_ERR_UNKNOWN;
+     for(int i = 0; i < PSN_DEVICES_TRIES; i++)
+     {
+         ChiakiErrorCode err = psn_requests.listDevices(psn_token.toUtf8().constData(), CHIAKI_HOLEPUNCH_CONSOLE_TYPE_PS5, &device_info_ps5, &num_devices_ps5, &backend_log);
++        result = err;
+         if (err != CHIAKI_ERR_SUCCESS)
+         {
+             if(PSN_DEVICES_TRIES - i > 1)
+@@ -3129,11 +3143,18 @@ void QmlBackend::updatePsnHostsThread(QString psn_token, uint32_t log_mask, QStr
+     if(!found_hosts.contains(duid) && (ps4_count > 0))
+         found_hosts.insert(duid, psn_host);
+ 
+-    QMetaObject::invokeMethod(this, [this, generation, found_hosts, found_nicknames] {
++    QMetaObject::invokeMethod(this, [this, generation, found_hosts, found_nicknames, result] {
+         if (generation != profile_generation) return;
++        if (result != CHIAKI_ERR_SUCCESS) {
++            psn_refresh = {{"phase", "failure"}, {"message", tr("Could not refresh remote consoles. Check your connection and try again.")}};
++            emit psnRefreshChanged();
++            return;
++        }
+         psn_hosts = found_hosts;
+         psn_nickname_hosts = found_nicknames;
++        psn_refresh = {{"phase", "success"}, {"message", tr("Remote consoles updated")}};
+         emit hostsChanged();
++        if (generation == profile_generation) emit psnRefreshChanged();
+     }, Qt::QueuedConnection);
+     qCInfo(chiakiGui) << "Updated PSN hosts";
+     if(device_info_ps5)
+@@ -3142,10 +3163,14 @@ void QmlBackend::updatePsnHostsThread(QString psn_token, uint32_t log_mask, QStr
+ 
+ void QmlBackend::refreshPsnToken()
+ {
++    if (refresh_token || updating_psn_hosts) return;
+     QString expiry_s = settings->GetPsnAuthTokenExpiry();
+     QString refresh = settings->GetPsnRefreshToken();
+-    if(expiry_s.isEmpty() || refresh.isEmpty())
++    if(expiry_s.isEmpty() || refresh.isEmpty()) {
++        psn_refresh = {{"phase", "failure"}, {"message", tr("Sign in to PSN before refreshing remote consoles.")}};
++        emit psnRefreshChanged();
+         return;
++    }
+     QDateTime expiry = QDateTime::fromString(expiry_s, settings->GetTimeFormat());
+     // give 1 minute buffer
+     QDateTime now = QDateTime::currentDateTime().addSecs(60);
+diff --git a/gui/src/setupbridge.cpp b/gui/src/setupbridge.cpp
+index a9b578d8..48abd2b8 100644
+--- a/gui/src/setupbridge.cpp
++++ b/gui/src/setupbridge.cpp
+@@ -20,6 +20,7 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
+     connect(backend->qmlSettings(), &QmlSettings::streamerModeChanged, this, &SetupBridge::refresh);
+     connect(backend->qmlSettings(), &QmlSettings::currentProfileChanged, this, &SetupBridge::refresh);
+     connect(backend, &QmlBackend::psnAuthAttemptChanged, this, &SetupBridge::refresh);
++    connect(backend, &QmlBackend::psnRefreshChanged, this, &SetupBridge::refresh);
+     connect(backend, &QmlBackend::psnTokenChanged, this, [this] { credentialsRejected = false; refresh(); });
+     connect(backend, &QmlBackend::psnCredsExpired, this, [this] { credentialsRejected = true; refresh(); });
+     connect(backend->qmlSettings(), &QmlSettings::psnAuthTokenChanged, this, &SetupBridge::refresh);
+@@ -170,7 +171,8 @@ void SetupBridge::refresh()
+         QT_TR_NOOP("Open embedded sign-in"), QT_TR_NOOP("Use external browser"), QT_TR_NOOP("Copy sign-in link"),
+         QT_TR_NOOP("After sign-in in an external browser, copy the complete final URL from its address bar. Paste the full URL, including its authorization code, below."),
+         QT_TR_NOOP("Sign-in redirect URL"), QT_TR_NOOP("Retry"), QT_TR_NOOP("Complete sign-in"), QT_TR_NOOP("Close"),
+-        QT_TR_NOOP("Use the same PlayStation account as your console. The Sony sign-in page and your external browser can show account details.")};
++        QT_TR_NOOP("Use the same PlayStation account as your console. The Sony sign-in page and your external browser can show account details."),
++        QT_TR_NOOP("Refresh remote consoles"), QT_TR_NOOP("Refreshing PSN credentials"), QT_TR_NOOP("Finding remote consoles")};
+     for (const auto *text : texts) strings.insert(QString::fromUtf8(text), tr(text));
+     const auto *native = backend->nativeSettings();
+     const bool configured = !native->GetPsnAuthToken().isEmpty() && !native->GetPsnRefreshToken().isEmpty()
+@@ -181,6 +183,7 @@ void SetupBridge::refresh()
+     accountExpiry.stop();
+     if (configured && !expired) accountExpiry.start(int(qMin<qint64>(remaining, std::numeric_limits<int>::max())));
+     QVariantMap psn{{"status", configured ? (expired ? "expired" : "ready") : "signedOut"}};
++    psn.insert("refresh", backend->psnRefresh());
+     const auto attempt = backend->psnAuthAttempt();
+     // Keep the bridge allowlist explicit: the native attempt also contains an Account ID.
+     for (const auto &field : {"id", "phase", "message", "profileValid"})
+@@ -449,13 +452,22 @@ QVariantMap SetupBridge::connectConsole(const QString &key)
+     if (!resolveConsole(key, index, nickname))
+         return {{"accepted", false}, {"message", tr("Console unavailable")}};
+     const auto host = backend->hosts().at(index).toMap();
+-    if (!host.value("registered").toBool() || !host.value("discovered").toBool() || host.value("state") != "ready")
+-        return {{"accepted", false}, {"message", tr("Select an online registered local console")}};
++    if (!host.value("registered").toBool() || (host.value("duid").toString().isEmpty()
++            && (!host.value("discovered").toBool() || host.value("state") != "ready")))
++        return {{"accepted", false}, {"message", tr("Select an online registered local console or a remote console")}};
+     selectedKey = key;
+     backend->connectToHost(index, nickname);
+     return {{"accepted", true}};
+ }
+ 
++QVariantMap SetupBridge::refreshPsnConsoles(const QString &profile)
++{
++    const auto phase = backend->psnRefresh().value("phase").toString();
++    if (!currentProfile(profile) || phase == "refreshing" || phase == "listing") return {{"accepted", false}};
++    backend->refreshPsnToken();
++    return {{"accepted", true}};
++}
++
+ QVariantMap SetupBridge::refreshAudioDevices()
+ {
+     backend->qmlSettings()->refreshAudioDevices();
+diff --git a/gui/tests/embeddedsetup.cpp b/gui/tests/embeddedsetup.cpp
+index 4c649ac5..96e022a7 100644
+--- a/gui/tests/embeddedsetup.cpp
++++ b/gui/tests/embeddedsetup.cpp
+@@ -81,6 +81,7 @@ static bool inputDesktopAvailable()
+ #include "applicationcontroller.h"
+ #include <QTcpServer>
+ #include <atomic>
++#include <QSemaphore>
+ #ifdef Q_OS_WIN
+ #include <stdlib.h>
+ #endif
+@@ -271,6 +272,60 @@ class EmbeddedSetupTest : public QObject
+     }
+ 
+ private slots:
++    void psnRemoteRefresh()
++    {
++        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
++        const auto removeSettings = qScopeGuard([&] {
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
++            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
++        });
++        Settings settings(profile);
++        settings.SetDiscoveryEnabled(false);
++        settings.SetRemotePlayAsk(false);
++        settings.SetAddSteamShortcutAsk(false);
++        settings.SetPsnAuthToken("refresh-access-secret");
++        settings.SetPsnRefreshToken("refresh-secret");
++        settings.SetPsnAccountId("AQAAAAAAAAA=");
++        settings.SetPsnAuthTokenExpiry(QDateTime::currentDateTime().addSecs(-60).toString(settings.GetTimeFormat()));
++        ChiakiRegisteredHost registered = {};
++        registered.target = CHIAKI_TARGET_PS5_1;
++        memcpy(registered.server_mac, "\x00\x11\x22\x33\x44\x55", 6);
++        strcpy(registered.server_nickname, "Remote office");
++        settings.AddRegisteredHost(RegisteredHost(registered));
++        QList<QPointer<PsnReply>> requests;
++        PsnRequests transport;
++        transport.networkManager = [&requests](QObject *parent) { return new PsnNetwork(requests, parent); };
++        transport.listDevices = [](const char *, ChiakiHolepunchConsoleType, ChiakiHolepunchDeviceInfo **devices, size_t *count, ChiakiLog *) {
++            *devices = static_cast<ChiakiHolepunchDeviceInfo *>(calloc(1, sizeof(ChiakiHolepunchDeviceInfo)));
++            *count = 1;
++            strcpy((*devices)[0].device_name, "Remote office");
++            memset((*devices)[0].device_uid, 0x12, sizeof((*devices)[0].device_uid));
++            (*devices)[0].remoteplay_enabled = true;
++            return CHIAKI_ERR_SUCCESS;
++        };
++        QmlNativeServices services(&settings, transport);
++        auto *backend = services.backend();
++        backend->stopAutoConnect();
++        SetupWindow setup(backend);
++        setup.show();
++        QTRY_COMPARE(requests.size(), 1);
++        QTRY_VERIFY(script(setup.view(), "document.querySelector('[data-psn-refresh]') !== null").toBool());
++        QVERIFY(script(setup.view(), "document.querySelector('[data-psn-refresh]').disabled").toBool());
++        requests[0]->finish({}, QNetworkReply::AuthenticationRequiredError);
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]').textContent").toString(), QStringLiteral("PSN credentials expired. Sign in again."));
++        QTRY_VERIFY(!script(setup.view(), "document.querySelector('[data-psn-refresh]').disabled").toBool());
++        script(setup.view(), "document.querySelector('[data-psn-refresh]').click();document.querySelector('[data-psn-refresh]').click()");
++        QTRY_COMPARE(requests.size(), 2);
++        requests[1]->finish(R"({"access_token":"renewed-access-secret","refresh_token":"renewed-refresh-secret","expires_in":3600})");
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('.console-card .console-name')?.textContent").toString(), QStringLiteral("Remote office"));
++        QTRY_COMPARE(script(setup.view(), "document.querySelector('[data-psn-refresh-status]').textContent").toString(), QStringLiteral("Remote consoles updated"));
++        QTRY_VERIFY(!script(setup.view(), "document.querySelector('.connect-console').disabled").toBool());
++        const auto snapshot = QJsonDocument::fromVariant(setup.bridge()->snapshot()).toJson();
++        QVERIFY(!snapshot.contains("access-secret"));
++        QVERIFY(!snapshot.contains("refresh-secret"));
++        QVERIFY(!snapshot.contains("12121212"));
++    }
++
+     void keyboardMouseSettings()
+     {
+         const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+diff --git a/gui/web/src/App.svelte b/gui/web/src/App.svelte
+index 44c945b6..ce036ea1 100644
+--- a/gui/web/src/App.svelte
++++ b/gui/web/src/App.svelte
+@@ -101,6 +101,10 @@
+       disabled={!connection || changingDiscovery || !current?.capabilities.discovery} onclick={discovery}>
+       {t('Discovery')}<span>{t(current?.discoveryEnabled ? 'Discovery is on' : 'Discovery is off')}</span>
+     </button>
++    <button data-psn-refresh disabled={!connection || !current || ['refreshing', 'listing'].includes(current.psn.refresh.phase ?? '')}
++      onclick={() => current && connection?.refreshPsnConsoles(current.profileGeneration)}>{t('Refresh remote consoles')}</button>
++    <span role="status" data-psn-refresh-status>{current?.psn.refresh.phase === 'refreshing' ? t('Refreshing PSN credentials')
++      : current?.psn.refresh.phase === 'listing' ? t('Finding remote consoles') : current?.psn.refresh.message ?? ''}</span>
+     <span role="status" class="message">{message || (!current ? t('Loading consoles') : '')}</span>
+   </div>
+   <ConnectAction {current} {connection} />
+diff --git a/gui/web/src/ConnectAction.svelte b/gui/web/src/ConnectAction.svelte
+index dcfeddb3..c6c00e12 100644
+--- a/gui/web/src/ConnectAction.svelte
++++ b/gui/web/src/ConnectAction.svelte
+@@ -24,7 +24,7 @@
+ {/if}
+ <div class="connect-action">
+   <button class="connect-console" disabled={!connection || pending || current?.connectionBusy || !selected?.available
+-    || !selected.registered || selected.route !== 'local' || selected.state !== 'ready'} onclick={connect}>{t('Connect')}</button>
++    || !selected.registered || (selected.route !== 'psn' && (selected.route !== 'local' || selected.state !== 'ready'))} onclick={connect}>{t('Connect')}</button>
+   <span role="status">{message}</span>
+ </div>
+ 
+diff --git a/gui/web/src/bridge.ts b/gui/web/src/bridge.ts
+index 0cf55f81..8ca26538 100644
+--- a/gui/web/src/bridge.ts
++++ b/gui/web/src/bridge.ts
+@@ -18,7 +18,8 @@ export interface State {
+   rendererSettings: Record<string, boolean | number>;
+   rendererStatus: { restartRequired: boolean; runtimeBackend?: number };
+   capabilities: { discovery: boolean }; strings: Record<string, string>;
+-  psn: { status: 'signedOut' | 'ready' | 'expired'; id?: string; phase?: string; message?: string; profileValid?: boolean };
++  psn: { status: 'signedOut' | 'ready' | 'expired'; id?: string; phase?: string; message?: string; profileValid?: boolean;
++    refresh: { phase?: string; message?: string } };
+ }
+ interface Reply { accepted: boolean; message?: string; form?: string }
+ interface NativeBridge {
+@@ -28,6 +29,7 @@ interface NativeBridge {
+   setDiscoveryEnabled(value: boolean, callback: (reply: Reply) => void): void;
+   selectConsole(key: string, callback: (reply: Reply) => void): void;
+   connectConsole(key: string, callback: (reply: Reply) => void): void;
++  refreshPsnConsoles(profile: string, callback: (reply: Reply) => void): void;
+   dismissStreamError(id: string, callback: (reply: Reply) => void): void;
+   openPsnSignIn(profile: string, callback: (reply: Reply) => void): void;
+   openPsnExternal(profile: string, callback: (reply: Reply) => void): void;
+@@ -55,6 +57,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
+   discovery(enabled: boolean): Promise<Reply>;
+   select(key: string): Promise<Reply>;
+   connect(key: string): Promise<Reply>;
++  refreshPsnConsoles(profile: string): Promise<Reply>;
+   dismissStreamError(id: string): Promise<Reply>;
+   psnEmbedded(profile: string): Promise<Reply>;
+   psnExternal(profile: string): Promise<Reply>;
+@@ -107,6 +110,7 @@ export function connectSetup(receive: (state: State) => void): Promise<{
+         discovery: value => new Promise(done => setup.setDiscoveryEnabled(value, done)),
+         select: key => new Promise(done => setup.selectConsole(key, done)),
+         connect: key => new Promise(done => setup.connectConsole(key, done)),
++        refreshPsnConsoles: profile => new Promise(done => setup.refreshPsnConsoles(profile, done)),
+         dismissStreamError: id => new Promise(done => setup.dismissStreamError(id, done)),
+         psnEmbedded: profile => new Promise(done => setup.openPsnSignIn(profile, done)),
+         psnExternal: profile => new Promise(done => setup.openPsnExternal(profile, done)),
