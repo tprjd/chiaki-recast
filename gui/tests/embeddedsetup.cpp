@@ -1662,6 +1662,9 @@ private slots:
         QVERIFY(!settingRequest(setup.view(), "rendererBackend", 2, generation, "setRendererSetting").value("accepted").toBool());
         QVERIFY(!settingRequest(setup.view(), "rendererBackend", runtimeBackend, generation + "-old", "setRendererSetting").value("accepted").toBool());
         QCOMPARE(launches, previous);
+        script(setup.view(), "[...document.querySelectorAll('.settings-content button')].find(e=>e.textContent==='Restart application').click()");
+        QTRY_COMPARE(launches, previous + 1);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-message')?.textContent.includes('could not restart')").toBool());
     }
 
     void rendererLayout()
