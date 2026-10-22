@@ -19,9 +19,7 @@
     <file>StreamActionNotice.qml</file>
     <file>ConfirmDialog.qml</file>
     <file>RendererFallbackDialog.qml</file>
-    <file>RemindDialog.qml</file>
     <file>DialogView.qml</file>
-    <file>SteamShortcutDialog.qml</file>
     <file>SettingsDialog.qml</file>
     <file>KeyboardMousePage.qml</file>
     <file>KeyboardMouseSettingsDialog.qml</file>
