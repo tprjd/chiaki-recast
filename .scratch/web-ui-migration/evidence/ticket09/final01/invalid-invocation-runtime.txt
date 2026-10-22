@@ -1,0 +1,5 @@
+Unknown test function: 'registrationResults'.
+
+C:\Users\david\.cache\chiaki-msvc-native\ticket09-build\gui\tests\chiaki-embedded-setup-tests.exe -functions
+lists all available test functions.
+
