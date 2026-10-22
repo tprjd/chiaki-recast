@@ -51,3 +51,19 @@ No new setup-only callback adapter was added. The Color mapping entry is ready
 for ticket 14. Live playback, GPU, physical displays, successful OS relaunch,
 platform, and package acceptance remain unverified. Production presets and
 the known HighQuality acceptance limit are unchanged.
+
+Integration merge `7e29e313` contains worker commit `fe0cfb0f` without conflicts.
+The merged tree matches the worker tree. GUI source matches compiled restart
+source `5a83520f`. All 20 final recorded source and executable hashes match.
+The merger independently checked the eight bounded function comparisons and
+their hashes, read the actual case logs, and inspected all four layout captures.
+The four merged capture hashes match the worker copies. The earlier file-only
+executable digest remains null. The layout images retain their earlier layout
+artifact identity, separate from the final restart executable identity.
+
+Passing checks were reused without builds or test reruns. The controlled restart
+case passes 4/0 and did not start a process. Successful OS relaunch and application
+quit remain untested. Ticket 04 lifetime, ticket 06 account, and ticket 12 media
+controls remain. Claims for 05, 15, and pairing preparation remain unchanged.
+Source-only whitespace checks pass. Physical display, GPU, live playback,
+platform, package, and HighQuality acceptance remain open.
