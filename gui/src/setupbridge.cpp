@@ -21,6 +21,7 @@ SetupBridge::SetupBridge(QmlBackend *backend, QObject *parent)
     connect(backend->qmlSettings(), &QmlSettings::registeredHostsChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::discoveryEnabledChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::connectionAttemptChanged, this, &SetupBridge::refresh);
+    connect(backend->qmlSettings(), &QmlSettings::autoConnectMacChanged, this, &SetupBridge::refresh);
     connect(backend, &QmlBackend::windowChanged, this, [this] {
         if (this->backend->qmlWindow()) invalidateControllerMapping();
         refresh();
@@ -194,6 +195,7 @@ void SetupBridge::refresh()
     }
     QHash<QString, QString> currentKeys;
     QVariantList consoles, registrations, hiddenConsoles;
+    QString autoConnectKey;
     const auto opaqueKey = [&](const QString &id) {
         auto key = keys.value(id);
         if (key.isEmpty()) key = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -215,7 +217,9 @@ void SetupBridge::refresh()
     for (const auto &registration : backend->qmlSettings()->registeredHosts()) {
         const auto host = registration.toMap();
         const auto mac = host.value("mac").toString();
-        registrations.append(QVariantMap{{"key", opaqueKey("registration:" + mac)},
+        const auto key = opaqueKey("registration:" + mac);
+        if (mac == backend->qmlSettings()->autoConnectMac()) autoConnectKey = key;
+        registrations.append(QVariantMap{{"key", key},
             {"name", safeName(host.value("name").toString(), {}, mac)},
             {"ps5", host.value("ps5")}, {"identifier", privateMode ? tr("hidden") : mac}});
     }
@@ -387,6 +391,10 @@ void SetupBridge::refresh()
         QT_TR_NOOP("Use the same PlayStation account as your console. The Sony sign-in page and your external browser can show account details."),
         QT_TR_NOOP("Refresh remote consoles"), QT_TR_NOOP("Refreshing PSN credentials"), QT_TR_NOOP("Finding remote consoles"),
         QT_TR_NOOP("Connecting through PSN"), QT_TR_NOOP("Connection cancelled"), QT_TR_NOOP("Waiting for connection cleanup"),
+        QT_TR_NOOP("Could not start Remote Play"), QT_TR_NOOP("Cancel"), QT_TR_NOOP("Back to consoles"),
+        QT_TR_NOOP("Auto-connect at startup"), QT_TR_NOOP("Off"), QT_TR_NOOP("Wake console"), QT_TR_NOOP("Wake and connect"),
+        QT_TR_NOOP("Waiting for the console to wake"), QT_TR_NOOP("Console is awake"), QT_TR_NOOP("Connecting to console"),
+        QT_TR_NOOP("Auto-connect"), QT_TR_NOOP("Waiting for the selected console"), QT_TR_NOOP("Stop auto-connect"),
         QT_TR_NOOP("Automatic registration"), QT_TR_NOOP("Registering through PSN"), QT_TR_NOOP("Console registered"),
         QT_TR_NOOP("Waiting for internet"), QT_TR_NOOP("Starting PSN connection"), QT_TR_NOOP("Registering console"),
         QT_TR_NOOP("Automatic registration requires your main PS4 console registered to your PSN account."),
@@ -694,8 +702,8 @@ void SetupBridge::refresh()
     }
     const auto nativeAttempt = backend->connectionAttempt();
     QVariantMap connection;
-    if (nativeAttempt.value("route") == "psn" && (!backend->qmlWindow() || nativeAttempt.value("registrationOnly").toBool()) && nativeAttempt.value("presented").toBool()) {
-        for (const auto &field : {"id", "phase", "cancelable", "cleanupPending", "targetValid", "registrationOnly"})
+    if ((!backend->qmlWindow() || nativeAttempt.value("registrationOnly").toBool()) && nativeAttempt.value("presented").toBool()) {
+        for (const auto &field : {"id", "phase", "route", "context", "waitingForWake", "cancelable", "cleanupPending", "targetValid", "registrationOnly"})
             connection.insert(field, nativeAttempt.value(field));
         if (nativeAttempt.value("registrationOnly").toBool() && backend->qmlWindow()) connection["cleanupPending"] = true;
         connection.insert("errorTitle", privateMode ? tr("Could not start Remote Play") : nativeAttempt.value("errorTitle"));
@@ -703,9 +711,9 @@ void SetupBridge::refresh()
     }
     const auto phase = nativeAttempt.value("phase").toString();
     const bool pending = nativeAttempt.value("presented").toBool() && !phase.isEmpty()
-        && phase != "failure" && phase != "cancelled" && phase != "registered";
+        && phase != "failure" && phase != "cancelled" && phase != "registered" && phase != "woken";
     state = {{"revision", QString::number(++revision)}, {"profileGeneration", QString::number(generation)},
-        {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
+        {"controllerSetup", controllerSetup}, {"registrations", registrations}, {"autoConnectKey", autoConnectKey}, {"hiddenConsoles", hiddenConsoles}, {"consoles", consoles}, {"selectedKey", selectedKey}, {"discoveryEnabled", backend->discoveryEnabled()},
         {"streamerMode", privateMode}, {"registration", registration}, {"accountLookup", lookup}, {"connectionBusy", backend->registrationBusy() || backend->qmlWindow() != nullptr || backend->qmlSession() != nullptr
             || nativeAttempt.value("cleanupPending").toBool() || pending}, {"connection", connection}, {"streamError", streamError}, {"psn", psn}, {"mediaSettings", media}, {"mediaChoices", choices}, {"generalSettings", general}, {"rendererSettings", renderer}, {"rendererStatus", rendererStatus}, {"keyboardMouse", keyboardMouse}, {"capabilities", QVariantMap{{"discovery", true}}}, {"strings", strings}};
     if (!suspended) emit stateChanged(state);
@@ -856,11 +864,43 @@ QVariantMap SetupBridge::connectConsole(const QString &key)
         return {{"accepted", false}, {"message", tr("Console unavailable")}};
     const auto host = backend->hosts().at(index).toMap();
     if (!host.value("registered").toBool() || (!host.value("discovered").toBool() && !host.value("manual").toBool() && host.value("duid").toString().isEmpty())
-            || (host.value("discovered").toBool() && host.value("state") != "ready"))
+            || (host.value("discovered").toBool() && host.value("state") != "ready" && host.value("state") != "standby"))
         return {{"accepted", false}, {"message", tr("Select an online registered console, a registered manual address, or a remote console")}};
     selectedKey = key;
     backend->connectToHost(index, nickname);
     return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::wakeConsole(const QString &key)
+{
+    int index;
+    QString nickname;
+    if (state.value("connectionBusy").toBool() || !resolveConsole(key, index, nickname)) return {{"accepted", false}};
+    return {{"accepted", backend->wakeUpHost(index, nickname)}};
+}
+
+QVariantMap SetupBridge::setAutoConnectTarget(const QString &key, const QString &profile)
+{
+    if (!currentProfile(profile) || state.value("connectionBusy").toBool()) return {{"accepted", false}};
+    QString mac;
+    if (!key.isEmpty()) {
+        const auto id = keys.key(key);
+        int matches = 0;
+        for (const auto &host : backend->nativeSettings()->GetRegisteredHosts())
+            if (id == "registration:" + host.GetServerMAC().ToString()
+                    && !backend->nativeSettings()->GetHiddenHostHidden(host.GetServerMAC())) {
+                mac = host.GetServerMAC().ToString();
+                ++matches;
+            }
+        if (matches != 1) return {{"accepted", false}, {"message", tr("Console unavailable")}};
+    }
+    backend->qmlSettings()->setAutoConnectMac(mac);
+    return {{"accepted", true}};
+}
+
+QVariantMap SetupBridge::stopAutoConnect(const QString &attempt)
+{
+    return {{"accepted", !attempt.isEmpty() && backend->stopAutoConnect(attempt)}};
 }
 
 QVariantMap SetupBridge::autoRegisterConsole(const QString &key, const QString &profile)
