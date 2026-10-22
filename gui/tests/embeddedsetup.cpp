@@ -879,6 +879,73 @@ private slots:
             QTest::newRow(mode) << QString::fromLatin1(mode);
     }
 
+    void setupFileLifetime_data()
+    {
+        QTest::addColumn<bool>("native");
+        QTest::newRow("web") << false;
+        QTest::newRow("native") << true;
+    }
+
+    void setupFileLifetime()
+    {
+        QFETCH(bool, native);
+        const QString profile = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const auto cleanup = qScopeGuard([&] {
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName() + "-" + profile).clear();
+            QSettings(QCoreApplication::organizationName(), QCoreApplication::applicationName()).clear();
+        });
+        Settings settings(profile);
+        settings.SetDiscoveryEnabled(false);
+        settings.SetRemotePlayAsk(false);
+        settings.SetAddSteamShortcutAsk(false);
+        QList<QPointer<PsnReply>> requests;
+        RegistrationTransport registration;
+        QmlNativeServices services(&settings, controlledPsn(requests), {}, registration.boundary(), controlledDiscovery());
+        services.backend()->stopAutoConnect();
+        SetupWindow setup(services.backend());
+        setup.resize(1280, 720);
+        setup.show();
+        QVERIFY(click(setup.view(), ".open-settings"));
+        QTemporaryDir files;
+        QVERIFY(files.isValid());
+        const auto output = files.filePath("retired.ini");
+        QWidget nativeWindow;
+        QPushButton nativeFocus("Native file action", &nativeWindow);
+        if (native) {
+            nativeWindow.show();
+            QApplication::setActiveWindow(&nativeWindow);
+            nativeFocus.setFocus();
+        } else setup.view()->setFocus();
+        QPointer<QFileDialog> dialog;
+        QTimer choose;
+        choose.setInterval(10);
+        connect(&choose, &QTimer::timeout, &choose, [&] {
+            auto *picker = qobject_cast<QFileDialog *>(QApplication::activeModalWidget());
+            if (!picker) return;
+            dialog = picker;
+            choose.stop();
+            picker->selectFile(output);
+            connect(setup.view()->page(), &QWebEnginePage::loadStarted, picker, [picker] {
+                QMetaObject::invokeMethod(picker, "accept", Qt::QueuedConnection);
+            });
+            setup.view()->reload();
+        });
+        choose.start();
+        if (native) {
+            const auto reply = services.backend()->qmlSettings()->exportPlaceboSettings();
+            QVERIFY(reply.value("accepted").toBool());
+        } else {
+            const auto generation = setup.bridge()->snapshot().value("profileGeneration").toString();
+            const auto reply = setup.bridge()->rendererAction("exportPlaceboSettings", generation);
+            QVERIFY(!reply.value("accepted").toBool());
+        }
+        QVERIFY(!choose.isActive());
+        QCOMPARE(QFile::exists(output), native);
+        QTRY_VERIFY(!dialog);
+        QTRY_VERIFY(script(setup.view(), "document.querySelector('.settings-search input') !== null").toBool());
+        QVERIFY(requests.isEmpty());
+    }
+
     void setupResourceUse()
     {
 #ifndef Q_OS_WIN
