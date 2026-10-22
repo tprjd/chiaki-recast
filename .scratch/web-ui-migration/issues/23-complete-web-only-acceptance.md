@@ -116,3 +116,14 @@ This resolves the requested source and visual milestone under the user's
 priority update. The remaining native, package, platform, hardware,
 HighQuality, and performance acceptance is user-skipped and remains
 unverified. The unchecked historical criteria above do not claim passes.
+
+### Final review follow-up
+
+The separate Standards review found zero violations. The Spec review found
+three defects. The merged fixes restore controller access to actions, reopen
+busy registration progress, and remove unsupported management actions. An
+additional fix keeps required Widgets profile hints outside the optional Quick
+guard. See [final review integration](../evidence/final-review/integration.md)
+for the separate reports, fix evidence, source identities, and cleanup status.
+The source and visual milestone remains resolved. All user-skipped acceptance
+and historical unchecked criteria remain unverified.

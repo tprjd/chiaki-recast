@@ -133,3 +133,5 @@ Keep the minimum design width at 1024 CSS pixels. Build only what is needed to
 preview UI changes, and use short visual reviews instead of validation matrices.
 
 - [23: Prototype fidelity](issues/23-complete-web-only-acceptance.md): resolved for the requested UI milestone. The selected library, Settings, and guided setup layouts are implemented. Frontend check/build and the short layout review are recorded in [verification](evidence/ticket23/verification.md). Remaining build qualification and performance tests are user-skipped and unverified.
+
+- [Final review follow-up](evidence/final-review/integration.md): Standards found zero violations. The three Spec findings are resolved, with an additional Widgets guard fix. Separate reports, bounded fix evidence, and worktree cleanup status are retained. Ticket 23 remains a resolved source and visual milestone. User-skipped qualification and unchecked criteria remain unverified.
